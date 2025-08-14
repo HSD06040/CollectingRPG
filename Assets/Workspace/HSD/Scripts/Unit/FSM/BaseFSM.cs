@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class BaseFSM<T> : MonoBehaviour where T : UnitBase
 {
-    public T Owner;
-    private StateMachine<T> _stateMachine;
+    public T Owner;    
 
     #region animHash
     private static readonly int _idleHash = Animator.StringToHash("Idle");
@@ -14,6 +13,8 @@ public class BaseFSM<T> : MonoBehaviour where T : UnitBase
     #endregion
 
     #region State
+    public StateMachine<T> StateMachine { get; private set; }
+
     public IdleState<T> IdleState {  get; private set; }
     public AttackState<T> AttackState { get; private set; }
     public SkillState<T> SkillState { get; private set; }
@@ -23,7 +24,7 @@ public class BaseFSM<T> : MonoBehaviour where T : UnitBase
     {
         Owner = owner;
 
-        _stateMachine = new StateMachine<T>();
+        StateMachine = new StateMachine<T>();
 
         IdleState = new IdleState<T>(this, _idleHash);
         AttackState = new AttackState<T>(this, _attackHash);

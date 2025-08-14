@@ -48,6 +48,8 @@ public class AttackState<T> : BaseState<T> where T : UnitBase
 
 public class SkillState<T> : BaseState<T> where T : UnitBase
 {
+    AnimatorStateInfo stateInfo;
+
     public SkillState(BaseFSM<T> fsm, int animHash) : base(fsm, animHash)
     {
     }
@@ -55,6 +57,7 @@ public class SkillState<T> : BaseState<T> where T : UnitBase
     public override void Enter()
     {
         base.Enter();
+        stateInfo = _anim.GetCurrentAnimatorStateInfo(0);
     }
 
     public override void Exit()
@@ -65,5 +68,10 @@ public class SkillState<T> : BaseState<T> where T : UnitBase
     public override void Update()
     {
         base.Update();
+
+        if (stateInfo.normalizedTime >= 1f && !stateInfo.loop)
+        {
+            _stateMachine.ChangeState(_fsm.IdleState);
+        }
     }
 }
