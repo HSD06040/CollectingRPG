@@ -4,5 +4,13 @@ using UnityEngine;
 
 public class UnitBase : MonoBehaviour
 {
-    public Animator _anim;
+    public BaseUnitData Data;
+    public Animator Anim;
+
+    [SerializeField] BaseFSM _fsm;
+
+    protected virtual void Start()
+    {
+        _fsm.Init(this);
+    }
 }

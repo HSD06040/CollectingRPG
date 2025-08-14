@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class StateMachine<T> where T : UnitBase
+public class StateMachine
 {
-    private BaseState<T> _currentState;
-    private BaseState<T> _nextState;
+    private BaseState _currentState;
+    private BaseState _nextState;
 
     public void Update()
     {
@@ -19,12 +19,12 @@ public class StateMachine<T> where T : UnitBase
         }
     }
 
-    public void ChangeState(BaseState<T> newState)
+    public void ChangeState(BaseState newState)
     {
         _currentState = newState;
     }
 
-    private void Transition(BaseState<T> newState)
+    private void Transition(BaseState newState)
     {
         _currentState?.Exit();
         _currentState = newState;

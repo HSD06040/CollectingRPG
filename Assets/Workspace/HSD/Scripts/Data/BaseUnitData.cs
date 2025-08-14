@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseData : ScriptableObject
+public class BaseUnitData : ScriptableObject
 {
     public int ID;
     public string Name;
@@ -32,4 +32,12 @@ public class BaseData : ScriptableObject
     public Stat<int> AttackRange;
     public Stat<int> AttackCount;
     public AttackAreaType AttackAreaType;
+
+    [Header("Skill")]
+    public UnitSkill UnitSkill;
+
+    public float GetAttackTime()
+    {
+        return AttackSpeed.Value / 1;
+    }
 }

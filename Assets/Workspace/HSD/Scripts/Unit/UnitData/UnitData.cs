@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "UnitData", menuName = "Data/Unit/UnitData")]
-public class UnitData : BaseData
+public class UnitData : BaseUnitData
 {
     [Header("Upgrade")]
     public int UpgradeCount;
@@ -11,8 +11,5 @@ public class UnitData : BaseData
 
     [Header("Synergy")]
     public ClassSynergy ClassSynergy;
-    public Synergy Synergy;
-
-    [Header("Skill")]
-    public UnitSkill UnitSkill;    
+    public Synergy Synergy;     
 }

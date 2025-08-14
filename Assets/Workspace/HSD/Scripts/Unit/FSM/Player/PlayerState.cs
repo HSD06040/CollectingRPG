@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IdleState<T> : BaseState<T> where T : UnitBase
+public class IdleState : BaseState
 {
-    public IdleState(BaseFSM<T> fsm, int animHash) : base(fsm, animHash)
+    public IdleState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
     }
 
@@ -24,9 +24,9 @@ public class IdleState<T> : BaseState<T> where T : UnitBase
     }
 }
 
-public class AttackState<T> : BaseState<T> where T : UnitBase
+public class AttackState : BaseState
 {
-    public AttackState(BaseFSM<T> fsm, int animHash) : base(fsm, animHash)
+    public AttackState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
     }
 
@@ -46,11 +46,11 @@ public class AttackState<T> : BaseState<T> where T : UnitBase
     }
 }
 
-public class SkillState<T> : BaseState<T> where T : UnitBase
+public class SkillState : BaseState
 {
     AnimatorStateInfo stateInfo;
 
-    public SkillState(BaseFSM<T> fsm, int animHash) : base(fsm, animHash)
+    public SkillState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
     }
 

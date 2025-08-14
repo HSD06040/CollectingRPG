@@ -2,18 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseState<T> where T : UnitBase
+public class BaseState
 {
-    protected BaseFSM<T> _fsm { get; private set; }
+    protected BaseFSM _fsm { get; private set; }
     protected Animator _anim;
-    protected StateMachine<T> _stateMachine;
+    protected StateMachine _stateMachine;
     private int _animHash;
 
-    public BaseState(BaseFSM<T> fsm, int animHash)
+    public BaseState(BaseFSM fsm, int animHash)
     {
         _fsm = fsm;
         _animHash = animHash;
-        _anim = _fsm.Owner._anim;
+        _anim = _fsm.Owner.Anim;
         _stateMachine = _fsm.StateMachine;
     }
 

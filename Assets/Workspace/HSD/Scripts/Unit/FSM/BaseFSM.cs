@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BaseFSM<T> : MonoBehaviour where T : UnitBase
+public class BaseFSM : MonoBehaviour
 {
-    public T Owner;    
+    public UnitBase Owner;    
 
     #region animHash
     private static readonly int _idleHash = Animator.StringToHash("Idle");
@@ -13,21 +13,21 @@ public class BaseFSM<T> : MonoBehaviour where T : UnitBase
     #endregion
 
     #region State
-    public StateMachine<T> StateMachine { get; private set; }
+    public StateMachine StateMachine { get; private set; }
 
-    public IdleState<T> IdleState {  get; private set; }
-    public AttackState<T> AttackState { get; private set; }
-    public SkillState<T> SkillState { get; private set; }
+    public IdleState IdleState {  get; private set; }
+    public AttackState AttackState { get; private set; }
+    public SkillState SkillState { get; private set; }
     #endregion
 
-    public virtual void Init(T owner)
+    public virtual void Init(UnitBase owner)
     {
         Owner = owner;
 
-        StateMachine = new StateMachine<T>();
+        StateMachine = new StateMachine();
 
-        IdleState = new IdleState<T>(this, _idleHash);
-        AttackState = new AttackState<T>(this, _attackHash);
-        SkillState = new SkillState<T>(this, _skillHash);
+        IdleState = new IdleState(this, _idleHash);
+        AttackState = new AttackState(this, _attackHash);
+        SkillState = new SkillState(this, _skillHash);
     }
 }
