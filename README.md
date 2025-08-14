@@ -15,6 +15,10 @@ UniTask : https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins
 | 상수 | UPPER_CASE | `MAX_LEVEL`, `DEFAULT_SPEED` |
 | async 메서드 | PascalCase + `Async` | `LoadDataAsync()`, `SaveGameAsync()` |
 
+### Branch 네이밍
+- 개발 시 : feat/unit
+- 수정 시 : fix/unit 
+처럼 작성한다.
 
 ## ■ 커밋 규칙
 
