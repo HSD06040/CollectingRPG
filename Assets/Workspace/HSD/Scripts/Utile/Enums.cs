@@ -13,3 +13,8 @@ public enum AttackAreaType
 {
     Single, Radius, Pierce, Row
 }
+
+public enum DamageType
+{
+    Physical, Magic
+}

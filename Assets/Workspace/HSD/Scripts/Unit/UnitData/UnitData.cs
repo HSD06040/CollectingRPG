@@ -12,4 +12,7 @@ public class UnitData : BaseData
     [Header("Synergy")]
     public ClassSynergy ClassSynergy;
     public Synergy Synergy;
+
+    [Header("Skill")]
+    public UnitSkill UnitSkill;    
 }

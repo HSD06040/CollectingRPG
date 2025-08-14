@@ -26,7 +26,7 @@ public class Stat<T> where T : struct, IComparable, IEquatable<T>
 
     public Action<T> OnChanged;
 
-    // Å¸ÀÔº° µ¡¼À ¿¬»ê µ¨¸®°ÔÀÌÆ®
+    // íƒ€ì…ë³„ ë§ì…ˆ ì—°ì‚° ë¸ë¦¬ê²Œì´íŠ¸
     private static readonly Func<T, T, T> addFunc;
 
     static Stat()
@@ -36,7 +36,7 @@ public class Stat<T> where T : struct, IComparable, IEquatable<T>
         else if (typeof(T) == typeof(float))
             addFunc = (a, b) => (T)(object)((float)(object)a + (float)(object)b);
         else
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            throw new NotSupportedException(typeof(T).Name);
     }
 
     public T Value
