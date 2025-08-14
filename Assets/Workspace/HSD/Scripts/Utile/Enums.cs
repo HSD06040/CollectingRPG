@@ -8,3 +8,8 @@ public enum Synergy
 {
     A, B, C, D
 }
+
+public enum AttackAreaType
+{
+    Single, Radius, Pierce, Row
+}

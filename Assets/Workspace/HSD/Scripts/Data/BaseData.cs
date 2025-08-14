@@ -31,4 +31,5 @@ public class BaseData : ScriptableObject
     [Header("Range")]
     public Stat<int> AttackRange;
     public Stat<int> AttackCount;
+    public AttackAreaType AttackAreaType;
 }
