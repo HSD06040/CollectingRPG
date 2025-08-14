@@ -5,12 +5,13 @@ using UnityEngine;
 
 public class PlayerUnit : UnitBase
 {
-    public UnitData UnitData;
-    [SerializeField] UnitStatusController<UnitData> _unitStatusController;
+    public UnitData UnitData { get; private set; }
+    
 
-    private void Awake()
+    protected override void Awake()
     {
-        UnitData = Data as UnitData;
-        _unitStatusController.Init(UnitData);
+        base.Awake();
+
+        UnitData = Data as UnitData;        
     }
 }

@@ -37,9 +37,6 @@ public class BaseUnitData : ScriptableObject
     [Header("Skill")]
     public UnitSkill UnitSkill;
 
-    [Header("AdvancedUnitData")]
-    public UnitData AdvancedData;
-
     public float GetAttackTime()
     {
         return AttackSpeed.Value / 1;

@@ -8,13 +8,13 @@ public class BaseFSM : MonoBehaviour
 
     #region animHash
     private static readonly int _idleHash = Animator.StringToHash("Idle");
+    private static readonly int _moveHash = Animator.StringToHash("Move");
     private static readonly int _attackHash = Animator.StringToHash("Attack");
     private static readonly int _skillHash = Animator.StringToHash("Skill");
     #endregion
 
     #region State
     public StateMachine StateMachine { get; private set; }
-
     public IdleState IdleState {  get; private set; }
     public AttackState AttackState { get; private set; }
     public SkillState SkillState { get; private set; }

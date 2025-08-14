@@ -25,7 +25,11 @@ public class IdleState : BaseState
     {
         base.Update();
 
-        if(CanAttack())
+        if(_fsm.Owner.SkillCheck())
+        {
+            _stateMachine.ChangeState(_fsm.SkillState);
+        }
+        else if(CanAttack())
         {
             _stateMachine.ChangeState(_fsm.AttackState);
         }
@@ -35,6 +39,28 @@ public class IdleState : BaseState
     {
         attackTimer -= Time.deltaTime;
         return attackTimer <= 0;        
+    }
+}
+
+public class MoveState : BaseState
+{
+    public MoveState(BaseFSM fsm, int animHash) : base(fsm, animHash)
+    {
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    public override void Update()
+    {
+        base.Update();
     }
 }
 
