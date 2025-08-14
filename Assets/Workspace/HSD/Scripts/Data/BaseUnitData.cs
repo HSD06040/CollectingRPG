@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "UnitData", menuName = "Data/Unit/UnitData")]
 public class BaseUnitData : ScriptableObject
 {
     public int ID;
@@ -36,8 +37,11 @@ public class BaseUnitData : ScriptableObject
     [Header("Skill")]
     public UnitSkill UnitSkill;
 
+    [Header("AdvancedUnitData")]
+    public UnitData AdvancedData;
+
     public float GetAttackTime()
     {
         return AttackSpeed.Value / 1;
-    }
+    }    
 }

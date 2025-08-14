@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class IdleState : BaseState
 {
+    private float attackTimer;
+
     public IdleState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
     }
@@ -11,6 +13,7 @@ public class IdleState : BaseState
     public override void Enter()
     {
         base.Enter();
+        attackTimer = _fsm.Owner.Data.GetAttackTime();
     }
 
     public override void Exit()
@@ -21,6 +24,17 @@ public class IdleState : BaseState
     public override void Update()
     {
         base.Update();
+
+        if(CanAttack())
+        {
+            _stateMachine.ChangeState(_fsm.AttackState);
+        }
+    }
+
+    private bool CanAttack()
+    {
+        attackTimer -= Time.deltaTime;
+        return attackTimer <= 0;        
     }
 }
 

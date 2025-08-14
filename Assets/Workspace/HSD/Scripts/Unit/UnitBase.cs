@@ -13,4 +13,9 @@ public class UnitBase : MonoBehaviour
     {
         _fsm.Init(this);
     }
+
+    private void Update()
+    {
+        
+    }
 }
