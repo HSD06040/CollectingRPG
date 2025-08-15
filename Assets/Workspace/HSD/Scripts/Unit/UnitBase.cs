@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class UnitBase : MonoBehaviour
@@ -11,7 +12,6 @@ public class UnitBase : MonoBehaviour
 
     public LayerMask TargetLayer;
     public Vector2 TargetDir => GetTargetDirection();
-    public int FacingDir => transform.localScale.x > 0 ? -1 : 1;
     private Vector3 _localScale;
 
     [SerializeField] BaseFSM _fsm;
@@ -29,6 +29,7 @@ public class UnitBase : MonoBehaviour
 
     public bool SkillCheck()
     {
+        return false; 
         if (_unitStatusController.CurMana.Value >= Data.UnitSkill.NeedMana)
         {
             _unitStatusController.CurMana.Value -= Data.UnitSkill.NeedMana;
@@ -67,15 +68,47 @@ public class UnitBase : MonoBehaviour
         transform.localScale = _localScale;
     }
 
+    /// <summary>
+    /// 범위안에 들어와 있다면
+    /// </summary>
+    /// <returns></returns>
+    public bool IsTargetInRange()
+    {
+        if(Target == null) return false;
+
+        return Vector2.Distance(Target.position, transform.position) <= Data.AttackRange.Value;
+    }
+
+    /// <summary>
+    /// 서로 보는 방향이 다르다면
+    /// </summary>
+    /// <returns></returns>
+    public bool CanAttack()
+    {
+        if (Target == null) return false;
+
+        if (!IsTargetInRange())
+            return false;
+
+        return Vector2.Dot(TargetDir, new Vector2(Target.GetFacingDir(), 0)) < 0;
+    }
+
     private Vector2 GetTargetDirection()
     {
         if (Target == null) return Vector2.zero;
         return (Target.position - transform.position).normalized;
-    }
+    }    
 
     private void OnDrawGizmos()
     {
+        if (Data == null) return;
+
+        // 찾는 거리
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, 10);
+
+        // 공격 사거리
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, Data.AttackRange.Value);
     }
 }

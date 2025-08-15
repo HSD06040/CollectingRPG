@@ -53,4 +53,9 @@ public static class Utils
 
         return closest;
     }
+
+    public static int GetFacingDir(this Transform transform)
+    {
+        return transform.localScale.x > 0 ? -1 : 1;
+    }
 }

@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class PlayerUnit : UnitBase
 {
-    public UnitEnhancementData EnhancementData;
-    
 
     protected override void Awake()
     {

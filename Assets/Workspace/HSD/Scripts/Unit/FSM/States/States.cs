@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,7 +36,7 @@ public class IdleState : BaseState
     public override void Enter()
     {
         base.Enter();
-        attackTimer = _fsm.Owner.Data.GetAttackTime();
+        attackTimer = _fsm.Owner.Data.GetAttackTime(); // 공격 시간 체크
     }
 
     public override void Exit()
@@ -47,19 +48,26 @@ public class IdleState : BaseState
     {
         base.Update();
 
-        if(_fsm.Owner.SkillCheck())
+        if(_fsm.Owner.SkillCheck()) // 스킬 사용 가능 여부 체크
         {
             _stateMachine.ChangeState(_fsm.SkillState);
         }
-        else if(CanAttack())
+        else if(CanAttack()) // 공격 가능 체크
         {
             _stateMachine.ChangeState(_fsm.AttackState);
+        }
+        else if (!_owner.IsTargetInRange()) // 멀어진거 체크
+        {
+            _stateMachine.ChangeState(_fsm.MoveState);
         }
     }
 
     private bool CanAttack()
-    {
-        attackTimer -= Time.deltaTime;
+    {        
+        if (!_owner.CanAttack())
+            return false;
+
+        attackTimer -= Time.deltaTime; 
         return attackTimer <= 0;        
     }
 }
@@ -84,22 +92,53 @@ public class MoveState : BaseState
     {
         base.Update();
 
+        if(_owner.IsTargetInRange())
+        {
+            _stateMachine.ChangeState(_fsm.IdleState);
+            return;
+        }
+
         if(_target == null)
         {
-            _owner.transform.Translate(new Vector2(_owner.FacingDir * _data.MoveSpeed.Value * Time.deltaTime, 0), Space.World);
+            _owner.transform.Translate(new Vector2(_owner.transform.GetFacingDir() * _data.MoveSpeed.Value * Time.deltaTime, 0), Space.World);
             //_rb.velocity = Vector2.right * _data.MoveSpeed.Value * Time.deltaTime;
         }
         else
         {
-            Debug.Log(_owner.TargetDir);
             _owner.transform.Translate(_owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime, Space.World);
             //_rb.velocity = _owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime;
         }
     }
 }
 
-public class AttackState : BaseState
+public class AnimationFinishedState : BaseState
 {
+    public AnimationFinishedState(BaseFSM fsm, int animHash) : base(fsm, animHash)
+    {
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (_isAnimFinished)
+            _stateMachine.ChangeState(_fsm.IdleState);
+    }
+}
+
+public class AttackState : AnimationFinishedState
+{
+
     public AttackState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
     }
@@ -120,10 +159,8 @@ public class AttackState : BaseState
     }
 }
 
-public class SkillState : BaseState
+public class SkillState : AnimationFinishedState
 {
-    AnimatorStateInfo stateInfo;
-
     public SkillState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
     }
@@ -131,7 +168,7 @@ public class SkillState : BaseState
     public override void Enter()
     {
         base.Enter();
-        stateInfo = _anim.GetCurrentAnimatorStateInfo(0);
+        
     }
 
     public override void Exit()
@@ -142,10 +179,5 @@ public class SkillState : BaseState
     public override void Update()
     {
         base.Update();
-
-        if (stateInfo.normalizedTime >= 1f && !stateInfo.loop)
-        {
-            _stateMachine.ChangeState(_fsm.IdleState);
-        }
     }
 }

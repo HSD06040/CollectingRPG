@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class StateMachine
 {
-    private BaseState _currentState;
+    public BaseState _currentState;
     private BaseState _nextState;
 
     public void Update()
@@ -21,7 +21,7 @@ public class StateMachine
 
     public void ChangeState(BaseState newState)
     {
-        _currentState = newState;
+        _nextState = newState;
     }
 
     private void Transition(BaseState newState)

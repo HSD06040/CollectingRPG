@@ -33,7 +33,9 @@ public class BaseFSM : MonoBehaviour
         IdleState = new IdleState(this, _idleHash);
         MoveState = new MoveState(this, _moveHash);
         AttackState = new AttackState(this, _attackHash);
-        SkillState = new SkillState(this, _skillHash);        
+        SkillState = new SkillState(this, _skillHash);
+
+        //Stanby(); //이거 추가 했는데 심지어 주석처리를 해뒀는데
     }
 
     public void Stanby()
@@ -45,6 +47,7 @@ public class BaseFSM : MonoBehaviour
         }
 
         StateMachine.ChangeState(StanbyState);
+        StateMachine.Update();
     }
 
     public void Fight()
@@ -63,4 +66,6 @@ public class BaseFSM : MonoBehaviour
             yield return null;
         }
     }
+
+    private void AnimationFinished() => StateMachine._currentState.AnimationFinished();
 }
