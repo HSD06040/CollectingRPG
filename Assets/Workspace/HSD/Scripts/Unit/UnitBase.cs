@@ -4,22 +4,24 @@ using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class UnitBase : MonoBehaviour, IAttacker
-{
+{    
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
     [field : SerializeField] public UnitData Data { get; private set; }
 
-    [field: SerializeField] public LayerMask TargetLayer { get; set; }
+    public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
 
     private Vector3 _localScale;
 
+    [Header("Logic Components")]
     [SerializeField] BaseFSM _fsm;
     [SerializeField] protected UnitStatusController _unitStatusController;
 
     protected virtual void Awake()
     {        
+        TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
         _unitStatusController.Init(Data);
     }
 
