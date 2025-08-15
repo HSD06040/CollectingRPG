@@ -18,3 +18,7 @@ public enum DamageType
 {
     Physical, Magic
 }
+public enum SearchType
+{
+    Circle, Box, Capsule
+}

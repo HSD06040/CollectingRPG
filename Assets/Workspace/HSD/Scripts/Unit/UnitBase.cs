@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
-public class UnitBase : MonoBehaviour
+public class UnitBase : MonoBehaviour, IAttacker
 {
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
     [field : SerializeField] public UnitData Data { get; private set; }
+    [field: SerializeField] public UnitAttackData AttackData { get; private set; }
 
-    public LayerMask TargetLayer;
+    public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
+
+    public float AttackPower { get; set; }
+
     private Vector3 _localScale;
 
     [SerializeField] BaseFSM _fsm;
@@ -25,6 +29,11 @@ public class UnitBase : MonoBehaviour
     protected virtual void Start()
     {
         _fsm.Init(this);
+    }
+
+    public void Attack()
+    {
+        AttackData.Attack(this);
     }
 
     public bool SkillCheck()
@@ -110,5 +119,20 @@ public class UnitBase : MonoBehaviour
         // 공격 사거리
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, Data.AttackRange.Value);
+    }
+
+    public Transform GetTarget()
+    {
+        return Target;
+    }
+
+    public UnitData GetUnitData()
+    {
+        return Data;
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
     }
 }
