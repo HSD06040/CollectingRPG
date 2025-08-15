@@ -16,6 +16,11 @@ public class Property<T>
         }
     }
 
+    public Property()
+    {
+        Value = default;
+    }
+
     private event Action<T> _onChange;
 
     public void AddEvent(Action<T> action)

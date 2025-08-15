@@ -28,4 +28,29 @@ public static class Utils
 
         return Mathf.RoundToInt(total);
     }
+
+    private static Collider2D[] _hitBuffer = new Collider2D[50];
+
+    public static Transform GetClosestTargetNonAlloc(Vector3 origin, float radius, LayerMask enemyMask)
+    {
+        int count = Physics2D.OverlapCircleNonAlloc(origin, radius, _hitBuffer, enemyMask);
+
+        Transform closest = null;
+        float bestDistSq = float.PositiveInfinity;
+
+        for (int i = 0; i < count; i++)
+        {
+            var hit = _hitBuffer[i];
+            if (hit == null) continue;
+
+            float distSq = (hit.transform.position - origin).sqrMagnitude;
+            if (distSq < bestDistSq)
+            {
+                bestDistSq = distSq;
+                closest = hit.transform;
+            }
+        }
+
+        return closest;
+    }
 }

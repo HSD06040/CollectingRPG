@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "UnitData", menuName = "Data/Unit/UnitEnhancementData")]
+[CreateAssetMenu(fileName = "UnitEnhancementData", menuName = "Data/Unit/UnitEnhancementData")]
 public class UnitEnhancementData : ScriptableObject
 {
     [Header("Upgrade")]

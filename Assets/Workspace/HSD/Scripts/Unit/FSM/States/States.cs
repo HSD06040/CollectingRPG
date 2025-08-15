@@ -2,6 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class StanbyState : BaseState
+{
+    public StanbyState(BaseFSM fsm, int animHash) : base(fsm, animHash)
+    {
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+    }
+}
+
 public class IdleState : BaseState
 {
     private float attackTimer;
@@ -61,6 +83,18 @@ public class MoveState : BaseState
     public override void Update()
     {
         base.Update();
+
+        if(_target == null)
+        {
+            _owner.transform.Translate(new Vector2(_owner.FacingDir * _data.MoveSpeed.Value * Time.deltaTime, 0), Space.World);
+            //_rb.velocity = Vector2.right * _data.MoveSpeed.Value * Time.deltaTime;
+        }
+        else
+        {
+            Debug.Log(_owner.TargetDir);
+            _owner.transform.Translate(_owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime, Space.World);
+            //_rb.velocity = _owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime;
+        }
     }
 }
 

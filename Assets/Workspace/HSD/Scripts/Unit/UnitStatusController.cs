@@ -11,8 +11,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public void Init(UnitData data)
     {
+        if (data == null)
+            Debug.Log("Data null");
         Data = data;
-
         CurHp.Value = Data.MaxHealth.Value;
         CurMana.Value = Data.MaxMana.Value;
     }
