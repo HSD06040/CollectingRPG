@@ -8,14 +8,14 @@ public static class Utils
         return ((1 << layer) & layerMask) != 0;
     }
 
-    public static int DamageCaluator(int damage, int defense, DamageType damageType)
+    public static int CalculateFinalDamage(int damage, int defense, DamageType damageType)
     {
         float totalDefense = defense / (defense + 100f);
 
         return Mathf.RoundToInt(damage * (1f - totalDefense));
     }
 
-    public static int TotalDamageCaluator(this UnitData data, float multiply, DamageType damageType)
+    public static int CalculateBaseDamage(this UnitData data, float multiply, DamageType damageType)
     {
         int damage = damageType == DamageType.Physical ? data.PhysicalDamage.Value : data.MagicDamage.Value;
         float total = damage * multiply;

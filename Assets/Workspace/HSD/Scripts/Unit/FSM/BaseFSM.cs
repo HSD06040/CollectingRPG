@@ -34,8 +34,6 @@ public class BaseFSM : MonoBehaviour
         MoveState = new MoveState(this, _moveHash);
         AttackState = new AttackState(this, _attackHash);
         SkillState = new SkillState(this, _skillHash);
-
-        //Stanby(); //이거 추가 했는데 심지어 주석처리를 해뒀는데
     }
 
     public void Stanby()
@@ -67,5 +65,6 @@ public class BaseFSM : MonoBehaviour
         }
     }
 
+    private void Attack() => Owner.Attack();
     private void AnimationFinished() => StateMachine._currentState.AnimationFinished();
 }

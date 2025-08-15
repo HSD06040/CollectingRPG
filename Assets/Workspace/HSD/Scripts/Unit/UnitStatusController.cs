@@ -11,8 +11,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public void Init(UnitData data)
     {
-        if (data == null)
-            Debug.Log("Data null");
         Data = data;
         CurHp.Value = Data.MaxHealth.Value;
         CurMana.Value = Data.MaxMana.Value;
@@ -21,8 +19,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     public void TakeDamage(int amount, DamageType damageType)
     {
         int defense = damageType == DamageType.Magic ? Data.MagicDefense.Value : Data.PhysicalDefense.Value;
-        int totalDamage = Utils.DamageCaluator(amount, defense, damageType);
-
+        int totalDamage = Utils.CalculateFinalDamage(amount, defense, damageType);
         CurHp.Value -= totalDamage;
+        Debug.Log($"현재 체력 :{CurHp.Value}, 받은 데미지 : {totalDamage}");
     }
 }

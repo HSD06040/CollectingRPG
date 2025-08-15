@@ -9,12 +9,9 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
     [field : SerializeField] public UnitData Data { get; private set; }
-    [field: SerializeField] public UnitAttackData AttackData { get; private set; }
 
-    public LayerMask TargetLayer { get; set; }
+    [field: SerializeField] public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
-
-    public float AttackPower { get; set; }
 
     private Vector3 _localScale;
 
@@ -33,15 +30,15 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Attack()
     {
-        AttackData.Attack(this);
+        Data.AttackData.Attack(this);
     }
 
     public bool SkillCheck()
     {
         return false; 
-        if (_unitStatusController.CurMana.Value >= Data.UnitSkill.NeedMana)
+        if (_unitStatusController.CurMana.Value >= Data.Skill.NeedMana)
         {
-            _unitStatusController.CurMana.Value -= Data.UnitSkill.NeedMana;
+            _unitStatusController.CurMana.Value -= Data.Skill.NeedMana;
             return true;
         }
         else 
@@ -51,6 +48,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     public void FindTarget()
     {
         if (Target != null) return;
+        Debug.Log("타겟 찾기!");
         Target = Utils.GetClosestTargetNonAlloc(transform.position, 10, TargetLayer);
     }
 
@@ -119,6 +117,18 @@ public class UnitBase : MonoBehaviour, IAttacker
         // 공격 사거리
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, Data.AttackRange.Value);
+
+        if (Data.AttackData == null) return;
+        // 공격 범위
+        Gizmos.color = Color.red;
+        if (Data.AttackData.SearchType == SearchType.Circle)
+        {
+            Vector2 center = transform.position;
+            Vector2 offset = Data.AttackData.Offset;
+            offset.x *= transform.GetFacingDir();
+
+            Gizmos.DrawWireSphere(center + offset, Data.AttackData.SizeOrRadius);
+        }
     }
 
     public Transform GetTarget()
@@ -134,5 +144,10 @@ public class UnitBase : MonoBehaviour, IAttacker
     public Transform GetTransform()
     {
         return transform;
+    }
+
+    public UnitStatusController GetStatusController()
+    {
+        return _unitStatusController;
     }
 }

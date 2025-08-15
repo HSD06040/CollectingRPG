@@ -34,8 +34,9 @@ public class UnitData : ScriptableObject
     public Stat<int> AttackCount;
     public AttackAreaType AttackAreaType;
 
-    [Header("Skill")]
-    public UnitSkill UnitSkill;
+    [Header("Attack_Data")]
+    public UnitSkill Skill;
+    public UnitAttackData AttackData; // Melee, Ranged 등 공격 타입에 따라 다름
 
     [Header("Player_Enhancement")]
     public UnitEnhancementData EnhancementData; // 적일 경우 더미 데이터로 존재 (추후 기획에 따라 달라질 수 있음)
