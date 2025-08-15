@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "UnitData", menuName = "Data/Unit/UnitData")]
-public class UnitData : BaseUnitData
+[CreateAssetMenu(fileName = "UnitData", menuName = "Data/Unit/UnitEnhancementData")]
+public class UnitEnhancementData : ScriptableObject
 {
     [Header("Upgrade")]
     public int UpgradeCount;

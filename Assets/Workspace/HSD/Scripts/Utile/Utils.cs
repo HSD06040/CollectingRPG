@@ -16,7 +16,7 @@ public static class Utils
         return Mathf.RoundToInt(damage * totalDefense);
     }
 
-    public static int TotalDamageCaluator(this BaseUnitData data, float multiply, DamageType damageType)
+    public static int TotalDamageCaluator(this UnitData data, float multiply, DamageType damageType)
     {
         int damage = damageType == DamageType.Physical ? data.PhysicalDamage.Value : data.MagicDamage.Value;
         float total = damage * multiply;

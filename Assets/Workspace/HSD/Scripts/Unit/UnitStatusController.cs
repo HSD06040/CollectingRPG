@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class UnitStatusController : MonoBehaviour, IDamageable
 {
-    public BaseUnitData Data { get; private set; }
+    public UnitData Data { get; private set; }
     public Property<int> CurHp = new Property<int>();
     public Property<int> CurMana = new Property<int>();
 
-    public void Init(BaseUnitData data)
+    public void Init(UnitData data)
     {
         Data = data;
 

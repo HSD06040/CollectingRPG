@@ -5,13 +5,11 @@ using UnityEngine;
 
 public class PlayerUnit : UnitBase
 {
-    public UnitData UnitData { get; private set; }
+    public UnitEnhancementData EnhancementData;
     
 
     protected override void Awake()
     {
-        base.Awake();
-
-        UnitData = Data as UnitData;        
+        base.Awake();   
     }
 }

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class UnitBase : MonoBehaviour
 {
-    public BaseUnitData Data;
+    public Transform Target;
+    public UnitData Data;
     public Animator Anim;
 
     [SerializeField] BaseFSM _fsm;
