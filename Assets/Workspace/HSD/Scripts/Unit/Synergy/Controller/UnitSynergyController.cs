@@ -5,7 +5,7 @@ public class SynergyController : MonoBehaviour
 {
     private readonly Dictionary<string, int> _synergyCountDic = new(60);
 
-    [SerializeField] SynergyDataBase _database;
+    [SerializeField] SynergyDatabase _database;
 
     private void Awake()
     {

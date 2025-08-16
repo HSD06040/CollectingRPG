@@ -101,8 +101,13 @@ public static class Utils
             });
         }
 
-        GameObject[] result = filter.Invoke(_cachedTargets, maxTargets);
-               
+        GameObject[] result;
+
+        if(filter != null)
+            result = filter.Invoke(_cachedTargets, maxTargets);
+        else
+            result = _cachedTargets.ToArray();
+
         return result;
     }
 

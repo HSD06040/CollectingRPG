@@ -66,8 +66,8 @@ public class UnitBase : MonoBehaviour, IAttacker
     public void FindTarget()
     {
         if (Target != null) return;
-        Debug.Log("타겟 찾기!");
-        Target = Utils.GetClosestTargetNonAlloc(transform.position, 10, TargetLayer);
+ 
+        Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 
     public void FlipToTarget()
@@ -76,7 +76,11 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         if (Target == null)
         {
-            _localScale.x = -Mathf.Abs(_localScale.x);
+            if(TargetLayer.Contain(6))
+                _localScale.x = -Mathf.Abs(_localScale.x);
+            else
+                _localScale.x = Mathf.Abs(_localScale.x);
+
             transform.localScale = _localScale;
             return;
         }
@@ -131,7 +135,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         // 찾는 거리
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, 10);
+        Gizmos.DrawWireSphere(transform.position, StatusController.DetectionRange);
 
         // 공격 사거리
         Gizmos.color = Color.green;

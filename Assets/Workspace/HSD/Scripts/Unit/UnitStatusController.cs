@@ -30,6 +30,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     [Header("Range")]
     public Stat<int> AttackRange;
     public Stat<int> AttackCount;
+    public float DetectionRange = 5f;
     #endregion
 
     public Property<int> CurHp = new Property<int>();

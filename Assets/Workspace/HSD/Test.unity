@@ -532,7 +532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxHealth:
-    _baseValue: 0
+    _baseValue: 100
     _modifiers: []
   MaxMana:
     _baseValue: 0
@@ -541,10 +541,10 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   AttackSpeed:
-    _baseValue: 0
+    _baseValue: 10
     _modifiers: []
   MoveSpeed:
-    _baseValue: 0
+    _baseValue: 1
     _modifiers: []
   PhysicalDamage:
     _baseValue: 0
@@ -559,17 +559,18 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   PhysicalDefense:
-    _baseValue: 0
+    _baseValue: 10
     _modifiers: []
   MagicDefense:
     _baseValue: 0
     _modifiers: []
   AttackRange:
-    _baseValue: 0
+    _baseValue: 1
     _modifiers: []
   AttackCount:
     _baseValue: 0
     _modifiers: []
+  DetectionRange: 5
 --- !u!70 &200288637
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -2377,6 +2378,83 @@ Transform:
   - {fileID: 1631027375}
   m_Father: {fileID: 639743625}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 30}
+--- !u!1 &1059808073
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1059808074}
+  m_Layer: 0
+  m_Name: GameController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1059808074
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1059808073}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.5102868, y: 0.6534467, z: 0.017173901}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1086594949}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1086594948
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1086594949}
+  - component: {fileID: 1086594950}
+  m_Layer: 0
+  m_Name: SynergyController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1086594949
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086594948}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1059808074}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1086594950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086594948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e2d0391365cc241b992c3ba5c24c65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _database: {fileID: 0}
 --- !u!1 &1090617701
 GameObject:
   m_ObjectHideFlags: 0
@@ -5702,7 +5780,7 @@ Transform:
   m_GameObject: {fileID: 2043808140}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.15, y: 0.1, z: 0}
+  m_LocalPosition: {x: -6.37, y: 2.77, z: 0}
   m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5766,10 +5844,10 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   AttackSpeed:
-    _baseValue: 0
+    _baseValue: 10
     _modifiers: []
   MoveSpeed:
-    _baseValue: 0
+    _baseValue: 1
     _modifiers: []
   PhysicalDamage:
     _baseValue: 0
@@ -5795,6 +5873,7 @@ MonoBehaviour:
   AttackCount:
     _baseValue: 0
     _modifiers: []
+  DetectionRange: 5
 --- !u!50 &2043808146
 Rigidbody2D:
   serializedVersion: 4
@@ -18548,3 +18627,4 @@ SceneRoots:
   - {fileID: 2043808143}
   - {fileID: 200288639}
   - {fileID: 1737774577}
+  - {fileID: 1059808074}

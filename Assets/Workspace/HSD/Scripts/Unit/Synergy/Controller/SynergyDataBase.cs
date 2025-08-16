@@ -3,17 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
-public class SynergyDataBase
+[CreateAssetMenu(fileName = "SynergyDatabase", menuName = "Data/Synergy/Database")]
+public class SynergyDatabase : ScriptableObject
 {
     private readonly Dictionary<string, SynergyData> _synergyEffectDic = new Dictionary<string, SynergyData>(60);
 
-    [SerializeField] private UnitSynergyData[] _unitSynergyEffects;
-    [SerializeField] private ClassSynergyData[] _classSynergyEffects;
+    [SerializeField] private UnitSynergyData[] _unitSynergyDatas;
+    [SerializeField] private ClassSynergyData[] _classSynergyDatas;
 
     public void Init()
     {        
-        foreach (var effect in _unitSynergyEffects)
+        foreach (var effect in _unitSynergyDatas)
         {
             if (!_synergyEffectDic.ContainsKey(effect.SynergyName))
                 _synergyEffectDic.Add(effect.Synergy.ToString(), effect);
@@ -21,7 +21,7 @@ public class SynergyDataBase
                 Debug.LogWarning($"Duplicate SynergyName: {effect.SynergyName}");
         }
 
-        foreach (var effect in _classSynergyEffects)
+        foreach (var effect in _classSynergyDatas)
         {
             if (!_synergyEffectDic.ContainsKey(effect.SynergyName))
                 _synergyEffectDic.Add(effect.Synergy.ToString(), effect);
