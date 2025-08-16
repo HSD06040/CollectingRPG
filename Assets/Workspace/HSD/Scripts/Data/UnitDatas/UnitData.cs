@@ -5,33 +5,36 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Unit_Data", menuName = "Data/Unit/Unit_Data")]
 public class UnitData : ScriptableObject
 {
+    [Header("MetaData")]
     public int ID;
     public string Name;
     [TextArea]
     public string Description;
+    public int Cost;
+    public int CombatPower;
 
     [Header("Status")]
-    public Stat<int> MaxHealth;
-    public Stat<int> MaxMana;
-    public Stat<int> ManaGain;
-    public Stat<float> AttackSpeed;
-    public Stat<float> MoveSpeed;
+    public int MaxHealth;
+    public int MaxMana;
+    public int ManaGain;
+    public float AttackSpeed;
+    public float MoveSpeed;
 
     [Header("Damage")]
-    public Stat<int> PhysicalDamage;
-    public Stat<int> MagicDamage;
+    public int PhysicalDamage;
+    public int MagicDamage;
 
     [Header("CritRate")]
-    public Stat<int> CritChance;
-    public Stat<int> CritDamage;
+    public int CritChance;
+    public int CritDamage;
 
     [Header("Defense")]
-    public Stat<int> PhysicalDefense;
-    public Stat<int> MagicDefense;
+    public int PhysicalDefense;
+    public int MagicDefense;
 
     [Header("Range")]
-    public Stat<int> AttackRange;
-    public Stat<int> AttackCount;
+    public int AttackRange;
+    public int AttackCount;
     public AttackAreaType AttackAreaType;
 
     [Header("Attack_Data")]
@@ -40,9 +43,4 @@ public class UnitData : ScriptableObject
 
     [Header("Player_Enhancement")]
     public UnitEnhancementData EnhancementData; // 적일 경우 더미 데이터로 존재 (추후 기획에 따라 달라질 수 있음)
-
-    public float GetAttackTime()
-    {
-        return 1 / AttackSpeed.Value;
-    }    
 }

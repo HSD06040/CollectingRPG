@@ -531,6 +531,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93ad3aa845033e42b805bfa9ddf719f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MaxHealth:
+    _baseValue: 0
+    _modifiers: []
+  MaxMana:
+    _baseValue: 0
+    _modifiers: []
+  ManaGain:
+    _baseValue: 0
+    _modifiers: []
+  AttackSpeed:
+    _baseValue: 0
+    _modifiers: []
+  MoveSpeed:
+    _baseValue: 0
+    _modifiers: []
+  PhysicalDamage:
+    _baseValue: 0
+    _modifiers: []
+  MagicDamage:
+    _baseValue: 0
+    _modifiers: []
+  CritChance:
+    _baseValue: 0
+    _modifiers: []
+  CritDamage:
+    _baseValue: 0
+    _modifiers: []
+  PhysicalDefense:
+    _baseValue: 0
+    _modifiers: []
+  MagicDefense:
+    _baseValue: 0
+    _modifiers: []
+  AttackRange:
+    _baseValue: 0
+    _modifiers: []
+  AttackCount:
+    _baseValue: 0
+    _modifiers: []
 --- !u!70 &200288637
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -583,11 +622,8 @@ MonoBehaviour:
   <Rb>k__BackingField: {fileID: 200288635}
   <Data>k__BackingField: {fileID: 11400000, guid: 0213d327ee461674dbd620f59eacfcdb,
     type: 2}
-  <TargetLayer>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 128
+  StatusController: {fileID: 200288636}
   _fsm: {fileID: 1389663898}
-  _unitStatusController: {fileID: 200288636}
 --- !u!4 &200288639
 Transform:
   m_ObjectHideFlags: 0
@@ -5655,11 +5691,8 @@ MonoBehaviour:
   <Rb>k__BackingField: {fileID: 2043808146}
   <Data>k__BackingField: {fileID: 11400000, guid: 0213d327ee461674dbd620f59eacfcdb,
     type: 2}
-  <TargetLayer>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 64
+  StatusController: {fileID: 2043808145}
   _fsm: {fileID: 8226123103500812869}
-  _unitStatusController: {fileID: 2043808145}
 --- !u!4 &2043808143
 Transform:
   m_ObjectHideFlags: 0
@@ -5723,6 +5756,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93ad3aa845033e42b805bfa9ddf719f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MaxHealth:
+    _baseValue: 0
+    _modifiers: []
+  MaxMana:
+    _baseValue: 0
+    _modifiers: []
+  ManaGain:
+    _baseValue: 0
+    _modifiers: []
+  AttackSpeed:
+    _baseValue: 0
+    _modifiers: []
+  MoveSpeed:
+    _baseValue: 0
+    _modifiers: []
+  PhysicalDamage:
+    _baseValue: 0
+    _modifiers: []
+  MagicDamage:
+    _baseValue: 0
+    _modifiers: []
+  CritChance:
+    _baseValue: 0
+    _modifiers: []
+  CritDamage:
+    _baseValue: 0
+    _modifiers: []
+  PhysicalDefense:
+    _baseValue: 0
+    _modifiers: []
+  MagicDefense:
+    _baseValue: 0
+    _modifiers: []
+  AttackRange:
+    _baseValue: 0
+    _modifiers: []
+  AttackCount:
+    _baseValue: 0
+    _modifiers: []
 --- !u!50 &2043808146
 Rigidbody2D:
   serializedVersion: 4

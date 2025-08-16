@@ -36,7 +36,7 @@ public class Stat<T> where T : struct, IComparable, IEquatable<T>
         else if (typeof(T) == typeof(float))
             addFunc = (a, b) => (T)(object)((float)(object)a + (float)(object)b);
         else
-            throw new NotSupportedException(typeof(T).Name);
+            throw new NotSupportedException(typeof(T).Name);        
     }
 
     public T Value

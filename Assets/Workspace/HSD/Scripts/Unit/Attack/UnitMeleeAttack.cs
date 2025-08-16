@@ -7,19 +7,19 @@ public class UnitMeleeAttack : UnitAttackData
 {
     public override void Attack(IAttacker attacker)
     {
-        UnitData data = attacker.GetUnitData();
+        UnitStatusController status = attacker.GetStatusController();
         Transform transform = attacker.GetTransform();
 
         foreach (GameObject obj in Utils.GetTargetsNonAlloc(
             (Vector2)transform.position + (Offset * transform.GetFacingDir()), SearchType.Circle, 
-            SizeOrRadius, BoxSize, Angle, data.AttackCount.Value, attacker.TargetLayer
+            SizeOrRadius, BoxSize, Angle, status.AttackCount.Value, attacker.TargetLayer
             ))
         {
             Debug.Log(obj.name);
-            obj.GetComponent<IDamageable>().TakeDamage(Utils.CalculateBaseDamage(data, AttackPower, DamageType), DamageType);
+            obj.GetComponent<IDamageable>().TakeDamage(Utils.CalculateBaseDamage(status, AttackPower, DamageType), DamageType);
         }
 
-        attacker.GetStatusController().CurMana.Value += data.ManaGain.Value;
+        status.GetMana();
 
         Debug.Log($"마나 : {attacker.GetStatusController().CurMana.Value}");
     }

@@ -16,13 +16,13 @@ public class UnitBase : MonoBehaviour, IAttacker
     private Vector3 _localScale;
 
     [Header("Logic Components")]
+    public UnitStatusController StatusController;
     [SerializeField] BaseFSM _fsm;
-    [SerializeField] protected UnitStatusController _unitStatusController;
 
     protected virtual void Awake()
     {        
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
-        _unitStatusController.Init(Data);
+        StatusController.Init(Data);
     }
 
     protected virtual void Start()
@@ -38,9 +38,9 @@ public class UnitBase : MonoBehaviour, IAttacker
     public bool SkillCheck()
     {
         return false; 
-        if (_unitStatusController.CurMana.Value >= Data.Skill.NeedMana)
+        if (StatusController.CurMana.Value >= Data.Skill.NeedMana)
         {
-            _unitStatusController.CurMana.Value -= Data.Skill.NeedMana;
+            StatusController.CurMana.Value -= Data.Skill.NeedMana;
             return true;
         }
         else 
@@ -85,7 +85,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         if(Target == null) return false;
 
-        return Vector2.Distance(Target.position, transform.position) <= Data.AttackRange.Value;
+        return Vector2.Distance(Target.position, transform.position) <= StatusController.AttackRange.Value;
     }
 
     /// <summary>
@@ -106,8 +106,9 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         if (Target == null) return Vector2.zero;
         return (Target.position - transform.position).normalized;
-    }    
+    }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (Data == null) return;
@@ -118,7 +119,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         // 공격 사거리
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, Data.AttackRange.Value);
+        Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
 
         if (Data.AttackData == null) return;
         // 공격 범위
@@ -131,6 +132,12 @@ public class UnitBase : MonoBehaviour, IAttacker
 
             Gizmos.DrawWireSphere(center + offset, Data.AttackData.SizeOrRadius);
         }
+    }
+#endif
+
+    public float GetAttackTime()
+    {
+        return 1 / StatusController.AttackSpeed.Value;
     }
 
     public Transform GetTarget()
@@ -150,6 +157,6 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public UnitStatusController GetStatusController()
     {
-        return _unitStatusController;
+        return StatusController;
     }
 }
