@@ -13,6 +13,11 @@ public class SynergyDatabase : ScriptableObject
 
     public void Init()
     {        
+        if(_unitSynergyDatas.Length == 0 || _classSynergyDatas.Length == 0)
+        {
+            Debug.Log("시너지 데이터가 설정되지 않았습니다.");
+            return;
+        }
         foreach (var effect in _unitSynergyDatas)
         {
             if (!_synergyEffectDic.ContainsKey(effect.SynergyName))
