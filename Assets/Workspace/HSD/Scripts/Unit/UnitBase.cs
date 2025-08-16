@@ -23,11 +23,27 @@ public class UnitBase : MonoBehaviour, IAttacker
     {        
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
         StatusController.Init(Data);
+        AddProviderComponents();
     }
 
     protected virtual void Start()
     {
         _fsm.Init(this);
+    }
+
+    private void OnDestroy()
+    {
+        RemoveProviderComponents();
+    }
+
+    private void AddProviderComponents()
+    {
+        ComponentProvider.Add<UnitStatusController>(gameObject, StatusController);
+    }
+
+    private void RemoveProviderComponents()
+    {
+        ComponentProvider.Remove<UnitStatusController>(gameObject);
     }
 
     public void Attack()

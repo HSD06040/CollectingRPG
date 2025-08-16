@@ -39,8 +39,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     {
         Data = data;
 
-
-
         CurHp.Value = MaxHealth.Value;
         CurMana.Value = MaxMana.Value;
     }
