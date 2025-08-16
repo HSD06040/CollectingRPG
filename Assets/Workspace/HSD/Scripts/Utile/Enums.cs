@@ -22,3 +22,28 @@ public enum SearchType
 {
     Circle, Box, Capsule
 }
+public enum StatType
+{
+    // Status
+    MaxHealth,
+    MaxMana,
+    ManaGain,
+    AttackSpeed,
+    MoveSpeed,
+
+    // Damage
+    PhysicalDamage,
+    MagicDamage,
+
+    // Crit
+    CritChance,
+    CritDamage,
+
+    // Defense
+    PhysicalDefense,
+    MagicDefense,
+
+    // Range
+    AttackRange,
+    AttackCount
+}

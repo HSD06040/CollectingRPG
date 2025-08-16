@@ -15,7 +15,7 @@ public class GameManager : Singleton<GameManager>
     public void SetAccelerate(float accelerate)
     {
         Time.timeScale = accelerate;
-        Time.fixedDeltaTime = 0.02f * accelerate; // Adjust fixed delta time based on the time scale
+        Time.fixedDeltaTime = 0.02f * accelerate;
         CurrentAccelerate = accelerate;
     }
 }
