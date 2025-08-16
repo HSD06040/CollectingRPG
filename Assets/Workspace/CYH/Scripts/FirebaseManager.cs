@@ -6,7 +6,7 @@ using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class FirebaseManager : MonoBehaviour
+public class FirebaseManager : CYH_Singleton<FirebaseManager>
 {
     private static FirebaseApp _app;
     public static FirebaseApp App { get { return _app; } }
@@ -31,9 +31,9 @@ public class FirebaseManager : MonoBehaviour
     private GoogleSignInConfiguration _configuration;
     public GoogleSignInConfiguration Configuration { get { return _configuration; } }
 
-    private void Awake()
+    protected override void Awake()
     {
-        // GoogleSignIn¿¡ »ç¿ëÇÒ ÀÎÁõ ¼³Á¤ ÃÊ±âÈ­
+        // GoogleSignInì— ì‚¬ìš©í•  ì¸ì¦ ì„¤ì • ì´ˆê¸°í™”
         _configuration = new GoogleSignInConfiguration
         {
             WebClientId = _googleWebAPI,
@@ -41,13 +41,14 @@ public class FirebaseManager : MonoBehaviour
             RequestEmail = true
         };
 
-        // ÃÊ±âÈ­ÇÑ ¼³Á¤À» GoogleSignIn.Configuration¿¡ Àû¿ë
+        // ì´ˆê¸°í™”í•œ ì„¤ì •ì„ GoogleSignIn.Configurationì— ì ìš©
         GoogleSignIn.Configuration = _configuration;
     }
 
     private void Start()
     {
         StartCoroutine(InitFirebaseCoroutine());
+        
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
         Time.fixedDeltaTime = 1f / 60f;
@@ -76,5 +77,28 @@ public class FirebaseManager : MonoBehaviour
         }
         _isFirebaseReady = true;
         Debug.Log($"IsFirebaseReady : {_isFirebaseReady}");
+
+       CheckCurrentUser();
+    }
+
+    private void CheckCurrentUser()
+    {
+
+        if(_auth == null)
+        {
+            Debug.Log("_auth == null");
+        }
+        else if (_auth.CurrentUser == null)
+        {
+            Debug.Log("_auth.CurrentUser == null");
+        }
+        else
+        {
+            Debug.Log("------ìë™ë¡œê·¸ì¸ ì„±ê³µ------");
+            Debug.Log("------ìœ ì € ì •ë³´------");
+            Debug.Log($"ìœ ì € ID: {_auth.CurrentUser.UserId}");
+            Debug.Log($"ìœ ì € ì´ë¦„ : {_auth.CurrentUser.DisplayName}");
+            Debug.Log($"ì´ë©”ì¼ : {_auth.CurrentUser.Email}");
+        }
     }
 }

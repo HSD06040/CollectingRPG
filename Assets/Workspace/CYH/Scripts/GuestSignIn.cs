@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Random = UnityEngine.Random;
 
-
 public class GuestSignIn : MonoBehaviour
 {
     [SerializeField] private Button _guestLoginButton;
@@ -30,11 +29,11 @@ public class GuestSignIn : MonoBehaviour
     {
         _isClicked = true;
        
-        // °Ô½ºÆ® ·Î±×ÀÎ °¡´É ¿©ºÎ Ã¼Å©
+        // ê²ŒìŠ¤íŠ¸ ë¡œê·¸ì¸ ê°€ëŠ¥ ì—¬ë¶€ ì²´í¬
         if (FirebaseManager.Auth.CurrentUser != null)
         {
-            Debug.LogError($"À¯Àú UID : {FirebaseManager.Auth.CurrentUser.UserId}  " +
-                $"/ À¯Àú ´Ğ³×ÀÓ : {FirebaseManager.Auth.CurrentUser.DisplayName}");
+            Debug.LogError($"ìœ ì € UID : {FirebaseManager.Auth.CurrentUser.UserId}  " +
+                $"/ ìœ ì € ë‹‰ë„¤ì„ : {FirebaseManager.Auth.CurrentUser.DisplayName}");
             _isClicked = false;
             return;
         }
@@ -43,13 +42,13 @@ public class GuestSignIn : MonoBehaviour
         {
             if (task.IsCanceled)
             {
-                Debug.LogError("°Ô½ºÆ® ·Î±×ÀÎ Ãë¼Ò");
+                Debug.LogError("ê²ŒìŠ¤íŠ¸ ë¡œê·¸ì¸ ì·¨ì†Œ");
                 _isClicked = false;
                 return;
             }
             if (task.IsFaulted)
             {
-                Debug.LogError($"°Ô½ºÆ® ·Î±×ÀÎ ½ÇÆĞ / ¿øÀÎ: {task.Exception}");
+                Debug.LogError($"ê²ŒìŠ¤íŠ¸ ë¡œê·¸ì¸ ì‹¤íŒ¨ / ì›ì¸: {task.Exception}");
                 _isClicked = false;
                 return;
             }
@@ -58,23 +57,23 @@ public class GuestSignIn : MonoBehaviour
 
             FirebaseUser user = FirebaseManager.Auth.CurrentUser;
 
-            Debug.Log("°Ô½ºÆ® »ı¼º ¿Ï·á");
+            Debug.Log("ê²ŒìŠ¤íŠ¸ ìƒì„± ì™„ë£Œ");
 
             await user.ReloadAsync();
 
-            // °Ô½ºÆ® ´Ğ³×ÀÓ º¯°æ 
-            await SetGuestNickname(user);
+            // ê²ŒìŠ¤íŠ¸ ë‹‰ë„¤ì„ ë³€ê²½ 
+            await SetGuestNicknameAsync(user);
             await user.ReloadAsync();
 
-            Debug.Log("------À¯Àú Á¤º¸(GuestLogin)------");
-            Debug.Log($"À¯Àú ´Ğ³×ÀÓ : {user.DisplayName}");
-            Debug.Log($"À¯Àú ID : {user.UserId}");
-            Debug.Log($"ÀÌ¸ŞÀÏ : {user.Email}");
+            Debug.Log("------ìœ ì € ì •ë³´(GuestLogin)------");
+            Debug.Log($"ìœ ì € ë‹‰ë„¤ì„ : {user.DisplayName}");
+            Debug.Log($"ìœ ì € ID : {user.UserId}");
+            Debug.Log($"ì´ë©”ì¼ : {user.Email}");
 
-            // LoginPanel -> GameStartPanel ·Î º¯°æ
+            // LoginPanel -> GameStartPanel ë¡œ ë³€ê²½
             if (user != null)
             {
-                Debug.Log("°Ô½ºÆ® Á¤º¸ ¾÷µ¥ÀÌÆ® ¿Ï·á. GameStartÆĞ³Î È°¼ºÈ­");
+                Debug.Log("ê²ŒìŠ¤íŠ¸ ì •ë³´ ì—…ë°ì´íŠ¸ ì™„ë£Œ. GameStartíŒ¨ë„ í™œì„±í™”");
                 LoginCompleted?.Invoke();
                 _isClicked = false;
             }
@@ -82,28 +81,28 @@ public class GuestSignIn : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀÍ¸í°èÁ¤ÀÇ DisplayNameÀ» "°Ô½ºÆ® + ·£´ı¼ıÀÚ"·Î º¯°æÇÏ´Â ¸Ş¼­µå 
-    /// ¿¬°á: GuestLogin
+    /// ìµëª…ê³„ì •ì˜ DisplayNameì„ "ê²ŒìŠ¤íŠ¸ + ëœë¤ìˆ«ì"ë¡œ ë³€ê²½í•˜ëŠ” ë©”ì„œë“œ 
+    /// ì—°ê²°: GuestLogin
     /// </summary>
-    /// <param name="currentUser">´Ğ³×ÀÓÀ» º¯°æÇÒ À¯Àú</param>
-    public static async Task SetGuestNickname(FirebaseUser currentUser)
+    /// <param name="currentUser">ë‹‰ë„¤ì„ì„ ë³€ê²½í•  ìœ ì €</param>
+    public static async Task SetGuestNicknameAsync(FirebaseUser currentUser)
     {
         UserProfile profile = new UserProfile();
-        profile.DisplayName = $"°Ô½ºÆ®{Random.Range(1000, 10000)}";
+        profile.DisplayName = $"ê²ŒìŠ¤íŠ¸{Random.Range(1000, 10000)}";
 
         await currentUser.UpdateUserProfileAsync(profile);
-        // ÃÊ±âÈ­
+        // ì´ˆê¸°í™”
         await currentUser.ReloadAsync();
         
-        // Firebase DB¿¡ ´Ğ³×ÀÓ ÀúÀå
+        // Firebase DBì— ë‹‰ë„¤ì„ ì €ì¥
         await SaveNicknameAsync();
         await currentUser.ReloadAsync();
 
-        Debug.Log("´Ğ³×ÀÓ ¼³Á¤ ¼º°ø");
-        Debug.Log($"º¯°æµÈ À¯Àú ´Ğ³×ÀÓ : {currentUser.DisplayName}");
+        Debug.Log("ë‹‰ë„¤ì„ ì„¤ì • ì„±ê³µ");
+        Debug.Log($"ë³€ê²½ëœ ìœ ì € ë‹‰ë„¤ì„ : {currentUser.DisplayName}");
     }
 
-    public static async Task<bool> SaveNicknameAsync()
+    private static async Task<bool> SaveNicknameAsync()
     {
         FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
         string uid = currentUser.UserId;
@@ -111,12 +110,11 @@ public class GuestSignIn : MonoBehaviour
 
         Dictionary<string, object> dictionary = new Dictionary<string, object>();
 
-        // ÀÍ¸í°èÁ¤ RankData ÀúÀå x
+        // ìµëª…ê³„ì • RankData ì €ì¥ x
         if (currentUser.IsAnonymous)
         {
             dictionary[$"UserData/{uid}/Nickname"] = userNickname;
         }
-
         else
         {
             dictionary[$"UserData/{uid}/Nickname"] = userNickname;
@@ -128,12 +126,12 @@ public class GuestSignIn : MonoBehaviour
 
         if (task.IsCompletedSuccessfully)
         {
-            Debug.Log("UserData / RankData ¿¡ ´Ğ³×ÀÓ ÀúÀå ¼º°ø");
+            Debug.Log("UserData / RankData ì— ë‹‰ë„¤ì„ ì €ì¥ ì„±ê³µ");
             return true;
         }
         else
         {
-            Debug.LogError("´Ğ³×ÀÓ ÀúÀå ½ÇÆĞ");
+            Debug.LogError("ë‹‰ë„¤ì„ ì €ì¥ ì‹¤íŒ¨");
             return false;
         }
     }
