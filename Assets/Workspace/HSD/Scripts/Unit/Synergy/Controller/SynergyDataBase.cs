@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "SynergyDatabase", menuName = "Data/Synergy/Database")]
+[CreateAssetMenu(fileName = "SynergyDatabase", menuName = "Data/Database/Synergy")]
 public class SynergyDatabase : ScriptableObject
 {
     private readonly Dictionary<string, SynergyData> _synergyEffectDic = new Dictionary<string, SynergyData>(60);
 
-    [SerializeField] private UnitSynergyData[] _unitSynergyDatas;
-    [SerializeField] private ClassSynergyData[] _classSynergyDatas;
+    [SerializeField] UnitSynergyData[] _unitSynergyDatas;
+    [SerializeField] ClassSynergyData[] _classSynergyDatas;
 
     public void Init()
     {        
