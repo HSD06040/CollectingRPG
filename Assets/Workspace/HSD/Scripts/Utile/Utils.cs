@@ -61,7 +61,9 @@ public static class Utils
         Vector2 boxSize,
         float angle,
         int maxCount,        
-        LayerMask layerMask,
+        LayerMask layerMask,        
+        System.Func<List<GameObject>, int, GameObject[]> filter = null,
+        int maxTargets = 50,
         bool sortByDistance = true)
     {
         _cachedTargets.Clear(); // 재사용
@@ -85,7 +87,7 @@ public static class Utils
         {
             if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
                 _cachedTargets.Add(_hitBuffer[i].gameObject);
-        }
+        }        
 
         if (sortByDistance && _cachedTargets.Count > 1)
         {
@@ -99,8 +101,8 @@ public static class Utils
             });
         }
 
-        GameObject[] result = new GameObject[_cachedTargets.Count];
-        _cachedTargets.CopyTo(result);
+        GameObject[] result = filter.Invoke(_cachedTargets, maxTargets);
+               
         return result;
     }
 

@@ -20,7 +20,5 @@ public class UnitMeleeAttack : UnitAttackData
         }
 
         status.GetMana();
-
-        Debug.Log($"마나 : {attacker.GetStatusController().CurMana.Value}");
     }
 }

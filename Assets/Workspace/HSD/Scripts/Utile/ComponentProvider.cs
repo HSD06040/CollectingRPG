@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class ComponentProvider
 {
-    private static readonly Dictionary<string, Component> _components = new Dictionary<string, Component>();
+    private static readonly Dictionary<string, Component> _components = new Dictionary<string, Component>(5000);
 
     public static void Add<T>(GameObject obj, T component) where T : Component
     {
