@@ -26,6 +26,9 @@ public class TeamOrganizeManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text _costInfoText;
     [SerializeField] private TMP_Text _totalOverallPowerText;
+    [SerializeField] private TMP_Text _leaderEffectText;
+    [SerializeField] private GameObject _popUpUI;
+    [SerializeField] private TMP_Text _popUpText;
 
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
@@ -54,8 +57,10 @@ public class TeamOrganizeManager : MonoBehaviour
     {
         OnCharacterDataChanged += ShowCostInfo;
         OnCharacterDataChanged += ShowTotalOverallPowerInfo;
+        OnCharacterDataChanged += ShowLeaderEffectInfo;
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
+        ShowLeaderEffectInfo();
         _collectedCharData = _collectedCharacterData.CollectedCharData;
     }
 
@@ -63,6 +68,7 @@ public class TeamOrganizeManager : MonoBehaviour
     {
         OnCharacterDataChanged -= ShowCostInfo;
         OnCharacterDataChanged -= ShowTotalOverallPowerInfo;
+        OnCharacterDataChanged -= ShowLeaderEffectInfo;
     }
 
     #endregion
@@ -84,13 +90,13 @@ public class TeamOrganizeManager : MonoBehaviour
 
         if (_currentCharacterSOs.Contains(data))
         {
-            Debug.Log("ÀÌ¹Ì Æí¼ºµÈ Ä³¸¯ÅÍÀÔ´Ï´Ù");
+            Debug.Log("ì´ë¯¸ í¸ì„±ëœ ìºë¦­í„°ì…ë‹ˆë‹¤");
             return;
         }
 
         if (_currentCost + data.Cost > _totalCost)
         {
-            Debug.Log("ÄÚ½ºÆ® »óÇÑÄ¡¸¦ ÃÊ°úÇß½À´Ï´Ù");
+            Debug.Log("ì½”ìŠ¤íŠ¸ ìƒí•œì¹˜ë¥¼ ì´ˆê³¼í–ˆìŠµë‹ˆë‹¤");
             return;
         }
 
@@ -106,7 +112,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
             if (i == _currentCharacterSOs.Length - 1)
             {
-                Debug.Log("Æí¼º Á¦ÇÑÄ¡¸¦ ÃÊ°úÇß½À´Ï´Ù.");
+                Debug.Log("í¸ì„± ì œí•œì¹˜ë¥¼ ì´ˆê³¼í–ˆìŠµë‹ˆë‹¤.");
                 return;
             }
         }
@@ -129,7 +135,7 @@ public class TeamOrganizeManager : MonoBehaviour
     #region AutoMatic Selection
 
     /// <summary>
-    /// µ¿Àû °èÈ¹¹ı ¾Ë°í¸®ÁòÀ» ÀÌ¿ëÇÑ Ä³¸¯ÅÍ ÀÚµ¿Æí¼º
+    /// ë™ì  ê³„íšë²• ì•Œê³ ë¦¬ì¦˜ì„ ì´ìš©í•œ ìºë¦­í„° ìë™í¸ì„±
     /// </summary>
     public void AutoSelectCharacters()
     {
@@ -137,7 +143,7 @@ public class TeamOrganizeManager : MonoBehaviour
         int[,,] dp = new int[n + 1, _totalCost + 1, _currentCharacterSOs.Length + 1];
         bool[,,] take = new bool[n + 1, _totalCost + 1, _currentCharacterSOs.Length + 1];
 
-        // DP ÁøÇà - Bottom-Up ¹æ½Ä
+        // DP ì§„í–‰ - Bottom-Up ë°©ì‹
         for (int i = 1; i <= n; i++)
         {
             int power = _collectedCharData[i - 1].OverallPower;
@@ -147,10 +153,10 @@ public class TeamOrganizeManager : MonoBehaviour
             {
                 for (int k = 0; k <= _currentCharacterSOs.Length; k++)
                 {
-                    // ¼±ÅÃ ¾ÈÇÔ
+                    // ì„ íƒ ì•ˆí•¨
                     dp[i, c, k] = dp[i - 1, c, k];
 
-                    // ¼±ÅÃ °¡´ÉÇÒ ¶§
+                    // ì„ íƒ ê°€ëŠ¥í•  ë•Œ
                     if (c >= cost && k >= 1)
                     {
                         int newPower = dp[i - 1, c - cost, k - 1] + power;
@@ -164,7 +170,7 @@ public class TeamOrganizeManager : MonoBehaviour
             }
         }
 
-        // ÃÖÀû °ª Ã£±â
+        // ìµœì  ê°’ ì°¾ê¸°
         int bestPower = 0;
         int bestC = 0;
         int bestK = 0;
@@ -181,7 +187,7 @@ public class TeamOrganizeManager : MonoBehaviour
             }
         }
 
-        // ¿ªÃßÀû
+        // ì—­ì¶”ì 
         List<CharacterSO> bestTeam = new List<CharacterSO>();
         int ci = bestC;
         int ki = bestK;
@@ -196,14 +202,14 @@ public class TeamOrganizeManager : MonoBehaviour
             }
         }
 
-        // ÀüÅõ·ÂÀÌ ³ôÀº ¼øÀ¸·Î Á¤·Ä
+        // ì „íˆ¬ë ¥ì´ ë†’ì€ ìˆœìœ¼ë¡œ ì •ë ¬
         bestTeam.OrderByDescending(n => n);
 
-        // ±âÁ¸ Æí¼º ÃÊ±âÈ­
+        // ê¸°ì¡´ í¸ì„± ì´ˆê¸°í™”
         Array.Clear(_currentCharacterSOs, 0, _currentCharacterSOs.Length);
         _currentCost = 0;
 
-        // ÃÖÀû Æí¼º Àû¿ë
+        // ìµœì  í¸ì„± ì ìš©
         for (int i = 0; i < bestTeam.Count; i++)
         {
             _currentCharacterSOs[i] = bestTeam[i];
@@ -226,7 +232,12 @@ public class TeamOrganizeManager : MonoBehaviour
     private void ShowTotalOverallPowerInfo()
     {
         _totalOverallPowerText.text = $"OverallPower : {_currentOverallPower}";
-        Debug.Log("½ÇÇà");
+    }
+
+    private void ShowLeaderEffectInfo()
+    {
+        if (_currentCharacterSOs[0] == null) _leaderEffectText.text = "LeaderEffect : None";
+        else _leaderEffectText.text = $"LeaderEffect : {_currentCharacterSOs[0].LeaderEffectDescription}";
     }
 
     #endregion
@@ -235,6 +246,13 @@ public class TeamOrganizeManager : MonoBehaviour
 
     public void SelectCharacterPreset(int index)
     {
+        if (_currentCharacterSOs[0] == null)
+        {
+            _popUpUI.SetActive(true);
+            _popUpText.text = "Leader is not added.\nPlease add.";
+            return;
+        }
+
         _currentCharacterSOs = _selectedCharacters[index].CharLists;
         _currentCost = 0;
         _currentOverallPower = 0;
