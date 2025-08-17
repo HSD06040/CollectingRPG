@@ -9,7 +9,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
-
+    public Vector2Int CurrentSlot;
     private Vector3 _localScale;
     private int _enemyLayer;
 

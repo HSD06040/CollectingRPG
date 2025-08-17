@@ -5,34 +5,41 @@ using UnityEngine;
 
 public class UnitSlot : MonoBehaviour
 {
+    public UnitBase Unit;
+
     private SpriteRenderer _sr;
     private int _line;
-    private Vector2 _pos;
-    private UnitBase _unit;
+    private Vector2Int _pos;
 
     private void Awake()
     {
         _sr = GetComponent<SpriteRenderer>();        
     }
 
-    public void Init(int line, Vector2 pos)
+    public void Init(int line, Vector2Int pos)
     {
         _line = line;
         _pos = pos;
-    }
-    
-    public void CheckUnit(UnitBase unit)
-    {
-
-    }
+    }  
 
     public void SetUnit(UnitBase unit)
     {
         if (unit == null) return;
-        
+
+        if(Unit != null)
+        {
+            Debug.Log("이미 배치된 유닛이 존재합니다.");
+        }
+
+        unit.CurrentSlot = _pos;
         unit.gameObject.transform.position = transform.position;
         unit.gameObject.transform.SetParent(transform);
 
-        _unit = unit;
+        Unit = unit;
+    }
+
+    public void ClearSlot()
+    {
+        Unit = null;
     }
 }

@@ -759,7 +759,7 @@ Transform:
   m_GameObject: {fileID: 187535050}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.63, y: -1.29, z: 0.042325046}
+  m_LocalPosition: {x: -7.63, y: 0.94, z: 0.042325046}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -948,6 +948,7 @@ MonoBehaviour:
   <Rb>k__BackingField: {fileID: 200288635}
   <Data>k__BackingField: {fileID: 11400000, guid: dd8b5398c417bc74ea9e3e3ef1f4be51,
     type: 2}
+  CurrentSlot: {x: 0, y: 0}
   StatusController: {fileID: 200288636}
   _fsm: {fileID: 1389663898}
 --- !u!4 &200288639
@@ -5003,6 +5004,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _synergyController: {fileID: 1086594950}
   _unitSlotManager: {fileID: 1570374704}
+  _unitDragDropSystem: {fileID: 1059808076}
 --- !u!114 &1059808076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6252,7 +6254,7 @@ MonoBehaviour:
     type: 3}
   _slotParent: {fileID: 187535051}
   _size: {x: 5, y: 3}
-  _offset: {x: 1.1, y: 1.1}
+  _offset: {x: 1.1, y: -1.1}
 --- !u!1 &1281826498
 GameObject:
   m_ObjectHideFlags: 0
@@ -9612,6 +9614,7 @@ MonoBehaviour:
   <Rb>k__BackingField: {fileID: 1858032779}
   <Data>k__BackingField: {fileID: 11400000, guid: 0213d327ee461674dbd620f59eacfcdb,
     type: 2}
+  CurrentSlot: {x: 0, y: 0}
   StatusController: {fileID: 1858032780}
   _fsm: {fileID: 351490880}
 --- !u!4 &1858032783
@@ -10605,6 +10608,7 @@ MonoBehaviour:
   <Rb>k__BackingField: {fileID: 2043808146}
   <Data>k__BackingField: {fileID: 11400000, guid: 0213d327ee461674dbd620f59eacfcdb,
     type: 2}
+  CurrentSlot: {x: 0, y: 0}
   StatusController: {fileID: 2043808145}
   _fsm: {fileID: 8226123103500812869}
 --- !u!4 &2043808143
