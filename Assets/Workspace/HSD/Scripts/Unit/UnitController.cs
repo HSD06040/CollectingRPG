@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitController : MonoBehaviour
@@ -7,13 +8,29 @@ public class UnitController : MonoBehaviour
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
 
+    private UnitBase[,] _unitGrid;
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassSynergy, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassSynergy, List<UnitBase>>(64);
 
     private void Awake()
     {
+        int rows = _unitSlotManager.SlotCreater.Size.y;
+        int cols = _unitSlotManager.SlotCreater.Size.x;
+        _unitGrid = new UnitBase[rows, cols];
+
         _unitSlotManager.Init();
         _unitDragDropSystem.OnUnitDropped += AddUnit;
+    }
+
+    public void UnitFight()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit == null)
+                continue;
+
+            unit.Fight();
+        }
     }
 
     public void AddUnit(UnitSlot slot, UnitBase unit)
@@ -27,26 +44,27 @@ public class UnitController : MonoBehaviour
                 RemoveUnit(slot);
             }
 
-            slot.SetUnit(unit);
+            SetSlot(slot, unit);
             AddSynergyUnit(unit);
         }
         else
         {
-            if (slotUnit != null)
-            {
-                UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(unit);
+            UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(unit);
 
+            // 스왑
+            if (slotUnit != null)
+            {                
                 unitSlot.ClearSlot();
                 slot.ClearSlot();
 
-                unitSlot.SetUnit(unit);
-                slot.SetUnit(slotUnit);
+                SetSlot(unitSlot, unit);
+                SetSlot(slot, slotUnit);               
             }
             else
-            {
-                UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(unit);
+            {     
+                // 이동
                 unitSlot.ClearSlot();
-                slot.SetUnit(unit);
+                SetSlot(slot, unit);                
             }
         }
     }
@@ -55,15 +73,22 @@ public class UnitController : MonoBehaviour
     {
         if (slot.Unit == null) return;
 
-        Destroy(slot.Unit.gameObject);
+        UnitBase unit = slot.Unit;
 
-        Synergy synergy = slot.Unit.Data.EnhancementData.Synergy;
-        ClassSynergy classSynergy = slot.Unit.Data.EnhancementData.ClassSynergy;
+        _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = null;
+
+        Synergy synergy = unit.Data.EnhancementData.Synergy;
+        ClassSynergy classSynergy = unit.Data.EnhancementData.ClassSynergy;
 
         _synergyController.RemoveSynergy(synergy, classSynergy);
 
-        _synergyUnitDic[synergy].Remove(slot.Unit);
-        _classSynergyUnitDic[classSynergy].Remove(slot.Unit);
+        if (_synergyUnitDic.TryGetValue(synergy, out var synergyList))
+            synergyList.Remove(unit);
+
+        if (_classSynergyUnitDic.TryGetValue(classSynergy, out var classList))
+            classList.Remove(unit);
+
+        Destroy(unit.gameObject);
 
         slot.ClearSlot();        
     }
@@ -89,5 +114,11 @@ public class UnitController : MonoBehaviour
         }
 
         classList.Add(unit);
+    }
+
+    public void SetSlot(UnitSlot slot, UnitBase unit)
+    {
+        slot.SetUnit(unit);
+        _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = unit;
     }
 }

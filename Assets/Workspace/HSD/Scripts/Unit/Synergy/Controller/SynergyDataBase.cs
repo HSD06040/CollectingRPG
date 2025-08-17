@@ -18,20 +18,20 @@ public class SynergyDatabase : ScriptableObject
             Debug.Log("시너지 데이터가 설정되지 않았습니다.");
             return;
         }
-        foreach (var effect in _unitSynergyDatas)
+        foreach (var synergyData in _unitSynergyDatas)
         {
-            if (!_synergyEffectDic.ContainsKey(effect.SynergyName))
-                _synergyEffectDic.Add(effect.Synergy.ToString(), effect);
+            if (!_synergyEffectDic.ContainsKey(synergyData.Synergy.ToString()))
+                _synergyEffectDic.Add(synergyData.Synergy.ToString(), synergyData);
             else
-                Debug.LogWarning($"Duplicate SynergyName: {effect.SynergyName}");
+                Debug.LogWarning($"Duplicate SynergyName: {synergyData.Synergy.ToString()}");
         }
 
-        foreach (var effect in _classSynergyDatas)
+        foreach (var synergyData in _classSynergyDatas)
         {
-            if (!_synergyEffectDic.ContainsKey(effect.SynergyName))
-                _synergyEffectDic.Add(effect.Synergy.ToString(), effect);
+            if (!_synergyEffectDic.ContainsKey(synergyData.Synergy.ToString()))
+                _synergyEffectDic.Add(synergyData.Synergy.ToString(), synergyData);
             else
-                Debug.LogWarning($"Duplicate SynergyName: {effect.SynergyName}");
+                Debug.LogWarning($"Duplicate SynergyName: {synergyData.Synergy.ToString()}");
         }
     }
 

@@ -7,16 +7,16 @@ public class SlotCreater : MonoBehaviour
 {
     [SerializeField] GameObject _slotPrefab;
     [SerializeField] Transform _slotParent;
-    [SerializeField] Vector2 _size;
     [SerializeField] Vector2 _offset;    
+    public Vector2Int Size;    
 
     public Dictionary<Vector2Int, UnitSlot> Init()
     {
         Dictionary<Vector2Int, UnitSlot> unitSlotDic = new Dictionary<Vector2Int, UnitSlot>();
 
-        for (int i = 0; i < _size.y; i++)
+        for (int i = 0; i < Size.y; i++)
         {
-            for (int j = 0; j < _size.x; j++)
+            for (int j = 0; j < Size.x; j++)
             {
                 UnitSlot slot = Instantiate(_slotPrefab, GetPos(j, i), Quaternion.identity, _slotParent).GetComponent<UnitSlot>();
                 Vector2Int pos = new Vector2Int(j + 1, i + 1);

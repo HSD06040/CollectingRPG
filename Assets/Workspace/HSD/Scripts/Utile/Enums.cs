@@ -1,7 +1,7 @@
 
 public enum ClassSynergy
 {
-    A,B,C,D
+    S, B, C, D
 }
 
 public enum Synergy

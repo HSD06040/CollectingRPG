@@ -2018,7 +2018,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1464242119}
-  - {fileID: 245099037}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5069,41 +5068,6 @@ Transform:
   - {fileID: 77193152}
   m_Father: {fileID: 1756922405}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &245099036
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 245099037}
-  m_Layer: 5
-  m_Name: TestUnitSelect
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &245099037
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 245099036}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 144563089}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &246311864
 GameObject:
   m_ObjectHideFlags: 0
@@ -14629,6 +14593,56 @@ Transform:
   - {fileID: 2028332262}
   m_Father: {fileID: 2008189731}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -30}
+--- !u!1 &859023219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 859023220}
+  - component: {fileID: 859023221}
+  m_Layer: 0
+  m_Name: EnemyController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &859023220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859023219}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.0034707, y: 0.91256016, z: 0.00929089}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &859023221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859023219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306ac8cc94dad434b9284c48a0406446, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _unitBases:
+  - {fileID: 200288638}
+  - {fileID: 768819644}
+  - {fileID: 1986286379}
+  - {fileID: 1732700157}
+  - {fileID: 809038388}
 --- !u!1 &864237761
 GameObject:
   m_ObjectHideFlags: 0
@@ -22081,8 +22095,8 @@ MonoBehaviour:
   _slotPrefab: {fileID: 70162652676710751, guid: f3680331042853349b2f17a614806dd0,
     type: 3}
   _slotParent: {fileID: 187535051}
-  _size: {x: 5, y: 3}
   _offset: {x: 1.1, y: -1.1}
+  Size: {x: 5, y: 3}
 --- !u!1 &1267951126
 GameObject:
   m_ObjectHideFlags: 0
@@ -25136,9 +25150,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8226123103500812869}
-        m_TargetAssemblyTypeName: BaseFSM, Assembly-CSharp
-        m_MethodName: Fight
+      - m_Target: {fileID: 1059808075}
+        m_TargetAssemblyTypeName: UnitController, Assembly-CSharp
+        m_MethodName: UnitFight
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -25148,9 +25162,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1389663898}
-        m_TargetAssemblyTypeName: BaseFSM, Assembly-CSharp
-        m_MethodName: Fight
+      - m_Target: {fileID: 859023221}
+        m_TargetAssemblyTypeName: EnemyController, Assembly-CSharp
+        m_MethodName: EnemyFight
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -26599,7 +26613,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1e509a568bf69a4590ec00530828fab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _slotCreater: {fileID: 1267641494}
+  SlotCreater: {fileID: 1267641494}
 --- !u!1 &1573220615
 GameObject:
   m_ObjectHideFlags: 0
@@ -53378,4 +53392,5 @@ SceneRoots:
   - {fileID: 809038389}
   - {fileID: 1737774577}
   - {fileID: 1059808074}
+  - {fileID: 859023220}
   - {fileID: 187535051}

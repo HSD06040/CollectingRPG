@@ -45,6 +45,11 @@ public class UnitBase : MonoBehaviour, IAttacker
         ComponentProvider.Remove<UnitStatusController>(gameObject);
     }
 
+    public void Fight()
+    {
+        _fsm.Fight();
+    }
+
     public void Attack()
     {
         Data.AttackData.Attack(this);

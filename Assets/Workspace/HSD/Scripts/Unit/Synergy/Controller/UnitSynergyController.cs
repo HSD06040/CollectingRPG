@@ -9,12 +9,21 @@ public class SynergyController : MonoBehaviour
 
     private void Awake()
     {
-        _database.Init();
+        _database.Init();       
     }
 
     public void AddSynergy(Synergy unitSynergy, ClassSynergy classSynergy)
     {
+        if(!_synergyCountDic.ContainsKey(unitSynergy.ToString()))
+        {
+            _synergyCountDic.Add(unitSynergy.ToString(), 0);
+        }
         _synergyCountDic[unitSynergy.ToString()]++;
+
+        if (!_synergyCountDic.ContainsKey(classSynergy.ToString()))
+        {
+            _synergyCountDic.Add(classSynergy.ToString(), 0);
+        }
         _synergyCountDic[classSynergy.ToString()]++;
 
         CheckSynergy(unitSynergy.ToString());
