@@ -25,7 +25,7 @@ public class HoverProjectile : Projectile
         base.OnTriggerEnter2D(collision);
     }
 
-    protected override async UniTaskVoid MoveAndDestroyAsync(float duration)
+    protected override async UniTask MoveAndDestroyAsync(float duration)
     {
         float elapsed = 0f;
 

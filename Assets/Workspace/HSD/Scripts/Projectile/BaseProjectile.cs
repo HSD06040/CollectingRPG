@@ -14,7 +14,7 @@ public class BaseProjectile : Projectile
         MoveAndDestroyAsync(3f).Forget(); // 3초 후에 파괴되도록 설정
     }
 
-    protected override async UniTaskVoid MoveAndDestroyAsync(float duration)
+    protected override async UniTask MoveAndDestroyAsync(float duration)
     {
         float elapsed = 0f;
 

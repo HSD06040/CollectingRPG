@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    protected float _lifeTime = 5f; // 발사체의 생명 시간
+    [SerializeField] protected float _lifeTime = 5f; // 발사체의 생명 시간
     protected int _pireceCount;
     protected float _attackPower;
     protected DamageType _damageType;
@@ -56,7 +56,7 @@ public class Projectile : MonoBehaviour
         }
     }
 
-    protected virtual async UniTaskVoid MoveAndDestroyAsync(float duration)
+    protected virtual async UniTask MoveAndDestroyAsync(float duration)
     {
     }
 }
