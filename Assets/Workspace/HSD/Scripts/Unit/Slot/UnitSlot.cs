@@ -26,11 +26,6 @@ public class UnitSlot : MonoBehaviour
     {
         if (unit == null) return;
 
-        if(Unit != null)
-        {
-            Debug.Log("이미 배치된 유닛이 존재합니다.");
-        }
-
         unit.CurrentSlot = _pos;
         unit.gameObject.transform.position = transform.position;
         unit.gameObject.transform.SetParent(transform);
@@ -40,6 +35,7 @@ public class UnitSlot : MonoBehaviour
 
     public void ClearSlot()
     {
+        Debug.Log($"{_pos} 의 슬롯 클리어");
         Unit = null;
     }
 }

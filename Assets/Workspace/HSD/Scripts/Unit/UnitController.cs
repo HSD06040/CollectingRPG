@@ -24,18 +24,18 @@ public class UnitController : MonoBehaviour
             }
 
             slot.SetUnit(unit);
+            _synergyController.AddSynergy(unit.Data.EnhancementData.Synergy, unit.Data.EnhancementData.ClassSynergy);
         }
         else
         {
-             // 슬롯 유닛의 현재 슬롯을 구한다.
-
             if (slotUnit != null)
             {
-                UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(slotUnit);
+                UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(unit);
+
                 unitSlot.ClearSlot();
                 slot.ClearSlot();
 
-                unitSlot.SetUnit(unit); // 슬롯 유닛의 현재 슬롯에 새로운 유닛을 배치한다.
+                unitSlot.SetUnit(unit);
                 slot.SetUnit(slotUnit);
             }
             else
@@ -52,6 +52,7 @@ public class UnitController : MonoBehaviour
         if (slot.Unit == null) return;
 
         Destroy(slot.Unit.gameObject);
-        slot.ClearSlot();           
+        _synergyController.RemoveSynergy(slot.Unit.Data.EnhancementData.Synergy, slot.Unit.Data.EnhancementData.ClassSynergy);
+        slot.ClearSlot();        
     }
 }
