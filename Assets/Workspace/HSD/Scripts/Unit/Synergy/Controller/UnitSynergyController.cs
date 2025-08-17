@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,9 +8,12 @@ public class SynergyController : MonoBehaviour
 
     [SerializeField] SynergyDatabase _database;
 
+    public Action OnSynergyChanged;
+
     private void Awake()
     {
-        _database.Init();       
+        _database.Init();
+        OnSynergyChanged += TestDebug;
     }
 
     public void AddSynergy(Synergy unitSynergy, ClassSynergy classSynergy)
@@ -28,6 +32,8 @@ public class SynergyController : MonoBehaviour
 
         CheckSynergy(unitSynergy.ToString());
         CheckSynergy(classSynergy.ToString());
+
+        OnSynergyChanged?.Invoke();
     }
 
     public void RemoveSynergy(Synergy unitSynergy, ClassSynergy classSynergy)
@@ -37,6 +43,8 @@ public class SynergyController : MonoBehaviour
 
         CheckSynergy(unitSynergy.ToString());
         CheckSynergy(classSynergy.ToString());
+
+        OnSynergyChanged?.Invoke();
     }
 
     private void CheckSynergy(string synergyName)
@@ -49,5 +57,13 @@ public class SynergyController : MonoBehaviour
         if (synergy == null) return;
 
         synergy.Check(count);
+    }
+
+    private void TestDebug()
+    {
+        foreach (var synergy in _synergyCountDic)
+        {
+            Debug.Log($"Synergy: {synergy.Key}, Count: {synergy.Value}");
+        }       
     }
 }

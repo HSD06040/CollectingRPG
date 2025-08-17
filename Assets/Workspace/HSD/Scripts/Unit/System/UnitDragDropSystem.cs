@@ -20,7 +20,7 @@ public class UnitDragDropSystem : MonoBehaviour
              
             RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
 
-            if (!_targetLayer.Contain(hit.collider.gameObject.layer))
+            if (hit.collider == null || !_targetLayer.Contain(hit.collider.gameObject.layer))
                 return;
 
             if (hit.collider != null && hit.collider.CompareTag("Unit"))
