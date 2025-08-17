@@ -22,6 +22,19 @@ public class UnitController : MonoBehaviour
         _unitDragDropSystem.OnUnitDropped += AddUnit;
     }
 
+    public void UnitStanby()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit == null)
+                continue;
+
+            unit.Stanby();
+        }
+
+        _unitDragDropSystem.enabled = true;
+    }
+
     public void UnitFight()
     {
         foreach (var unit in _unitGrid)
@@ -31,6 +44,8 @@ public class UnitController : MonoBehaviour
 
             unit.Fight();
         }
+
+        _unitDragDropSystem.enabled = false;
     }
 
     public void AddUnit(UnitSlot slot, UnitBase unit)

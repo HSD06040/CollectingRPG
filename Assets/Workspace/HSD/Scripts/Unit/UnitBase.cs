@@ -17,6 +17,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     public UnitStatusController StatusController;
     [SerializeField] BaseFSM _fsm;
 
+    #region LifeCycle
     protected virtual void Awake()
     {
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
@@ -35,6 +36,9 @@ public class UnitBase : MonoBehaviour, IAttacker
         RemoveProviderComponents();
     }
 
+    #endregion
+
+    #region Provider
     private void AddProviderComponents()
     {
         ComponentProvider.Add<UnitStatusController>(gameObject, StatusController);
@@ -44,10 +48,17 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         ComponentProvider.Remove<UnitStatusController>(gameObject);
     }
+    #endregion
 
+    #region FSM
     public void Fight()
     {
         _fsm.Fight();
+    }
+
+    public void Stanby()
+    {
+        _fsm.Stanby();
     }
 
     public void Attack()
@@ -100,7 +111,9 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         transform.localScale = _localScale;
     }
+    
 
+    #region Bool
     /// <summary>
     /// 범위안에 들어와 있다면
     /// </summary>
@@ -125,13 +138,44 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         return Vector2.Dot(TargetDir, new Vector2(Target.GetFacingDir(), 0)) < 0;
     }
+    #endregion
 
+    #endregion
+
+    #region Getters
     private Vector2 GetTargetDirection()
     {
         if (Target == null) return Vector2.zero;
         return (Target.position - transform.position).normalized;
     }
 
+    public float GetAttackTime()
+    {
+        return 1 / StatusController.AttackSpeed.Value;
+    }
+
+    public Transform GetTarget()
+    {
+        return Target;
+    }
+
+    public UnitData GetUnitData()
+    {
+        return Data;
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
+    }
+
+    public UnitStatusController GetStatusController()
+    {
+        return StatusController;
+    }
+    #endregion
+
+    #region Gizmos
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
@@ -168,29 +212,5 @@ public class UnitBase : MonoBehaviour, IAttacker
         }
     }
 #endif
-
-    public float GetAttackTime()
-    {
-        return 1 / StatusController.AttackSpeed.Value;
-    }
-
-    public Transform GetTarget()
-    {
-        return Target;
-    }
-
-    public UnitData GetUnitData()
-    {
-        return Data;
-    }
-
-    public Transform GetTransform()
-    {
-        return transform;
-    }
-
-    public UnitStatusController GetStatusController()
-    {
-        return StatusController;
-    }
+    #endregion
 }

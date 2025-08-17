@@ -9,7 +9,7 @@ public class UnitDragDropSystem : MonoBehaviour
     private GameObject _currentUnit;
     private Vector2 _offset;
     private Vector2 _pos;
-
+    [SerializeField] LayerMask _targetLayer;
     public event Action<UnitSlot, UnitBase> OnUnitDropped;
 
     private void Update()
@@ -19,6 +19,9 @@ public class UnitDragDropSystem : MonoBehaviour
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
              
             RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+
+            if (!_targetLayer.Contain(hit.collider.gameObject.layer))
+                return;
 
             if (hit.collider != null && hit.collider.CompareTag("Unit"))
             {
