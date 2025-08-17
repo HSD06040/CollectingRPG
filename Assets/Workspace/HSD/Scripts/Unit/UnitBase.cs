@@ -1,27 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class UnitBase : MonoBehaviour, IAttacker
-{    
+{
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
-    [field : SerializeField] public UnitData Data { get; private set; }
+    [field: SerializeField] public UnitData Data { get; private set; }
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
 
     private Vector3 _localScale;
+    private int _enemyLayer;
 
     [Header("Logic Components")]
     public UnitStatusController StatusController;
     [SerializeField] BaseFSM _fsm;
 
     protected virtual void Awake()
-    {        
+    {
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
+        _enemyLayer = LayerMask.NameToLayer("Enemy");
         StatusController.Init(Data);
         AddProviderComponents();
     }
@@ -53,20 +52,20 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public bool SkillCheck()
     {
-        return false; 
+        return false;
         if (StatusController.CurMana.Value >= Data.Skill.NeedMana)
         {
             StatusController.CurMana.Value -= Data.Skill.NeedMana;
             return true;
         }
-        else 
+        else
             return false;
     }
 
     public void FindTarget()
     {
         if (Target != null) return;
- 
+
         Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 
@@ -76,7 +75,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         if (Target == null)
         {
-            if(TargetLayer.Contain(6))
+            if (TargetLayer.Contain(_enemyLayer))
                 _localScale.x = -Mathf.Abs(_localScale.x);
             else
                 _localScale.x = Mathf.Abs(_localScale.x);
@@ -103,7 +102,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     /// <returns></returns>
     public bool IsTargetInRange()
     {
-        if(Target == null) return false;
+        if (Target == null) return false;
 
         return Vector2.Distance(Target.position, transform.position) <= StatusController.AttackRange.Value;
     }
@@ -144,13 +143,23 @@ public class UnitBase : MonoBehaviour, IAttacker
         if (Data.AttackData == null) return;
         // 공격 범위
         Gizmos.color = Color.red;
-        if (Data.AttackData.SearchType == SearchType.Circle)
+        Vector2 center = transform.position;
+        if (Data.AttackData is UnitMeleeAttack MeleeAttackData)
         {
-            Vector2 center = transform.position;
-            Vector2 offset = Data.AttackData.Offset;
+            if (MeleeAttackData.SearchType == SearchType.Circle)
+            {
+                Vector2 offset = Data.AttackData.AttackPointOffset;
+                offset.x *= transform.GetFacingDir();
+
+                Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);
+            }
+        }
+        else if (Data.AttackData is UnitRangedAttack RandAttackData)
+        {
+            Vector2 offset = Data.AttackData.AttackPointOffset;
             offset.x *= transform.GetFacingDir();
 
-            Gizmos.DrawWireSphere(center + offset, Data.AttackData.SizeOrRadius);
+            Gizmos.DrawWireSphere(center + offset, .1f);
         }
     }
 #endif

@@ -15,10 +15,10 @@ public static class Utils
         return Mathf.RoundToInt(damage * (1f - totalDefense));
     }
 
-    public static int CalculateBaseDamage(this UnitStatusController status, float multiply, DamageType damageType)
+    public static int CalculateBaseDamage(this UnitStatusController status, float attackPower, DamageType damageType)
     {
         int damage = damageType == DamageType.Physical ? status.PhysicalDamage.Value : status.MagicDamage.Value;
-        float total = damage * multiply;
+        float total = damage * attackPower;
 
         if(status.CritChance.Value > Random.Range(0f, 100f))
         {

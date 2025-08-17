@@ -532,7 +532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxHealth:
-    _baseValue: 100
+    _baseValue: 0
     _modifiers: []
   MaxMana:
     _baseValue: 0
@@ -541,7 +541,7 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   AttackSpeed:
-    _baseValue: 10
+    _baseValue: 1
     _modifiers: []
   MoveSpeed:
     _baseValue: 1
@@ -559,16 +559,16 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   PhysicalDefense:
-    _baseValue: 10
+    _baseValue: 0
     _modifiers: []
   MagicDefense:
     _baseValue: 0
     _modifiers: []
   AttackRange:
-    _baseValue: 1
+    _baseValue: 4.13
     _modifiers: []
   AttackCount:
-    _baseValue: 0
+    _baseValue: 2
     _modifiers: []
   DetectionRange: 5
 --- !u!70 &200288637
@@ -621,7 +621,7 @@ MonoBehaviour:
   <Target>k__BackingField: {fileID: 0}
   <Anim>k__BackingField: {fileID: 1389663901}
   <Rb>k__BackingField: {fileID: 200288635}
-  <Data>k__BackingField: {fileID: 11400000, guid: 0213d327ee461674dbd620f59eacfcdb,
+  <Data>k__BackingField: {fileID: 11400000, guid: dd8b5398c417bc74ea9e3e3ef1f4be51,
     type: 2}
   StatusController: {fileID: 200288636}
   _fsm: {fileID: 1389663898}
@@ -2454,7 +2454,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76e2d0391365cc241b992c3ba5c24c65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _database: {fileID: 0}
+  _database: {fileID: 11400000, guid: 63bb2100fd9d0af4793a4566e4193c1c, type: 2}
 --- !u!1 &1090617701
 GameObject:
   m_ObjectHideFlags: 0
@@ -5844,7 +5844,7 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   AttackSpeed:
-    _baseValue: 10
+    _baseValue: 1
     _modifiers: []
   MoveSpeed:
     _baseValue: 1
@@ -5868,10 +5868,10 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   AttackRange:
-    _baseValue: 1
+    _baseValue: 0.78
     _modifiers: []
   AttackCount:
-    _baseValue: 0
+    _baseValue: 2
     _modifiers: []
   DetectionRange: 5
 --- !u!50 &2043808146

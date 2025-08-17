@@ -28,7 +28,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     public Stat<int> MagicDefense;
 
     [Header("Range")]
-    public Stat<int> AttackRange;
+    public Stat<float> AttackRange;
     public Stat<int> AttackCount;
     public float DetectionRange = 5f;
     #endregion
