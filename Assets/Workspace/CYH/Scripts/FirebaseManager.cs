@@ -1,12 +1,12 @@
+using System.Collections;
+using System.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
-using Google;
-using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine;
+using Google;
 
-public class FirebaseManager : CYH_Singleton<FirebaseManager>
+public class FirebaseManager : Singleton<FirebaseManager>
 {
     private static FirebaseApp _app;
     public static FirebaseApp App { get { return _app; } }
@@ -31,7 +31,7 @@ public class FirebaseManager : CYH_Singleton<FirebaseManager>
     private GoogleSignInConfiguration _configuration;
     public GoogleSignInConfiguration Configuration { get { return _configuration; } }
 
-    protected override void Awake()
+    private void Awake()
     {
         // GoogleSignIn에 사용할 인증 설정 초기화
         _configuration = new GoogleSignInConfiguration

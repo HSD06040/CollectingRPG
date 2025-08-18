@@ -1,18 +1,19 @@
-using Firebase.Auth;
-using Firebase.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Firebase.Auth;
+using Firebase.Extensions;
 using Random = UnityEngine.Random;
 
 public class GuestSignIn : MonoBehaviour
 {
     [SerializeField] private Button _guestLoginButton;
 
+    // TODO: [CYH] 패널 전환 테스트_1 (삭제 예정)
+    [SerializeField] private GameObject tutorialPanel;
+    [SerializeField] private GameObject SigninPanel;
+
     private bool _isClicked;
-    public Action LoginCompleted { get; set; }
+
 
     private void Start()
     {
@@ -25,10 +26,13 @@ public class GuestSignIn : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Firebase 익명 로그인 후 닉네임 설정
+    /// </summary>
     private void OnClick_GuestLogin()
     {
         _isClicked = true;
-       
+
         // 게스트 로그인 가능 여부 체크
         if (FirebaseManager.Auth.CurrentUser != null)
         {
@@ -55,84 +59,31 @@ public class GuestSignIn : MonoBehaviour
 
             Firebase.Auth.AuthResult result = task.Result;
 
-            FirebaseUser user = FirebaseManager.Auth.CurrentUser;
+            FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
 
             Debug.Log("게스트 생성 완료");
 
-            await user.ReloadAsync();
+            await currentUser.ReloadAsync();
 
             // 게스트 닉네임 변경 
-            await SetGuestNicknameAsync(user);
-            await user.ReloadAsync();
+            await AuthManager.Instance.SetGuestNicknameAsync(currentUser);
+            await currentUser.ReloadAsync();
 
             Debug.Log("------유저 정보(GuestLogin)------");
-            Debug.Log($"유저 닉네임 : {user.DisplayName}");
-            Debug.Log($"유저 ID : {user.UserId}");
-            Debug.Log($"이메일 : {user.Email}");
+            Debug.Log($"유저 닉네임 : {currentUser.DisplayName}");
+            Debug.Log($"유저 ID : {currentUser.UserId}");
+            Debug.Log($"이메일 : {currentUser.Email}");
 
-            // LoginPanel -> GameStartPanel 로 변경
-            if (user != null)
+            // SignInPanel -> tutorial패널 로 변경
+            if (currentUser != null)
             {
-                Debug.Log("게스트 정보 업데이트 완료. GameStart패널 활성화");
-                LoginCompleted?.Invoke();
+                // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
+                Debug.Log("게스트 정보 업데이트 완료. tutorial패널 활성화");
+                tutorialPanel.SetActive(true);
+                SigninPanel.SetActive(false);
+;
                 _isClicked = false;
             }
         });
-    }
-
-    /// <summary>
-    /// 익명계정의 DisplayName을 "게스트 + 랜덤숫자"로 변경하는 메서드 
-    /// 연결: GuestLogin
-    /// </summary>
-    /// <param name="currentUser">닉네임을 변경할 유저</param>
-    public static async Task SetGuestNicknameAsync(FirebaseUser currentUser)
-    {
-        UserProfile profile = new UserProfile();
-        profile.DisplayName = $"게스트{Random.Range(1000, 10000)}";
-
-        await currentUser.UpdateUserProfileAsync(profile);
-        // 초기화
-        await currentUser.ReloadAsync();
-        
-        // Firebase DB에 닉네임 저장
-        await SaveNicknameAsync();
-        await currentUser.ReloadAsync();
-
-        Debug.Log("닉네임 설정 성공");
-        Debug.Log($"변경된 유저 닉네임 : {currentUser.DisplayName}");
-    }
-
-    private static async Task<bool> SaveNicknameAsync()
-    {
-        FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
-        string uid = currentUser.UserId;
-        string userNickname = FirebaseManager.Auth.CurrentUser.DisplayName;
-
-        Dictionary<string, object> dictionary = new Dictionary<string, object>();
-
-        // 익명계정 RankData 저장 x
-        if (currentUser.IsAnonymous)
-        {
-            dictionary[$"UserData/{uid}/Nickname"] = userNickname;
-        }
-        else
-        {
-            dictionary[$"UserData/{uid}/Nickname"] = userNickname;
-            dictionary[$"RankData/{uid}/Nickname"] = userNickname;
-        }
-
-        var task = FirebaseManager.DataReference.UpdateChildrenAsync(dictionary);
-        await task;
-
-        if (task.IsCompletedSuccessfully)
-        {
-            Debug.Log("UserData / RankData 에 닉네임 저장 성공");
-            return true;
-        }
-        else
-        {
-            Debug.LogError("닉네임 저장 실패");
-            return false;
-        }
     }
 }
