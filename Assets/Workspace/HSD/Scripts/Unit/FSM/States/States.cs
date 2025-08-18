@@ -36,7 +36,7 @@ public class IdleState : BaseState
     public override void Enter()
     {
         base.Enter();
-        attackTimer = _fsm.Owner.Data.GetAttackTime(); // 공격 시간 체크
+        attackTimer = _fsm.Owner.GetAttackTime(); // 공격 시간 체크
     }
 
     public override void Exit()
@@ -100,12 +100,12 @@ public class MoveState : BaseState
 
         if(_target == null)
         {
-            _owner.transform.Translate(new Vector2(_owner.transform.GetFacingDir() * _data.MoveSpeed.Value * Time.deltaTime, 0), Space.World);
+            _owner.transform.Translate(new Vector2(_owner.transform.GetFacingDir() * _status.MoveSpeed.Value * Time.deltaTime, 0), Space.World);
             //_rb.velocity = Vector2.right * _data.MoveSpeed.Value * Time.deltaTime;
         }
         else
         {
-            _owner.transform.Translate(_owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime, Space.World);
+            _owner.transform.Translate(_owner.TargetDir * _status.MoveSpeed.Value * Time.deltaTime, Space.World);
             //_rb.velocity = _owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime;
         }
     }

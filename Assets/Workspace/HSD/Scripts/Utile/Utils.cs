@@ -15,14 +15,14 @@ public static class Utils
         return Mathf.RoundToInt(damage * (1f - totalDefense));
     }
 
-    public static int CalculateBaseDamage(this UnitData data, float multiply, DamageType damageType)
+    public static int CalculateBaseDamage(this UnitStatusController status, float attackPower, DamageType damageType)
     {
-        int damage = damageType == DamageType.Physical ? data.PhysicalDamage.Value : data.MagicDamage.Value;
-        float total = damage * multiply;
+        int damage = damageType == DamageType.Physical ? status.PhysicalDamage.Value : status.MagicDamage.Value;
+        float total = damage * attackPower;
 
-        if(data.CritChance.Value > Random.Range(0f, 100f))
+        if(status.CritChance.Value > Random.Range(0f, 100f))
         {
-            total *= data.CritDamage.Value / 100;
+            total *= status.CritDamage.Value / 100;
         }
 
         return Mathf.RoundToInt(total);
@@ -61,7 +61,9 @@ public static class Utils
         Vector2 boxSize,
         float angle,
         int maxCount,        
-        LayerMask layerMask,
+        LayerMask layerMask,        
+        System.Func<List<GameObject>, int, GameObject[]> filter = null,
+        int maxTargets = 50,
         bool sortByDistance = true)
     {
         _cachedTargets.Clear(); // 재사용
@@ -85,7 +87,7 @@ public static class Utils
         {
             if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
                 _cachedTargets.Add(_hitBuffer[i].gameObject);
-        }
+        }        
 
         if (sortByDistance && _cachedTargets.Count > 1)
         {
@@ -99,8 +101,13 @@ public static class Utils
             });
         }
 
-        GameObject[] result = new GameObject[_cachedTargets.Count];
-        _cachedTargets.CopyTo(result);
+        GameObject[] result;
+
+        if(filter != null)
+            result = filter.Invoke(_cachedTargets, maxTargets);
+        else
+            result = _cachedTargets.ToArray();
+
         return result;
     }
 

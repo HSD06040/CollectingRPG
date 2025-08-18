@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 [Serializable]
 public struct Modifier<T>
@@ -36,28 +37,37 @@ public class Stat<T> where T : struct, IComparable, IEquatable<T>
         else if (typeof(T) == typeof(float))
             addFunc = (a, b) => (T)(object)((float)(object)a + (float)(object)b);
         else
-            throw new NotSupportedException(typeof(T).Name);
+            throw new NotSupportedException(typeof(T).Name);        
     }
 
+    //public T Value
+    //{
+    //    get
+    //    {
+    //        if (_isChanged)
+    //        {
+    //            _lastValue = _baseValue;
+    //            foreach (var modifier in _modifiers)
+    //                _lastValue = addFunc(_lastValue, modifier.Value);
+    //            _isChanged = false;
+    //        }
+    //        return _lastValue;
+    //    }        
+    //}
     public T Value
     {
         get
         {
-            if (_isChanged)
-            {
-                _lastValue = _baseValue;
-                foreach (var modifier in _modifiers)
-                    _lastValue = addFunc(_lastValue, modifier.Value);
-                _isChanged = false;
-            }
-            return _lastValue;
+            T result = _baseValue;
+            foreach (var modifier in _modifiers)
+                result = addFunc(result, modifier.Value);
+            return result;
         }
     }
 
     public void SetBaseStat(T value)
     {
         _baseValue = value;
-        _isChanged = true;
     }
 
     public void AddModifier(T value, string source)
