@@ -10,9 +10,10 @@ public class CharacterUnit : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TMP_Text _charText;
-    [SerializeField] private TMP_Text _costText;
-    [SerializeField] private TMP_Text _jobSynergyText;
-    [SerializeField] private TMP_Text _roleSynergyText;
+    [SerializeField] private Image _characterImg;
+    [SerializeField] private Image _costImg;
+    [SerializeField] private Image _jobSynergyImg;
+    [SerializeField] private Image _roleSynergyImg;
     [SerializeField] private TMP_Text _overallPowerText;
 
     private bool _isCollected = true;
@@ -55,9 +56,10 @@ public class CharacterUnit : MonoBehaviour
     private void UIUpdate()
     {
         _charText.text = $"{_charData.name}";
-        _costText.text = $"{_charData.Cost}";
-        _jobSynergyText.text = $"{_charData.CharacterSynergy.JobSynergy}";
-        _roleSynergyText.text = $"{_charData.CharacterSynergy.RoleSynergy}";
+        _characterImg.sprite = _charData.CharacterImage;
+        _costImg.sprite = _charData.CostImg;
+        _jobSynergyImg.sprite = _charData.CharacterSynergy.JobSynergy;
+        _roleSynergyImg.sprite = _charData.CharacterSynergy.RoleSynergy;
         _overallPowerText.text = $"{_charData.OverallPower}";
     }
 

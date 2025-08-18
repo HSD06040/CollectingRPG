@@ -8,11 +8,7 @@ public class SelectedCharacterUnit : MonoBehaviour
     [SerializeField] private int _index;
 
     [Header("UI")]
-    [SerializeField] private TMP_Text _charText;
-    [SerializeField] private TMP_Text _costText;
-    [SerializeField] private TMP_Text _jobSynergyText;
-    [SerializeField] private TMP_Text _roleSynergyText;
-    [SerializeField] private TMP_Text _overallPowerText;
+    [SerializeField] Image _charImage;
 
     private CharacterSO _charData;
     private TeamOrganizeManager _manager;
@@ -50,19 +46,13 @@ public class SelectedCharacterUnit : MonoBehaviour
 
         if(_manager == null || _charData == null)
         {
-            _charText.text = "";
-            _costText.text = "";
-            _jobSynergyText.text = "";
-            _roleSynergyText.text = "";
-            _overallPowerText.text = "";
+            _charImage.color = Color.clear;
+            _charImage.sprite = null;
         }
         else
         {
-            _charText.text = $"{_charData.name}";
-            _costText.text = $"{_charData.Cost}";
-            _jobSynergyText.text = $"{_charData.CharacterSynergy.JobSynergy}";
-            _roleSynergyText.text = $"{_charData.CharacterSynergy.RoleSynergy}";
-            _overallPowerText.text = $"{_charData.OverallPower}";
+            _charImage.color = Color.white;
+            _charImage.sprite = _charData.CharacterImage;
         }
     }
 }
