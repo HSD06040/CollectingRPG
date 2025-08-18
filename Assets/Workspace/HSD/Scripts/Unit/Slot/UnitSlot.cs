@@ -35,7 +35,6 @@ public class UnitSlot : MonoBehaviour
 
     public void ClearSlot()
     {
-        Debug.Log($"{_pos} 의 슬롯 클리어");
         Unit = null;
     }
 }

@@ -16,9 +16,11 @@ public class UnitDragDropSystem : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Mouse0))
         {
-            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-             
-            RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero);
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = -Camera.main.transform.position.z;
+            Vector2 worldMouse = Camera.main.ScreenToWorldPoint(mousePos);
+
+            RaycastHit2D hit = Physics2D.Raycast(worldMouse, Vector2.zero);
 
             if (hit.collider == null || !_targetLayer.Contain(hit.collider.gameObject.layer))
                 return;
@@ -27,15 +29,18 @@ public class UnitDragDropSystem : MonoBehaviour
             {
                 _isDragging = true;
                 _currentUnit = hit.collider.gameObject;
-                
-                _offset = (Vector2)_currentUnit.transform.position - mousePosition;
+
+                _offset = (Vector2)_currentUnit.transform.position - worldMouse;
                 _pos = _currentUnit.transform.position;
             }
         }
 
         if (_isDragging && _currentUnit != null && Input.GetMouseButton(0))
         {
-            Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = -Camera.main.transform.position.z;
+            Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
+
             _currentUnit.transform.position = mouseWorldPos + _offset;
         }
 

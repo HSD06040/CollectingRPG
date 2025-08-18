@@ -6,13 +6,18 @@ using UnityEngine;
 public class UnitData : ScriptableObject
 {
     [Header("MetaData")]
+    public int Level; // addressable 시 주소 값 Name_Level
+    public string Address => $"{Name}_{Level}"; // addressable 시 주소 값 Name_Level
+    public GameObject UnitPrefab; // Test
+    public Sprite Icon;
     public int ID;
     public string Name;
     [TextArea]
     public string Description;
     public int Cost;
     public int CombatPower;
-
+    public int UpgradeCount;
+    
     [Header("Status")]
     public int MaxHealth;
     public int MaxMana;
