@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UnitDragDropSystem : MonoBehaviour
@@ -9,16 +7,17 @@ public class UnitDragDropSystem : MonoBehaviour
     private GameObject _currentUnit;
     private Vector2 _offset;
     private Vector2 _pos;
+    private int _currentSlotIdx = 0;
     [SerializeField] LayerMask _targetLayer;
     public event Action<UnitSlot, UnitBase> OnUnitDropped;
 
+    private Action<Collider2D, UnitBase> OnSlotChanged;
+
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            Vector3 mousePos = Input.mousePosition;
-            mousePos.z = -Camera.main.transform.position.z;
-            Vector2 worldMouse = Camera.main.ScreenToWorldPoint(mousePos);
+            Vector2 worldMouse = GetWorldMouse();
 
             RaycastHit2D hit = Physics2D.Raycast(worldMouse, Vector2.zero);
 
@@ -27,11 +26,7 @@ public class UnitDragDropSystem : MonoBehaviour
 
             if (hit.collider != null && hit.collider.CompareTag("Unit"))
             {
-                _isDragging = true;
-                _currentUnit = hit.collider.gameObject;
-
-                _offset = (Vector2)_currentUnit.transform.position - worldMouse;
-                _pos = _currentUnit.transform.position;
+                SetUnit(hit.collider.gameObject);
             }
         }
 
@@ -52,19 +47,64 @@ public class UnitDragDropSystem : MonoBehaviour
             {
                 // 슬롯 체크
                 Collider2D slotCollider = Physics2D.OverlapPoint(_currentUnit.transform.position, LayerMask.GetMask("Slot"));
+
+                UnitBase unit = _currentUnit.GetComponent<UnitBase>();
+
+                if (_currentSlotIdx != -1 && unit != null)
+                {
+                    OnSlotChanged?.Invoke(slotCollider, unit);
+                }
+
                 if (slotCollider != null)
                 {
-                    UnitSlot slot = slotCollider.GetComponent<UnitSlot>();
-                    UnitBase unit = _currentUnit.GetComponent<UnitBase>();
+                    UnitSlot slot = slotCollider.GetComponent<UnitSlot>();                    
+
                     OnUnitDropped?.Invoke(slot, unit);
                 }
                 else
                 {
                     _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
                 }
-            }
 
-            _currentUnit = null;
+                            
+            }
+            Clear();
         }
+    }
+
+    private static Vector2 GetWorldMouse()
+    {
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = -Camera.main.transform.position.z;
+        Vector2 worldMouse = Camera.main.ScreenToWorldPoint(mousePos);
+        return worldMouse;
+    }
+
+    public void SetUnit(GameObject unit)
+    {
+        _isDragging = true;
+        _currentUnit = unit;
+
+        _offset = Vector2.zero;
+        _pos = _currentUnit.transform.position;
+    }
+
+    public void SetUnit(GameObject unit, Action<Collider2D, UnitBase> action, int slotIdx)
+    {
+        OnSlotChanged = action;
+
+        _currentSlotIdx = slotIdx;
+        _isDragging = true;
+        _currentUnit = unit;
+
+        _offset = Vector2.zero;
+        _pos = _currentUnit.transform.position;
+    }
+
+    private void Clear()
+    {
+        _currentUnit = null;
+        OnSlotChanged = null;
+        _currentSlotIdx = -1;
     }
 }

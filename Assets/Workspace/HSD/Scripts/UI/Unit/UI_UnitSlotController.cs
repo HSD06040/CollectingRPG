@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class UI_UnitSlotController : MonoBehaviour
 {
+    [SerializeField] UnitDragDropSystem _dragDropSystem;
     [SerializeField] Transform _content;
     [SerializeField] GameObject _unitSlotPrefab;
     [SerializeField] int _slotCount;
+    [SerializeField] UnitData[] _testDatas;
 
     private UI_UnitSlot[] _unitSlots;
     private Dictionary<string, int> _unitCountDic = new Dictionary<string, int>(256);
@@ -26,8 +28,16 @@ public class UI_UnitSlotController : MonoBehaviour
         {
             UI_UnitSlot slot = Instantiate(_unitSlotPrefab, _content).GetComponent<UI_UnitSlot>();
             slot.ClearSlot();
+            slot.Init(_dragDropSystem, i, this);
             _unitSlots[i] = slot;
         }
+    }
+
+    public void RandomSpawn()
+    {
+        UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
+
+        AddUnit(unit);
     }
 
     public void AddUnit(UnitData unit)
@@ -45,7 +55,7 @@ public class UI_UnitSlotController : MonoBehaviour
 
     private void SetSlot(UnitData unit, int idx)
     {
-        _unitSlots[idx].SetUnit(unit);
+        _unitSlots[idx].SetSlot(unit);
 
         if(!_unitSlotDic.ContainsKey(unit.Address))
         {
@@ -67,6 +77,7 @@ public class UI_UnitSlotController : MonoBehaviour
         UnitData unit = _unitSlots[idx].GetUnit();
 
         _unitCountDic[unit.Address]--;
+        _unitSlotDic[unit.Address].Remove(idx);
 
         _unitSlots[idx].ClearSlot();       
     }
@@ -93,7 +104,7 @@ public class UI_UnitSlotController : MonoBehaviour
 
         foreach (var idx in slotIdxs)
         {
-            _unitSlots[idx].ClearSlot();
+            ClearSlot(idx);
         }
 
         AddUnit(newUnit);
@@ -109,5 +120,11 @@ public class UI_UnitSlotController : MonoBehaviour
             }
         }
         return -1;
+    }
+
+    public void RemoveUnit(UnitData unit, int idx)
+    {
+        _unitCountDic[unit.Address]--;
+        _unitSlotDic[unit.Address].Remove(idx);
     }
 }
