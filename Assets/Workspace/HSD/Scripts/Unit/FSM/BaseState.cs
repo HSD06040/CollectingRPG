@@ -9,7 +9,7 @@ public class BaseState
     protected Rigidbody2D _rb;
     protected Transform _target => _fsm.Owner.Target;
     protected StateMachine _stateMachine;
-    protected UnitData _data;
+    protected UnitStatusController _status;
     protected UnitBase _owner;
     private int _animHash;
 
@@ -20,7 +20,7 @@ public class BaseState
         _fsm = fsm;
         _animHash = animHash;
         _stateMachine = _fsm.StateMachine;        
-        _data = _fsm.Owner.Data;
+        _status = _fsm.Owner.StatusController;
         _rb = _fsm.Owner.Rb;
         _owner = _fsm.Owner;        
     }

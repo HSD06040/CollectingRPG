@@ -1,33 +1,64 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
 public class UnitBase : MonoBehaviour, IAttacker
-{    
+{
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
-    [field : SerializeField] public UnitData Data { get; private set; }
+    [field: SerializeField] public UnitData Data { get; private set; }
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
-
+    public Vector2Int CurrentSlot;
     private Vector3 _localScale;
+    private int _enemyLayer;
 
     [Header("Logic Components")]
+    public UnitStatusController StatusController;
     [SerializeField] BaseFSM _fsm;
-    [SerializeField] protected UnitStatusController _unitStatusController;
 
+    #region LifeCycle
     protected virtual void Awake()
-    {        
+    {
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
-        _unitStatusController.Init(Data);
+        _enemyLayer = LayerMask.NameToLayer("Enemy");
+        StatusController.Init(Data);
+        AddProviderComponents();
     }
 
     protected virtual void Start()
     {
         _fsm.Init(this);
+    }
+
+    private void OnDestroy()
+    {
+        RemoveProviderComponents();
+    }
+
+    #endregion
+
+    #region Provider
+    private void AddProviderComponents()
+    {
+        ComponentProvider.Add<UnitStatusController>(gameObject, StatusController);
+    }
+
+    private void RemoveProviderComponents()
+    {
+        ComponentProvider.Remove<UnitStatusController>(gameObject);
+    }
+    #endregion
+
+    #region FSM
+    public void Fight()
+    {
+        _fsm.Fight();
+    }
+
+    public void Stanby()
+    {
+        _fsm.Stanby();
     }
 
     public void Attack()
@@ -37,21 +68,21 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public bool SkillCheck()
     {
-        return false; 
-        if (_unitStatusController.CurMana.Value >= Data.Skill.NeedMana)
+        return false;
+        if (StatusController.CurMana.Value >= Data.Skill.NeedMana)
         {
-            _unitStatusController.CurMana.Value -= Data.Skill.NeedMana;
+            StatusController.CurMana.Value -= Data.Skill.NeedMana;
             return true;
         }
-        else 
+        else
             return false;
     }
 
     public void FindTarget()
     {
         if (Target != null) return;
-        Debug.Log("타겟 찾기!");
-        Target = Utils.GetClosestTargetNonAlloc(transform.position, 10, TargetLayer);
+
+        Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 
     public void FlipToTarget()
@@ -60,7 +91,11 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         if (Target == null)
         {
-            _localScale.x = -Mathf.Abs(_localScale.x);
+            if (TargetLayer.Contain(_enemyLayer))
+                _localScale.x = -Mathf.Abs(_localScale.x);
+            else
+                _localScale.x = Mathf.Abs(_localScale.x);
+
             transform.localScale = _localScale;
             return;
         }
@@ -76,16 +111,18 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         transform.localScale = _localScale;
     }
+    
 
+    #region Bool
     /// <summary>
     /// 범위안에 들어와 있다면
     /// </summary>
     /// <returns></returns>
     public bool IsTargetInRange()
     {
-        if(Target == null) return false;
+        if (Target == null) return false;
 
-        return Vector2.Distance(Target.position, transform.position) <= Data.AttackRange.Value;
+        return Vector2.Distance(Target.position, transform.position) <= StatusController.AttackRange.Value;
     }
 
     /// <summary>
@@ -101,36 +138,20 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         return Vector2.Dot(TargetDir, new Vector2(Target.GetFacingDir(), 0)) < 0;
     }
+    #endregion
 
+    #endregion
+
+    #region Getters
     private Vector2 GetTargetDirection()
     {
         if (Target == null) return Vector2.zero;
         return (Target.position - transform.position).normalized;
-    }    
+    }
 
-    private void OnDrawGizmos()
+    public float GetAttackTime()
     {
-        if (Data == null) return;
-
-        // 찾는 거리
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, 10);
-
-        // 공격 사거리
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, Data.AttackRange.Value);
-
-        if (Data.AttackData == null) return;
-        // 공격 범위
-        Gizmos.color = Color.red;
-        if (Data.AttackData.SearchType == SearchType.Circle)
-        {
-            Vector2 center = transform.position;
-            Vector2 offset = Data.AttackData.Offset;
-            offset.x *= transform.GetFacingDir();
-
-            Gizmos.DrawWireSphere(center + offset, Data.AttackData.SizeOrRadius);
-        }
+        return 1 / StatusController.AttackSpeed.Value;
     }
 
     public Transform GetTarget()
@@ -150,6 +171,46 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public UnitStatusController GetStatusController()
     {
-        return _unitStatusController;
+        return StatusController;
     }
+    #endregion
+
+    #region Gizmos
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (Data == null) return;
+
+        // 찾는 거리
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, StatusController.DetectionRange);
+
+        // 공격 사거리
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
+
+        if (Data.AttackData == null) return;
+        // 공격 범위
+        Gizmos.color = Color.red;
+        Vector2 center = transform.position;
+        if (Data.AttackData is UnitMeleeAttack MeleeAttackData)
+        {
+            if (MeleeAttackData.SearchType == SearchType.Circle)
+            {
+                Vector2 offset = Data.AttackData.AttackPointOffset;
+                offset.x *= transform.GetFacingDir();
+
+                Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);
+            }
+        }
+        else if (Data.AttackData is UnitRangedAttack RandAttackData)
+        {
+            Vector2 offset = Data.AttackData.AttackPointOffset;
+            offset.x *= transform.GetFacingDir();
+
+            Gizmos.DrawWireSphere(center + offset, .1f);
+        }
+    }
+#endif
+    #endregion
 }
