@@ -136,4 +136,9 @@ public class UnitController : MonoBehaviour
         slot.SetUnit(unit);
         _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = unit;
     }
+
+    public UnitSlot GetUnitSlot(UnitBase unit)
+    {        
+        return _unitSlotManager.UnitSlotDic[unit.CurrentSlot];
+    }
 }

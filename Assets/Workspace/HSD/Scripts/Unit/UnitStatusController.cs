@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class UnitStatusController : MonoBehaviour, IDamageable
 {
-    public UnitData Data { get; private set; }
+    public UnitData Data { get; set; }
 
     #region Stat
     [Header("Status")]

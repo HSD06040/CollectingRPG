@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class UnitDragDropSystem : MonoBehaviour
 {
@@ -9,7 +11,9 @@ public class UnitDragDropSystem : MonoBehaviour
     private Vector2 _pos;
     private int _currentSlotIdx = 0;
     [SerializeField] LayerMask _targetLayer;
+
     public event Action<UnitSlot, UnitBase> OnUnitDropped;
+    public event Action OnUISlotSelected;
 
     private Action<Collider2D, UnitBase> OnSlotChanged;
 
@@ -41,7 +45,32 @@ public class UnitDragDropSystem : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0) && _isDragging)
         {
+            PointerEventData pointerData = new PointerEventData(EventSystem.current)
+            {
+                position = Input.mousePosition
+            };
+
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointerData, results);
+
+            bool isSlot = false;
+
+            foreach (var result in results)
+            {
+                var dropHandler = result.gameObject.GetComponent<IDropHandler>();
+                if (dropHandler != null)
+                {
+                    dropHandler.OnDrop(pointerData);
+
+                    isSlot = true;
+                    break;
+                }
+            }
+
             _isDragging = false;
+
+            if (isSlot)
+                return;
 
             if (_currentUnit != null)
             {
@@ -64,9 +93,7 @@ public class UnitDragDropSystem : MonoBehaviour
                 else
                 {
                     _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
-                }
-
-                            
+                }                   
             }
             Clear();
         }
@@ -106,5 +133,10 @@ public class UnitDragDropSystem : MonoBehaviour
         _currentUnit = null;
         OnSlotChanged = null;
         _currentSlotIdx = -1;
+    }
+
+    public GameObject GetCurrentUnit()
+    {
+        return _currentUnit;
     }
 }

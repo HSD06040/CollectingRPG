@@ -22,6 +22,12 @@ public enum SearchType
 {
     Circle, Box, Capsule
 }
+
+public enum Grade
+{
+    Normal, Rare, Unique, Legendary
+}
+
 public enum StatType
 {
     // Status

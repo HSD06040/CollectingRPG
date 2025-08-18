@@ -6,6 +6,7 @@ using UnityEngine;
 public class UI_UnitSlotController : MonoBehaviour
 {
     [SerializeField] UnitDragDropSystem _dragDropSystem;
+    [SerializeField] UnitController _unitController;
     [SerializeField] Transform _content;
     [SerializeField] GameObject _unitSlotPrefab;
     [SerializeField] int _slotCount;
@@ -18,6 +19,7 @@ public class UI_UnitSlotController : MonoBehaviour
     private void Awake()
     {
         CreateSlots();
+        UI_UnitSlot.OnUnitChanged += SetSlot;
     }
 
     private void CreateSlots()
@@ -126,5 +128,16 @@ public class UI_UnitSlotController : MonoBehaviour
     {
         _unitCountDic[unit.Address]--;
         _unitSlotDic[unit.Address].Remove(idx);
+    }
+
+    public void RemoveInGameSlot(UnitBase unit, int slotIdx)
+    {
+        if(unit.CurrentSlot != Vector2Int.zero)
+        {
+            UnitSlot slot = _unitController.GetUnitSlot(unit);
+            _unitController.RemoveUnit(slot);
+        }        
+
+        RemoveUnit(unit.StatusController.Data, slotIdx);
     }
 }

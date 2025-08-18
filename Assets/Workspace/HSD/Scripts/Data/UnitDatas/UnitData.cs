@@ -6,7 +6,8 @@ using UnityEngine;
 public class UnitData : ScriptableObject
 {
     [Header("MetaData")]
-    public int Level; // addressable 시 주소 값 Name_Level
+    public int Level;
+    public Grade Grade;
     public string Address => $"{Name}_{Level}"; // addressable 시 주소 값 Name_Level
     public GameObject UnitPrefab; // Test
     public Sprite Icon;

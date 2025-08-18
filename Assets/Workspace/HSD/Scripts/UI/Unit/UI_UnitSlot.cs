@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler
+public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDropHandler
 {
     [SerializeField] private UnitData _unit;
     [SerializeField] private Image _unitIcon;
@@ -13,6 +13,8 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginD
     private UnitDragDropSystem _dragDropSystem;
     private UnitData _chachedUnit;
     private int _slotIdx;
+
+    public static Action<UnitData, int> OnUnitChanged;
 
     public void Init(UnitDragDropSystem dragDropSystem, int slotIdx, UI_UnitSlotController unitSlotController)
     {
@@ -57,26 +59,9 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginD
         return _unit;
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        _dragDropSystem.SetUnit(Instantiate(_unit.UnitPrefab), UnitSetting, _slotIdx);
-        _chachedUnit = _unit;
-        ClearSlot();
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        
-    }
-
     private void UnitSetting(Collider2D collider, UnitBase unit)
     {
-        if(collider == null)
+        if (collider == null)
         {
             SetSlot(_chachedUnit);
             _chachedUnit = null;
@@ -85,5 +70,38 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginD
         }
 
         _unitSlotController.RemoveUnit(unit.Data, _slotIdx);
-    }    
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        GameObject unit = Instantiate(_unit.UnitPrefab);
+        ComponentProvider.Get<UnitStatusController>(unit).Data = _unit;
+        _dragDropSystem.SetUnit(unit, UnitSetting, _slotIdx);
+        _chachedUnit = _unit;
+        ClearSlot();
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        Debug.Log("드래그 중");
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        GameObject currentDragUnit = _dragDropSystem.GetCurrentUnit();
+        if (currentDragUnit == null)
+        {
+            Debug.Log("No unit to drop");
+            return;
+        }
+
+        UnitData unit = ComponentProvider.Get<UnitStatusController>(currentDragUnit).Data;
+
+        if (_unit == null)
+        {            
+            _unitSlotController.RemoveInGameSlot(currentDragUnit.GetComponent<UnitBase>(), _slotIdx);
+            OnUnitChanged?.Invoke(unit, _slotIdx);
+            Destroy(currentDragUnit);
+        }
+    }
 }
