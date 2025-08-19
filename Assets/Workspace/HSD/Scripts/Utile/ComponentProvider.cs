@@ -8,7 +8,7 @@ public static class ComponentProvider
 
     public static void Add<T>(GameObject obj, T component) where T : Component
     {
-        string key = GenerateKey(obj);
+        string key = GenerateKey<T>(obj);
 
         if (!_components.ContainsKey(key))
         {            
@@ -16,9 +16,9 @@ public static class ComponentProvider
         }        
     }
 
-    public static void Remove<T>(GameObject obj)
+    public static void Remove<T>(GameObject obj) where T : Component
     {
-        string key = GenerateKey(obj);
+        string key = GenerateKey<T>(obj);
         if (_components.ContainsKey(key))
         {
             _components.Remove(key);
@@ -27,16 +27,17 @@ public static class ComponentProvider
 
     public static T Get<T>(GameObject obj) where T : Component
     {
-        string key = GenerateKey(obj);
+        string key = GenerateKey<T>(obj);
+
         if (_components.TryGetValue(key, out Component component))
-        {
+        {            
             return component as T;
         }
         return null;
     }
 
-    private static string GenerateKey(GameObject obj)
+    private static string GenerateKey<T>(GameObject obj) where T : Component    
     {
-        return $"{obj.name}_{obj.GetInstanceID()}";
+        return $"{obj.GetInstanceID()}_{typeof(T).Name}";
     }
 }
