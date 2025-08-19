@@ -82,7 +82,6 @@ public class UI_UnitSlotController : MonoBehaviour
     {
         var slotList = _unitSlotDic[unit.Address];
         int lastIdx = slotList[slotList.Count - 1];
-        Debug.Log(lastIdx);
         ClearSlot(lastIdx);
     }
 
@@ -108,7 +107,6 @@ public class UI_UnitSlotController : MonoBehaviour
 
     public int GetUnitCount(UnitData unit)
     {
-        Debug.Log(unit.Address);
         return GetUnitCount(unit.Address);
     }
 }
