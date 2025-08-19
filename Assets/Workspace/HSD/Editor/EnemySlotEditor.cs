@@ -258,6 +258,9 @@ public class EnemySlotEditor : EditorWindow
 
     private void RefreshAvailableGridDatas()
     {
+        Debug.Log($"SAVE_PATH: {SAVE_PATH}");
+        Debug.Log($"Directory exists: {Directory.Exists(SAVE_PATH)}");
+
         if (!Directory.Exists(SAVE_PATH))
         {
             availableGridDatas = new UnitGridDataSO[0];
@@ -265,12 +268,29 @@ public class EnemySlotEditor : EditorWindow
         }
 
         string[] guids = AssetDatabase.FindAssets("t:UnitGridDataSO", new[] { SAVE_PATH });
+        Debug.Log($"Found {guids.Length} UnitGridDataSO files");
+
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            Debug.Log($"Found asset at path: {path}");
+        }
+
         availableGridDatas = new UnitGridDataSO[guids.Length];
 
         for (int i = 0; i < guids.Length; i++)
         {
             string path = AssetDatabase.GUIDToAssetPath(guids[i]);
             availableGridDatas[i] = AssetDatabase.LoadAssetAtPath<UnitGridDataSO>(path);
+
+            if (availableGridDatas[i] == null)
+            {
+                Debug.LogError($"Failed to load UnitGridDataSO at path: {path}");
+            }
+            else
+            {
+                Debug.Log($"Successfully loaded: {availableGridDatas[i].gridName}");
+            }
         }
     }
 
@@ -327,18 +347,17 @@ public class EnemySlotEditor : EditorWindow
         {
             if (availableUnitDatas[i] == null) continue;
 
-            EditorGUILayout.BeginHorizontal(GUI.skin.box);
+            UnitData unitData = availableUnitDatas[i];
 
-            // 선택 상태 표시
-            bool isSelected = selectedUnitData == availableUnitDatas[i];
+            // 선택 상태에 따른 색상 설정
+            bool isSelected = selectedUnitData == unitData;
+            Color originalColor = GUI.backgroundColor;
             if (isSelected)
             {
                 GUI.backgroundColor = Color.cyan;
             }
 
-            UnitData unitData = availableUnitDatas[i];
-
-            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal(GUI.skin.box);
 
             // 아이콘 표시
             if (unitData.Icon != null)
@@ -347,6 +366,10 @@ public class EnemySlotEditor : EditorWindow
                 if (iconTexture != null)
                 {
                     GUILayout.Label(iconTexture, GUILayout.Width(24), GUILayout.Height(24));
+                }
+                else
+                {
+                    GUILayout.Space(28);
                 }
             }
             else
@@ -362,8 +385,8 @@ public class EnemySlotEditor : EditorWindow
 
             EditorGUILayout.EndHorizontal();
 
-            GUI.backgroundColor = Color.white;
-            EditorGUILayout.EndHorizontal();
+            // 원래 색상 복원
+            GUI.backgroundColor = originalColor;
         }
 
         EditorGUILayout.EndScrollView();
