@@ -21,6 +21,10 @@ public class EnemySlotEditor : EditorWindow
     private string newGridName = "새그리드구성";
     private bool showUnitDataList = true;
 
+    // 수정 모드 관련 변수들
+    private UnitGridDataSO selectedGridDataForEdit;
+    private bool isEditMode = false;
+
     [MenuItem("Collecting_RPG/EnemyDataGrid_Editor")]
     public static void ShowWindow()
     {
@@ -157,9 +161,25 @@ public class EnemySlotEditor : EditorWindow
         newGridName = EditorGUILayout.TextField(newGridName);
         EditorGUILayout.EndHorizontal();
 
-        if (GUILayout.Button("생성하기", GUILayout.Height(30)))
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("새로 생성하기", GUILayout.Height(30)))
         {
             CreateGridDataAsset();
+        }
+
+        // 수정 모드일 때만 수정 버튼 표시
+        GUI.enabled = isEditMode && selectedGridDataForEdit != null;
+        if (GUILayout.Button("현재 그리드 수정하기", GUILayout.Height(30)))
+        {
+            UpdateGridDataAsset();
+        }
+        GUI.enabled = true;
+        EditorGUILayout.EndHorizontal();
+
+        // 현재 수정 중인 그리드 정보 표시
+        if (isEditMode && selectedGridDataForEdit != null)
+        {
+            EditorGUILayout.HelpBox($"수정 모드: {selectedGridDataForEdit.gridName}", MessageType.Info);
         }
 
         EditorGUILayout.Space(5);
@@ -179,10 +199,19 @@ public class EnemySlotEditor : EditorWindow
     {
         EditorGUILayout.LabelField("불러오기", EditorStyles.boldLabel);
 
-        if (GUILayout.Button("새로고침"))
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("새로고침", GUILayout.Width(100)))
         {
             RefreshAvailableGridDatas();
         }
+
+        if (GUILayout.Button("새 그리드 만들기", GUILayout.Width(150)))
+        {
+            CreateNewGridData();
+            isEditMode = false;
+            selectedGridDataForEdit = null;
+        }
+        EditorGUILayout.EndHorizontal();
 
         if (availableGridDatas != null && availableGridDatas.Length > 0)
         {
@@ -192,6 +221,14 @@ public class EnemySlotEditor : EditorWindow
             {
                 if (gridData != null)
                 {
+                    // 현재 편집 중인 그리드인지 확인
+                    bool isCurrentlyEditing = isEditMode && selectedGridDataForEdit == gridData;
+                    Color originalColor = GUI.backgroundColor;
+                    if (isCurrentlyEditing)
+                    {
+                        GUI.backgroundColor = Color.yellow;
+                    }
+
                     EditorGUILayout.BeginHorizontal(GUI.skin.box);
 
                     if (GUILayout.Button(gridData.gridName, EditorStyles.label))
@@ -201,7 +238,13 @@ public class EnemySlotEditor : EditorWindow
 
                     EditorGUILayout.LabelField($"유닛: {gridData.unitDatas.Count}", GUILayout.Width(80));
 
+                    if (GUILayout.Button("수정", GUILayout.Width(40)))
+                    {
+                        LoadGridDataForEdit(gridData);
+                    }
+
                     EditorGUILayout.EndHorizontal();
+                    GUI.backgroundColor = originalColor;
                 }
             }
 
@@ -304,9 +347,70 @@ public class EnemySlotEditor : EditorWindow
         }
 
         EditorUtility.SetDirty(currentGridData);
+
+        // 읽기 전용 로드이므로 수정 모드 해제
+        isEditMode = false;
+        selectedGridDataForEdit = null;
+
         Repaint();
 
         Debug.Log($"그리드 구성을 불러왔습니다: {gridData.gridName}");
+    }
+
+    private void LoadGridDataForEdit(UnitGridDataSO gridData)
+    {
+        // 수정 모드로 그리드 로드
+        currentGridData.ClearAllUnitDatas();
+
+        foreach (var unitDataInfo in gridData.unitDatas)
+        {
+            currentGridData.SetUnitData(unitDataInfo.position, unitDataInfo.unitData);
+        }
+
+        EditorUtility.SetDirty(currentGridData);
+
+        // 수정 모드 활성화
+        isEditMode = true;
+        selectedGridDataForEdit = gridData;
+        newGridName = gridData.gridName; // 현재 이름을 텍스트 필드에 표시
+
+        Repaint();
+
+        Debug.Log($"수정 모드로 그리드 구성을 불러왔습니다: {gridData.gridName}");
+    }
+
+    private void UpdateGridDataAsset()
+    {
+        if (selectedGridDataForEdit == null)
+        {
+            EditorUtility.DisplayDialog("오류", "수정할 그리드 데이터가 선택되지 않았습니다!", "확인");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(newGridName))
+        {
+            EditorUtility.DisplayDialog("오류", "유효한 이름을 입력해주세요!", "확인");
+            return;
+        }
+
+        // 기존 그리드 데이터 업데이트
+        selectedGridDataForEdit.gridName = newGridName;
+        selectedGridDataForEdit.unitDatas.Clear();
+        selectedGridDataForEdit.unitDatas.AddRange(currentGridData.unitDatas);
+
+        EditorUtility.SetDirty(selectedGridDataForEdit);
+        AssetDatabase.SaveAssets();
+
+        EditorUtility.DisplayDialog("성공", $"그리드 구성 '{newGridName}'이(가) 성공적으로 수정되었습니다!", "확인");
+
+        // 수정 모드 해제
+        isEditMode = false;
+        selectedGridDataForEdit = null;
+
+        RefreshAvailableGridDatas();
+        Repaint();
+
+        Debug.Log($"그리드 구성이 수정되었습니다: {newGridName}");
     }
 
     private void RefreshAvailableUnitDatas()
