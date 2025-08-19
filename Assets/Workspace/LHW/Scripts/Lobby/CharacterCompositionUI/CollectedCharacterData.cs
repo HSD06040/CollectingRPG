@@ -8,7 +8,13 @@ public class CollectedCharacterData : MonoBehaviour
     [SerializeField] private List<CharacterSO> _collectedCharData = new List<CharacterSO>();
     public List<CharacterSO> CollectedCharData => _collectedCharData;
 
-    private void OnEnable()
+    private int _characterCount;
+    public int CharacterCount => _characterCount;
+
+    private int _collectedCharacterCount;
+    public int CollectedCharacterCount => _collectedCharacterCount;
+
+    private void Awake()
     {
         for(int i = 0; i < _characters.Length; i++)
         {
@@ -17,5 +23,7 @@ public class CollectedCharacterData : MonoBehaviour
                 _collectedCharData.Add(_characters[i].CharData);
             }
         }
+        _characterCount = _characters.Length;
+        _collectedCharacterCount = _collectedCharData.Count;
     }
 }
