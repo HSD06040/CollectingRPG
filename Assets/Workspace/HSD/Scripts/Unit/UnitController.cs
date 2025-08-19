@@ -183,4 +183,17 @@ public class UnitController : MonoBehaviour
     {
         return GetUnitCount(unit.Address);
     }
+
+    public UnitBase[] GetUnits()
+    {
+        List<UnitBase> units = new List<UnitBase>();
+
+        foreach (var unit in _unitGrid)
+        {
+            if (unit != null)
+                units.Add(unit);
+        }
+
+        return units.ToArray();
+    }
 }

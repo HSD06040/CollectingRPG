@@ -5,10 +5,17 @@ using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [SerializeField] UnitUIManager _unitUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
     [SerializeField] UnitController _unitController;
     [SerializeField] UnitData[] _testDatas;
     [SerializeField] int _upgradeNeedCount = 3;
+
+    public void Fight()
+    {
+        _unitUIManager._fightSlotController.SetUnit(_unitController.GetUnits());
+        _unitController.UnitFight();
+    }
 
     public void RandomSpawn()
     {
