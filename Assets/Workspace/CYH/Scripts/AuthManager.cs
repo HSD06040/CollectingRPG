@@ -1,9 +1,31 @@
 using System.Threading.Tasks;
 using UnityEngine;
 using Firebase.Auth;
+using Google;
 
 public class AuthManager : Singleton<AuthManager>
 {
+    /// <summary>
+    /// 현재 로그인된 계정을 로그아웃 처리하는 메서드
+    /// </summary>
+    public void UserSignOut()
+    {
+        FirebaseManager.Auth.SignOut();
+        Debug.Log("로그아웃");
+
+        //TODO: [CYH] 게스트/구글 계정 예외 처리
+        GoogleSignIn.DefaultInstance.SignOut();
+        GoogleSignIn.DefaultInstance.Disconnect();
+    }
+
+    /// <summary>
+    /// 현재 로그인된 계정을 FirebaseAuth / Firebase DB에서 삭제하는 메서드
+    /// </summary>
+    public void DeleteUser()
+    {
+        //TODO: [CYH] 회원탈퇴 기능
+    }
+
     /// <summary>
     /// 익명계정의 DisplayName을 "게스트 + 랜덤숫자"로 변경하는 메서드 
     /// </summary>
@@ -14,15 +36,12 @@ public class AuthManager : Singleton<AuthManager>
         profile.DisplayName = $"게스트{Random.Range(1000, 10000)}";
 
         await currentUser.UpdateUserProfileAsync(profile);
-        
-        // 초기화
         await currentUser.ReloadAsync();
 
         // Firebase DB에 닉네임 저장
         await Manager.DB.SaveNicknameAsync();
         await currentUser.ReloadAsync();
 
-        Debug.Log("닉네임 설정 성공 / SetGuestNicknameAsync");
         Debug.Log($"변경된 유저 닉네임 / SetGuestNicknameAsync : {currentUser.DisplayName}");
     }
 
@@ -36,7 +55,6 @@ public class AuthManager : Singleton<AuthManager>
         string googleName = googleDisplayName;
         UserProfile profile = new UserProfile();
         profile.DisplayName = googleName;
-        Debug.Log($"SetGoogleNickname : googleDisplayName = {googleDisplayName}");
 
         await currentUser.UpdateUserProfileAsync(profile);
         await currentUser.ReloadAsync();
@@ -45,7 +63,6 @@ public class AuthManager : Singleton<AuthManager>
         await Manager.DB.SaveNicknameAsync();
         await currentUser.ReloadAsync();
 
-        Debug.Log("닉네임 설정 성공 / SetGoogleNicknameAsync");
         Debug.Log($"변경된 유저 닉네임 / SetGoogleNicknameAsync : {currentUser.DisplayName}");
     }
 }

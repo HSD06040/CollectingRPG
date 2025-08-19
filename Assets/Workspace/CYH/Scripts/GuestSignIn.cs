@@ -23,8 +23,6 @@ public class GuestSignIn : MonoBehaviour
             {
                 if (FirebaseManager.Auth.CurrentUser != null)
                 {
-                    Debug.LogError($"유저 UID : {FirebaseManager.Auth.CurrentUser.UserId}  " +
-                        $"/ 유저 닉네임 : {FirebaseManager.Auth.CurrentUser.DisplayName}");
                     _isClicked = false;
 
                     // 튜토리얼 진행 여부 체크
@@ -66,11 +64,6 @@ public class GuestSignIn : MonoBehaviour
 
             // 튜토리얼 isTutorialComplete = false Data 생성
             SetTutorialInCompleteAsync();
-
-            Debug.Log("------유저 정보(GuestSignIn)------");
-            Debug.Log($"유저 닉네임 : {currentUser.DisplayName}");
-            Debug.Log($"유저 ID : {currentUser.UserId}");
-            Debug.Log($"이메일 : {currentUser.Email}");
 
             // SignInPanel -> Tutorial패널 로 변경
             if (currentUser != null)

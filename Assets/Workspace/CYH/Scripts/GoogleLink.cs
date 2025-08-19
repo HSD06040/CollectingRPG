@@ -61,16 +61,14 @@ public class GoogleLink : MonoBehaviour
                 Firebase.Auth.AuthResult linkedUser = linkTask.Result;
 
                 string googleDisplayName = googleUser.DisplayName;
-                Debug.Log($"구글 계정 닉네임 : {googleDisplayName}");
                 
                 // DB에 google 계정 닉네임 저장
                 await Manager.DB.SaveNicknameAsync(googleDisplayName);
                 await currentUser.ReloadAsync();
 
-                //GameStartPanel 닉네임 text 변경 이벤트 호출
+                // TODO: [CYH] 닉네임 text 변경 이벤트 호출
                 //_gameStartPanel.OnSetNicknameField?.Invoke(user.DisplayName);
 
-                Debug.Log("구글 계정 전환 성공");
                 Debug.Log("------유저 정보(GoogleLink)------");
                 await Manager.DB.LoadNicknameAsync((nickname) =>
                 {

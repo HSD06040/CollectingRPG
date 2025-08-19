@@ -30,7 +30,6 @@ public class DBManager : Singleton<DBManager>
 
         if (task.IsCompletedSuccessfully)
         {
-            Debug.Log("UserData에 닉네임 저장 성공");
             return true;
         }
         else
@@ -64,7 +63,6 @@ public class DBManager : Singleton<DBManager>
 
         if (task.IsCompletedSuccessfully)
         {
-            Debug.Log("UserData에 닉네임 저장 성공");
             return true;
         }
         else
@@ -85,7 +83,6 @@ public class DBManager : Singleton<DBManager>
 
         DataSnapshot snapshot = await nicknameRef.GetValueAsync();
         string nickname = snapshot.Value.ToString();
-        Debug.Log($"LoadNickname 닉네임 : {nickname}");
 
         if (snapshot.Exists)
         {
@@ -117,11 +114,9 @@ public class DBManager : Singleton<DBManager>
 
         if (!snapshot.Exists)
         {
-            Debug.LogWarning($"[튜토리얼 상태 null] 유저 UID : {uid}");
+            Debug.LogWarning($"튜토리얼 상태 null / 유저 UID : {uid}");
             return false;
         }
-
-        Debug.Log($"유저 UID : {uid} isTutorialComplete: {snapshot.Value}");
 
         // 튜토리얼 진행
         if (snapshot.Value is bool isTutorialComplete)
@@ -148,7 +143,6 @@ public class DBManager : Singleton<DBManager>
         DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(userUid).Child("isTutorialComplete");
 
         await userRef.SetValueAsync(false);
-        Debug.Log($"튜토리얼 진행 여부 false / 유저 UID : {userUid}");
     }
 
     /// <summary>
@@ -161,6 +155,5 @@ public class DBManager : Singleton<DBManager>
         DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(userUid).Child("isTutorialComplete");
 
         await userRef.SetValueAsync(true);
-        Debug.Log($"튜토리얼 진행 여부 true  / 유저 UID : {userUid}");
     }
 }
