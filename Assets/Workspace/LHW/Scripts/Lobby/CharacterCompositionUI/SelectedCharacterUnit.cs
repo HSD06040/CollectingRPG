@@ -4,15 +4,14 @@ using UnityEngine.UI;
 
 public class SelectedCharacterUnit : MonoBehaviour
 {
+    [Header("Referenece")]
+    [SerializeField] private Sprite _xImage;
+
     [Header("Index")]
     [SerializeField] private int _index;
 
     [Header("UI")]
-    [SerializeField] private TMP_Text _charText;
-    [SerializeField] private TMP_Text _costText;
-    [SerializeField] private TMP_Text _jobSynergyText;
-    [SerializeField] private TMP_Text _roleSynergyText;
-    [SerializeField] private TMP_Text _overallPowerText;
+    [SerializeField] private Image _charImage;
 
     private CharacterSO _charData;
     private TeamOrganizeManager _manager;
@@ -48,21 +47,29 @@ public class SelectedCharacterUnit : MonoBehaviour
     {
         _charData = _manager.GetCurrentCharacterData(_index);
 
-        if(_manager == null || _charData == null)
+        if (_manager == null || _charData == null)
         {
-            _charText.text = "";
-            _costText.text = "";
-            _jobSynergyText.text = "";
-            _roleSynergyText.text = "";
-            _overallPowerText.text = "";
+            if (_manager.CurrentCost == _manager.TotalCost)
+            {
+                _charImage.color = Color.black;
+                _charImage.sprite = _xImage;
+            }
+            else
+            {
+                _charImage.color = Color.clear;
+                _charImage.sprite = null;
+            }
         }
         else
         {
-            _charText.text = $"{_charData.name}";
-            _costText.text = $"{_charData.Cost}";
-            _jobSynergyText.text = $"{_charData.CharacterSynergy.JobSynergy}";
-            _roleSynergyText.text = $"{_charData.CharacterSynergy.RoleSynergy}";
-            _overallPowerText.text = $"{_charData.OverallPower}";
+            if (_manager.CurrentCost == _manager.TotalCost && _charData == null)
+            {
+                _charImage.color = Color.black;
+                _charImage.sprite = _xImage;
+            }
+
+            _charImage.color = Color.white;
+            _charImage.sprite = _charData.CharacterImage;
         }
     }
 }
