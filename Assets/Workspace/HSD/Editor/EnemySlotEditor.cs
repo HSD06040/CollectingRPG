@@ -301,9 +301,6 @@ public class EnemySlotEditor : EditorWindow
 
     private void RefreshAvailableGridDatas()
     {
-        Debug.Log($"SAVE_PATH: {SAVE_PATH}");
-        Debug.Log($"Directory exists: {Directory.Exists(SAVE_PATH)}");
-
         if (!Directory.Exists(SAVE_PATH))
         {
             availableGridDatas = new UnitGridDataSO[0];
@@ -311,12 +308,10 @@ public class EnemySlotEditor : EditorWindow
         }
 
         string[] guids = AssetDatabase.FindAssets("t:UnitGridDataSO", new[] { SAVE_PATH });
-        Debug.Log($"Found {guids.Length} UnitGridDataSO files");
 
         foreach (string guid in guids)
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
-            Debug.Log($"Found asset at path: {path}");
         }
 
         availableGridDatas = new UnitGridDataSO[guids.Length];
