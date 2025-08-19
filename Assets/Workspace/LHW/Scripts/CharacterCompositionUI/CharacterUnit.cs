@@ -15,6 +15,7 @@ public class CharacterUnit : MonoBehaviour
     [SerializeField] private Image _jobSynergyImg;
     [SerializeField] private Image _roleSynergyImg;
     [SerializeField] private TMP_Text _overallPowerText;
+    [SerializeField] private TMP_Text _levelText;
 
     private bool _isCollected = true;
     public bool IsCollected => _isCollected;
@@ -60,7 +61,8 @@ public class CharacterUnit : MonoBehaviour
         _costImg.sprite = _charData.CostImg;
         _jobSynergyImg.sprite = _charData.CharacterSynergy.JobSynergy;
         _roleSynergyImg.sprite = _charData.CharacterSynergy.RoleSynergy;
-        _overallPowerText.text = $"{_charData.OverallPower}";
+        _overallPowerText.text = $"Damage {_charData.OverallPower}";
+        _levelText.text = $"Lv{_charData.Level}";
     }
 
     public void InputData(CharacterSO data)
