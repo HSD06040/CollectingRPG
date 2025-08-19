@@ -5,11 +5,12 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
-    [field: SerializeField] public UnitData Data { get; private set; }
+    [field: SerializeField] public UnitData Data { get; set; }
+    [field: SerializeField] public Collider2D Col { get; private set; }
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
-    public Vector2Int CurrentSlot;
+    public Vector2Int CurrentSlot { get; set; }
     private Vector3 _localScale;
     private int _enemyLayer;
 
@@ -22,7 +23,11 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
         _enemyLayer = LayerMask.NameToLayer("Enemy");
-        StatusController.Init(Data);
+
+        Anim ??= GetComponentInChildren<Animator>();
+        Rb ??= GetComponent<Rigidbody2D>();
+        Col ??= GetComponent<CapsuleCollider2D>();
+
         AddProviderComponents();
     }
 
@@ -35,8 +40,14 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         RemoveProviderComponents();
     }
-
     #endregion
+
+    public void Init()
+    {  
+        Col.enabled = true;
+
+        StatusController.Init(Data);
+    }
 
     #region Provider
     private void AddProviderComponents()
@@ -68,7 +79,8 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public bool SkillCheck()
     {
-        return false;
+        if (Data.Skill == null) return false;
+
         if (StatusController.CurMana.Value >= Data.Skill.NeedMana)
         {
             StatusController.CurMana.Value -= Data.Skill.NeedMana;
@@ -80,13 +92,14 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target != null) return;
-
-        Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
+        if (Target == null || ComponentProvider.Get<UnitStatusController>(Target.gameObject).IsDead)
+            Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 
     public void FlipToTarget()
     {
+        if (Target == null || StatusController.IsDead) return;
+
         _localScale = transform.localScale;
 
         if (Target == null)

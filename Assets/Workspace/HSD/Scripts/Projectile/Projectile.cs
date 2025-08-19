@@ -58,5 +58,6 @@ public class Projectile : MonoBehaviour
 
     protected virtual async UniTask MoveAndDestroyAsync(float duration)
     {
+        
     }
 }

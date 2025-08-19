@@ -64,8 +64,8 @@ public class IdleState : BaseState
 
     private bool CanAttack()
     {        
-        if (!_owner.CanAttack())
-            return false;
+        //if (!_owner.CanAttack())
+        //    return false;
 
         attackTimer -= Time.deltaTime; 
         return attackTimer <= 0;        
@@ -169,6 +169,31 @@ public class SkillState : AnimationFinishedState
     {
         base.Enter();
         
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+    }
+}
+
+public class DeadState : BaseState
+{
+    public DeadState(BaseFSM fsm, int animHash) : base(fsm, animHash)
+    {
+        _status.OnPlayerDied += () => _stateMachine.ChangeState(_fsm.DeadState);
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+
+        _owner.Col.enabled = false;
     }
 
     public override void Exit()
