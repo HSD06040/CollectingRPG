@@ -45,9 +45,9 @@ public class GuestSignIn : MonoBehaviour
     {
         _isClicked = true;
 
-        FirebaseManager.Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(async task =>
-        {
-            if (task.IsCanceled)
+        FirebaseManager.Auth
+            .SignInAnonymouslyAsync()
+            .ContinueWithOnMainThread(async task =>
             {
                 Debug.LogError("게스트 로그인 취소");
                 _isClicked = false;
