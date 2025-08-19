@@ -27,15 +27,18 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private TMP_Text _costInfoText;
     [SerializeField] private TMP_Text _totalOverallPowerText;
     [SerializeField] private TMP_Text _leaderEffectText;
+    [SerializeField] private TMP_Text _characterCountText;
     [SerializeField] private GameObject _popUpUI;
     [SerializeField] private TMP_Text _popUpText;
 
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
+    public int TotalCost => _totalCost;
 
     public Action OnCharacterDataChanged;
 
     private int _currentCost;
+    public int CurrentCost => _currentCost;
     private int _currentOverallPower;
     private CharacterSO _selectedCharacterSO;
 
@@ -51,17 +54,24 @@ public class TeamOrganizeManager : MonoBehaviour
         _currentCharacterSOs = _selectedCharacters[0].CharLists;
     }
 
+    private void Start()
+    {
+        ShowCharacterCountInfo();
+    }
+
     #region Event
 
     private void OnEnable()
     {
+        _collectedCharData = _collectedCharacterData.CollectedCharData;
         OnCharacterDataChanged += ShowCostInfo;
         OnCharacterDataChanged += ShowTotalOverallPowerInfo;
         OnCharacterDataChanged += ShowLeaderEffectInfo;
+        OnCharacterDataChanged += ShowCharacterCountInfo;
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
         ShowLeaderEffectInfo();
-        _collectedCharData = _collectedCharacterData.CollectedCharData;
+
     }
 
     private void OnDisable()
@@ -69,6 +79,7 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged -= ShowCostInfo;
         OnCharacterDataChanged -= ShowTotalOverallPowerInfo;
         OnCharacterDataChanged -= ShowLeaderEffectInfo;
+        OnCharacterDataChanged -= ShowCharacterCountInfo;
     }
 
     #endregion
@@ -238,6 +249,11 @@ public class TeamOrganizeManager : MonoBehaviour
     {
         if (_currentCharacterSOs[0] == null) _leaderEffectText.text = "LeaderEffect : None";
         else _leaderEffectText.text = $"LeaderEffect : {_currentCharacterSOs[0].LeaderEffectDescription}";
+    }
+
+    private void ShowCharacterCountInfo()
+    {
+        _characterCountText.text = $"Character {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
     }
 
     #endregion
