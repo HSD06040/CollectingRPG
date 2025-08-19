@@ -30,6 +30,7 @@ public class UnitController : MonoBehaviour
             if (unit == null)
                 continue;
 
+            unit.transform.position = _unitSlotManager.GetUnitSlot(unit.CurrentSlot).transform.position;
             unit.Stanby();
         }
 
