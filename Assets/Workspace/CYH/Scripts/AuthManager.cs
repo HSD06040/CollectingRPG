@@ -22,8 +22,8 @@ public class AuthManager : Singleton<AuthManager>
         await DBManager.Instance.SaveNicknameAsync();
         await currentUser.ReloadAsync();
 
-        Debug.Log("닉네임 설정 성공");
-        Debug.Log($"변경된 유저 닉네임 : {currentUser.DisplayName}");
+        Debug.Log("닉네임 설정 성공 / SetGuestNicknameAsync");
+        Debug.Log($"변경된 유저 닉네임 / SetGuestNicknameAsync : {currentUser.DisplayName}");
     }
 
     /// <summary>
@@ -31,23 +31,21 @@ public class AuthManager : Singleton<AuthManager>
     /// </summary>
     /// <param name="currentUser">현재 로그인된 Firebase 유저</param>
     /// <param name="googleDisplayName">구글 계정 닉네임</param>
-    /// <returns>비동기 작업 Task</returns>
-    public async Task SetGoogleNicknameAsunc(FirebaseUser currentUser, string googleDisplayName)
+    public async Task SetGoogleNicknameAsync(FirebaseUser currentUser, string googleDisplayName)
     {
+        string googleName = googleDisplayName;
         UserProfile profile = new UserProfile();
-        profile.DisplayName = googleDisplayName;
+        profile.DisplayName = googleName;
         Debug.Log($"SetGoogleNickname : googleDisplayName = {googleDisplayName}");
 
         await currentUser.UpdateUserProfileAsync(profile);
-
-        // 초기화
         await currentUser.ReloadAsync();
 
         // Firebase DB에 닉네임 저장
         await DBManager.Instance.SaveNicknameAsync();
         await currentUser.ReloadAsync();
 
-        Debug.Log("닉네임 설정 성공");
-        Debug.Log($"변경된 유저 닉네임 : {currentUser.DisplayName}");
+        Debug.Log("닉네임 설정 성공 / SetGoogleNicknameAsync");
+        Debug.Log($"변경된 유저 닉네임 / SetGoogleNicknameAsync : {currentUser.DisplayName}");
     }
 }

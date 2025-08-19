@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Threading.Tasks;
+using UnityEngine;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
-using UnityEngine;
 using Google;
 
 public class FirebaseManager : Singleton<FirebaseManager>
@@ -23,15 +23,15 @@ public class FirebaseManager : Singleton<FirebaseManager>
     private static DatabaseReference _dataReference;
     public static DatabaseReference DataReference { get { return _dataReference; } }
 
-    private bool _isFirebaseReady;
-    public bool IsFirebaseReady => _isFirebaseReady;
+    private static GoogleSignInConfiguration _configuration;
+    public static GoogleSignInConfiguration Configuration { get { return _configuration; } }
 
     [SerializeField] private string _googleWebAPI = "52905915404-o1kab5fo4ran5vi51o39bvgkf1d3mvig.apps.googleusercontent.com";
 
-    private GoogleSignInConfiguration _configuration;
-    public GoogleSignInConfiguration Configuration { get { return _configuration; } }
+    private bool _isFirebaseReady;
+    public bool IsFirebaseReady => _isFirebaseReady;
 
-    private void Awake()
+    protected override void Awake()
     {
         // GoogleSignIn에 사용할 인증 설정 초기화
         _configuration = new GoogleSignInConfiguration
@@ -48,7 +48,7 @@ public class FirebaseManager : Singleton<FirebaseManager>
     private void Start()
     {
         StartCoroutine(InitFirebaseCoroutine());
-        
+
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
         Time.fixedDeltaTime = 1f / 60f;
@@ -75,16 +75,16 @@ public class FirebaseManager : Singleton<FirebaseManager>
             _database = null;
             _dataReference = null;
         }
+
         _isFirebaseReady = true;
         Debug.Log($"IsFirebaseReady : {_isFirebaseReady}");
-
-       CheckCurrentUser();
+        
+        CheckCurrentUser();
     }
 
     private void CheckCurrentUser()
     {
-
-        if(_auth == null)
+        if (_auth == null)
         {
             Debug.Log("_auth == null");
         }
@@ -95,7 +95,7 @@ public class FirebaseManager : Singleton<FirebaseManager>
         else
         {
             Debug.Log("------자동로그인 성공------");
-            Debug.Log("------유저 정보------");
+            Debug.Log("------유저 정보(FirebaseManager)------");
             Debug.Log($"유저 ID: {_auth.CurrentUser.UserId}");
             Debug.Log($"유저 이름 : {_auth.CurrentUser.DisplayName}");
             Debug.Log($"이메일 : {_auth.CurrentUser.Email}");

@@ -8,11 +8,15 @@ public class GoogleLink : MonoBehaviour
 {
     [SerializeField] private Button _googleButton;
 
+
     private void Start()
     {
         _googleButton.onClick.AddListener(OnClick_LinkWithGoogle);
     }
 
+    /// <summary>
+    /// 게스트 계정 -> 구글 계정으로 전환하는 메서드
+    /// </summary>
     public void OnClick_LinkWithGoogle()
     {
         // 계정 전환 가능 여부 체크
@@ -58,28 +62,22 @@ public class GoogleLink : MonoBehaviour
 
                 string googleDisplayName = googleUser.DisplayName;
                 Debug.Log($"구글 계정 닉네임 : {googleDisplayName}");
-
-                // 구글 닉네임 변경 
-                await AuthManager.Instance.SetGoogleNicknameAsunc(currentUser, googleDisplayName);
                 
+                // DB에 google 계정 닉네임 저장
+                await DBManager.Instance.SaveNicknameAsync(googleDisplayName);
                 await currentUser.ReloadAsync();
 
                 //GameStartPanel 닉네임 text 변경 이벤트 호출
                 //_gameStartPanel.OnSetNicknameField?.Invoke(user.DisplayName);
 
-                Debug.Log("------유저 정보------");
-                Debug.Log($"유저 이름 : {currentUser.DisplayName}");
+                Debug.Log("구글 계정 전환 성공");
+                Debug.Log("------유저 정보(GoogleLink)------");
+                await DBManager.Instance.LoadNicknameAsync((nickname) =>
+                {
+                    Debug.Log($"유저 ID : {nickname}");
+                });
                 Debug.Log($"유저 ID: {currentUser.UserId}");
                 Debug.Log($"이메일 : {currentUser.Email}");
-
-                Debug.LogError("구글 계정 전환 성공 / 재로그인");
-
-                // 강제 로그아웃
-                FirebaseManager.Auth.SignOut();
-
-                // 구글 계정 로그아웃 처리 및 계정과 앱 연결 해제
-                GoogleSignIn.DefaultInstance.SignOut();
-                GoogleSignIn.DefaultInstance.Disconnect();
             });
         });
     }

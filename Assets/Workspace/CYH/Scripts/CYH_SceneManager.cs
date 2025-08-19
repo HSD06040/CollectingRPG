@@ -10,6 +10,7 @@ public class CYH_SceneManager : Singleton<CYH_SceneManager>
     private float _minLoadingTime;                  // 최소 로드 시간
     private string _targetSceneName;                // 로드할 목표씬
 
+
     void Update()
     {
         // 테스트
