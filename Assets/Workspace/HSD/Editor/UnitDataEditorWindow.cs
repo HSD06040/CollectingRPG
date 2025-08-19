@@ -319,8 +319,6 @@ public class UnitDataEditorWindow : EditorWindow
 
         availableUnitDatas = unitDataList.ToArray();
         System.Array.Sort(availableUnitDatas, (a, b) => a.Name.CompareTo(b.Name));
-
-        Debug.Log($"{availableUnitDatas.Length}개의 UnitData를 찾았습니다");
     }
 
     private void LoadUnitData(UnitData unitData)

@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections.Generic;
 [System.Serializable]
 public class GridUnitData
 {
@@ -17,7 +17,7 @@ public class GridUnitData
 public class UnitGridDataSO : ScriptableObject
 {
     public string gridName;
-    public System.Collections.Generic.List<GridUnitData> unitDatas = new System.Collections.Generic.List<GridUnitData>();
+    public List<GridUnitData> unitDatas = new List<GridUnitData>();
 
     public UnitData GetUnitData(Vector2Int position)
     {

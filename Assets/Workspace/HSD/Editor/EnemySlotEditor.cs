@@ -309,8 +309,6 @@ public class EnemySlotEditor : EditorWindow
 
         // 이름순으로 정렬
         System.Array.Sort(availableUnitDatas, (a, b) => a.Name.CompareTo(b.Name));
-
-        Debug.Log($"{availableUnitDatas.Length}개의 UnitData를 찾았습니다");
     }
 
     private void DrawUnitDataList()

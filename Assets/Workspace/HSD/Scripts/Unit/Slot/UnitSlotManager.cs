@@ -5,7 +5,7 @@ using UnityEngine;
 public class UnitSlotManager : MonoBehaviour
 {
     public SlotCreater SlotCreater;
-    public Dictionary<Vector2Int, UnitSlot> UnitSlotDic = new Dictionary<Vector2Int, UnitSlot>(500);
+    public Dictionary<Vector2Int, UnitSlot> UnitSlotDic = new Dictionary<Vector2Int, UnitSlot>(128);
 
     public void Init()
     {
