@@ -36,9 +36,36 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     public Property<int> CurHp = new Property<int>();
     public Property<int> CurMana = new Property<int>();
 
+    public event Action OnPlayerDied;
+    public bool IsDead => CurHp.Value <= 0;
+
     public void Init(UnitData data)
     {
         Data = data;
+
+        SetBaseStat();
+    }
+
+    private void SetBaseStat()
+    {
+        MaxHealth.SetBaseStat(Data.MaxHealth);
+        MaxMana.SetBaseStat(Data.MaxMana);
+        ManaGain.SetBaseStat(Data.ManaGain);
+
+        AttackSpeed.SetBaseStat(Data.AttackSpeed);
+        MoveSpeed.SetBaseStat(Data.MoveSpeed);
+
+        PhysicalDamage.SetBaseStat(Data.PhysicalDamage);
+        MagicDamage.SetBaseStat(Data.MagicDamage);
+
+        CritChance.SetBaseStat(Data.CritChance);
+        CritDamage.SetBaseStat(Data.CritDamage);
+
+        PhysicalDefense.SetBaseStat(Data.PhysicalDefense);
+        MagicDefense.SetBaseStat(Data.MagicDefense);
+
+        AttackRange.SetBaseStat(Data.AttackRange);
+        AttackCount.SetBaseStat(Data.AttackCount);
 
         CurHp.Value = MaxHealth.Value;
         CurMana.Value = MaxMana.Value;
@@ -50,6 +77,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable
         int totalDamage = Utils.CalculateFinalDamage(amount, defense, damageType);
         CurHp.Value -= totalDamage;
         Debug.Log($"현재 체력 :{CurHp.Value}, 받은 데미지 : {totalDamage}");
+
+        if(CurHp.Value <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        OnPlayerDied?.Invoke();
     }
 
     public void GetMana()
