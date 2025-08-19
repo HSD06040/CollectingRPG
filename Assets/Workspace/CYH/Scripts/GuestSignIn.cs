@@ -45,16 +45,9 @@ public class GuestSignIn : MonoBehaviour
     {
         _isClicked = true;
 
-        FirebaseManager.Auth
-            .SignInAnonymouslyAsync()
-            .ContinueWithOnMainThread(async task =>
-            {
-                Debug.LogError("게스트 로그인 취소");
-                _isClicked = false;
-                return;
-            }
-
-            if (task.IsFaulted)
+        FirebaseManager.Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(async task =>
+        {
+            if (task.IsCanceled || task.IsFaulted)
             {
                 Debug.LogError($"게스트 로그인 실패 / 원인: {task.Exception}");
                 _isClicked = false;
@@ -64,8 +57,6 @@ public class GuestSignIn : MonoBehaviour
             Firebase.Auth.AuthResult result = task.Result;
 
             FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
-
-            Debug.Log("게스트 생성 완료");
 
             await currentUser.ReloadAsync();
 
@@ -85,13 +76,11 @@ public class GuestSignIn : MonoBehaviour
             if (currentUser != null)
             {
                 // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
-                Debug.Log("게스트 정보 업데이트 완료. tutorial패널 활성화");
                 tutorialPanel.SetActive(true);
                 SigninPanel.SetActive(false);
 
                 // 튜토리얼 isTutorialComplete = true Data 변경
                 SetTutorialCompleteAsync();
-;
                 _isClicked = false;
             }
         });
@@ -100,11 +89,11 @@ public class GuestSignIn : MonoBehaviour
     private async void CheckTutorialCompletedAsync()
     {
         bool isTutorialNotCompleted = await DBManager.Instance.CheckTutorialCompletedAsync();
-        if(isTutorialNotCompleted)
+        if (isTutorialNotCompleted)
         {
             SceneManager.LoadScene("CYH_Lobby");
         }
-        else 
+        else
         {
             // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
             tutorialPanel.SetActive(true);
