@@ -14,7 +14,7 @@ public class CollectedCharacterData : MonoBehaviour
     private int _collectedCharacterCount;
     public int CollectedCharacterCount => _collectedCharacterCount;
 
-    private void OnEnable()
+    private void Awake()
     {
         for(int i = 0; i < _characters.Length; i++)
         {
