@@ -1,3 +1,4 @@
+using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,8 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private TMP_Text _characterCountText;
     [SerializeField] private GameObject _popUpUI;
     [SerializeField] private TMP_Text _popUpText;
+
+    [SerializeField] private ButtonManagerBasic[] _presetAddButton;
 
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
@@ -273,7 +276,7 @@ public class TeamOrganizeManager : MonoBehaviour
             return;
         }
 
-        // 해당 프리셋이 비활성화된 프리팹일 시 확장 가능한지 확인하고, 확장을 진행
+        // 해당 프리셋이 생성되지 않은 프리셋일 시 확장 가능한지 확인하고, 확장을 진행
         if (_selectedCharacters.Count < index + 1)
         {
             if (PopupManager.Instance != null)
@@ -285,7 +288,6 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             LoadPreset(index);
         }
-        OnCharacterDataChanged?.Invoke();
     }
 
     private void CreatePreset(int index)
@@ -294,9 +296,11 @@ public class TeamOrganizeManager : MonoBehaviour
 
         Debug.Log("Used 500 Gold");
         _selectedCharacters.Add(new SelectedCharacters(5));
+        // 이 부분은 UI 디자인 변경 시 변경 필요
+        _presetAddButton[index - 2].buttonText = $"{(index + 1)}";
+        _presetAddButton[index - 2].UpdateUI();
 
         LoadPreset(index);
-        OnCharacterDataChanged?.Invoke();
     }
 
     private void LoadPreset(int index)
@@ -312,6 +316,8 @@ public class TeamOrganizeManager : MonoBehaviour
                 _currentOverallPower += _currentCharacterSOs[i].OverallPower;
             }
         }
+
+        OnCharacterDataChanged?.Invoke();
     }
 
     #endregion
