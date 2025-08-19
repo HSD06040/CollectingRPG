@@ -4,11 +4,14 @@ using UnityEngine.UI;
 
 public class SelectedCharacterUnit : MonoBehaviour
 {
+    [Header("Referenece")]
+    [SerializeField] private Sprite _xImage;
+
     [Header("Index")]
     [SerializeField] private int _index;
 
     [Header("UI")]
-    [SerializeField] Image _charImage;
+    [SerializeField] private Image _charImage;
 
     private CharacterSO _charData;
     private TeamOrganizeManager _manager;
@@ -44,13 +47,27 @@ public class SelectedCharacterUnit : MonoBehaviour
     {
         _charData = _manager.GetCurrentCharacterData(_index);
 
-        if(_manager == null || _charData == null)
+        if (_manager == null || _charData == null)
         {
-            _charImage.color = Color.clear;
-            _charImage.sprite = null;
+            if (_manager.CurrentCost == _manager.TotalCost)
+            {
+                _charImage.color = Color.black;
+                _charImage.sprite = _xImage;
+            }
+            else
+            {
+                _charImage.color = Color.clear;
+                _charImage.sprite = null;
+            }
         }
         else
         {
+            if (_manager.CurrentCost == _manager.TotalCost && _charData == null)
+            {
+                _charImage.color = Color.black;
+                _charImage.sprite = _xImage;
+            }
+
             _charImage.color = Color.white;
             _charImage.sprite = _charData.CharacterImage;
         }

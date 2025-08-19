@@ -33,10 +33,12 @@ public class TeamOrganizeManager : MonoBehaviour
 
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
+    public int TotalCost => _totalCost;
 
     public Action OnCharacterDataChanged;
 
     private int _currentCost;
+    public int CurrentCost => _currentCost;
     private int _currentOverallPower;
     private CharacterSO _selectedCharacterSO;
 
@@ -52,6 +54,11 @@ public class TeamOrganizeManager : MonoBehaviour
         _currentCharacterSOs = _selectedCharacters[0].CharLists;
     }
 
+    private void Start()
+    {
+        ShowCharacterCountInfo();
+    }
+
     #region Event
 
     private void OnEnable()
@@ -64,7 +71,7 @@ public class TeamOrganizeManager : MonoBehaviour
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
         ShowLeaderEffectInfo();
-        ShowCharacterCountInfo();
+
     }
 
     private void OnDisable()
