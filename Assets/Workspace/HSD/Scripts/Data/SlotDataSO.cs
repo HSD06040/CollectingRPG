@@ -1,17 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-[System.Serializable]
-public class GridUnitData
-{
-    public Vector2Int position;
-    public UnitData unitData;
 
-    public GridUnitData(Vector2Int pos, UnitData data)
-    {
-        position = pos;
-        unitData = data;
-    }
-}
 
 [CreateAssetMenu(fileName = "UnitGridData", menuName = "Data/UnitGridData")]
 public class UnitGridDataSO : ScriptableObject

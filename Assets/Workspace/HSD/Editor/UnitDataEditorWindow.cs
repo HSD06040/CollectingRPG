@@ -347,16 +347,19 @@ public class UnitDataEditorWindow : EditorWindow
         {
             if (availableUnitDatas[i] == null) continue;
 
-            EditorGUILayout.BeginHorizontal(GUI.skin.box);
+            UnitData unitData = availableUnitDatas[i];
+            bool isSelected = currentUnitData == unitData;
 
-            bool isSelected = currentUnitData == availableUnitDatas[i];
+            // 선택된 항목의 배경색 변경
+            Color originalColor = GUI.backgroundColor;
             if (isSelected)
             {
                 GUI.backgroundColor = Color.cyan;
             }
 
-            UnitData unitData = availableUnitDatas[i];
+            EditorGUILayout.BeginHorizontal(GUI.skin.box);
 
+            // 아이콘과 정보를 포함한 버튼 생성
             EditorGUILayout.BeginHorizontal();
 
             // 아이콘 표시
@@ -367,15 +370,20 @@ public class UnitDataEditorWindow : EditorWindow
                 {
                     GUILayout.Label(iconTexture, GUILayout.Width(32), GUILayout.Height(32));
                 }
+                else
+                {
+                    GUILayout.Space(36);
+                }
             }
             else
             {
                 GUILayout.Space(36);
             }
 
+            // 유닛 정보 표시 및 클릭 처리
             EditorGUILayout.BeginVertical();
 
-            // 클릭 가능한 라벨
+            // 클릭 가능한 라벨로 변경
             if (GUILayout.Button($"{unitData.Name} (Lv.{unitData.Level})", EditorStyles.label))
             {
                 LoadUnitData(unitData);
@@ -386,8 +394,10 @@ public class UnitDataEditorWindow : EditorWindow
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
 
-            GUI.backgroundColor = Color.white;
             EditorGUILayout.EndHorizontal();
+
+            // 배경색 복원
+            GUI.backgroundColor = originalColor;
         }
 
         EditorGUILayout.EndScrollView();
