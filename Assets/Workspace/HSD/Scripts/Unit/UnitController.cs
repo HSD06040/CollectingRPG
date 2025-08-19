@@ -9,6 +9,7 @@ public class UnitController : MonoBehaviour
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
 
     private UnitBase[,] _unitGrid;
+    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300); 
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassSynergy, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassSynergy, List<UnitBase>>(64);
 
@@ -84,6 +85,16 @@ public class UnitController : MonoBehaviour
         }
     }
 
+    public void AddUnit(UnitBase newUnit, Vector2Int pos)
+    {        
+        UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);
+        
+        newUnit.transform.SetParent(slot.transform);
+        newUnit.transform.position = slot.transform.position;
+
+        AddUnit(slot, newUnit);
+    }
+
     public void RemoveUnit(UnitSlot slot)
     {
         if (slot.Unit == null) return;
@@ -103,9 +114,22 @@ public class UnitController : MonoBehaviour
         if (_classSynergyUnitDic.TryGetValue(classSynergy, out var classList))
             classList.Remove(unit);
 
+        _unitBaseDic[unit.Data.Address].Remove(unit);
+
         Destroy(unit.gameObject);
 
         slot.ClearSlot();        
+    }
+
+    public Vector2Int RemoveUnit(UnitData unit)
+    {
+        UnitBase unitBase = _unitBaseDic[unit.Address][0];
+        UnitSlot slot = _unitSlotManager.GetUnitSlot(unitBase);
+
+        Vector2Int pos = unitBase.CurrentSlot;
+        RemoveUnit(slot);
+
+        return unitBase.CurrentSlot;
     }
 
     private void AddSynergyUnit(UnitBase unit)
@@ -134,11 +158,29 @@ public class UnitController : MonoBehaviour
     public void SetSlot(UnitSlot slot, UnitBase unit)
     {
         slot.SetUnit(unit);
+
+        if(!_unitBaseDic.TryGetValue(unit.Data.Address, out var list))
+        {
+            list = new List<UnitBase>(16);
+            _unitBaseDic.Add(unit.Data.Address, list);
+        }
+        list.Add(unit);
+
         _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = unit;
     }
 
     public UnitSlot GetUnitSlot(UnitBase unit)
     {        
         return _unitSlotManager.UnitSlotDic[unit.CurrentSlot];
+    }
+
+    public int GetUnitCount(string address)
+    {
+        return _unitBaseDic.TryGetValue(address, out var unitList) ? unitList.Count : 0;
+    }
+
+    public int GetUnitCount(UnitData unit)
+    {
+        return GetUnitCount(unit.Address);
     }
 }

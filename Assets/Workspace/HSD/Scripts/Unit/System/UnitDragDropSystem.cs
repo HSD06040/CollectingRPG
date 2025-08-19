@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 public class UnitDragDropSystem : MonoBehaviour
 {
-    private bool _isDragging;
+    private bool _isDragging;    
     private GameObject _currentUnit;
     private Vector2 _offset;
     private Vector2 _pos;
@@ -91,8 +91,14 @@ public class UnitDragDropSystem : MonoBehaviour
                     OnUnitDropped?.Invoke(slot, unit);
                 }
                 else
-                {
-                    _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
+                {   
+                    if(unit != null)
+                    {
+                        if(unit.CurrentSlot == Vector2Int.zero)
+                            Destroy(_currentUnit);
+                        else
+                            _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
+                    }                    
                 }                   
             }
             Clear();

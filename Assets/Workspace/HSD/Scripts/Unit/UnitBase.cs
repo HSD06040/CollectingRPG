@@ -5,7 +5,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
-    [field: SerializeField] public UnitData Data { get; private set; }
+    [field: SerializeField] public UnitData Data { get; set; }
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();

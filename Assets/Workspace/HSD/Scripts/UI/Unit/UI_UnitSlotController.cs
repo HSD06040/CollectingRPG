@@ -9,11 +9,9 @@ public class UI_UnitSlotController : MonoBehaviour
     [SerializeField] UnitController _unitController;
     [SerializeField] Transform _content;
     [SerializeField] GameObject _unitSlotPrefab;
-    [SerializeField] int _slotCount;
-    [SerializeField] UnitData[] _testDatas;
+    [SerializeField] int _slotCount;    
 
-    private UI_UnitSlot[] _unitSlots;
-    private Dictionary<string, int> _unitCountDic = new Dictionary<string, int>(256);
+    private UI_UnitSlot[] _unitSlots;    
     private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(256);
 
     private void Awake()
@@ -35,81 +33,29 @@ public class UI_UnitSlotController : MonoBehaviour
         }
     }
 
-    public void RandomSpawn()
-    {
-        UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
-
-        AddUnit(unit);
-    }
-
-    public void AddUnit(UnitData unit)
-    {
-        int slotIdx = GetEmptySlot();
-
-        if (slotIdx == -1)
-        {
-            Debug.Log("슬롯이 부족합니다.");
-            return;
-        }
-
-        SetSlot(unit, slotIdx);
-    }
-
-    private void SetSlot(UnitData unit, int idx)
+    public void SetSlot(UnitData unit, int idx)
     {
         _unitSlots[idx].SetSlot(unit);
 
-        if(!_unitSlotDic.ContainsKey(unit.Address))
+        if (!_unitSlotDic.ContainsKey(unit.Address))
         {
             _unitSlotDic.Add(unit.Address, new List<int>(5));
         }
-        _unitSlotDic[unit.Address].Add(idx);
-
-        if (!_unitCountDic.TryGetValue(unit.Address, out int value))
+        var slotList = _unitSlotDic[unit.Address];
+        if (!slotList.Contains(idx))
         {
-            _unitCountDic.Add(unit.Address, 0);
-        }        
-        _unitCountDic[unit.Address]++;
-        
-        CheckUpgrade(unit);
+            slotList.Add(idx);
+        }
     }
 
     public void ClearSlot(int idx)
     {
         UnitData unit = _unitSlots[idx].GetUnit();
+        if (unit == null) return;
 
-        _unitCountDic[unit.Address]--;
         _unitSlotDic[unit.Address].Remove(idx);
 
-        _unitSlots[idx].ClearSlot();       
-    }
-
-    private void CheckUpgrade(UnitData unit)
-    {
-        if(unit.Level == 3)
-        {
-            Debug.Log($"최종 유닛 {unit.Name} 업그레이드 불가");
-            return;
-        }
-
-        if(_unitCountDic[unit.Address] >= 3)
-        {
-            Upgrade(unit);
-        }
-    }
-
-    private void Upgrade(UnitData unit)
-    {
-        UnitData newUnit = Resources.Load<UnitData>($"UnitDatas/{unit.Name}_{unit.Level + 1}");
-
-        _unitSlotDic.TryGetValue(unit.Address, out List<int> slotIdxs);
-
-        foreach (var idx in slotIdxs)
-        {
-            ClearSlot(idx);
-        }
-
-        AddUnit(newUnit);
+        _unitSlots[idx].ClearSlot();
     }
 
     public int GetEmptySlot()
@@ -126,8 +72,18 @@ public class UI_UnitSlotController : MonoBehaviour
 
     public void RemoveUnit(UnitData unit, int idx)
     {
-        _unitCountDic[unit.Address]--;
-        _unitSlotDic[unit.Address].Remove(idx);
+        if (_unitSlotDic.TryGetValue(unit.Address, out var slotList))
+        {
+            slotList.Remove(idx);
+        }
+    }
+
+    public void RemoveLastUnit(UnitData unit)
+    {
+        var slotList = _unitSlotDic[unit.Address];
+        int lastIdx = slotList[slotList.Count - 1];
+        Debug.Log(lastIdx);
+        ClearSlot(lastIdx);
     }
 
     public void RemoveInGameSlot(UnitBase unit, int slotIdx)
@@ -139,5 +95,20 @@ public class UI_UnitSlotController : MonoBehaviour
         }        
 
         RemoveUnit(unit.StatusController.Data, slotIdx);
+    }
+
+    public int GetUnitCount(string address)
+    {
+        if (_unitSlotDic.TryGetValue(address, out List<int> slotIdxs))
+        {
+            return slotIdxs.Count;
+        }
+        return 0;
+    }
+
+    public int GetUnitCount(UnitData unit)
+    {
+        Debug.Log(unit.Address);
+        return GetUnitCount(unit.Address);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Unit_Data", menuName = "Data/Unit/Unit_Data")]
@@ -49,4 +50,29 @@ public class UnitData : ScriptableObject
 
     [Header("Player_Enhancement")]
     public UnitEnhancementData EnhancementData; // 적일 경우 더미 데이터로 존재 (추후 기획에 따라 달라질 수 있음)
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (!string.IsNullOrEmpty(Name))
+        {
+            string targetName = $"{Name}_{Level}";
+
+            if (name != targetName)
+            {
+                name = targetName;
+                EditorUtility.SetDirty(this);
+
+                string assetPath = AssetDatabase.GetAssetPath(this);
+                string currentFileName = System.IO.Path.GetFileNameWithoutExtension(assetPath);
+
+                if (currentFileName != targetName)
+                {
+                    AssetDatabase.RenameAsset(assetPath, targetName);
+                    AssetDatabase.SaveAssets();
+                }
+            }
+        }
+    }
+#endif
 }

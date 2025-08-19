@@ -14,6 +14,11 @@ public class UnitSlotManager : MonoBehaviour
 
     public UnitSlot GetUnitSlot(UnitBase unit)
     {
-        return UnitSlotDic.TryGetValue(unit.CurrentSlot, out UnitSlot slot) ? slot : null;
+        return GetUnitSlot(unit.CurrentSlot);
+    }
+
+    public UnitSlot GetUnitSlot(Vector2Int pos)
+    {
+        return UnitSlotDic.TryGetValue(pos, out UnitSlot slot) ? slot : null;
     }
 }

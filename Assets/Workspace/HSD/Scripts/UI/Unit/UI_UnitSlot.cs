@@ -74,8 +74,11 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (_unit == null) return;
+
+        _unitSlotController.RemoveUnit(_unit, _slotIdx);
         GameObject unit = Instantiate(_unit.UnitPrefab);
-        ComponentProvider.Get<UnitStatusController>(unit).Data = _unit;
+        unit.GetComponent<UnitBase>().Data = _unit;
         _dragDropSystem.SetUnit(unit, UnitSetting, _slotIdx);
         _chachedUnit = _unit;
         ClearSlot();
@@ -83,7 +86,7 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
 
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log("드래그 중");
+        
     }
 
     public void OnDrop(PointerEventData eventData)
