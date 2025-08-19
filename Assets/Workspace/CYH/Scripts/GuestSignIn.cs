@@ -61,7 +61,7 @@ public class GuestSignIn : MonoBehaviour
             await currentUser.ReloadAsync();
 
             // 게스트 닉네임 변경 
-            await AuthManager.Instance.SetGuestNicknameAsync(currentUser);
+            await Manager.Auth.SetGuestNicknameAsync(currentUser);
             await currentUser.ReloadAsync();
 
             // 튜토리얼 isTutorialComplete = false Data 생성
@@ -88,7 +88,7 @@ public class GuestSignIn : MonoBehaviour
 
     private async void CheckTutorialCompletedAsync()
     {
-        bool isTutorialNotCompleted = await DBManager.Instance.CheckTutorialCompletedAsync();
+        bool isTutorialNotCompleted = await Manager.DB.CheckTutorialCompletedAsync();
         if (isTutorialNotCompleted)
         {
             SceneManager.LoadScene("CYH_Lobby");
@@ -103,11 +103,11 @@ public class GuestSignIn : MonoBehaviour
 
     private async void SetTutorialInCompleteAsync()
     {
-        await DBManager.Instance.SetTutorialInCompleteAsync();
+        await Manager.DB.SetTutorialInCompleteAsync();
     }
 
     private async void SetTutorialCompleteAsync()
     {
-        await DBManager.Instance.SetTutorialCompleteAsync();
+        await Manager.DB.SetTutorialCompleteAsync();
     }
 }

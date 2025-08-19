@@ -19,7 +19,7 @@ public class AuthManager : Singleton<AuthManager>
         await currentUser.ReloadAsync();
 
         // Firebase DB에 닉네임 저장
-        await DBManager.Instance.SaveNicknameAsync();
+        await Manager.DB.SaveNicknameAsync();
         await currentUser.ReloadAsync();
 
         Debug.Log("닉네임 설정 성공 / SetGuestNicknameAsync");
@@ -42,7 +42,7 @@ public class AuthManager : Singleton<AuthManager>
         await currentUser.ReloadAsync();
 
         // Firebase DB에 닉네임 저장
-        await DBManager.Instance.SaveNicknameAsync();
+        await Manager.DB.SaveNicknameAsync();
         await currentUser.ReloadAsync();
 
         Debug.Log("닉네임 설정 성공 / SetGoogleNicknameAsync");

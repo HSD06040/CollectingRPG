@@ -64,7 +64,7 @@ public class GoogleLink : MonoBehaviour
                 Debug.Log($"구글 계정 닉네임 : {googleDisplayName}");
                 
                 // DB에 google 계정 닉네임 저장
-                await DBManager.Instance.SaveNicknameAsync(googleDisplayName);
+                await Manager.DB.SaveNicknameAsync(googleDisplayName);
                 await currentUser.ReloadAsync();
 
                 //GameStartPanel 닉네임 text 변경 이벤트 호출
@@ -72,7 +72,7 @@ public class GoogleLink : MonoBehaviour
 
                 Debug.Log("구글 계정 전환 성공");
                 Debug.Log("------유저 정보(GoogleLink)------");
-                await DBManager.Instance.LoadNicknameAsync((nickname) =>
+                await Manager.DB.LoadNicknameAsync((nickname) =>
                 {
                     Debug.Log($"유저 ID : {nickname}");
                 });

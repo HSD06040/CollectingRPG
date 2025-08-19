@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class CYH_SceneManager : Singleton<CYH_SceneManager>
+public class CYH_SceneManager : MonoBehaviour
 {
     private AsyncOperation _asyncLoad;
 

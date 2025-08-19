@@ -31,7 +31,7 @@ public class FirebaseManager : Singleton<FirebaseManager>
     private bool _isFirebaseReady;
     public bool IsFirebaseReady => _isFirebaseReady;
 
-    protected override void Awake()
+    private void Awake()
     {
         // GoogleSignIn에 사용할 인증 설정 초기화
         _configuration = new GoogleSignInConfiguration
