@@ -80,6 +80,8 @@ public class UnitManager : MonoBehaviour
         {
             UnitBase unitBase = Instantiate(newUnit.UnitPrefab).GetComponent<UnitBase>();
             unitBase.Data = newUnit;
+            unitBase.Init();
+
             _unitController.AddUnit(unitBase, pos);            
         }
         else

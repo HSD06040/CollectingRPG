@@ -78,7 +78,11 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
 
         _unitSlotController.RemoveUnit(_unit, _slotIdx);
         GameObject unit = Instantiate(_unit.UnitPrefab);
-        unit.GetComponent<UnitBase>().Data = _unit;
+
+        UnitBase unitBase = unit.GetComponent<UnitBase>();
+        unitBase.Data = _unit;
+        unitBase.Init();
+
         _dragDropSystem.SetUnit(unit, UnitSetting, _slotIdx);
         _chachedUnit = _unit;
         ClearSlot();

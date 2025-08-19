@@ -21,8 +21,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     protected virtual void Awake()
     {
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
-        _enemyLayer = LayerMask.NameToLayer("Enemy");
-        StatusController.Init(Data);
+        _enemyLayer = LayerMask.NameToLayer("Enemy");        
         AddProviderComponents();
     }
 
@@ -37,6 +36,11 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
 
     #endregion
+
+    public void Init()
+    {
+        StatusController.Init(Data);
+    }
 
     #region Provider
     private void AddProviderComponents()
