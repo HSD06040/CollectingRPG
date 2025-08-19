@@ -1,18 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Firebase.Auth;
-using Firebase.Extensions;
 using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
+using UnityEngine.SceneManagement;
+using Firebase.Auth;
+using Firebase.Extensions;
 
 public class GuestSignIn : MonoBehaviour
 {
     [SerializeField] private Button _guestLoginButton;
 
+    // TODO: [CYH] 패널 전환 테스트_1 (삭제 예정)
+    [SerializeField] private GameObject tutorialPanel;
+    [SerializeField] private GameObject SigninPanel;
+
     private bool _isClicked;
-    public Action LoginCompleted { get; set; }
+
 
     private void Start()
     {
@@ -20,137 +21,86 @@ public class GuestSignIn : MonoBehaviour
         {
             if (!_isClicked)
             {
-                OnClick_GuestLogin();
+                if (FirebaseManager.Auth.CurrentUser != null)
+                {
+                    _isClicked = false;
+
+                    // 튜토리얼 진행 여부 체크
+                    CheckTutorialCompletedAsync();
+                }
+                else
+                {
+                    OnClick_GuestLogin();
+                }
             }
         });
     }
 
+    /// <summary>
+    /// Firebase 익명 로그인 후 닉네임 설정
+    /// </summary>
     private void OnClick_GuestLogin()
     {
         _isClicked = true;
 
-        // 게스트 로그인 중복 시도 방지
-        var current = FirebaseManager.Auth.CurrentUser;
-        if (current != null)
+        FirebaseManager.Auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(async task =>
         {
-            Debug.LogError($"[Auth] 이미 로그인됨 - UID={current.UserId}, 닉네임={current.DisplayName}");
-            _isClicked = false;
-            return;
-        }
-
-        FirebaseManager.Auth
-            .SignInAnonymouslyAsync()
-            .ContinueWithOnMainThread(async task =>
+            if (task.IsCanceled || task.IsFaulted)
             {
-                if (task.IsCanceled)
-                {
-                    Debug.LogError("[Auth] 게스트 로그인 취소됨");
-                    _isClicked = false;
-                    return;
-                }
-                if (task.IsFaulted)
-                {
-                    Debug.LogError($"[Auth] 게스트 로그인 실패 - 예외: {task.Exception}");
-                    _isClicked = false;
-                    return;
-                }
-
-                var result = task.Result;
-                var user = FirebaseManager.Auth.CurrentUser;
-
-                Debug.Log("[Auth] 게스트 로그인 완료");
-
-                // 프로필(닉네임) 설정
-                await SetGuestNickname(user);
-
-                // 최종 상태 동기화 (1회)
-                await user.ReloadAsync();
-
-                // 요약 로그
-                Debug.Log("------ 게스트 로그인(GuestLogin) ------");
-                Debug.Log($"현재 닉네임: {user.DisplayName}");
-                Debug.Log($"현재 ID: {user.UserId}");
-                Debug.Log($"이메일: {user.Email}");
-
-                // UI 전환
-                if (user != null)
-                {
-                    Debug.Log("[Auth] 게스트 로그인 초기화 완료. GameStart 패널 활성화");
-                    LoginCompleted?.Invoke();
-                }
-
+                Debug.LogError($"게스트 로그인 실패 / 원인: {task.Exception}");
                 _isClicked = false;
-            });
+                return;
+            }
+
+            Firebase.Auth.AuthResult result = task.Result;
+
+            FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
+
+            await currentUser.ReloadAsync();
+
+            // 게스트 닉네임 변경 
+            await Manager.Auth.SetGuestNicknameAsync(currentUser);
+            await currentUser.ReloadAsync();
+
+            // 튜토리얼 isTutorialComplete = false Data 생성
+            SetTutorialInCompleteAsync();
+
+            // SignInPanel -> Tutorial패널 로 변경
+            if (currentUser != null)
+            {
+                // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
+                tutorialPanel.SetActive(true);
+                SigninPanel.SetActive(false);
+
+                // 튜토리얼 isTutorialComplete = true Data 변경
+                SetTutorialCompleteAsync();
+                _isClicked = false;
+            }
+        });
     }
 
-    /// <summary>
-    /// 익명 사용자(DisplayName)를 "게스트 + 난수"로 설정하고 DB에 저장합니다.
-    /// </summary>
-    /// <param name="currentUser">현재 로그인된 사용자</param>
-    public static async Task SetGuestNickname(FirebaseUser currentUser)
+    private async void CheckTutorialCompletedAsync()
     {
-        // 닉네임 생성
-        string nickname = $"게스트{Random.Range(1000, 10000)}";
-        var profile = new UserProfile { DisplayName = nickname };
-
-        // 프로필 업데이트
-        await currentUser.UpdateUserProfileAsync(profile);
-
-        // 서버 상태 동기화 (업데이트 직후 1회)
-        await currentUser.ReloadAsync();
-
-        // DB 저장
-        bool ok = await SaveNicknameAsync();
-        if (ok)
+        bool isTutorialNotCompleted = await Manager.DB.CheckTutorialCompletedAsync();
+        if (isTutorialNotCompleted)
         {
-            Debug.Log("닉네임 저장 성공");
+            SceneManager.LoadScene("CYH_Lobby");
         }
         else
         {
-            Debug.LogError("닉네임 저장 실패");
+            // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
+            tutorialPanel.SetActive(true);
+            SigninPanel.SetActive(false);
         }
-
-        Debug.Log($"최종 설정 닉네임: {currentUser.DisplayName}");
     }
 
-    /// <summary>
-    /// UserData/RankData에 닉네임 저장.
-    /// 익명 사용자는 UserData만, 비익명은 UserData+RankData.
-    /// </summary>
-    public static async Task<bool> SaveNicknameAsync()
+    private async void SetTutorialInCompleteAsync()
     {
-        var currentUser = FirebaseManager.Auth.CurrentUser;
-        if (currentUser == null)
-        {
-            Debug.LogError("[DB] 저장 실패 - CurrentUser가 null");
-            return false;
-        }
+        await Manager.DB.SetTutorialInCompleteAsync();
+    }
 
-        string uid = currentUser.UserId;
-        string userNickname = currentUser.DisplayName;
-
-        var dictionary = new Dictionary<string, object>();
-
-        if (currentUser.IsAnonymous)
-        {
-            dictionary[$"UserData/{uid}/Nickname"] = userNickname;
-        }
-        else
-        {
-            dictionary[$"UserData/{uid}/Nickname"] = userNickname;
-            dictionary[$"RankData/{uid}/Nickname"] = userNickname;
-        }
-
-        var task = FirebaseManager.DataReference.UpdateChildrenAsync(dictionary);
-        await task;
-
-        if (task.IsCompletedSuccessfully)
-        {
-            Debug.Log("UserData / RankData 에 닉네임 저장 성공");
-            return true;
-        }
-
-        Debug.LogError("닉네임 저장 실패");
-        return false;
+    private async void SetTutorialCompleteAsync()
+    {
+        await Manager.DB.SetTutorialCompleteAsync();
     }
 }
