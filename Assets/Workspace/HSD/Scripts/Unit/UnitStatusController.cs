@@ -69,6 +69,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
         CurHp.Value = MaxHealth.Value;
         CurMana.Value = MaxMana.Value;
+        TotalDamage.Value = 0;
     }
 
     public void TakeDamage(int amount)

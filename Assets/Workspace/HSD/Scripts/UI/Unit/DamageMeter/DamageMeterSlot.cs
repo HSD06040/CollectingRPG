@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,9 +29,9 @@ public class DamageMeterSlot : MonoBehaviour, IDamageMeterView
 
     public void SetDamage(int damage)
     {
-        _damageSlider.value = damage;
         _totalDamage = damage;
         _damageText.text = damage.ToString();
+        _damageSlider.value = damage;
         OnDamaged?.Invoke();
     }
 
@@ -47,5 +48,9 @@ public class DamageMeterSlot : MonoBehaviour, IDamageMeterView
     public void SetNumber(int num)
     {
         _numberText.text = num.ToString();
+    }
+    public void RefreshValue()
+    {
+        _damageSlider.value = _totalDamage;
     }
 }

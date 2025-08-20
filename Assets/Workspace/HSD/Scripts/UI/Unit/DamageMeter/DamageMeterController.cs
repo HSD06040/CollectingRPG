@@ -111,6 +111,7 @@ public class DamageMeterController : MonoBehaviour
         foreach (var slot in _damageMeterSlots)
         {
             slot.SetSliderMaxValue(maxValue);
+            slot.RefreshValue();
         }
     }
 }
