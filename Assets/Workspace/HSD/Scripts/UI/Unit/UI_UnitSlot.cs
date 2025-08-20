@@ -93,7 +93,6 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
         
     }
 
-    // 인게임 -> UI에 드랍했을 때
     public void OnDrop(PointerEventData eventData)
     {
         UnitBase unitBase = _dragDropSystem.GetCurrentUnitBase();
@@ -104,34 +103,41 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
             return;
         }
 
+        UnitData temp = _unit;
         UnitData unit = unitBase.Data;
-        Vector2Int pos = unitBase.CurrentSlot;        
+        Vector2Int pos = unitBase.CurrentSlot;
 
         // ui 에서 생성한 거라면
-        if(pos == Vector2Int.zero)
+        if (pos == Vector2Int.zero)
         {
             if(IsEmpty())
             {
-                _unitSlotController.ClearSlot(_slotIdx);
                 OnUnitChanged?.Invoke(unit, _slotIdx);
             }
             else
             {
-                UnitData temp = _unit;
+                
                 OnUnitChanged?.Invoke(unit, _slotIdx);
                 _unitSlotController.SetSlot(temp, _dragDropSystem.GetCurrentSlotIdx());
             }
         }
         else
         {
-            _unitSlotController.RemoveInGameSlot(unitBase, _slotIdx);
+            // 인게임에서 생성한 거라면 (인 게임 Slot -> UI)
+           
+            _unitSlotController.RemoveInGameSlot(unitBase, _slotIdx, true); // 인게임 슬롯에서 제거
 
-            // 현재 UI에 데이터가 있는 지 확인, unitBase가 UI에서 파생된 애가 아닌지 확인
-            if (_unit != null && unitBase.CurrentSlot != Vector2Int.zero)
+            if (temp != null) // 만약 UI 슬롯이 비어있지 않다면
             {
-                _unitSlotController.AddInGameSlot(_unit, _slotIdx, unitBase.CurrentSlot);
+                Debug.Log("Temp != null");
+                // 인게임 해당 슬롯에 추가
+                _unitSlotController.AddInGameSlot(temp, _slotIdx, unitBase.CurrentSlot);
+                _unitSlotController.RemoveUnit(temp, _slotIdx);
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+                return;
             }
-
+            
+            _unitSlotController.RemoveUnit(unit, _slotIdx);
             OnUnitChanged?.Invoke(unit, _slotIdx);
         }
         

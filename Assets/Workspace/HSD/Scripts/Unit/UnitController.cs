@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.UI.CanvasScaler;
 
 public class UnitController : MonoBehaviour
 {
@@ -8,11 +9,13 @@ public class UnitController : MonoBehaviour
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UI_UnitSlotController _uiSlotController;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
+    [SerializeField] int _unitMaxCount;
 
     private UnitBase[,] _unitGrid;
     private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300); 
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassSynergy, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassSynergy, List<UnitBase>>(64);
+    private int _currentUnitCount = 0;
 
     private void Awake()
     {
@@ -52,15 +55,29 @@ public class UnitController : MonoBehaviour
     }
 
     public void AddUnit(UnitSlot slot, UnitBase unit)
-    {
+    {       
         UnitBase slotUnit = slot.Unit;
 
-        if (unit.CurrentSlot == Vector2.zero)
+        if (IsUnitMaxCount())
+        {
+            if(unit.CurrentSlot == Vector2Int.zero)
+            {
+                _uiSlotController.SetSlot(unit.Data, _unitDragDropSystem.GetCurrentSlotIdx());
+                Destroy(unit.gameObject);
+            }
+            else
+            {
+                SetSlot(_unitSlotManager.GetUnitSlot(unit), unit);                
+            }
+            return;
+        }
+
+        if (unit.CurrentSlot == Vector2Int.zero)
         {
             if (slotUnit != null)
             {
                 // 기존 유닛을 UI 슬롯으로 돌려보내기
-                _uiSlotController.SetSlot(slotUnit.Data, _uiSlotController.GetEmptySlot());
+                _uiSlotController.SetSlot(slotUnit.Data, _unitDragDropSystem.GetCurrentSlotIdx());
 
                 RemoveUnit(slot, destroyGameObject: false); // 유닛 데이터만 제거 (Destroy 안 함)
                 Destroy(slotUnit.gameObject); // UI로 복제했으니 인게임 오브젝트 제거
@@ -68,6 +85,8 @@ public class UnitController : MonoBehaviour
 
             SetSlot(slot, unit);
             AddSynergyUnit(unit);
+            AddList(unit);
+            _currentUnitCount++;
         }
         else
         {
@@ -80,7 +99,7 @@ public class UnitController : MonoBehaviour
                 slot.ClearSlot();
 
                 SetSlot(unitSlot, unit);
-                SetSlot(slot, slotUnit);               
+                SetSlot(slot, slotUnit);             
             }
             else
             {     
@@ -92,13 +111,32 @@ public class UnitController : MonoBehaviour
     }
 
     public void AddUnit(UnitBase newUnit, Vector2Int pos)
-    {        
+    {                
         UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);
         
         newUnit.transform.SetParent(slot.transform);
         newUnit.transform.position = slot.transform.position;
 
         AddUnit(slot, newUnit);
+    }
+
+    public void AddUnit(UnitData newUnitData, Vector2Int pos)
+    {
+        UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);
+        UnitBase newUnit = Instantiate(newUnitData.UnitPrefab).GetComponent<UnitBase>();
+        newUnit.Data = newUnitData;
+
+        newUnit.transform.SetParent(slot.transform);
+        newUnit.transform.position = slot.transform.position;
+
+        AddUnit(slot, newUnit);
+    }
+
+    public void RemoveUnit(UnitBase unit)
+    {
+        UnitSlot slot = GetUnitSlot(unit);
+
+        RemoveUnit(slot);
     }
 
     public void RemoveUnit(UnitSlot slot, bool destroyGameObject = true)
@@ -126,6 +164,7 @@ public class UnitController : MonoBehaviour
             Destroy(unit.gameObject);
 
         slot.ClearSlot();
+        _currentUnitCount--;
     }
 
     public Vector2Int RemoveUnit(UnitData unit)
@@ -166,14 +205,17 @@ public class UnitController : MonoBehaviour
     {
         slot.SetUnit(unit);
 
-        if(!_unitBaseDic.TryGetValue(unit.Data.Address, out var list))
+        _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = unit;
+    }
+
+    private void AddList(UnitBase unit)
+    {
+        if (!_unitBaseDic.TryGetValue(unit.Data.Address, out var list))
         {
             list = new List<UnitBase>(16);
             _unitBaseDic.Add(unit.Data.Address, list);
         }
         list.Add(unit);
-
-        _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = unit;
     }
 
     public UnitSlot GetUnitSlot(UnitBase unit)
@@ -206,5 +248,10 @@ public class UnitController : MonoBehaviour
         }
 
         return units.ToArray();
+    }
+
+    public bool IsUnitMaxCount()
+    {
+        return _currentUnitCount >= _unitMaxCount;
     }
 }

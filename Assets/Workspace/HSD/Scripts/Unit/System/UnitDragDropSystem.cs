@@ -46,30 +46,8 @@ public class UnitDragDropSystem : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0) && _isDragging)
         {
-            PointerEventData pointerData = new PointerEventData(EventSystem.current)
-            {
-                position = Input.mousePosition
-            };
-
-            List<RaycastResult> results = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(pointerData, results);
-
-            bool isSlot = false;
-
-            foreach (var result in results)
-            {
-                if (!result.gameObject.CompareTag("Slot"))
-                    return;
-
-                var dropHandler = result.gameObject.GetComponent<UI_UnitSlot>();
-                if (dropHandler != null)
-                {
-                    dropHandler.OnDrop(pointerData);
-
-                    isSlot = true;
-                    break;
-                }
-            }
+            bool isSlot;
+            CheckUISlot(out isSlot);
 
             _isDragging = false;
 
@@ -78,32 +56,65 @@ public class UnitDragDropSystem : MonoBehaviour
 
             if (_currentUnit != null)
             {
-                // 슬롯 체크
-                Collider2D slotCollider = Physics2D.OverlapPoint(_currentUnit.transform.position, LayerMask.GetMask("Slot"));
-
-                if (_currentSlotIdx != -1 && _currentUnitBase != null)
-                {
-                    OnSlotChanged?.Invoke(slotCollider, _currentUnitBase);
-                }
-
-                if (slotCollider != null)
-                {
-                    UnitSlot slot = slotCollider.GetComponent<UnitSlot>();                    
-
-                    OnUnitDropped?.Invoke(slot, _currentUnitBase);
-                }
-                else
-                {   
-                    if(_currentUnitBase != null)
-                    {
-                        if(_currentUnitBase.CurrentSlot == Vector2Int.zero)
-                            Destroy(_currentUnit);
-                        else
-                            _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
-                    }                    
-                }                   
+                CheckSlot();
             }
+
             Clear();
+        }
+    }
+
+    private static void CheckUISlot(out bool isSlot)
+    {
+        PointerEventData pointerData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+
+        isSlot = false;
+        foreach (var result in results)
+        {
+            if (!result.gameObject.CompareTag("Slot"))
+                return;
+
+            var dropHandler = result.gameObject.GetComponent<UI_UnitSlot>();
+            if (dropHandler != null)
+            {
+                dropHandler.OnDrop(pointerData);
+
+                isSlot = true;
+                break;
+            }
+        }
+    }
+
+    private void CheckSlot()
+    {
+        // 슬롯 체크
+        Collider2D slotCollider = Physics2D.OverlapPoint(_currentUnit.transform.position, LayerMask.GetMask("Slot"));
+
+        if (_currentSlotIdx != -1 && _currentUnitBase != null)
+        {
+            OnSlotChanged?.Invoke(slotCollider, _currentUnitBase);
+        }
+
+        if (slotCollider != null)
+        {
+            UnitSlot slot = slotCollider.GetComponent<UnitSlot>();
+
+            OnUnitDropped?.Invoke(slot, _currentUnitBase);
+        }
+        else
+        {
+            if (_currentUnitBase != null)
+            {
+                if (_currentUnitBase.CurrentSlot == Vector2Int.zero)
+                    Destroy(_currentUnit);
+                else
+                    _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
+            }
         }
     }
 

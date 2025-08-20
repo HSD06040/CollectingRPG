@@ -83,7 +83,7 @@ public class UnitManager : MonoBehaviour
             pos = _unitController.RemoveUnit(unit);
         }
 
-        if (pos != Vector2Int.zero)
+        if (pos != Vector2Int.zero && !_unitController.IsUnitMaxCount())
         {
             UnitBase unitBase = Instantiate(newUnit.UnitPrefab).GetComponent<UnitBase>();
             unitBase.Data = newUnit;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class UI_UnitSlotController : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class UI_UnitSlotController : MonoBehaviour
     [SerializeField] int _slotCount;
 
     private UI_UnitSlot[] _unitSlots;
-    private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(256);
+    [SerializeField] private SerializedDictionary<string, List<int>> _unitSlotDic;
 
     private void Awake()
     {
@@ -34,18 +35,7 @@ public class UI_UnitSlotController : MonoBehaviour
     public void SetSlot(UnitData unit, int idx)
     {
         _unitSlots[idx].SetSlot(unit);
-
-        if (!_unitSlotDic.ContainsKey(unit.Address))
-        {
-            _unitSlotDic.Add(unit.Address, new List<int>(5));
-        }
-
-        var slotList = _unitSlotDic[unit.Address];
-
-        if (!slotList.Contains(idx))
-        {
-            slotList.Add(idx);
-        }
+        AddUnit(unit, idx);
     }
 
     public void ClearSlot(int idx)
@@ -70,12 +60,27 @@ public class UI_UnitSlotController : MonoBehaviour
         return -1;
     }
 
+    public void AddUnit(UnitData unit, int idx)
+    {
+        if (!_unitSlotDic.ContainsKey(unit.Address))
+        {
+            _unitSlotDic.Add(unit.Address, new List<int>(5));
+        }
+
+        var slotList = _unitSlotDic[unit.Address];
+
+        if (!slotList.Contains(idx))
+        {
+            slotList.Add(idx);
+        }
+    }
+
     public void RemoveUnit(UnitData unit, int idx)
     {
-        if (_unitSlotDic.TryGetValue(unit.Address, out var slotList))
+        if (_unitSlotDic.ContainsKey(unit.Address))
         {
-            slotList.Remove(idx);
-        }
+            _unitSlotDic[unit.Address].Remove(idx);
+        }        
     }
 
     public void RemoveLastUnit(UnitData unit)
@@ -88,15 +93,22 @@ public class UI_UnitSlotController : MonoBehaviour
     /// <summary>
     /// 인 게임 슬롯에서 유닛을 제거합니다.
     /// </summary>    
-    public void RemoveInGameSlot(UnitBase unit, int slotIdx)
+    public void RemoveInGameSlot(UnitBase unit, int slotIdx, bool isSwitch = false)
     {
+        if (unit == null || unit.StatusController == null)
+        {
+            Debug.LogWarning("RemoveInGameSlot called with invalid unit");
+            return;
+        }
+
         if (unit.CurrentSlot != Vector2Int.zero)
         {
             UnitSlot slot = _unitController.GetUnitSlot(unit);
-            _unitController.RemoveUnit(slot);
+            _unitController.RemoveUnit(slot); // 슬롯에 있는 유닛 삭제
         }
 
-        RemoveUnit(unit.StatusController.Data, slotIdx);
+        if(!isSwitch)
+            RemoveUnit(unit.StatusController.Data, slotIdx);        
     }
 
     public void ReturnUnitToUI(UnitBase unit)
@@ -114,7 +126,7 @@ public class UI_UnitSlotController : MonoBehaviour
     public void AddInGameSlot(UnitData unit, int slotIdx, Vector2Int pos)
     {
         UnitSlot slot = _unitController.GetUnitSlot(pos);
-        _unitController.AddUnit(slot, Instantiate(unit.UnitPrefab).GetComponent<UnitBase>());
+        _unitController.AddUnit(unit, pos);
     }
 
     public int GetUnitCount(string address)
