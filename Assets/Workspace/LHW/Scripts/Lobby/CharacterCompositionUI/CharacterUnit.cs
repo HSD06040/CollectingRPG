@@ -2,6 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 편성할 수 있는 캐릭터를 표시하는 유닛
+/// </summary>
 public class CharacterUnit : MonoBehaviour
 {
     [Header("Data Input")]
@@ -28,6 +31,11 @@ public class CharacterUnit : MonoBehaviour
         GetComponent<Button>().onClick.AddListener(TryAddCharacter);
     }
 
+    private void Start()
+    {
+        UIUpdate();
+    }
+
     private void OnEnable()
     {
         _manager.OnCharacterDataChanged += UIUpdate;
@@ -40,8 +48,6 @@ public class CharacterUnit : MonoBehaviour
         {
             GetComponent<Button>().interactable = false;
         }
-
-        UIUpdate();
     }
 
     private void OnDisable()

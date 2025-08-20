@@ -31,7 +31,6 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private TMP_Text _characterCountText;
     [SerializeField] private GameObject _popUpUI;
     [SerializeField] private TMP_Text _popUpText;
-
     [SerializeField] private ButtonManagerBasic[] _presetAddButton;
 
     [Header("Capacity")]
@@ -50,15 +49,22 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void Awake()
     {
-        for (int i = 0; i < 2; i++)
+        // 최초 생성 - 2칸
+        if (_selectedCharacters.Count == 0)
         {
-            _selectedCharacters.Add(new SelectedCharacters(5));
+            for (int i = 0; i < 2; i++)
+            {
+                _selectedCharacters.Add(new SelectedCharacters(5));
+            }
         }
         _currentCharacterSOs = _selectedCharacters[0].CharLists;
     }
 
     private void Start()
     {
+        ShowCostInfo();
+        ShowTotalOverallPowerInfo();
+        ShowLeaderEffectInfo();
         ShowCharacterCountInfo();
     }
 
@@ -71,10 +77,6 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged += ShowTotalOverallPowerInfo;
         OnCharacterDataChanged += ShowLeaderEffectInfo;
         OnCharacterDataChanged += ShowCharacterCountInfo;
-        ShowCostInfo();
-        ShowTotalOverallPowerInfo();
-        ShowLeaderEffectInfo();
-
     }
 
     private void OnDisable()
@@ -87,7 +89,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     #endregion
 
-    #region
+    #region Read Data
 
     public CharacterSO GetCurrentCharacterData(int index)
     {
@@ -98,6 +100,10 @@ public class TeamOrganizeManager : MonoBehaviour
 
     #region Manual Selection
 
+    /// <summary>
+    /// 캐릭터를 수동으로 추가함
+    /// </summary>
+    /// <param name="data"></param>
     public void AddCharacterData(CharacterSO data)
     {
         _selectedCharacterSO = data;
@@ -133,6 +139,10 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged?.Invoke();
     }
 
+    /// <summary>
+    /// 캐릭터를 수동으로 해제함
+    /// </summary>
+    /// <param name="index"></param>
     public void RemoveCharacterData(int index)
     {
         if (_currentCharacterSOs[index] != null)
@@ -185,6 +195,7 @@ public class TeamOrganizeManager : MonoBehaviour
         }
 
         // 최적 값 찾기
+        // TODO : 같은 최적값이 여러 개일 경우 추가 판정 할지? 현재는 제일 먼저 찾은 값 기준으로 편성
         int bestPower = 0;
         int bestC = 0;
         int bestK = 0;
@@ -201,7 +212,7 @@ public class TeamOrganizeManager : MonoBehaviour
             }
         }
 
-        // 역추적
+        // 선택한 캐릭터 역추적
         List<CharacterSO> bestTeam = new List<CharacterSO>();
         int ci = bestC;
         int ki = bestK;

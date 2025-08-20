@@ -1,7 +1,9 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 편성된 캐릭터를 확인하기 위한 유닛
+/// </summary>
 public class SelectedCharacterUnit : MonoBehaviour
 {
     [Header("Referenece")]
