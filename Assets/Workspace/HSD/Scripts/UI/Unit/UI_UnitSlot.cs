@@ -60,15 +60,16 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
     }
 
     private void UnitSetting(Collider2D collider, UnitBase unit)
-    {
+    {        
         if (collider == null)
         {
+            Debug.Log(_unitSlotController.GetUnitCount(unit.Data));
             SetSlot(_chachedUnit);
-            _chachedUnit = null;
-            Debug.Log("Collider is null");
+            _unitSlotController.AddUnit(unit.Data, _slotIdx);
+            _chachedUnit = null;            
             return;
         }
-
+        
         _unitSlotController.RemoveUnit(unit.Data, _slotIdx);
     }
 
