@@ -94,17 +94,18 @@ public class UnitController : MonoBehaviour
 
             // 스왑
             if (slotUnit != null)
-            {                
-                unitSlot.ClearSlot();
-                slot.ClearSlot();
+            {
+                ClearSlot(unitSlot, unit);
+                ClearSlot(slot, slotUnit);                
 
-                SetSlot(unitSlot, unit);
-                SetSlot(slot, slotUnit);             
+                SetSlot(slot, unit);
+                SetSlot(unitSlot, slotUnit);             
             }
             else
-            {     
-                // 이동
-                unitSlot.ClearSlot();
+            {
+                Debug.Log("이동");
+
+                ClearSlot(unitSlot, unit);
                 SetSlot(slot, unit);                
             }
         }
@@ -160,10 +161,11 @@ public class UnitController : MonoBehaviour
 
         _unitBaseDic[unit.Data.Address].Remove(unit);
 
+        ClearSlot(slot, unit);
+
         if (destroyGameObject)
             Destroy(unit.gameObject);
-
-        slot.ClearSlot();
+        
         _currentUnitCount--;
     }
 
@@ -206,6 +208,13 @@ public class UnitController : MonoBehaviour
         slot.SetUnit(unit);
 
         _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = unit;
+    }
+
+    private void ClearSlot(UnitSlot slot, UnitBase unit)
+    {
+        slot.ClearSlot();
+
+        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
     }
 
     private void AddList(UnitBase unit)
