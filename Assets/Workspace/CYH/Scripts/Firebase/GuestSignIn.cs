@@ -9,8 +9,8 @@ public class GuestSignIn : MonoBehaviour
     [SerializeField] private Button _guestLoginButton;
 
     // TODO: [CYH] 패널 전환 테스트_1 (삭제 예정)
-    [SerializeField] private GameObject tutorialPanel;
-    [SerializeField] private GameObject SigninPanel;
+    //[SerializeField] private GameObject tutorialPanel;
+    //[SerializeField] private GameObject SigninPanel;
 
     private bool _isClicked;
 
@@ -71,28 +71,30 @@ public class GuestSignIn : MonoBehaviour
             if (currentUser != null)
             {
                 // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
-                tutorialPanel.SetActive(true);
-                SigninPanel.SetActive(false);
+                //tutorialPanel.SetActive(true);
+                //SigninPanel.SetActive(false);
 
                 // 튜토리얼 isTutorialComplete = true Data 변경
                 SetTutorialCompleteAsync();
                 _isClicked = false;
+                SceneManager.LoadScene("USW_TutorialScene");
             }
         });
     }
 
     private async void CheckTutorialCompletedAsync()
     {
-        bool isTutorialNotCompleted = await Manager.DB.CheckTutorialCompletedAsync();
-        if (isTutorialNotCompleted)
+        bool isTutorialCompleted = await Manager.DB.CheckTutorialCompletedAsync();
+        if (isTutorialCompleted)
         {
             SceneManager.LoadScene("LobbyScene_Copy");
         }
         else
         {
+            SceneManager.LoadScene("USW_TutorialScene");
             // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
-            tutorialPanel.SetActive(true);
-            SigninPanel.SetActive(false);
+            //tutorialPanel.SetActive(true);
+            //SigninPanel.SetActive(false);
         }
     }
 
