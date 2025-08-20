@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,13 +8,13 @@ public class UnitDragDropSystem : MonoBehaviour
 {
     private bool _isDragging;    
     private GameObject _currentUnit;
+    private UnitBase _currentUnitBase;
     private Vector2 _offset;
     private Vector2 _pos;
     private int _currentSlotIdx = 0;
     [SerializeField] LayerMask _targetLayer;
 
     public event Action<UnitSlot, UnitBase> OnUnitDropped;
-    public event Action OnUISlotSelected;
 
     private Action<Collider2D, UnitBase> OnSlotChanged;
 
@@ -57,7 +58,10 @@ public class UnitDragDropSystem : MonoBehaviour
 
             foreach (var result in results)
             {
-                var dropHandler = result.gameObject.GetComponent<IDropHandler>();
+                if (!result.gameObject.CompareTag("Slot"))
+                    return;
+
+                var dropHandler = result.gameObject.GetComponent<UI_UnitSlot>();
                 if (dropHandler != null)
                 {
                     dropHandler.OnDrop(pointerData);
@@ -77,24 +81,22 @@ public class UnitDragDropSystem : MonoBehaviour
                 // 슬롯 체크
                 Collider2D slotCollider = Physics2D.OverlapPoint(_currentUnit.transform.position, LayerMask.GetMask("Slot"));
 
-                UnitBase unit = _currentUnit.GetComponent<UnitBase>();
-
-                if (_currentSlotIdx != -1 && unit != null)
+                if (_currentSlotIdx != -1 && _currentUnitBase != null)
                 {
-                    OnSlotChanged?.Invoke(slotCollider, unit);
+                    OnSlotChanged?.Invoke(slotCollider, _currentUnitBase);
                 }
 
                 if (slotCollider != null)
                 {
                     UnitSlot slot = slotCollider.GetComponent<UnitSlot>();                    
 
-                    OnUnitDropped?.Invoke(slot, unit);
+                    OnUnitDropped?.Invoke(slot, _currentUnitBase);
                 }
                 else
                 {   
-                    if(unit != null)
+                    if(_currentUnitBase != null)
                     {
-                        if(unit.CurrentSlot == Vector2Int.zero)
+                        if(_currentUnitBase.CurrentSlot == Vector2Int.zero)
                             Destroy(_currentUnit);
                         else
                             _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
@@ -117,7 +119,7 @@ public class UnitDragDropSystem : MonoBehaviour
     {
         _isDragging = true;
         _currentUnit = unit;
-
+        _currentUnitBase = _currentUnit.GetComponent<UnitBase>();
         _offset = Vector2.zero;
         _pos = _currentUnit.transform.position;
     }
@@ -129,6 +131,7 @@ public class UnitDragDropSystem : MonoBehaviour
         _currentSlotIdx = slotIdx;
         _isDragging = true;
         _currentUnit = unit;
+        _currentUnitBase = _currentUnit.GetComponent<UnitBase>();
 
         _offset = Vector2.zero;
         _pos = _currentUnit.transform.position;
@@ -137,6 +140,7 @@ public class UnitDragDropSystem : MonoBehaviour
     private void Clear()
     {
         _currentUnit = null;
+        _currentUnitBase = null;
         OnSlotChanged = null;
         _currentSlotIdx = -1;
     }
@@ -144,5 +148,14 @@ public class UnitDragDropSystem : MonoBehaviour
     public GameObject GetCurrentUnit()
     {
         return _currentUnit;
+    }
+
+    public UnitBase GetCurrentUnitBase()
+    {
+        return _currentUnitBase;
+    }
+    public int GetCurrentSlotIdx()
+    {
+        return _currentSlotIdx;
     }
 }

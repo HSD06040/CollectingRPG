@@ -321,14 +321,14 @@ public class EnemySlotEditor : EditorWindow
             string path = AssetDatabase.GUIDToAssetPath(guids[i]);
             availableGridDatas[i] = AssetDatabase.LoadAssetAtPath<UnitGridDataSO>(path);
 
-            if (availableGridDatas[i] == null)
-            {
-                Debug.LogError($"Failed to load UnitGridDataSO at path: {path}");
-            }
-            else
-            {
-                Debug.Log($"Successfully loaded: {availableGridDatas[i].gridName}");
-            }
+            //if (availableGridDatas[i] == null)
+            //{
+            //    Debug.LogError($"Failed to load UnitGridDataSO at path: {path}");
+            //}
+            //else
+            //{
+            //    Debug.Log($"Successfully loaded: {availableGridDatas[i].gridName}");
+            //}
         }
     }
 

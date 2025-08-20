@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDropHandler
+public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
 {
     [SerializeField] private UnitData _unit;
     [SerializeField] private Image _unitIcon;
@@ -93,22 +93,48 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
         
     }
 
+    // 인게임 -> UI에 드랍했을 때
     public void OnDrop(PointerEventData eventData)
     {
-        GameObject currentDragUnit = _dragDropSystem.GetCurrentUnit();
-        if (currentDragUnit == null)
+        UnitBase unitBase = _dragDropSystem.GetCurrentUnitBase();
+
+        if (unitBase == null)
         {
             Debug.Log("No unit to drop");
             return;
         }
 
-        UnitData unit = ComponentProvider.Get<UnitStatusController>(currentDragUnit).Data;
+        UnitData unit = unitBase.Data;
+        Vector2Int pos = unitBase.CurrentSlot;        
 
-        if (_unit == null)
-        {            
-            _unitSlotController.RemoveInGameSlot(currentDragUnit.GetComponent<UnitBase>(), _slotIdx);
-            OnUnitChanged?.Invoke(unit, _slotIdx);
-            Destroy(currentDragUnit);
+        // ui 에서 생성한 거라면
+        if(pos == Vector2Int.zero)
+        {
+            if(IsEmpty())
+            {
+                _unitSlotController.ClearSlot(_slotIdx);
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+            }
+            else
+            {
+                UnitData temp = _unit;
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+                _unitSlotController.SetSlot(temp, _dragDropSystem.GetCurrentSlotIdx());
+            }
         }
+        else
+        {
+            _unitSlotController.RemoveInGameSlot(unitBase, _slotIdx);
+
+            // 현재 UI에 데이터가 있는 지 확인, unitBase가 UI에서 파생된 애가 아닌지 확인
+            if (_unit != null && unitBase.CurrentSlot != Vector2Int.zero)
+            {
+                _unitSlotController.AddInGameSlot(_unit, _slotIdx, unitBase.CurrentSlot);
+            }
+
+            OnUnitChanged?.Invoke(unit, _slotIdx);
+        }
+        
+        Destroy(unitBase.gameObject);
     }
 }

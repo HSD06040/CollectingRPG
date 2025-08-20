@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class UI_UnitSlotController : MonoBehaviour
@@ -9,9 +7,9 @@ public class UI_UnitSlotController : MonoBehaviour
     [SerializeField] UnitController _unitController;
     [SerializeField] Transform _content;
     [SerializeField] GameObject _unitSlotPrefab;
-    [SerializeField] int _slotCount;    
+    [SerializeField] int _slotCount;
 
-    private UI_UnitSlot[] _unitSlots;    
+    private UI_UnitSlot[] _unitSlots;
     private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(256);
 
     private void Awake()
@@ -41,7 +39,9 @@ public class UI_UnitSlotController : MonoBehaviour
         {
             _unitSlotDic.Add(unit.Address, new List<int>(5));
         }
+
         var slotList = _unitSlotDic[unit.Address];
+
         if (!slotList.Contains(idx))
         {
             slotList.Add(idx);
@@ -59,7 +59,7 @@ public class UI_UnitSlotController : MonoBehaviour
     }
 
     public int GetEmptySlot()
-    {        
+    {
         for (int i = 0; i < _unitSlots.Length; i++)
         {
             if (_unitSlots[i].IsEmpty())
@@ -85,15 +85,36 @@ public class UI_UnitSlotController : MonoBehaviour
         ClearSlot(lastIdx);
     }
 
+    /// <summary>
+    /// 인 게임 슬롯에서 유닛을 제거합니다.
+    /// </summary>    
     public void RemoveInGameSlot(UnitBase unit, int slotIdx)
     {
-        if(unit.CurrentSlot != Vector2Int.zero)
+        if (unit.CurrentSlot != Vector2Int.zero)
         {
             UnitSlot slot = _unitController.GetUnitSlot(unit);
             _unitController.RemoveUnit(slot);
-        }        
+        }
 
         RemoveUnit(unit.StatusController.Data, slotIdx);
+    }
+
+    public void ReturnUnitToUI(UnitBase unit)
+    {
+        int emptySlotIdx = GetEmptySlot();
+        if (emptySlotIdx == -1)
+        {
+            Debug.LogWarning("No empty UI slots available!");
+            return;
+        }
+
+        SetSlot(unit.Data, emptySlotIdx);
+    }
+
+    public void AddInGameSlot(UnitData unit, int slotIdx, Vector2Int pos)
+    {
+        UnitSlot slot = _unitController.GetUnitSlot(pos);
+        _unitController.AddUnit(slot, Instantiate(unit.UnitPrefab).GetComponent<UnitBase>());
     }
 
     public int GetUnitCount(string address)

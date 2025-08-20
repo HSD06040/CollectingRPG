@@ -6,6 +6,7 @@ public class UnitController : MonoBehaviour
 {
     [SerializeField] SynergyController _synergyController;
     [SerializeField] UnitSlotManager _unitSlotManager;
+    [SerializeField] UI_UnitSlotController _uiSlotController;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
 
     private UnitBase[,] _unitGrid;
@@ -58,7 +59,11 @@ public class UnitController : MonoBehaviour
         {
             if (slotUnit != null)
             {
-                RemoveUnit(slot);
+                // 기존 유닛을 UI 슬롯으로 돌려보내기
+                _uiSlotController.SetSlot(slotUnit.Data, _uiSlotController.GetEmptySlot());
+
+                RemoveUnit(slot, destroyGameObject: false); // 유닛 데이터만 제거 (Destroy 안 함)
+                Destroy(slotUnit.gameObject); // UI로 복제했으니 인게임 오브젝트 제거
             }
 
             SetSlot(slot, unit);
@@ -96,13 +101,13 @@ public class UnitController : MonoBehaviour
         AddUnit(slot, newUnit);
     }
 
-    public void RemoveUnit(UnitSlot slot)
+    public void RemoveUnit(UnitSlot slot, bool destroyGameObject = true)
     {
         if (slot.Unit == null) return;
 
         UnitBase unit = slot.Unit;
 
-        _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = null;
+        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
 
         Synergy synergy = unit.Data.EnhancementData.Synergy;
         ClassSynergy classSynergy = unit.Data.EnhancementData.ClassSynergy;
@@ -117,9 +122,10 @@ public class UnitController : MonoBehaviour
 
         _unitBaseDic[unit.Data.Address].Remove(unit);
 
-        Destroy(unit.gameObject);
+        if (destroyGameObject)
+            Destroy(unit.gameObject);
 
-        slot.ClearSlot();        
+        slot.ClearSlot();
     }
 
     public Vector2Int RemoveUnit(UnitData unit)
@@ -173,6 +179,10 @@ public class UnitController : MonoBehaviour
     public UnitSlot GetUnitSlot(UnitBase unit)
     {        
         return _unitSlotManager.UnitSlotDic[unit.CurrentSlot];
+    }
+    public UnitSlot GetUnitSlot(Vector2Int pos)
+    {
+        return _unitSlotManager.GetUnitSlot(pos);
     }
 
     public int GetUnitCount(string address)
