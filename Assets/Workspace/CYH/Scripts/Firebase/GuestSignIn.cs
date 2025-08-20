@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using Firebase.Auth;
 using Firebase.Extensions;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GuestSignIn : MonoBehaviour
 {
@@ -64,6 +64,8 @@ public class GuestSignIn : MonoBehaviour
 
             // 튜토리얼 isTutorialComplete = false Data 생성
             SetTutorialInCompleteAsync();
+            // 유저 재화 생성
+            await Manager.DB.SaveCurrencyAsync(30, 50);
 
             // SignInPanel -> Tutorial패널 로 변경
             if (currentUser != null)
@@ -84,7 +86,7 @@ public class GuestSignIn : MonoBehaviour
         bool isTutorialNotCompleted = await Manager.DB.CheckTutorialCompletedAsync();
         if (isTutorialNotCompleted)
         {
-            SceneManager.LoadScene("CYH_Lobby");
+            SceneManager.LoadScene("LobbyScene_Copy");
         }
         else
         {
