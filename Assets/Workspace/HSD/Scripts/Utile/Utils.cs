@@ -1,8 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public static class Utils
 {
+    private static GameObject _damagePopUpObj;
+    private static GameObject _worldCanvas;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Initialize()
+    {
+        _damagePopUpObj = Addressables.LoadAssetAsync<GameObject>("DamagePopUp").WaitForCompletion();
+        GameObject obj = Addressables.LoadAssetAsync<GameObject>("WorldCanvas").WaitForCompletion();
+        _worldCanvas = Object.Instantiate(obj);
+    }
+
     public static bool Contain(this LayerMask layerMask, int layer)
     {
         return ((1 << layer) & layerMask) != 0;
@@ -14,14 +26,20 @@ public static class Utils
         int defense = damageType == DamageType.Physical ? enemy.PhysicalDefense.Value : enemy.MagicDefense.Value;
         float total = damage * attackPower;
 
+        bool isCrit = false;
+
         if (status.CritChance.Value > Random.Range(0f, 100f))
         {
+            isCrit = true;
             total *= status.CritDamage.Value / 100;
         }
 
         float totalDefense = defense / (defense + 100f);
 
         int totalDamage = Mathf.RoundToInt(total * (1f - totalDefense));
+
+        Object.Instantiate(_damagePopUpObj, enemy.transform.position, Quaternion.identity, _worldCanvas.transform).
+            GetComponent<DamagePopUp>().Init(totalDamage, isCrit);
 
         status.TotalDamage.Value += totalDamage;
 
