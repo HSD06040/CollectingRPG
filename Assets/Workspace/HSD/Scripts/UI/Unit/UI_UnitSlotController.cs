@@ -11,7 +11,7 @@ public class UI_UnitSlotController : MonoBehaviour
     [SerializeField] int _slotCount;
 
     private UI_UnitSlot[] _unitSlots;
-    [SerializeField] private SerializedDictionary<string, List<int>> _unitSlotDic;
+    private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(128);
 
     private void Awake()
     {

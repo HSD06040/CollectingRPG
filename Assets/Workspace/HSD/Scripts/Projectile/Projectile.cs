@@ -1,6 +1,4 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
@@ -42,22 +40,19 @@ public class Projectile : MonoBehaviour
     {
         if (_targetLayer.Contain(collision.gameObject.layer))
         {
-            if (collision.TryGetComponent(out IDamageable damageable))
+            _status.CalculateDamage(_attackPower, _damageType, ComponentProvider.Get<UnitStatusController>(collision.gameObject));
+
+            _pireceCount--;
+
+            if (_pireceCount <= 0)
             {
-                damageable.TakeDamage(Utils.CalculateBaseDamage(_status, _attackPower, _damageType), _damageType);
-
-                _pireceCount--;
-
-                if (_pireceCount <= 0)
-                {
-                    Destroy(gameObject);
-                }
+                Destroy(gameObject);
             }
         }
     }
 
     protected virtual async UniTask MoveAndDestroyAsync(float duration)
     {
-        
+
     }
 }

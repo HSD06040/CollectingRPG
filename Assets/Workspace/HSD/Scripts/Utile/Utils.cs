@@ -6,26 +6,26 @@ public static class Utils
     public static bool Contain(this LayerMask layerMask, int layer)
     {
         return ((1 << layer) & layerMask) != 0;
-    }
+    }   
 
-    public static int CalculateFinalDamage(int damage, int defense, DamageType damageType)
-    {
-        float totalDefense = defense / (defense + 100f);
-
-        return Mathf.RoundToInt(damage * (1f - totalDefense));
-    }
-
-    public static int CalculateBaseDamage(this UnitStatusController status, float attackPower, DamageType damageType)
+    public static void CalculateDamage(this UnitStatusController status, float attackPower, DamageType damageType, UnitStatusController enemy)
     {
         int damage = damageType == DamageType.Physical ? status.PhysicalDamage.Value : status.MagicDamage.Value;
+        int defense = damageType == DamageType.Physical ? enemy.PhysicalDefense.Value : enemy.MagicDefense.Value;
         float total = damage * attackPower;
 
-        if(status.CritChance.Value > Random.Range(0f, 100f))
+        if (status.CritChance.Value > Random.Range(0f, 100f))
         {
             total *= status.CritDamage.Value / 100;
         }
 
-        return Mathf.RoundToInt(total);
+        float totalDefense = defense / (defense + 100f);
+
+        int totalDamage = Mathf.RoundToInt(total * (1f - totalDefense));
+
+        status.TotalDamage.Value += totalDamage;
+
+        enemy.TakeDamage(totalDamage);
     }
 
     private static Collider2D[] _hitBuffer = new Collider2D[50];

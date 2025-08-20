@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.UI.CanvasScaler;
 
 public class UnitController : MonoBehaviour
 {
@@ -9,7 +7,7 @@ public class UnitController : MonoBehaviour
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UI_UnitSlotController _uiSlotController;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
-    [SerializeField] int _unitMaxCount;
+    public static readonly int UnitMaxCount = 10;
 
     private UnitBase[,] _unitGrid;
     private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300); 
@@ -54,6 +52,10 @@ public class UnitController : MonoBehaviour
         _unitDragDropSystem.enabled = false;
     }
 
+    #region AddUnit
+    /// <summary>
+    /// 유닛을 슬롯에 추가합니다.
+    /// </summary>    
     public void AddUnit(UnitSlot slot, UnitBase unit)
     {       
         UnitBase slotUnit = slot.Unit;
@@ -103,8 +105,6 @@ public class UnitController : MonoBehaviour
             }
             else
             {
-                Debug.Log("이동");
-
                 ClearSlot(unitSlot, unit);
                 SetSlot(slot, unit);                
             }
@@ -132,7 +132,9 @@ public class UnitController : MonoBehaviour
 
         AddUnit(slot, newUnit);
     }
+    #endregion
 
+    #region RemoveUnit
     public void RemoveUnit(UnitBase unit)
     {
         UnitSlot slot = GetUnitSlot(unit);
@@ -179,6 +181,7 @@ public class UnitController : MonoBehaviour
 
         return unitBase.CurrentSlot;
     }
+    #endregion
 
     private void AddSynergyUnit(UnitBase unit)
     {
@@ -231,6 +234,7 @@ public class UnitController : MonoBehaviour
     {        
         return _unitSlotManager.UnitSlotDic[unit.CurrentSlot];
     }
+
     public UnitSlot GetUnitSlot(Vector2Int pos)
     {
         return _unitSlotManager.GetUnitSlot(pos);
@@ -261,6 +265,6 @@ public class UnitController : MonoBehaviour
 
     public bool IsUnitMaxCount()
     {
-        return _currentUnitCount >= _unitMaxCount;
+        return _currentUnitCount >= UnitMaxCount;
     }
 }

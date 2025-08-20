@@ -14,7 +14,11 @@ public class UnitManager : MonoBehaviour
     public void Fight()
     {
         _unitController.UnitFight();
-        _unitUIManager._fightSlotController.SetUnit(_unitController.GetUnits());
+
+        _unitUIManager.Init();
+
+        _unitUIManager.FightSlotController.Init(_unitController.GetUnits());
+        _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
     }
 
     public void RandomSpawn()

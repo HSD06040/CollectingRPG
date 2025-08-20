@@ -12,9 +12,6 @@ public class FightUnitSlotPresenter
         _view = view;
         _status = status;
 
-        if (_status.Data.Icon == null)
-            Debug.Log("Icon is null");
-
         _view.SetIcon(_status.Data.Icon);
         _view.SetHp(_status.CurHp.Value, _status.MaxHealth.Value);
         _view.SetMana(_status.CurMana.Value, _status.MaxMana.Value);

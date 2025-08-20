@@ -53,7 +53,6 @@ public class BaseFSM : MonoBehaviour
 
     public void Fight()
     {
-        Owner.Init();
         _fightRoutine = StartCoroutine(FightRoutine());        
         StateMachine.ChangeState(MoveState);
     }

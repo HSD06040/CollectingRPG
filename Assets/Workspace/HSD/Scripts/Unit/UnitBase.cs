@@ -26,7 +26,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         Anim ??= GetComponentInChildren<Animator>();
         Rb ??= GetComponent<Rigidbody2D>();
-        Col ??= GetComponent<CapsuleCollider2D>();   
+        Col ??= GetComponent<CapsuleCollider2D>();
 
         AddProviderComponents();
     }
@@ -64,6 +64,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     #region FSM
     public void Fight()
     {
+        Init();
         _fsm.Fight();
     }
 
