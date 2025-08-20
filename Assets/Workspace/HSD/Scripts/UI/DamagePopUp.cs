@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 
@@ -26,6 +27,8 @@ public class DamagePopUp : MonoBehaviour
 
     private async UniTask PopUp()
     {
+        CancellationToken cancellationToken = this.GetCancellationTokenOnDestroy();
+
         float elapsedTime = 0f;
         _startPos = transform.position;
         _endPos = _startPos + _startOffset;

@@ -10,7 +10,7 @@ public class DamageMeterController : MonoBehaviour
     private DamageMeterSlot[] _damageMeterSlots;
     private List<DamageMeterSlot> _activeSlots = new List<DamageMeterSlot>();
     private CancellationTokenSource _cts;
-    private int _totalDamage;
+    private int _unitCount;
 
     private void Awake()
     {
@@ -24,9 +24,11 @@ public class DamageMeterController : MonoBehaviour
 
     public void Init(UnitBase[] units)
     {
+        _unitCount = units.Length;
+
         for (int i = 0; i < _damageMeterSlots.Length; i++)
         {
-            if (i < units.Length)
+            if (i < _unitCount)
             {
                 UnitStatusController status = units[i].StatusController;
                 _damageMeterSlots[i].Init(status);
@@ -70,7 +72,7 @@ public class DamageMeterController : MonoBehaviour
             slot.gameObject.SetActive(false);
 
         // 상위 5개만 활성화
-        int count = Mathf.Min(5, _activeSlots.Count);
+        int count = Mathf.Min(5, _unitCount);
 
         for (int i = 0; i < count; i++)
         {
