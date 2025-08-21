@@ -24,11 +24,12 @@ public class UnitManager : MonoBehaviour
     public void RandomSpawn()
     {
         UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
+        UnitStatus unitStatus = new UnitStatus(unit);
 
-        AddUnit(unit);
+        AddUnit(unitStatus);
     }
 
-    public void AddUnit(UnitData unit)
+    public void AddUnit(UnitStatus unit)
     {
         int slotIdx = _unitSlotController.GetEmptySlot();
 
@@ -41,18 +42,18 @@ public class UnitManager : MonoBehaviour
         SetSlot(unit, slotIdx);
     }
 
-    private void SetSlot(UnitData unit, int idx)
+    private void SetSlot(UnitStatus unit, int idx)
     {
         _unitSlotController.SetSlot(unit, idx);
 
         CheckUpgrade(unit);
     }
 
-    private void CheckUpgrade(UnitData unit)
+    private void CheckUpgrade(UnitStatus unit)
     {
-        if (unit.Level == 3)
+        if (unit.Level == 2)
         {
-            Debug.Log($"최종 유닛 {unit.Name} 업그레이드 불가");
+            Debug.Log($"최종 유닛 {unit.Data.Name} 업그레이드 불가");
             return;
         }
 
@@ -62,11 +63,9 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    private void UpgradeUnit(UnitData unit)
+    private void UpgradeUnit(UnitStatus unit)
     {
-        string key = $"Data/Unit/{unit.Name}_{unit.Level + 1}";
-
-        UnitData newUnit = Resources.Load<UnitData>(key);
+        UnitStatus newUnit = new UnitStatus(unit.Data, unit.Level + 1);
 
         int upgradeNeedCount = _upgradeNeedCount;
 
@@ -89,8 +88,8 @@ public class UnitManager : MonoBehaviour
 
         if (pos != Vector2Int.zero && !_unitController.IsUnitMaxCount())
         {
-            UnitBase unitBase = Instantiate(newUnit.UnitPrefab).GetComponent<UnitBase>();
-            unitBase.Data = newUnit;
+            UnitBase unitBase = Instantiate(newUnit.Data.UnitPrefab).GetComponent<UnitBase>();
+            unitBase.Status = newUnit;
             unitBase.Init();
 
             _unitController.AddUnit(unitBase, pos);            
@@ -101,7 +100,7 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    private int GetUnitCount(UnitData unit)
+    private int GetUnitCount(UnitStatus unit)
     {
         Debug.Log($"SlotCount : {_unitSlotController.GetUnitCount(unit)}, UnitCount : {_unitController.GetUnitCount(unit)}");
         return _unitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class UnitStatusController : MonoBehaviour, IDamageable
 {
-    public UnitData Data { get; set; }
+    public UnitStatus Status { get; set; }
 
     #region Stat
     [Header("Status")]
@@ -40,32 +40,32 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     public event Action OnPlayerDied;
     public bool IsDead => CurHp.Value <= 0;
 
-    public void Init(UnitData data)
+    public void Init(UnitStatus status)
     {
-        Data = data;
-        SetBaseStat();
+        Status = status;
+        SetBaseStat(status.GetCurrentStat());
     }
 
-    private void SetBaseStat()
+    private void SetBaseStat(UnitStats stat)
     {
-        MaxHealth.SetBaseStat(Data.MaxHealth);
-        MaxMana.SetBaseStat(Data.MaxMana);
-        ManaGain.SetBaseStat(Data.ManaGain);
+        MaxHealth.SetBaseStat(stat.MaxHealth);
+        MaxMana.SetBaseStat(stat.MaxMana);
+        ManaGain.SetBaseStat(stat.ManaGain);
 
-        AttackSpeed.SetBaseStat(Data.AttackSpeed);
-        MoveSpeed.SetBaseStat(Data.MoveSpeed);
+        AttackSpeed.SetBaseStat(stat.AttackSpeed);
+        MoveSpeed.SetBaseStat(stat.MoveSpeed);
 
-        PhysicalDamage.SetBaseStat(Data.PhysicalDamage);
-        MagicDamage.SetBaseStat(Data.MagicDamage);
+        PhysicalDamage.SetBaseStat(stat.PhysicalDamage);
+        MagicDamage.SetBaseStat(stat.MagicDamage);
 
-        CritChance.SetBaseStat(Data.CritChance);
-        CritDamage.SetBaseStat(Data.CritDamage);
+        CritChance.SetBaseStat(stat.CritChance);
+        CritDamage.SetBaseStat(stat.CritDamage);
 
-        PhysicalDefense.SetBaseStat(Data.PhysicalDefense);
-        MagicDefense.SetBaseStat(Data.MagicDefense);
+        PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
+        MagicDefense.SetBaseStat(stat.MagicDefense);
 
-        AttackRange.SetBaseStat(Data.AttackRange);
-        AttackCount.SetBaseStat(Data.AttackCount);
+        AttackRange.SetBaseStat(stat.AttackRange);
+        AttackCount.SetBaseStat(stat.AttackCount);
 
         CurHp.Value = MaxHealth.Value;
         CurMana.Value = MaxMana.Value;
