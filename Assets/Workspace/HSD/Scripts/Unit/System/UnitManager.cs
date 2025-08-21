@@ -106,7 +106,6 @@ public class UnitManager : MonoBehaviour
 
     private int GetUnitCount(UnitStatus unit)
     {
-        Debug.Log($"SlotCount : {_unitSlotController.GetUnitCount(unit)}, UnitCount : {_unitController.GetUnitCount(unit)}");
         return _unitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);
     }
 }

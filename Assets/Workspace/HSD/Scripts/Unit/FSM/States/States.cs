@@ -177,7 +177,7 @@ public class SkillState : AnimationFinishedState
 
     public override void Update()
     {
-        base.Update();
+        base.Update();        
     }
 }
 

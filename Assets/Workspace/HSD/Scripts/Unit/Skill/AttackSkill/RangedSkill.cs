@@ -17,6 +17,8 @@ public class RangedSkill : AttackSkill
 
         GameObject obj = Instantiate(_projectilePrefab, spawnPoint, Quaternion.identity);
         Projectile projectile = ComponentProvider.Get<Projectile>(obj);
-        projectile.Init(GetTargetSingle(attacker).transform , attacker.GetStatusController(), AttackPower, DamageType, attacker.TargetLayer, projectileSpeed);
+        Transform target = GetTargetSingle(attacker).transform;
+
+        projectile.Init(target, attacker.GetStatusController(), AttackPower, DamageType, attacker.TargetLayer, projectileSpeed);
     }
 }

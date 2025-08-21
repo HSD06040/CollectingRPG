@@ -36,7 +36,8 @@ public abstract class AttackSkill : UnitSkill
 
     protected GameObject GetTargetSingle(IAttacker attacker)
     {
-        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, SizeOrRadius, BoxSize, Angle, attacker.TargetLayer, GetPriorityFilter());
+        var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, SizeOrRadius, BoxSize, Angle, attacker.TargetLayer, GetPriorityFilter());
+        return target;
     }
 
     protected System.Func<IAttacker, List<GameObject>, GameObject> GetPriorityFilter()
@@ -66,14 +67,19 @@ public abstract class AttackSkill : UnitSkill
 
     protected GameObject Close(IAttacker attacker, List<GameObject> targets)
     {
+        if (targets == null || targets.Count == 0)
+            return null; // 대상 없음
+
         return targets[0];
     }
 
     protected GameObject Far(IAttacker attacker, List<GameObject> targets)
     {
+        if (targets == null || targets.Count == 0)
+            return null;
+
         Vector2 origin = attacker.GetTransform().position;
 
-        // 거리 역순으로 정렬
         targets.Sort((a, b) =>
         {
             Vector2 posA = a.transform.position;
@@ -86,8 +92,11 @@ public abstract class AttackSkill : UnitSkill
         return targets[0];
     }
 
-    protected private GameObject LowHp(IAttacker attacker, List<GameObject> targets)
+    protected GameObject LowHp(IAttacker attacker, List<GameObject> targets)
     {
+        if (targets == null || targets.Count == 0)
+            return null;
+
         List<GameObject> validTargets = new List<GameObject>();
 
         foreach (var target in targets)
@@ -99,7 +108,9 @@ public abstract class AttackSkill : UnitSkill
             }
         }
 
-        // HP 낮은 순으로 정렬
+        if (validTargets.Count == 0)
+            return null;
+
         validTargets.Sort((a, b) =>
         {
             var statusA = ComponentProvider.Get<UnitStatusController>(a);
@@ -114,8 +125,12 @@ public abstract class AttackSkill : UnitSkill
         return validTargets[0];
     }
 
+
     protected GameObject HighHp(IAttacker attacker, List<GameObject> targets)
     {
+        if (targets == null || targets.Count == 0)
+            return null;
+
         List<GameObject> validTargets = new List<GameObject>();
 
         foreach (var target in targets)
@@ -126,6 +141,9 @@ public abstract class AttackSkill : UnitSkill
                 validTargets.Add(target);
             }
         }
+
+        if (validTargets.Count == 0)
+            return null;
 
         // HP 높은 순으로 정렬
         validTargets.Sort((a, b) =>
@@ -179,7 +197,7 @@ public abstract class AttackSkill : UnitSkill
         return searchTargets.ToArray();
     }
 
-    public void OnDrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기
+    public void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기
     {
         Transform transform = attacker.GetTransform();
         Handles.color = Color.yellow;

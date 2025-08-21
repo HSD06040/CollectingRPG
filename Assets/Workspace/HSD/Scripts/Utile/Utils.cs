@@ -159,6 +159,12 @@ public static class Utils
                 break;
         }
 
+        for (int i = 0; i < hitCount; i++)
+        {
+            if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
+                _cachedTargets.Add(_hitBuffer[i].gameObject);
+        }
+
         GameObject result;
 
         if (filter != null)

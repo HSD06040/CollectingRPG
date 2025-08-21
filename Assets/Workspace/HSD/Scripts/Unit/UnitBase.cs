@@ -198,7 +198,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     #region Gizmos
 #if UNITY_EDITOR
     private void OnDrawGizmos()
-    {
+    {        
         if (Status == null) return;
 
         // 찾는 거리
@@ -208,6 +208,8 @@ public class UnitBase : MonoBehaviour, IAttacker
         // 공격 사거리
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
+
+        if (Status.Data == null) return;
 
         if (Status.Data.AttackData == null) return;
         // 공격 범위
@@ -233,7 +235,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         if(Status.Data.Skill != null && Status.Data.Skill is AttackSkill attackSkill)
         {
-            attackSkill.OnDrawGizmos(this);
+            attackSkill.DrawGizmos(this);
         }
     }
 #endif
