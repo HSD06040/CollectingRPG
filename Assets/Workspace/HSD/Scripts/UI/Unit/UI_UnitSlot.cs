@@ -5,16 +5,16 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDropHandler
+public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
 {
-    [SerializeField] private UnitData _unit;
+    [SerializeField] private UnitStatus _unit;
     [SerializeField] private Image _unitIcon;
     private UI_UnitSlotController _unitSlotController;
     private UnitDragDropSystem _dragDropSystem;
-    private UnitData _chachedUnit;
+    private UnitStatus _chachedUnit;
     private int _slotIdx;
 
-    public static Action<UnitData, int> OnUnitChanged;
+    public static Action<UnitStatus, int> OnUnitChanged;
 
     public void Init(UnitDragDropSystem dragDropSystem, int slotIdx, UI_UnitSlotController unitSlotController)
     {
@@ -23,7 +23,7 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
         _unitSlotController = unitSlotController;
     }
 
-    public void SetSlot(UnitData unit)
+    public void SetSlot(UnitStatus unit)
     {
         _unit = unit;
 
@@ -34,7 +34,7 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
     {
         if (_unit != null)
         {
-            _unitIcon.sprite = _unit.Icon;
+            _unitIcon.sprite = _unit.Data.Icon;
             _unitIcon.color = Color.white;
         }
         else
@@ -54,22 +54,22 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
         return _unit == null;
     }
 
-    public UnitData GetUnit()
+    public UnitStatus GetUnit()
     {
         return _unit;
     }
 
     private void UnitSetting(Collider2D collider, UnitBase unit)
-    {
+    {        
         if (collider == null)
         {
             SetSlot(_chachedUnit);
-            _chachedUnit = null;
-            Debug.Log("Collider is null");
+            _unitSlotController.AddUnit(unit.Status, _slotIdx);
+            _chachedUnit = null;            
             return;
         }
-
-        _unitSlotController.RemoveUnit(unit.Data, _slotIdx);
+        
+        _unitSlotController.RemoveUnit(unit.Status, _slotIdx);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -77,10 +77,10 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
         if (_unit == null) return;
 
         _unitSlotController.RemoveUnit(_unit, _slotIdx);
-        GameObject unit = Instantiate(_unit.UnitPrefab);
+        GameObject unit = Instantiate(_unit.Data.UnitPrefab);
 
         UnitBase unitBase = unit.GetComponent<UnitBase>();
-        unitBase.Data = _unit;
+        unitBase.Status = _unit;
         unitBase.Init();
 
         _dragDropSystem.SetUnit(unit, UnitSetting, _slotIdx);
@@ -95,20 +95,52 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
 
     public void OnDrop(PointerEventData eventData)
     {
-        GameObject currentDragUnit = _dragDropSystem.GetCurrentUnit();
-        if (currentDragUnit == null)
+        UnitBase unitBase = _dragDropSystem.GetCurrentUnitBase();
+
+        if (unitBase == null)
         {
             Debug.Log("No unit to drop");
             return;
         }
 
-        UnitData unit = ComponentProvider.Get<UnitStatusController>(currentDragUnit).Data;
+        UnitStatus temp = _unit;
+        UnitStatus unit = unitBase.Status;
+        Vector2Int pos = unitBase.CurrentSlot;
 
-        if (_unit == null)
-        {            
-            _unitSlotController.RemoveInGameSlot(currentDragUnit.GetComponent<UnitBase>(), _slotIdx);
-            OnUnitChanged?.Invoke(unit, _slotIdx);
-            Destroy(currentDragUnit);
+        // ui 에서 생성한 거라면
+        if (pos == Vector2Int.zero)
+        {
+            if(IsEmpty())
+            {
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+            }
+            else
+            {
+                
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+                _unitSlotController.SetSlot(temp, _dragDropSystem.GetCurrentSlotIdx());
+            }
         }
+        else
+        {
+            // 인게임에서 생성한 거라면 (인 게임 Slot -> UI)
+           
+            _unitSlotController.RemoveInGameSlot(unitBase, _slotIdx, true); // 인게임 슬롯에서 제거
+
+            if (temp != null) // 만약 UI 슬롯이 비어있지 않다면
+            {
+                Debug.Log("Temp != null");
+                // 인게임 해당 슬롯에 추가
+                _unitSlotController.AddInGameSlot(temp, _slotIdx, unitBase.CurrentSlot);
+                _unitSlotController.RemoveUnit(temp, _slotIdx);
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+                return;
+            }
+            
+            _unitSlotController.RemoveUnit(unit, _slotIdx);
+            OnUnitChanged?.Invoke(unit, _slotIdx);
+        }
+        
+        Destroy(unitBase.gameObject);
     }
 }
