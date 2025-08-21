@@ -18,15 +18,19 @@ public class SelectedCharacterUnit : MonoBehaviour
     private CharacterSO _charData;
     private TeamOrganizeManager _manager;
 
+    [SerializeField] private UnitStatus _status;
+
     private void Awake()
     {
         _manager = GetComponentInParent<TeamOrganizeManager>();
         GetComponent<Button>().onClick.AddListener(TryDeleteCharacter);
+        _status = new UnitStatus(null, 0);
+        Debug.Log("생성2");
     }
 
     private void OnEnable()
     {
-        _manager.OnCharacterDataChanged += UIUpdate;        
+        _manager.OnCharacterDataChanged += UIUpdate;
     }
 
     private void OnDisable()
@@ -41,15 +45,16 @@ public class SelectedCharacterUnit : MonoBehaviour
 
     private void TryDeleteCharacter()
     {
-        _manager.RemoveCharacterData(_index);
-        _charData = null;
+        _manager.RemoveUnitData(_index);
+        _status = _manager.GetCurrentPresetData(_index);
+        Debug.Log("편성해제함");
     }
 
     private void UIUpdate()
     {
-        _charData = _manager.GetCurrentCharacterData(_index);
+        _status = _manager.GetCurrentPresetData(_index);
 
-        if (_manager == null || _charData == null)
+        if (_manager == null || _status == null || _status.Data == null)
         {
             if (_manager.CurrentCost == _manager.TotalCost)
             {
@@ -64,14 +69,11 @@ public class SelectedCharacterUnit : MonoBehaviour
         }
         else
         {
-            if (_manager.CurrentCost == _manager.TotalCost && _charData == null)
+            if (_status.Data != null)
             {
-                _charImage.color = Color.black;
-                _charImage.sprite = _xImage;
+                _charImage.color = Color.white;
+                _charImage.sprite = _status.Data.Icon;
             }
-
-            _charImage.color = Color.white;
-            _charImage.sprite = _charData.CharacterImage;
         }
     }
 }

@@ -18,46 +18,54 @@ public class SelectedCharacters
 
 public class TeamOrganizeManager : MonoBehaviour
 {
-    [Header("Reference")]
-    [SerializeField] private CollectedCharacterData _collectedCharacterData;
-
+    // 테스트
     [Header("Data")]
     [SerializeField] private List<SelectedCharacters> _selectedCharacters = new List<SelectedCharacters>();
+    
+    private CharacterSO _selectedCharacterSO;
+    [SerializeField] private CharacterSO[] _currentCharacterSOs;
+    private List<CharacterSO> _collectedCharData;
+    
+
+    // 연결
+    [Header("Reference")]
+    [SerializeField] private CollectedCharacterData _collectedCharacterData;
+    
+    [Header("Data")]
+    [SerializeField] private List<TeamPresetData> _presetData = new List<TeamPresetData>();
+
+    private UnitStatus _selectedUnit;
+    [SerializeField] private UnitStatus[] _currentPreset;
+
 
     [Header("UI")]
     [SerializeField] private TMP_Text _costInfoText;
     [SerializeField] private TMP_Text _totalOverallPowerText;
     [SerializeField] private TMP_Text _leaderEffectText;
     [SerializeField] private TMP_Text _characterCountText;
-    [SerializeField] private GameObject _popUpUI;
-    [SerializeField] private TMP_Text _popUpText;
     [SerializeField] private ButtonManagerBasic[] _presetAddButton;
-
+    
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
     public int TotalCost => _totalCost;
 
     public Action OnCharacterDataChanged;
 
-    private int _currentCost;
+    private int _currentCost = 0;
     public int CurrentCost => _currentCost;
     private int _currentOverallPower;
-    private CharacterSO _selectedCharacterSO;
-
-    [SerializeField] private CharacterSO[] _currentCharacterSOs;
-    private List<CharacterSO> _collectedCharData;
 
     private void Awake()
     {
-        // 최초 생성 - 2칸
-        if (_selectedCharacters.Count == 0)
+        if(_presetData.Count == 0)
         {
-            for (int i = 0; i < 2; i++)
+            for(int i = 0; i < 2; i++)
             {
-                _selectedCharacters.Add(new SelectedCharacters(5));
+                _presetData.Add(new TeamPresetData(5));
             }
         }
-        _currentCharacterSOs = _selectedCharacters[0].CharLists;
+        _currentPreset = _presetData[0].Statuses;
+        Debug.Log("생성");
     }
 
     private void Start()
@@ -96,60 +104,65 @@ public class TeamOrganizeManager : MonoBehaviour
         return _currentCharacterSOs[index];
     }
 
+    public UnitStatus GetCurrentPresetData(int index)
+    { 
+        return _currentPreset[index];
+    }
+
     #endregion
 
     #region Manual Selection
 
-    /// <summary>
-    /// 캐릭터를 수동으로 추가함
-    /// </summary>
-    /// <param name="data"></param>
-    public void AddCharacterData(CharacterSO data)
+    public void AddPresetData(UnitStatus data)
     {
-        _selectedCharacterSO = data;
+        _selectedUnit = data;
 
-        if (_currentCharacterSOs.Contains(data))
+        for (int i = 0; i < 5; i++)
         {
-            Debug.Log("이미 편성된 캐릭터입니다");
-            return;
-        }
-
-        if (_currentCost + data.Cost > _totalCost)
-        {
-            Debug.Log("코스트 상한치를 초과했습니다");
-            return;
-        }
-
-        for (int i = 0; i < _currentCharacterSOs.Length; i++)
-        {
-            if (_currentCharacterSOs[i] == null)
+            if (_currentPreset[i].Data != null && _currentPreset[i].Data.ID == data.Data.ID)
             {
-                _currentCharacterSOs[i] = _selectedCharacterSO;
-                _currentCost += _selectedCharacterSO.Cost;
-                _currentOverallPower += _selectedCharacterSO.OverallPower;
+                Debug.Log("이미 편성된 캐릭터입니다");
+                return;
+            }
+        }
+
+        if (_currentCost + data.Data.Cost > _totalCost)
+        {
+            Debug.Log($"코스트 상한치를 초과했습니다 {data.Data.Cost} {_currentCost}");
+            return;
+        }
+
+        for(int i = 0; i < _currentPreset.Length; i++)
+        {
+            if (_currentPreset[i].Data == null)
+            {
+                _currentPreset[i].Data = _selectedUnit.Data;
+                _currentPreset[i].Level = _selectedUnit.Level;
+                _currentCost += _currentPreset[i].Data.Cost;
+                _currentOverallPower += _currentPreset[i].CombatPower;
+                Debug.Log("편성됨");
                 break;
             }
 
-            if (i == _currentCharacterSOs.Length - 1)
+            if(i == _currentPreset.Length - 1)
             {
                 Debug.Log("편성 제한치를 초과했습니다.");
                 return;
             }
         }
+
         OnCharacterDataChanged?.Invoke();
     }
 
-    /// <summary>
-    /// 캐릭터를 수동으로 해제함
-    /// </summary>
-    /// <param name="index"></param>
-    public void RemoveCharacterData(int index)
+    public void RemoveUnitData(int index)
     {
-        if (_currentCharacterSOs[index] != null)
+        if(_currentPreset[index].Data != null)
         {
-            _currentCost -= _currentCharacterSOs[index].Cost;
-            _currentOverallPower -= _currentCharacterSOs[index].OverallPower;
-            _currentCharacterSOs[index] = null;
+            _currentCost -= _currentPreset[index].Data.Cost;
+            _currentOverallPower -= _currentPreset[index].CombatPower;
+            _currentPreset[index].Data = null;
+            _currentPreset[index].Level = 0;
+
             OnCharacterDataChanged?.Invoke();
         }
     }
@@ -157,6 +170,8 @@ public class TeamOrganizeManager : MonoBehaviour
     #endregion
 
     #region AutoMatic Selection
+
+    // 조금 이따 하자...
 
     /// <summary>
     /// 동적 계획법 알고리즘을 이용한 캐릭터 자동편성
@@ -259,10 +274,11 @@ public class TeamOrganizeManager : MonoBehaviour
         _totalOverallPowerText.text = $"OverallPower : {_currentOverallPower}";
     }
 
+    
     private void ShowLeaderEffectInfo()
     {
-        if (_currentCharacterSOs[0] == null) _leaderEffectText.text = "LeaderEffect : None";
-        else _leaderEffectText.text = $"LeaderEffect : {_currentCharacterSOs[0].LeaderEffectDescription}";
+        //if (_currentCharacterSOs[0] == null) _leaderEffectText.text = "LeaderEffect : None";
+        //else _leaderEffectText.text = $"LeaderEffect : {_currentCharacterSOs[0].LeaderEffectDescription}";
     }
 
     private void ShowCharacterCountInfo()

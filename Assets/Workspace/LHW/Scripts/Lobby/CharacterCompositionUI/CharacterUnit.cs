@@ -13,6 +13,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] private CharacterSO _charData;
     public CharacterSO CharData => _charData;
 
+
     [Header("UI")]
     [SerializeField] private TMP_Text _charText;
     [SerializeField] private Image _characterImg;
@@ -22,6 +23,10 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
 
+    private UnitStatus _status;
+    public UnitStatus Status => _status;
+    [SerializeField] UnitData _unitData;
+    
     private bool _isCollected = true;
     public bool IsCollected => _isCollected;
 
@@ -32,6 +37,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     
     private void Awake()
     {
+        DataInit();
         _manager = GetComponentInParent<TeamOrganizeManager>();
         GetComponent<Button>().onClick.AddListener(TryAddCharacter);
     }
@@ -39,6 +45,11 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     private void Start()
     {
         UIUpdate();
+    }
+
+    private void DataInit()
+    {
+        _status = new UnitStatus(_unitData, 1);
     }
 
     #region Event
@@ -68,7 +79,10 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void TryAddCharacter()
     {
+        /*
         _manager.AddCharacterData(_charData);
+        */
+        _manager.AddPresetData(_status);
     }
 
     #endregion
@@ -103,6 +117,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void UIUpdate()
     {
+        /*
         _charText.text = $"{_charData.name}";
         _characterImg.sprite = _charData.CharacterImage;
         _costImg.sprite = _charData.CostImg;
@@ -110,6 +125,15 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         _roleSynergyImg.sprite = _charData.CharacterSynergy.RoleSynergy;
         _overallPowerText.text = $"Damage {_charData.OverallPower}";
         _levelText.text = $"Lv{_charData.Level}";
+        */
+
+        _charText.text = $"{_status.Data.Name}";
+        _characterImg.sprite = _status.Data.Icon;
+        //_costImg.sprite = 아이콘 추가 예정
+        //_jobSynergyImg.sprite = 아이콘 추가 예정
+        //_roleSynergyImg.sprite = 아이콘 추가 예정
+        _overallPowerText.text = $"Damage {_status.CombatPower}";
+        _levelText.text = $"Lv{_status.Level}";
     }
 
     #endregion

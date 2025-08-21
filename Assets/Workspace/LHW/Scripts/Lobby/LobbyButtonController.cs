@@ -21,7 +21,7 @@ public class LobbyButtonController : MonoBehaviour
     [SerializeField] private GameObject _stageSelectPanel;
     [SerializeField] private GameObject _partySelectPanel;
 
-    private void Awake()
+    private void Start()
     {
         _shopButton.onClick.AddListener(ShopOpen);
         _upgradeButton.onClick.AddListener(UpgradeOpen);
