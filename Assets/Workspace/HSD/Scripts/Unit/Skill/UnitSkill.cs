@@ -4,19 +4,145 @@ using UnityEngine;
 
 public abstract class UnitSkill : ScriptableObject
 {
-    public int NeedMana;
+    public int ManaCost;
     public DamageType DamageType;
-    public float BaseCoolTime;
-    private float coolDown;
+    public Priority Priority;
 
-    public abstract void Active();
+    public SearchType SearchType;
+    public float SizeOrRadius;
+    public Vector2 BoxSize;
+    public float Angle;
 
-    public bool CoolTimeCheckActive()
+    public int SearchCount;
+
+    public abstract void Active(IAttacker attacker);
+    
+
+    protected GameObject GetTargetSingle(IAttacker attacker)
     {
-        if (coolDown <= 0)
-            return true;
+        return Utils.GetTargetsNonAllocSingle(attacker, SearchType, SizeOrRadius, BoxSize, Angle, attacker.TargetLayer, GetPriorityFilter());
+    }
 
-        coolDown -= Time.deltaTime;
-        return coolDown <= 0;
+    private System.Func<IAttacker, List<GameObject>, GameObject> GetPriorityFilter()
+    {
+        switch (Priority)
+        {
+            case Priority.Close:
+                return Close;
+            case Priority.Far:
+                return Far;
+            case Priority.LowHp:
+                return LowHp;
+            case Priority.HightHp:
+                return HighHp;
+            case Priority.Tank:
+                return ClassFilter(ClassType.Tank);
+            case Priority.Melee:
+                return ClassFilter(ClassType.Melee);
+            case Priority.Ranged:
+                return ClassFilter(ClassType.Ranged);
+            case Priority.Support:
+                return ClassFilter(ClassType.Support);
+            default:
+                return null;
+        }
+    }
+
+    private GameObject Close(IAttacker attacker, List<GameObject> targets)
+    {
+        return targets[0];
+    }
+
+    private GameObject Far(IAttacker attacker, List<GameObject> targets)
+    {
+        Vector2 origin = attacker.GetTransform().position;
+
+        // 거리 역순으로 정렬
+        targets.Sort((a, b) =>
+        {
+            Vector2 posA = a.transform.position;
+            Vector2 posB = b.transform.position;
+            float distA = (origin - posA).sqrMagnitude;
+            float distB = (origin - posB).sqrMagnitude;
+            return distB.CompareTo(distA); // 역순
+        });
+
+        return targets[0];
+    }
+
+    private GameObject LowHp(IAttacker attacker, List<GameObject> targets)
+    {
+        List<GameObject> validTargets = new List<GameObject>();
+
+        foreach (var target in targets)
+        {
+            var statusController = ComponentProvider.Get<UnitStatusController>(target);
+            if (statusController != null && !statusController.IsDead)
+            {
+                validTargets.Add(target);
+            }
+        }
+
+        // HP 낮은 순으로 정렬
+        validTargets.Sort((a, b) =>
+        {
+            var statusA = ComponentProvider.Get<UnitStatusController>(a);
+            var statusB = ComponentProvider.Get<UnitStatusController>(b);
+
+            float hpPercentA = (float)statusA.CurHp.Value / statusA.MaxHealth.Value;
+            float hpPercentB = (float)statusB.CurHp.Value / statusB.MaxHealth.Value;
+
+            return hpPercentA.CompareTo(hpPercentB);
+        });
+
+        return validTargets[0];
+    }
+
+    private GameObject HighHp(IAttacker attacker, List<GameObject> targets)
+    {
+        List<GameObject> validTargets = new List<GameObject>();
+
+        foreach (var target in targets)
+        {
+            var statusController = ComponentProvider.Get<UnitStatusController>(target);
+            if (statusController != null && !statusController.IsDead)
+            {
+                validTargets.Add(target);
+            }
+        }
+
+        // HP 높은 순으로 정렬
+        validTargets.Sort((a, b) =>
+        {
+            var statusA = ComponentProvider.Get<UnitStatusController>(a);
+            var statusB = ComponentProvider.Get<UnitStatusController>(b);
+
+            float hpPercentA = (float)statusA.CurHp.Value / statusA.MaxHealth.Value;
+            float hpPercentB = (float)statusB.CurHp.Value / statusB.MaxHealth.Value;
+
+            return hpPercentB.CompareTo(hpPercentA); // 역순
+        });
+
+        return validTargets[0];
+    }
+
+    private System.Func<IAttacker, List<GameObject>, GameObject> ClassFilter(ClassType classType)
+    {
+        return (attacker, targets) =>
+        {
+            foreach (var target in targets)
+            {
+                var statusController = ComponentProvider.Get<UnitStatusController>(target);
+                if (statusController != null && !statusController.IsDead)
+                {
+                    if (statusController.Status.Data.EnhancementData.ClassSynergy == classType)
+                    {
+                        return target;
+                    }
+                }
+            }
+
+            return targets[Random.Range(0, targets.Count)];
+        };
     }
 }

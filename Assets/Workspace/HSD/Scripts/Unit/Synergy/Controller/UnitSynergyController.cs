@@ -16,7 +16,7 @@ public class SynergyController : MonoBehaviour
         OnSynergyChanged += TestDebug;
     }
 
-    public void AddSynergy(Synergy unitSynergy, ClassSynergy classSynergy)
+    public void AddSynergy(Synergy unitSynergy, ClassType classSynergy)
     {
         if(!_synergyCountDic.ContainsKey(unitSynergy.ToString()))
         {
@@ -36,7 +36,7 @@ public class SynergyController : MonoBehaviour
         OnSynergyChanged?.Invoke();
     }
 
-    public void RemoveSynergy(Synergy unitSynergy, ClassSynergy classSynergy)
+    public void RemoveSynergy(Synergy unitSynergy, ClassType classSynergy)
     {
         _synergyCountDic[unitSynergy.ToString()]--;
         _synergyCountDic[classSynergy.ToString()]--;

@@ -82,9 +82,9 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         if (Status.Data.Skill == null) return false;
 
-        if (StatusController.CurMana.Value >= Status.Data.Skill.NeedMana)
+        if (StatusController.CurMana.Value >= Status.Data.Skill.ManaCost)
         {
-            StatusController.CurMana.Value -= Status.Data.Skill.NeedMana;
+            StatusController.CurMana.Value -= Status.Data.Skill.ManaCost;
             return true;
         }
         else

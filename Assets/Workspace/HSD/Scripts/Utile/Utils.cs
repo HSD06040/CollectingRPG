@@ -72,14 +72,15 @@ public static class Utils
         return closest;
     }
 
+    #region GetTargetsNonAlloc
     public static GameObject[] GetTargetsNonAlloc(
         Vector2 origin,
         SearchType shape,
         float sizeOrRadius,
         Vector2 boxSize,
         float angle,
-        int maxCount,        
-        LayerMask layerMask,        
+        int maxCount,
+        LayerMask layerMask,
         System.Func<List<GameObject>, int, GameObject[]> filter = null,
         int maxTargets = 50,
         bool sortByDistance = true)
@@ -105,7 +106,7 @@ public static class Utils
         {
             if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
                 _cachedTargets.Add(_hitBuffer[i].gameObject);
-        }        
+        }
 
         if (sortByDistance && _cachedTargets.Count > 1)
         {
@@ -121,13 +122,52 @@ public static class Utils
 
         GameObject[] result;
 
-        if(filter != null)
+        if (filter != null)
             result = filter.Invoke(_cachedTargets, maxTargets);
         else
             result = _cachedTargets.ToArray();
 
         return result;
     }
+
+    public static GameObject GetTargetsNonAllocSingle(
+        IAttacker attacker,
+        SearchType shape,
+        float sizeOrRadius,
+        Vector2 boxSize,
+        float angle,
+        LayerMask layerMask,
+        System.Func<IAttacker, List<GameObject>, GameObject> filter = null)
+    {
+        _cachedTargets.Clear(); // 재사용
+
+        int hitCount = 0;
+
+        Vector2 origin = attacker.GetTransform().position;
+
+        switch (shape)
+        {
+            case SearchType.Circle:
+                hitCount = Physics2D.OverlapCircleNonAlloc(origin, sizeOrRadius, _hitBuffer, layerMask);
+                break;
+            case SearchType.Box:
+                hitCount = Physics2D.OverlapBoxNonAlloc(origin, boxSize, angle, _hitBuffer, layerMask);
+                break;
+            case SearchType.Capsule:
+                hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, angle, _hitBuffer, layerMask);
+                break;
+        }
+
+        GameObject result;
+
+        if (filter != null)
+            result = filter.Invoke(attacker, _cachedTargets);
+        else
+            result = _cachedTargets[0];
+
+        return result;
+    }
+    #endregion
 
     public static int GetFacingDir(this Transform transform)
     {

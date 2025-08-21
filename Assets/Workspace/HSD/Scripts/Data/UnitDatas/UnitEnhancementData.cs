@@ -10,6 +10,6 @@ public class UnitEnhancementData : ScriptableObject
     public UnitUpgradeData UpgradeData;
 
     [Header("Synergy")]
-    public ClassSynergy ClassSynergy;
+    public ClassType ClassSynergy;
     public Synergy Synergy;     
 }

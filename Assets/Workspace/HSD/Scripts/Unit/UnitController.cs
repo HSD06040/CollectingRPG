@@ -12,7 +12,7 @@ public class UnitController : MonoBehaviour
     private UnitBase[,] _unitGrid;
     private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300); 
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
-    private Dictionary<ClassSynergy, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassSynergy, List<UnitBase>>(64);
+    private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
     private int _currentUnitCount = 0;
 
     private void Awake()
@@ -151,7 +151,7 @@ public class UnitController : MonoBehaviour
         _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
 
         Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
-        ClassSynergy classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
+        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
 
         _synergyController.RemoveSynergy(synergy, classSynergy);
 
@@ -186,7 +186,7 @@ public class UnitController : MonoBehaviour
     private void AddSynergyUnit(UnitBase unit)
     {
         Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
-        ClassSynergy classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
+        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
 
         _synergyController.AddSynergy(synergy, classSynergy);
 
