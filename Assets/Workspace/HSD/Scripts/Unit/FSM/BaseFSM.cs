@@ -10,6 +10,7 @@ public class BaseFSM : MonoBehaviour
     private static readonly int _moveHash = Animator.StringToHash("Move");
     private static readonly int _attackHash = Animator.StringToHash("Attack");
     private static readonly int _skillHash = Animator.StringToHash("Skill");
+    private static readonly int _deadHash = Animator.StringToHash("Dead");
     #endregion
 
     #region State
@@ -17,6 +18,7 @@ public class BaseFSM : MonoBehaviour
     public StanbyState StanbyState { get; private set; }
     public IdleState IdleState {  get; private set; }
     public MoveState MoveState { get; private set; }
+    public DeadState DeadState { get; private set; }
     public AttackState AttackState { get; private set; }
     public SkillState SkillState { get; private set; }
     #endregion
@@ -27,13 +29,14 @@ public class BaseFSM : MonoBehaviour
     {
         Owner = owner;
 
-        StateMachine = new StateMachine();
+        StateMachine ??= new StateMachine();
 
-        StanbyState = new StanbyState(this, _idleHash);
-        IdleState = new IdleState(this, _idleHash);
-        MoveState = new MoveState(this, _moveHash);
-        AttackState = new AttackState(this, _attackHash);
-        SkillState = new SkillState(this, _skillHash);
+        StanbyState ??= new StanbyState(this, _idleHash);
+        IdleState ??= new IdleState(this, _idleHash);
+        MoveState ??= new MoveState(this, _moveHash);
+        AttackState ??= new AttackState(this, _attackHash);
+        SkillState ??= new SkillState(this, _skillHash);
+        DeadState ??= new DeadState(this, _deadHash);
     }
 
     public void Stanby()

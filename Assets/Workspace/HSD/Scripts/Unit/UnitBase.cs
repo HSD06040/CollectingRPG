@@ -5,11 +5,12 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
-    [field: SerializeField] public UnitData Data { get; private set; }
+    [field: SerializeField] public UnitStatus Status { get; set; }
+    [field: SerializeField] public Collider2D Col { get; private set; }
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
-    public Vector2Int CurrentSlot;
+    public Vector2Int CurrentSlot { get; set; }
     private Vector3 _localScale;
     private int _enemyLayer;
 
@@ -22,7 +23,11 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
         _enemyLayer = LayerMask.NameToLayer("Enemy");
-        StatusController.Init(Data);
+
+        Anim ??= GetComponentInChildren<Animator>();
+        Rb ??= GetComponent<Rigidbody2D>();
+        Col ??= GetComponent<CapsuleCollider2D>();
+
         AddProviderComponents();
     }
 
@@ -35,8 +40,14 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         RemoveProviderComponents();
     }
-
     #endregion
+
+    public void Init()
+    {  
+        Col.enabled = true;
+
+        StatusController.Init(Status);
+    }
 
     #region Provider
     private void AddProviderComponents()
@@ -53,6 +64,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     #region FSM
     public void Fight()
     {
+        Init();
         _fsm.Fight();
     }
 
@@ -63,15 +75,16 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Attack()
     {
-        Data.AttackData.Attack(this);
+        Status.Data.AttackData.Attack(this);
     }
 
     public bool SkillCheck()
     {
-        return false;
-        if (StatusController.CurMana.Value >= Data.Skill.NeedMana)
+        if (Status.Data.Skill == null) return false;
+
+        if (StatusController.CurMana.Value >= Status.Data.Skill.NeedMana)
         {
-            StatusController.CurMana.Value -= Data.Skill.NeedMana;
+            StatusController.CurMana.Value -= Status.Data.Skill.NeedMana;
             return true;
         }
         else
@@ -80,13 +93,14 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target != null) return;
-
-        Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
+        if (Target == null || ComponentProvider.Get<UnitStatusController>(Target.gameObject).IsDead)
+            Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 
     public void FlipToTarget()
     {
+        if (Target == null || StatusController.IsDead) return;
+
         _localScale = transform.localScale;
 
         if (Target == null)
@@ -159,9 +173,9 @@ public class UnitBase : MonoBehaviour, IAttacker
         return Target;
     }
 
-    public UnitData GetUnitData()
+    public UnitStatus GetUnitData()
     {
-        return Data;
+        return Status;
     }
 
     public Transform GetTransform()
@@ -179,7 +193,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (Data == null) return;
+        if (Status == null) return;
 
         // 찾는 거리
         Gizmos.color = Color.cyan;
@@ -189,23 +203,23 @@ public class UnitBase : MonoBehaviour, IAttacker
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
 
-        if (Data.AttackData == null) return;
+        if (Status.Data.AttackData == null) return;
         // 공격 범위
         Gizmos.color = Color.red;
         Vector2 center = transform.position;
-        if (Data.AttackData is UnitMeleeAttack MeleeAttackData)
+        if (Status.Data.AttackData is UnitMeleeAttack MeleeAttackData)
         {
             if (MeleeAttackData.SearchType == SearchType.Circle)
             {
-                Vector2 offset = Data.AttackData.AttackPointOffset;
+                Vector2 offset = Status.Data.AttackData.AttackPointOffset;
                 offset.x *= transform.GetFacingDir();
 
                 Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);
             }
         }
-        else if (Data.AttackData is UnitRangedAttack RandAttackData)
+        else if (Status.Data.AttackData is UnitRangedAttack RandAttackData)
         {
-            Vector2 offset = Data.AttackData.AttackPointOffset;
+            Vector2 offset = Status.Data.AttackData.AttackPointOffset;
             offset.x *= transform.GetFacingDir();
 
             Gizmos.DrawWireSphere(center + offset, .1f);

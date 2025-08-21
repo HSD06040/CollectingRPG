@@ -4,7 +4,43 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] UnitBase[] _unitBases;
+    [SerializeField] UnitGridDataSO _gridDataSO;
+    [SerializeField] UnitSlotManager _slotManager;
+    [SerializeField] LayerMask _targetLayer;
+    private UnitBase[,] _unitBases;
+
+    private void Awake()
+    {
+        _slotManager.Init();
+        _unitBases = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];
+        SetUnit();
+    }
+
+    public void SetUnit()
+    {
+        foreach (var unitDatas in _gridDataSO.unitDatas)
+        {
+            UnitSlot slot = _slotManager.GetUnitSlot(unitDatas.position + new Vector2Int(1, 1));
+
+            int x = unitDatas.position.x;
+            int y = unitDatas.position.y;
+
+            UnitBase unit = Instantiate(unitDatas.unitStatus.Data.UnitPrefab).GetComponent<UnitBase>();
+            unit.Status = unitDatas.unitStatus;
+
+            unit.transform.position = slot.transform.position;
+            unit.transform.SetParent(slot.transform);
+            unit.TargetLayer = _targetLayer;
+
+            // 레이어 변경 (자식 포함)
+            SetLayerRecursively(unit.gameObject, 6);
+
+            if (unit.transform.localScale.x < 0)
+                unit.transform.localScale = new Vector3(-unit.transform.localScale.x, unit.transform.localScale.y, unit.transform.localScale.z);
+
+            _unitBases[y, x] = unit;
+        }
+    }
 
     public void EnemyFight()
     {
@@ -14,6 +50,16 @@ public class EnemyController : MonoBehaviour
                 continue;
 
             unit.Fight();
+        }
+    }
+
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
         }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class UnitStatusController : MonoBehaviour, IDamageable
 {
-    public UnitData Data { get; private set; }
+    public UnitStatus Status { get; set; }
 
     #region Stat
     [Header("Status")]
@@ -35,21 +35,56 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public Property<int> CurHp = new Property<int>();
     public Property<int> CurMana = new Property<int>();
+    public Property<int> TotalDamage = new Property<int>();
 
-    public void Init(UnitData data)
+    public event Action OnPlayerDied;
+    public bool IsDead => CurHp.Value <= 0;
+
+    public void Init(UnitStatus status)
     {
-        Data = data;
+        Status = status;
+        SetBaseStat(status.GetCurrentStat());
+    }
+
+    private void SetBaseStat(UnitStats stat)
+    {
+        MaxHealth.SetBaseStat(stat.MaxHealth);
+        MaxMana.SetBaseStat(stat.MaxMana);
+        ManaGain.SetBaseStat(stat.ManaGain);
+
+        AttackSpeed.SetBaseStat(stat.AttackSpeed);
+        MoveSpeed.SetBaseStat(stat.MoveSpeed);
+
+        PhysicalDamage.SetBaseStat(stat.PhysicalDamage);
+        MagicDamage.SetBaseStat(stat.MagicDamage);
+
+        CritChance.SetBaseStat(stat.CritChance);
+        CritDamage.SetBaseStat(stat.CritDamage);
+
+        PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
+        MagicDefense.SetBaseStat(stat.MagicDefense);
+
+        AttackRange.SetBaseStat(stat.AttackRange);
+        AttackCount.SetBaseStat(stat.AttackCount);
 
         CurHp.Value = MaxHealth.Value;
         CurMana.Value = MaxMana.Value;
+        TotalDamage.Value = 0;
     }
 
-    public void TakeDamage(int amount, DamageType damageType)
+    public void TakeDamage(int amount)
     {
-        int defense = damageType == DamageType.Magic ? MagicDefense.Value : PhysicalDefense.Value;
-        int totalDamage = Utils.CalculateFinalDamage(amount, defense, damageType);
-        CurHp.Value -= totalDamage;
-        Debug.Log($"현재 체력 :{CurHp.Value}, 받은 데미지 : {totalDamage}");
+        CurHp.Value -= amount;
+
+        if(CurHp.Value <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        OnPlayerDied?.Invoke();
     }
 
     public void GetMana()

@@ -21,7 +21,7 @@ public class UnitMeleeAttack : UnitAttackData
             SizeOrRadius, BoxSize, Angle, status.AttackCount.Value, attacker.TargetLayer
             ))
         {
-            obj.GetComponent<IDamageable>().TakeDamage(Utils.CalculateBaseDamage(status, AttackPower, DamageType), DamageType);
+            status.CalculateDamage(AttackPower, DamageType, ComponentProvider.Get<UnitStatusController>(obj));
         }
 
         status.GetMana();

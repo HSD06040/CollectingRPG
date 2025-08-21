@@ -24,7 +24,11 @@ public class UnitSlot : MonoBehaviour
 
     public void SetUnit(UnitBase unit)
     {
-        if (unit == null) return;
+        if (unit == null)
+        {
+            ClearSlot();
+            return;
+        }
 
         unit.CurrentSlot = _pos;
         unit.gameObject.transform.position = transform.position;
@@ -35,7 +39,6 @@ public class UnitSlot : MonoBehaviour
 
     public void ClearSlot()
     {
-        Debug.Log($"{_pos} 의 슬롯 클리어");
         Unit = null;
     }
 }

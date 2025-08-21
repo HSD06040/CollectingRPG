@@ -38,8 +38,8 @@ public class SynergyController : MonoBehaviour
 
     public void RemoveSynergy(Synergy unitSynergy, ClassSynergy classSynergy)
     {
-        _synergyCountDic[unitSynergy.ToString()]++;
-        _synergyCountDic[classSynergy.ToString()]++;
+        _synergyCountDic[unitSynergy.ToString()]--;
+        _synergyCountDic[classSynergy.ToString()]--;
 
         CheckSynergy(unitSynergy.ToString());
         CheckSynergy(classSynergy.ToString());
