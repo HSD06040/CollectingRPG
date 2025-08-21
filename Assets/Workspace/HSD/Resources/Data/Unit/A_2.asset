@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 800a2287a0d8cdb4a9cfad46b0614703, type: 3}
   m_Name: A_2
   m_EditorClassIdentifier: 
-  Level: 2
   Grade: 0
   UnitPrefab: {fileID: 97618571295326938, guid: 8bf7c4d31fffe56458cf0b8cfa8f7fef,
     type: 3}
@@ -21,22 +20,50 @@ MonoBehaviour:
   Name: A
   Description: 
   Cost: 1
-  CombatPower: 1
   UpgradeCount: 1
-  MaxHealth: 200
-  MaxMana: 20
-  ManaGain: 5
-  AttackSpeed: 2
-  MoveSpeed: 1
-  PhysicalDamage: 18
-  MagicDamage: 1
-  CritChance: 1
-  CritDamage: 1
-  PhysicalDefense: 15
-  MagicDefense: 1
-  AttackRange: 1
-  AttackCount: 1
-  AttackAreaType: 0
-  Skill: {fileID: 0}
+  Skill: {fileID: 11400000, guid: aaed2cefc25c1d845b231a60a11ec433, type: 2}
   AttackData: {fileID: 11400000, guid: 4750821608597134baf4707114ccc114, type: 2}
   EnhancementData: {fileID: 11400000, guid: 44fb799ca8a6ace47ab99477ac58aefd, type: 2}
+  UnitStats:
+  - MaxHealth: 1000
+    MaxMana: 10
+    ManaGain: 5
+    AttackSpeed: 1
+    MoveSpeed: 1
+    PhysicalDamage: 15
+    MagicDamage: 1
+    CritChance: 1
+    CritDamage: 1
+    PhysicalDefense: 1
+    MagicDefense: 1
+    AttackRange: 1
+    AttackCount: 1
+    AttackAreaType: 0
+  - MaxHealth: 1000
+    MaxMana: 10
+    ManaGain: 5
+    AttackSpeed: 1
+    MoveSpeed: 1
+    PhysicalDamage: 1
+    MagicDamage: 1
+    CritChance: 1
+    CritDamage: 1
+    PhysicalDefense: 1
+    MagicDefense: 1
+    AttackRange: 1
+    AttackCount: 1
+    AttackAreaType: 0
+  - MaxHealth: 1000
+    MaxMana: 10
+    ManaGain: 5
+    AttackSpeed: 1
+    MoveSpeed: 1
+    PhysicalDamage: 1
+    MagicDamage: 1
+    CritChance: 1
+    CritDamage: 1
+    PhysicalDefense: 1
+    MagicDefense: 1
+    AttackRange: 1
+    AttackCount: 1
+    AttackAreaType: 0

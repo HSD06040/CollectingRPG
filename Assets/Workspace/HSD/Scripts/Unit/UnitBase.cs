@@ -91,6 +91,8 @@ public class UnitBase : MonoBehaviour, IAttacker
             return false;
     }
 
+    public void UseSkill() => Status.Data.Skill.Active(this);
+
     public void FindTarget()
     {
         if (Target == null || ComponentProvider.Get<UnitStatusController>(Target.gameObject).IsDead)
@@ -227,6 +229,11 @@ public class UnitBase : MonoBehaviour, IAttacker
             offset.x *= transform.GetFacingDir();
 
             Gizmos.DrawWireSphere(center + offset, .1f);
+        }
+
+        if(Status.Data.Skill != null && Status.Data.Skill is AttackSkill attackSkill)
+        {
+            attackSkill.OnDrawGizmos(this);
         }
     }
 #endif

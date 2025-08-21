@@ -69,5 +69,6 @@ public class BaseFSM : MonoBehaviour
     }
 
     private void Attack() => Owner.Attack();
+    private void UseSkill() => Owner.UseSkill();
     private void AnimationFinished() => StateMachine._currentState.AnimationFinished();
 }
