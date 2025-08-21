@@ -9,4 +9,5 @@ public interface IAttacker
     public Transform GetTransform();
     public Transform GetTarget();
     public UnitStatus GetUnitData();
+    public Vector2 GetTargetDir();
 }

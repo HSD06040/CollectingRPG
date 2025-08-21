@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class UnitSkill : ScriptableObject
@@ -8,19 +9,32 @@ public abstract class UnitSkill : ScriptableObject
     public DamageType DamageType;
     public Priority Priority;
 
-    public SearchType SearchType;
     public float SizeOrRadius;
     public Vector2 BoxSize;
     public float Angle;
 
+    public int MaxCount;
     public int SearchCount;
+    public float Fov;
 
     public abstract void Active(IAttacker attacker);
     
 
-    protected GameObject GetTargetSingle(IAttacker attacker)
+    protected GameObject[] GetTargets(IAttacker attacker)
     {
-        return Utils.GetTargetsNonAllocSingle(attacker, SearchType, SizeOrRadius, BoxSize, Angle, attacker.TargetLayer, GetPriorityFilter());
+        return Utils.GetTargetsNonAlloc(attacker,
+            attacker.GetTransform().position,
+            SearchType.Circle,
+            SizeOrRadius,
+            BoxSize,
+            Angle,
+            MaxCount,
+            attacker.TargetLayer);
+    }
+
+    protected GameObject GetTargetSingle(IAttacker attacker)
+    {        
+        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, SizeOrRadius, BoxSize, Angle, attacker.TargetLayer, GetPriorityFilter());
     }
 
     private System.Func<IAttacker, List<GameObject>, GameObject> GetPriorityFilter()
@@ -144,5 +158,22 @@ public abstract class UnitSkill : ScriptableObject
 
             return targets[Random.Range(0, targets.Count)];
         };
+    }
+
+    protected GameObject[] GetConeTargets(IAttacker attacker, GameObject[] targets, int searchCount)
+    {
+        Transform transform = attacker.GetTransform();
+
+        List<GameObject> searchTargets = new List<GameObject>(searchCount);
+
+        foreach (var target in targets)
+        {
+            if (Vector2.Dot(transform.up, attacker.GetTargetDir()) >= Mathf.Cos(Fov / 2 * Mathf.Deg2Rad))
+            {
+                searchTargets.Add(target);
+            }
+        }
+
+        return searchTargets.ToArray();
     }
 }

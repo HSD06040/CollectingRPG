@@ -74,6 +74,7 @@ public static class Utils
 
     #region GetTargetsNonAlloc
     public static GameObject[] GetTargetsNonAlloc(
+        IAttacker attacker,
         Vector2 origin,
         SearchType shape,
         float sizeOrRadius,
@@ -81,7 +82,7 @@ public static class Utils
         float angle,
         int maxCount,
         LayerMask layerMask,
-        System.Func<List<GameObject>, int, GameObject[]> filter = null,
+        System.Func<IAttacker, List<GameObject>, int, GameObject[]> filter = null,
         int maxTargets = 50,
         bool sortByDistance = true)
     {
@@ -123,7 +124,7 @@ public static class Utils
         GameObject[] result;
 
         if (filter != null)
-            result = filter.Invoke(_cachedTargets, maxTargets);
+            result = filter.Invoke(attacker, _cachedTargets, maxTargets);
         else
             result = _cachedTargets.ToArray();
 

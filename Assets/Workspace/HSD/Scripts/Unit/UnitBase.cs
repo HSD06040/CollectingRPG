@@ -187,6 +187,10 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return StatusController;
     }
+    public Vector2 GetTargetDir()
+    {
+        return TargetDir;
+    }
     #endregion
 
     #region Gizmos

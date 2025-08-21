@@ -16,8 +16,8 @@ public class UnitMeleeAttack : UnitAttackData
         UnitStatusController status = attacker.GetStatusController();
         Transform transform = attacker.GetTransform();
 
-        foreach (GameObject obj in Utils.GetTargetsNonAlloc(
-            (Vector2)transform.position + (AttackPointOffset * (attacker.GetTarget().position - attacker.GetTransform().position).normalized), 
+        foreach (GameObject obj in Utils.GetTargetsNonAlloc(attacker,
+            (Vector2)transform.position + (AttackPointOffset * attacker.GetTargetDir()),
             SearchType.Circle, SizeOrRadius, BoxSize, Angle, status.AttackCount.Value, attacker.TargetLayer
             ))
         {
