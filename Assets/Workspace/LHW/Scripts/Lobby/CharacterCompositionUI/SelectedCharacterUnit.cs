@@ -25,7 +25,6 @@ public class SelectedCharacterUnit : MonoBehaviour
         _manager = GetComponentInParent<TeamOrganizeManager>();
         GetComponent<Button>().onClick.AddListener(TryDeleteCharacter);
         _status = new UnitStatus(null, 0);
-        Debug.Log("생성2");
     }
 
     private void OnEnable()

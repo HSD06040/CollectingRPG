@@ -8,17 +8,15 @@ public class CollectedCharacterData : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private CharacterUnit[] _charUnits;
-    [SerializeField] private List<CharacterSO> _collectedCharData = new List<CharacterSO>();
-    public List<CharacterSO> CollectedCharData => _collectedCharData;
+    
+    [SerializeField] private List<UnitStatus> _collectedUnit = new List<UnitStatus>();
+    public List<UnitStatus> CollectedUnit => _collectedUnit;
 
     private int _characterCount;
     public int CharacterCount => _characterCount;
 
     private int _collectedCharacterCount;
     public int CollectedCharacterCount => _collectedCharacterCount;
-
-    [SerializeField] private List<UnitStatus> _collectedUnit = new List<UnitStatus>();
-    public List<UnitStatus> CollectedUnit => _collectedUnit;
 
     private void Awake()
     {

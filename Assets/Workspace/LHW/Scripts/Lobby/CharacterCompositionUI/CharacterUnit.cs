@@ -79,9 +79,6 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void TryAddCharacter()
     {
-        /*
-        _manager.AddCharacterData(_charData);
-        */
         _manager.AddPresetData(_status);
     }
 
@@ -117,16 +114,6 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void UIUpdate()
     {
-        /*
-        _charText.text = $"{_charData.name}";
-        _characterImg.sprite = _charData.CharacterImage;
-        _costImg.sprite = _charData.CostImg;
-        _jobSynergyImg.sprite = _charData.CharacterSynergy.JobSynergy;
-        _roleSynergyImg.sprite = _charData.CharacterSynergy.RoleSynergy;
-        _overallPowerText.text = $"Damage {_charData.OverallPower}";
-        _levelText.text = $"Lv{_charData.Level}";
-        */
-
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         //_costImg.sprite = 아이콘 추가 예정

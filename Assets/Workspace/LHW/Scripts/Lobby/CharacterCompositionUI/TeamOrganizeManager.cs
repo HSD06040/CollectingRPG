@@ -6,28 +6,22 @@ using TMPro;
 using UnityEngine;
 
 [Serializable]
-public class SelectedCharacters
+public class TeamPresetData
 {
-    public CharacterSO[] CharLists;
+    public UnitStatus[] Statuses;
 
-    public SelectedCharacters(int size)
+    public TeamPresetData(int size)
     {
-        CharLists = new CharacterSO[size];
+        Statuses = new UnitStatus[size];
+        for (int i = 0; i < size; i++)
+        {
+            Statuses[i] = new UnitStatus(null, 0);
+        }
     }
 }
 
 public class TeamOrganizeManager : MonoBehaviour
 {
-    // 테스트
-    [Header("Data")]
-    [SerializeField] private List<SelectedCharacters> _selectedCharacters = new List<SelectedCharacters>();
-    
-    private CharacterSO _selectedCharacterSO;
-    [SerializeField] private CharacterSO[] _currentCharacterSOs;
-    private List<CharacterSO> _collectedCharData;
-    
-
-    // 연결
     [Header("Reference")]
     [SerializeField] private CollectedCharacterData _collectedCharacterData;
     
@@ -35,8 +29,8 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private List<TeamPresetData> _presetData = new List<TeamPresetData>();
 
     private UnitStatus _selectedUnit;
-    [SerializeField] private UnitStatus[] _currentPreset;
-
+    private UnitStatus[] _currentPreset;
+    private List<UnitStatus> _collectedUnits;
 
     [Header("UI")]
     [SerializeField] private TMP_Text _costInfoText;
@@ -65,7 +59,6 @@ public class TeamOrganizeManager : MonoBehaviour
             }
         }
         _currentPreset = _presetData[0].Statuses;
-        Debug.Log("생성");
     }
 
     private void Start()
@@ -80,7 +73,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void OnEnable()
     {
-        _collectedCharData = _collectedCharacterData.CollectedCharData;
+        _collectedUnits = _collectedCharacterData.CollectedUnit;
         OnCharacterDataChanged += ShowCostInfo;
         OnCharacterDataChanged += ShowTotalOverallPowerInfo;
         OnCharacterDataChanged += ShowLeaderEffectInfo;
@@ -98,11 +91,6 @@ public class TeamOrganizeManager : MonoBehaviour
     #endregion
 
     #region Read Data
-
-    public CharacterSO GetCurrentCharacterData(int index)
-    {
-        return _currentCharacterSOs[index];
-    }
 
     public UnitStatus GetCurrentPresetData(int index)
     { 
@@ -171,26 +159,24 @@ public class TeamOrganizeManager : MonoBehaviour
 
     #region AutoMatic Selection
 
-    // 조금 이따 하자...
-
     /// <summary>
     /// 동적 계획법 알고리즘을 이용한 캐릭터 자동편성
     /// </summary>
     public void AutoSelectCharacters()
     {
-        int n = _collectedCharData.Count;
-        int[,,] dp = new int[n + 1, _totalCost + 1, _currentCharacterSOs.Length + 1];
-        bool[,,] take = new bool[n + 1, _totalCost + 1, _currentCharacterSOs.Length + 1];
+        int n = _collectedUnits.Count;
+        int[,,] dp = new int[n + 1, _totalCost + 1, _currentPreset.Length + 1];
+        bool[,,] take = new bool[n + 1, _totalCost + 1, _currentPreset.Length + 1];
 
         // DP 진행 - Bottom-Up 방식
         for (int i = 1; i <= n; i++)
         {
-            int power = _collectedCharData[i - 1].OverallPower;
-            int cost = _collectedCharData[i - 1].Cost;
+            int power = _collectedUnits[i - 1].CombatPower;
+            int cost = _collectedUnits[i - 1].Data.Cost;
 
             for (int c = 0; c <= _totalCost; c++)
             {
-                for (int k = 0; k <= _currentCharacterSOs.Length; k++)
+                for (int k = 0; k <= _currentPreset.Length; k++)
                 {
                     // 선택 안함
                     dp[i, c, k] = dp[i - 1, c, k];
@@ -216,7 +202,7 @@ public class TeamOrganizeManager : MonoBehaviour
         int bestK = 0;
         for (int c = 0; c <= _totalCost; c++)
         {
-            for (int k = 0; k <= _currentCharacterSOs.Length; k++)
+            for (int k = 0; k <= _currentPreset.Length; k++)
             {
                 if (dp[n, c, k] > bestPower)
                 {
@@ -228,7 +214,7 @@ public class TeamOrganizeManager : MonoBehaviour
         }
 
         // 선택한 캐릭터 역추적
-        List<CharacterSO> bestTeam = new List<CharacterSO>();
+        List<UnitStatus> bestTeam = new List<UnitStatus>();
         int ci = bestC;
         int ki = bestK;
 
@@ -236,8 +222,8 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             if (take[i, ci, ki])
             {
-                bestTeam.Add(_collectedCharData[i - 1]);
-                ci -= _collectedCharData[i - 1].Cost;
+                bestTeam.Add(_collectedUnits[i - 1]);
+                ci -= _collectedUnits[i - 1].Data.Cost;
                 ki -= 1;
             }
         }
@@ -246,14 +232,14 @@ public class TeamOrganizeManager : MonoBehaviour
         bestTeam.OrderByDescending(n => n);
 
         // 기존 편성 초기화
-        Array.Clear(_currentCharacterSOs, 0, _currentCharacterSOs.Length);
+        Array.Clear(_currentPreset, 0, _currentPreset.Length);
         _currentCost = 0;
 
         // 최적 편성 적용
         for (int i = 0; i < bestTeam.Count; i++)
         {
-            _currentCharacterSOs[i] = bestTeam[i];
-            _currentCost += bestTeam[i].Cost;
+            _currentPreset[i] = bestTeam[i];
+            _currentCost += bestTeam[i].Data.Cost;
         }
         _currentOverallPower = bestPower;
 
@@ -293,7 +279,7 @@ public class TeamOrganizeManager : MonoBehaviour
     public void SelectCharacterPreset(int index)
     {
         // 리더 캐릭터가 배치되지 않았을 시 경고 팝업 띄우기
-        if (_currentCharacterSOs[0] == null)
+        if (_currentPreset[0].Data == null)
         {
             if (PopupManager.Instance != null)
             {
@@ -304,7 +290,7 @@ public class TeamOrganizeManager : MonoBehaviour
         }
 
         // 해당 프리셋이 생성되지 않은 프리셋일 시 확장 가능한지 확인하고, 확장을 진행
-        if (_selectedCharacters.Count < index + 1)
+        if (_presetData.Count < index + 1)
         {
             if (PopupManager.Instance != null)
             {
@@ -322,7 +308,7 @@ public class TeamOrganizeManager : MonoBehaviour
         // TODO : 금액이 부족할 시에 조건 추가
 
         Debug.Log("Used 500 Gold");
-        _selectedCharacters.Add(new SelectedCharacters(5));
+        _presetData.Add(new TeamPresetData(5));
         // 이 부분은 UI 디자인 변경 시 변경 필요
         _presetAddButton[index - 2].buttonText = $"{(index + 1)}";
         _presetAddButton[index - 2].UpdateUI();
@@ -332,15 +318,15 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void LoadPreset(int index)
     {
-        _currentCharacterSOs = _selectedCharacters[index].CharLists;
+        _currentPreset = _presetData[index].Statuses;
         _currentCost = 0;
         _currentOverallPower = 0;
-        for (int i = 0; i < _currentCharacterSOs.Length; i++)
+        for (int i = 0; i < _currentPreset.Length; i++)
         {
-            if (_currentCharacterSOs[i] != null)
+            if (_currentPreset[i].Data != null)
             {
-                _currentCost += _currentCharacterSOs[i].Cost;
-                _currentOverallPower += _currentCharacterSOs[i].OverallPower;
+                _currentCost += _currentPreset[i].Data.Cost;
+                _currentOverallPower += _currentPreset[i].CombatPower;
             }
         }
 
