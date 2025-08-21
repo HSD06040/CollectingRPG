@@ -10,12 +10,16 @@ public class LobbyButtonController : MonoBehaviour
     [SerializeField] private Button _stageButton;
     [SerializeField] private Button _characterCompositionButton;
     [SerializeField] private Button _gachaButton;
+    [SerializeField] private Button _gameStartButton;
+    [SerializeField] private Button[] _stageSelectButtons;
 
     [SerializeField] private GameObject _shopPanel;
     [SerializeField] private GameObject _upgradePanel;
     [SerializeField] private GameObject _stagePanel;
     [SerializeField] private GameObject _characterCompositionPanel;
     [SerializeField] private GameObject _gachaPanel;
+    [SerializeField] private GameObject _stageSelectPanel;
+    [SerializeField] private GameObject _partySelectPanel;
 
     private void Awake()
     {
@@ -24,6 +28,11 @@ public class LobbyButtonController : MonoBehaviour
         _stageButton.onClick.AddListener(StageOpen);
         _characterCompositionButton.onClick.AddListener(CharacterCompositionOpen);
         _gachaButton.onClick.AddListener(GachaOpen);
+        _gameStartButton.onClick.AddListener(StageSelectOpen);
+        for(int i = 0; i < _stageSelectButtons.Length; i++)
+        {
+            _stageSelectButtons[i].onClick.AddListener(PartySelectOpen);
+        }
 
         StageOpen();
     }
@@ -43,6 +52,16 @@ public class LobbyButtonController : MonoBehaviour
         SetActivePanel("StageUIPanel");
     }
 
+    private void StageSelectOpen()
+    {
+        SetActivePanel("StageSelectPanel");
+    }
+
+    private void PartySelectOpen()
+    {
+        SetActivePanel("PartySelectPanel");
+    }
+
     private void CharacterCompositionOpen()
     {
         SetActivePanel("CharacterCompositionUIPanel");
@@ -60,5 +79,7 @@ public class LobbyButtonController : MonoBehaviour
         _stagePanel.SetActive(activePanel.Equals(_stagePanel.name));
         _characterCompositionPanel.SetActive(activePanel.Equals(_characterCompositionPanel.name));
         _gachaPanel.SetActive(activePanel.Equals(_gachaPanel.name));
+        _stageSelectPanel.SetActive(activePanel.Equals(_stageSelectPanel.name));
+        _partySelectPanel.SetActive(activePanel.Equals(_partySelectPanel.name));
     }
 }
