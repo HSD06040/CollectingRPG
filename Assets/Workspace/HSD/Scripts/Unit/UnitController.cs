@@ -64,7 +64,7 @@ public class UnitController : MonoBehaviour
         {
             if(unit.CurrentSlot == Vector2Int.zero)
             {
-                _uiSlotController.SetSlot(unit.Data, _unitDragDropSystem.GetCurrentSlotIdx());
+                _uiSlotController.SetSlot(unit.Status, _unitDragDropSystem.GetCurrentSlotIdx());
                 Destroy(unit.gameObject);
             }
             else
@@ -79,7 +79,7 @@ public class UnitController : MonoBehaviour
             if (slotUnit != null)
             {
                 // 기존 유닛을 UI 슬롯으로 돌려보내기
-                _uiSlotController.SetSlot(slotUnit.Data, _unitDragDropSystem.GetCurrentSlotIdx());
+                _uiSlotController.SetSlot(slotUnit.Status, _unitDragDropSystem.GetCurrentSlotIdx());
 
                 RemoveUnit(slot, destroyGameObject: false); // 유닛 데이터만 제거 (Destroy 안 함)
                 Destroy(slotUnit.gameObject); // UI로 복제했으니 인게임 오브젝트 제거
@@ -121,11 +121,11 @@ public class UnitController : MonoBehaviour
         AddUnit(slot, newUnit);
     }
 
-    public void AddUnit(UnitData newUnitData, Vector2Int pos)
+    public void AddUnit(UnitStatus newUnitData, Vector2Int pos)
     {
         UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);
-        UnitBase newUnit = Instantiate(newUnitData.UnitPrefab).GetComponent<UnitBase>();
-        newUnit.Data = newUnitData;
+        UnitBase newUnit = Instantiate(newUnitData.Data.UnitPrefab).GetComponent<UnitBase>();
+        newUnit.Status = newUnitData;
 
         newUnit.transform.SetParent(slot.transform);
         newUnit.transform.position = slot.transform.position;
@@ -150,8 +150,8 @@ public class UnitController : MonoBehaviour
 
         _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
 
-        Synergy synergy = unit.Data.EnhancementData.Synergy;
-        ClassSynergy classSynergy = unit.Data.EnhancementData.ClassSynergy;
+        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
+        ClassSynergy classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
 
         _synergyController.RemoveSynergy(synergy, classSynergy);
 
@@ -161,7 +161,7 @@ public class UnitController : MonoBehaviour
         if (_classSynergyUnitDic.TryGetValue(classSynergy, out var classList))
             classList.Remove(unit);
 
-        _unitBaseDic[unit.Data.Address].Remove(unit);
+        _unitBaseDic[unit.Status.Address].Remove(unit);
 
         ClearSlot(slot, unit);
 
@@ -171,7 +171,7 @@ public class UnitController : MonoBehaviour
         _currentUnitCount--;
     }
 
-    public Vector2Int RemoveUnit(UnitData unit)
+    public Vector2Int RemoveUnit(UnitStatus unit)
     {
         UnitBase unitBase = _unitBaseDic[unit.Address][0];
         UnitSlot slot = _unitSlotManager.GetUnitSlot(unitBase);
@@ -185,8 +185,8 @@ public class UnitController : MonoBehaviour
 
     private void AddSynergyUnit(UnitBase unit)
     {
-        Synergy synergy = unit.Data.EnhancementData.Synergy;
-        ClassSynergy classSynergy = unit.Data.EnhancementData.ClassSynergy;
+        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
+        ClassSynergy classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
 
         _synergyController.AddSynergy(synergy, classSynergy);
 
@@ -222,10 +222,10 @@ public class UnitController : MonoBehaviour
 
     private void AddList(UnitBase unit)
     {
-        if (!_unitBaseDic.TryGetValue(unit.Data.Address, out var list))
+        if (!_unitBaseDic.TryGetValue(unit.Status.Address, out var list))
         {
             list = new List<UnitBase>(16);
-            _unitBaseDic.Add(unit.Data.Address, list);
+            _unitBaseDic.Add(unit.Status.Address, list);
         }
         list.Add(unit);
     }
@@ -245,7 +245,7 @@ public class UnitController : MonoBehaviour
         return _unitBaseDic.TryGetValue(address, out var unitList) ? unitList.Count : 0;
     }
 
-    public int GetUnitCount(UnitData unit)
+    public int GetUnitCount(UnitStatus unit)
     {
         return GetUnitCount(unit.Address);
     }

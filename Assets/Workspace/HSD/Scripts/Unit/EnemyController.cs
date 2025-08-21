@@ -25,7 +25,8 @@ public class EnemyController : MonoBehaviour
             int x = unitDatas.position.x;
             int y = unitDatas.position.y;
 
-            UnitBase unit = Instantiate(unitDatas.unitData.UnitPrefab).GetComponent<UnitBase>();
+            UnitBase unit = Instantiate(unitDatas.unitStatus.Data.UnitPrefab).GetComponent<UnitBase>();
+            unit.Status = unitDatas.unitStatus;
 
             unit.transform.position = slot.transform.position;
             unit.transform.SetParent(slot.transform);

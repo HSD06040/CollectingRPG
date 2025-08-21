@@ -12,6 +12,7 @@ public class EnemySlotEditor : EditorWindow
     private const string UNIT_DATA_SEARCH_PATH = "Assets/";
 
     private UnitData selectedUnitData;
+    private int selectedLevel = 0;
     private UnitGridDataSO currentGridData;
     private UnitGridDataSO[] availableGridDatas;
     private UnitData[] availableUnitDatas;
@@ -75,8 +76,46 @@ public class EnemySlotEditor : EditorWindow
         if (newUnitData != selectedUnitData)
         {
             selectedUnitData = newUnitData;
+            selectedLevel = 0; // 새 유닛 선택시 레벨 0으로 초기화
         }
         EditorGUILayout.EndHorizontal();
+
+        // 레벨 선택 (UnitData가 선택되었을 때만)
+        if (selectedUnitData != null && selectedUnitData.UnitStats != null && selectedUnitData.UnitStats.Length > 0)
+        {
+            EditorGUILayout.Space(5);
+            EditorGUILayout.BeginVertical(GUI.skin.box);
+            EditorGUILayout.LabelField($"'{selectedUnitData.Name}' 레벨 선택", EditorStyles.boldLabel);
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("레벨:", GUILayout.Width(50));
+            int newLevel = EditorGUILayout.IntSlider(selectedLevel, 0, selectedUnitData.UnitStats.Length - 1);
+            if (newLevel != selectedLevel)
+            {
+                selectedLevel = newLevel;
+                Debug.Log($"레벨 변경: {selectedUnitData.Name} Lv.{selectedLevel + 1}");
+            }
+            EditorGUILayout.LabelField($"Lv.{selectedLevel + 1} / {selectedUnitData.UnitStats.Length}", GUILayout.Width(80));
+            EditorGUILayout.EndHorizontal();
+
+            // 레벨 버튼들
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("빠른 선택:", GUILayout.Width(70));
+            for (int i = 0; i < Mathf.Min(selectedUnitData.UnitStats.Length, 10); i++)
+            {
+                if (GUILayout.Button($"{i + 1}", selectedLevel == i ? GUI.skin.box : GUI.skin.button, GUILayout.Width(25)))
+                {
+                    selectedLevel = i;
+                    Debug.Log($"레벨 선택: {selectedUnitData.Name} Lv.{selectedLevel + 1}");
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+        }
+        else if (selectedUnitData != null)
+        {
+            EditorGUILayout.HelpBox("선택된 UnitData에 스탯 정보가 없습니다.", MessageType.Warning);
+        }
 
         // UnitData 목록
         if (showUnitDataList)
@@ -94,7 +133,18 @@ public class EnemySlotEditor : EditorWindow
     private void DrawGrid()
     {
         EditorGUILayout.LabelField("그리드 크기 (5x4)", EditorStyles.boldLabel);
-        EditorGUILayout.LabelField("좌클릭: UnitData 배치 | 우클릭: UnitData 삭제");
+
+        // 현재 선택된 유닛과 레벨 정보 표시
+        if (selectedUnitData != null)
+        {
+            EditorGUILayout.LabelField($"배치할 유닛: {selectedUnitData.Name} Lv.{selectedLevel + 1}", EditorStyles.helpBox);
+        }
+        else
+        {
+            EditorGUILayout.LabelField("배치할 유닛을 먼저 선택하세요", EditorStyles.helpBox);
+        }
+
+        EditorGUILayout.LabelField("좌클릭: UnitStatus 배치 | 우클릭: UnitStatus 삭제");
 
         EditorGUILayout.BeginVertical(GUI.skin.box);
 
@@ -105,20 +155,40 @@ public class EnemySlotEditor : EditorWindow
             for (int x = 0; x < GRID_WIDTH; x++)
             {
                 Vector2Int position = new Vector2Int(x, y);
-                UnitData unitData = currentGridData.GetUnitData(position);
+                UnitStatus unitStatus = currentGridData.GetUnitStatus(position);
 
                 Rect slotRect = GUILayoutUtility.GetRect(SLOT_SIZE, SLOT_SIZE);
 
-                GUI.Box(slotRect, "", GUI.skin.button);
-
-                if (unitData != null && unitData.Icon != null)
+                // 슬롯 배경색 설정 (유닛이 있으면 다른 색상)
+                Color originalColor = GUI.backgroundColor;
+                if (unitStatus != null)
                 {
-                    Rect iconRect = new Rect(slotRect.x + 2, slotRect.y + 2, slotRect.width - 4, slotRect.height - 4);
-                    GUI.DrawTexture(iconRect, unitData.Icon.texture, ScaleMode.ScaleToFit);
+                    GUI.backgroundColor = Color.green * 0.8f;
+                }
+
+                GUI.Box(slotRect, "", GUI.skin.button);
+                GUI.backgroundColor = originalColor;
+
+                if (unitStatus != null && unitStatus.Data != null && unitStatus.Data.Icon != null)
+                {
+                    Rect iconRect = new Rect(slotRect.x + 2, slotRect.y + 2, slotRect.width - 4, slotRect.height - 20);
+                    GUI.DrawTexture(iconRect, unitStatus.Data.Icon.texture, ScaleMode.ScaleToFit);
 
                     // 유닛 이름과 레벨 표시 (작은 텍스트)
-                    Rect textRect = new Rect(slotRect.x, slotRect.y + slotRect.height - 15, slotRect.width, 15);
-                    GUI.Label(textRect, $"{unitData.Name} Lv.{unitData.Level}", EditorStyles.miniLabel);
+                    Rect textRect = new Rect(slotRect.x, slotRect.y + slotRect.height - 18, slotRect.width, 18);
+                    GUIStyle centeredStyle = new GUIStyle(EditorStyles.miniLabel);
+                    centeredStyle.alignment = TextAnchor.MiddleCenter;
+                    centeredStyle.fontSize = 8;
+                    GUI.Label(textRect, $"{unitStatus.Data.Name}\nLv.{unitStatus.Level + 1}", centeredStyle);
+                }
+                else
+                {
+                    // 빈 슬롯일 때 위치 표시
+                    Rect posRect = new Rect(slotRect.x, slotRect.y + slotRect.height - 15, slotRect.width, 15);
+                    GUIStyle centeredStyle = new GUIStyle(EditorStyles.miniLabel);
+                    centeredStyle.alignment = TextAnchor.MiddleCenter;
+                    centeredStyle.fontSize = 8;
+                    GUI.Label(posRect, $"({x},{y})", centeredStyle);
                 }
 
                 Event currentEvent = Event.current;
@@ -130,13 +200,24 @@ public class EnemySlotEditor : EditorWindow
                         {
                             if (selectedUnitData != null)
                             {
-                                currentGridData.SetUnitData(position, selectedUnitData);
+                                // UnitStatus를 생성해서 배치 (선택된 레벨 사용)
+                                UnitStatus newUnitStatus = new UnitStatus(selectedUnitData, selectedLevel);
+                                currentGridData.SetUnitStatus(position, newUnitStatus);
                                 EditorUtility.SetDirty(currentGridData);
+                                Debug.Log($"배치됨: {selectedUnitData.Name} Lv.{selectedLevel + 1} at ({x},{y})");
                                 Repaint();
+                            }
+                            else
+                            {
+                                Debug.LogWarning("배치할 유닛을 먼저 선택하세요!");
                             }
                         }
                         else if (currentEvent.button == 1) // 우클릭
                         {
+                            if (unitStatus != null)
+                            {
+                                Debug.Log($"삭제됨: {unitStatus.Data.Name} Lv.{unitStatus.Level + 1} from ({x},{y})");
+                            }
                             currentGridData.RemoveUnitData(position);
                             EditorUtility.SetDirty(currentGridData);
                             Repaint();
@@ -150,6 +231,10 @@ public class EnemySlotEditor : EditorWindow
         }
 
         EditorGUILayout.EndVertical();
+
+        // 현재 그리드 상태 요약 표시
+        int totalUnits = currentGridData.unitDatas.Count;
+        EditorGUILayout.LabelField($"배치된 유닛 수: {totalUnits} / {GRID_WIDTH * GRID_HEIGHT}", EditorStyles.helpBox);
     }
 
     private void DrawCreateSection()
@@ -288,7 +373,13 @@ public class EnemySlotEditor : EditorWindow
 
         UnitGridDataSO newGridData = CreateInstance<UnitGridDataSO>();
         newGridData.gridName = newGridName;
-        newGridData.unitDatas.AddRange(currentGridData.unitDatas);
+
+        // 현재 그리드의 모든 UnitStatus들을 복사
+        foreach (var unitDataInfo in currentGridData.unitDatas)
+        {
+            newGridData.unitDatas.Add(new GridUnitData(unitDataInfo.position,
+                new UnitStatus(unitDataInfo.unitStatus.Data, unitDataInfo.unitStatus.Level)));
+        }
 
         AssetDatabase.CreateAsset(newGridData, fullPath);
         AssetDatabase.SaveAssets();
@@ -308,27 +399,12 @@ public class EnemySlotEditor : EditorWindow
         }
 
         string[] guids = AssetDatabase.FindAssets("t:UnitGridDataSO", new[] { SAVE_PATH });
-
-        foreach (string guid in guids)
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-        }
-
         availableGridDatas = new UnitGridDataSO[guids.Length];
 
         for (int i = 0; i < guids.Length; i++)
         {
             string path = AssetDatabase.GUIDToAssetPath(guids[i]);
             availableGridDatas[i] = AssetDatabase.LoadAssetAtPath<UnitGridDataSO>(path);
-
-            //if (availableGridDatas[i] == null)
-            //{
-            //    Debug.LogError($"Failed to load UnitGridDataSO at path: {path}");
-            //}
-            //else
-            //{
-            //    Debug.Log($"Successfully loaded: {availableGridDatas[i].gridName}");
-            //}
         }
     }
 
@@ -336,9 +412,12 @@ public class EnemySlotEditor : EditorWindow
     {
         currentGridData.ClearAllUnitDatas();
 
-        foreach (var unitDataInfo in gridData.unitDatas)
+        // UnitStatus들을 모두 로드해서 표시
+        foreach (var gridUnitData in gridData.unitDatas)
         {
-            currentGridData.SetUnitData(unitDataInfo.position, unitDataInfo.unitData);
+            // 새로운 UnitStatus 인스턴스를 생성해서 로드
+            UnitStatus loadedStatus = new UnitStatus(gridUnitData.unitStatus.Data, gridUnitData.unitStatus.Level);
+            currentGridData.SetUnitStatus(gridUnitData.position, loadedStatus);
         }
 
         EditorUtility.SetDirty(currentGridData);
@@ -349,7 +428,7 @@ public class EnemySlotEditor : EditorWindow
 
         Repaint();
 
-        Debug.Log($"그리드 구성을 불러왔습니다: {gridData.gridName}");
+        Debug.Log($"그리드 구성을 불러왔습니다: {gridData.gridName} (유닛 {gridData.unitDatas.Count}개)");
     }
 
     private void LoadGridDataForEdit(UnitGridDataSO gridData)
@@ -357,9 +436,12 @@ public class EnemySlotEditor : EditorWindow
         // 수정 모드로 그리드 로드
         currentGridData.ClearAllUnitDatas();
 
-        foreach (var unitDataInfo in gridData.unitDatas)
+        // UnitStatus들을 모두 로드해서 표시
+        foreach (var gridUnitData in gridData.unitDatas)
         {
-            currentGridData.SetUnitData(unitDataInfo.position, unitDataInfo.unitData);
+            // 새로운 UnitStatus 인스턴스를 생성해서 로드
+            UnitStatus loadedStatus = new UnitStatus(gridUnitData.unitStatus.Data, gridUnitData.unitStatus.Level);
+            currentGridData.SetUnitStatus(gridUnitData.position, loadedStatus);
         }
 
         EditorUtility.SetDirty(currentGridData);
@@ -371,7 +453,7 @@ public class EnemySlotEditor : EditorWindow
 
         Repaint();
 
-        Debug.Log($"수정 모드로 그리드 구성을 불러왔습니다: {gridData.gridName}");
+        Debug.Log($"수정 모드로 그리드 구성을 불러왔습니다: {gridData.gridName} (유닛 {gridData.unitDatas.Count}개)");
     }
 
     private void UpdateGridDataAsset()
@@ -391,7 +473,13 @@ public class EnemySlotEditor : EditorWindow
         // 기존 그리드 데이터 업데이트
         selectedGridDataForEdit.gridName = newGridName;
         selectedGridDataForEdit.unitDatas.Clear();
-        selectedGridDataForEdit.unitDatas.AddRange(currentGridData.unitDatas);
+
+        // 현재 그리드의 모든 UnitStatus들을 복사
+        foreach (var unitDataInfo in currentGridData.unitDatas)
+        {
+            selectedGridDataForEdit.unitDatas.Add(new GridUnitData(unitDataInfo.position,
+                new UnitStatus(unitDataInfo.unitStatus.Data, unitDataInfo.unitStatus.Level)));
+        }
 
         EditorUtility.SetDirty(selectedGridDataForEdit);
         AssetDatabase.SaveAssets();
@@ -476,10 +564,12 @@ public class EnemySlotEditor : EditorWindow
                 GUILayout.Space(28);
             }
 
-            // 클릭 가능한 라벨
-            if (GUILayout.Button($"{unitData.Name} (Lv.{unitData.Level})", EditorStyles.label))
+            // 클릭 가능한 라벨 - UnitStats 배열 길이를 레벨로 표시
+            int maxLevel = unitData.UnitStats?.Length ?? 1;
+            if (GUILayout.Button($"{unitData.Name} (최대Lv.{maxLevel})", EditorStyles.label))
             {
                 selectedUnitData = unitData;
+                selectedLevel = 0; // 새 유닛 선택시 레벨 0으로 초기화
             }
 
             EditorGUILayout.EndHorizontal();
@@ -513,10 +603,22 @@ public class EnemySlotEditor : EditorWindow
             // 정보
             EditorGUILayout.BeginVertical();
             EditorGUILayout.LabelField("이름:", selectedUnitData.Name);
-            EditorGUILayout.LabelField("레벨:", selectedUnitData.Level.ToString());
-            EditorGUILayout.LabelField("체력:", selectedUnitData.MaxHealth.ToString());
-            EditorGUILayout.LabelField("물리데미지:", selectedUnitData.PhysicalDamage.ToString());
-            EditorGUILayout.LabelField("마법데미지:", selectedUnitData.MagicDamage.ToString());
+
+            // 선택된 레벨의 스탯 표시
+            if (selectedUnitData.UnitStats != null && selectedLevel < selectedUnitData.UnitStats.Length && selectedUnitData.UnitStats[selectedLevel] != null)
+            {
+                var stats = selectedUnitData.UnitStats[selectedLevel];
+                EditorGUILayout.LabelField("레벨:", $"{selectedLevel + 1}");
+                EditorGUILayout.LabelField("체력:", stats.MaxHealth.ToString());
+                EditorGUILayout.LabelField("물리데미지:", stats.PhysicalDamage.ToString());
+                EditorGUILayout.LabelField("마법데미지:", stats.MagicDamage.ToString());
+                EditorGUILayout.LabelField("공격속도:", stats.AttackSpeed.ToString("F2"));
+                EditorGUILayout.LabelField("이동속도:", stats.MoveSpeed.ToString("F2"));
+            }
+            else
+            {
+                EditorGUILayout.LabelField("스탯:", "없음");
+            }
             EditorGUILayout.EndVertical();
 
             EditorGUILayout.EndHorizontal();

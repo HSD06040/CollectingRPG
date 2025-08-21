@@ -32,7 +32,7 @@ public class UI_UnitSlotController : MonoBehaviour
         }
     }
 
-    public void SetSlot(UnitData unit, int idx)
+    public void SetSlot(UnitStatus unit, int idx)
     {
         _unitSlots[idx].SetSlot(unit);
         AddUnit(unit, idx);
@@ -40,7 +40,7 @@ public class UI_UnitSlotController : MonoBehaviour
 
     public void ClearSlot(int idx)
     {
-        UnitData unit = _unitSlots[idx].GetUnit();
+        UnitStatus unit = _unitSlots[idx].GetUnit();
         if (unit == null) return;
 
         _unitSlotDic[unit.Address].Remove(idx);
@@ -60,7 +60,7 @@ public class UI_UnitSlotController : MonoBehaviour
         return -1;
     }
 
-    public void AddUnit(UnitData unit, int idx)
+    public void AddUnit(UnitStatus unit, int idx)
     {
         if (!_unitSlotDic.ContainsKey(unit.Address))
         {
@@ -75,7 +75,7 @@ public class UI_UnitSlotController : MonoBehaviour
         }
     }
 
-    public void RemoveUnit(UnitData unit, int idx)
+    public void RemoveUnit(UnitStatus unit, int idx)
     {
         if (_unitSlotDic.ContainsKey(unit.Address))
         {
@@ -83,7 +83,7 @@ public class UI_UnitSlotController : MonoBehaviour
         }        
     }
 
-    public void RemoveLastUnit(UnitData unit)
+    public void RemoveLastUnit(UnitStatus unit)
     {
         var slotList = _unitSlotDic[unit.Address];
         int lastIdx = slotList[slotList.Count - 1];
@@ -108,7 +108,7 @@ public class UI_UnitSlotController : MonoBehaviour
         }
 
         if(!isSwitch)
-            RemoveUnit(unit.StatusController.Data, slotIdx);        
+            RemoveUnit(unit.StatusController.Status, slotIdx);        
     }
 
     public void ReturnUnitToUI(UnitBase unit)
@@ -120,10 +120,10 @@ public class UI_UnitSlotController : MonoBehaviour
             return;
         }
 
-        SetSlot(unit.Data, emptySlotIdx);
+        SetSlot(unit.Status, emptySlotIdx);
     }
 
-    public void AddInGameSlot(UnitData unit, int slotIdx, Vector2Int pos)
+    public void AddInGameSlot(UnitStatus unit, int slotIdx, Vector2Int pos)
     {
         UnitSlot slot = _unitController.GetUnitSlot(pos);
         _unitController.AddUnit(unit, pos);
@@ -138,7 +138,7 @@ public class UI_UnitSlotController : MonoBehaviour
         return 0;
     }
 
-    public int GetUnitCount(UnitData unit)
+    public int GetUnitCount(UnitStatus unit)
     {
         return GetUnitCount(unit.Address);
     }
