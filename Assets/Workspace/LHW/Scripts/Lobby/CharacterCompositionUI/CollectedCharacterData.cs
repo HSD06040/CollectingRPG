@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 획득한 캐릭터의 개수 및 목록을 반환하기 위한 데이터 저장
+/// </summary>
 public class CollectedCharacterData : MonoBehaviour
 {
     [Header("Reference")]
