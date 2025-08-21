@@ -212,7 +212,7 @@ public class UnitBase : MonoBehaviour, IAttacker
             if (MeleeAttackData.SearchType == SearchType.Circle)
             {
                 Vector2 offset = Status.Data.AttackData.AttackPointOffset;
-                offset.x *= transform.GetFacingDir();
+                offset *= TargetDir;
 
                 Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);
             }

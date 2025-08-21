@@ -133,4 +133,16 @@ public static class Utils
     {
         return transform.localScale.x > 0 ? -1 : 1;
     }
+
+    public static string ToAbbreviation(long value)
+    {
+        if (value >= 1_000_000_000)
+            return $"{(value / 1_000_000_000f).ToString("0.#")}B";
+        if (value >= 1_000_000)
+            return $"{(value / 1_000_000f).ToString("0.#")}M";
+        if (value >= 1_000)
+            return $"{(value / 1_000f).ToString("0.#")}k";
+
+        return value.ToString();
+    }
 }

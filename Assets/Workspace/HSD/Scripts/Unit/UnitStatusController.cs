@@ -74,9 +74,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public void TakeDamage(int amount)
     {
-        CurHp.Value -= amount;
+        CurHp.Value = Mathf.Clamp(CurHp.Value - amount,0, int.MaxValue);
 
-        if(CurHp.Value <= 0)
+        if(CurHp.Value == 0)
         {
             Die();
         }

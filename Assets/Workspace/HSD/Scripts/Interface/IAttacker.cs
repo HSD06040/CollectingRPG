@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IAttacker
 {
-    public LayerMask TargetLayer { get; set; }
+    public LayerMask TargetLayer { get; set; }    
     public UnitStatusController GetStatusController();
     public Transform GetTransform();
     public Transform GetTarget();
