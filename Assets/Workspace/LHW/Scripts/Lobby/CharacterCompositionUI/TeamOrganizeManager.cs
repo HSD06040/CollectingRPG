@@ -1,3 +1,4 @@
+using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,8 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private GameObject _popUpUI;
     [SerializeField] private TMP_Text _popUpText;
 
+    [SerializeField] private ButtonManagerBasic[] _presetAddButton;
+
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
     public int TotalCost => _totalCost;
@@ -47,7 +50,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void Awake()
     {
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 2; i++)
         {
             _selectedCharacters.Add(new SelectedCharacters(5));
         }
@@ -262,17 +265,50 @@ public class TeamOrganizeManager : MonoBehaviour
 
     public void SelectCharacterPreset(int index)
     {
+        // 리더 캐릭터가 배치되지 않았을 시 경고 팝업 띄우기
         if (_currentCharacterSOs[0] == null)
         {
-            _popUpUI.SetActive(true);
-            _popUpText.text = "Leader is not added.\nPlease add.";
+            if (PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowPopup("Leader is not added.\nPlease add.");
+            }
+
             return;
         }
 
+        // 해당 프리셋이 생성되지 않은 프리셋일 시 확장 가능한지 확인하고, 확장을 진행
+        if (_selectedCharacters.Count < index + 1)
+        {
+            if (PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowConfirmationPopup("Add Preset?\nConsumes 500 Gold.", () => CreatePreset(index), null);
+            }
+        }
+        else
+        {
+            LoadPreset(index);
+        }
+    }
+
+    private void CreatePreset(int index)
+    {
+        // TODO : 금액이 부족할 시에 조건 추가
+
+        Debug.Log("Used 500 Gold");
+        _selectedCharacters.Add(new SelectedCharacters(5));
+        // 이 부분은 UI 디자인 변경 시 변경 필요
+        _presetAddButton[index - 2].buttonText = $"{(index + 1)}";
+        _presetAddButton[index - 2].UpdateUI();
+
+        LoadPreset(index);
+    }
+
+    private void LoadPreset(int index)
+    {
         _currentCharacterSOs = _selectedCharacters[index].CharLists;
         _currentCost = 0;
         _currentOverallPower = 0;
-        for(int i = 0; i <  _currentCharacterSOs.Length; i++)
+        for (int i = 0; i < _currentCharacterSOs.Length; i++)
         {
             if (_currentCharacterSOs[i] != null)
             {
