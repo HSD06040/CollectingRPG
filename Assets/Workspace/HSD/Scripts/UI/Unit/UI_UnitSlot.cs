@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDropHandler
+public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
 {
     [SerializeField] private UnitData _unit;
     [SerializeField] private Image _unitIcon;
@@ -60,15 +60,16 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
     }
 
     private void UnitSetting(Collider2D collider, UnitBase unit)
-    {
+    {        
         if (collider == null)
         {
+            Debug.Log(_unitSlotController.GetUnitCount(unit.Data));
             SetSlot(_chachedUnit);
-            _chachedUnit = null;
-            Debug.Log("Collider is null");
+            _unitSlotController.AddUnit(unit.Data, _slotIdx);
+            _chachedUnit = null;            
             return;
         }
-
+        
         _unitSlotController.RemoveUnit(unit.Data, _slotIdx);
     }
 
@@ -95,20 +96,52 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IDrop
 
     public void OnDrop(PointerEventData eventData)
     {
-        GameObject currentDragUnit = _dragDropSystem.GetCurrentUnit();
-        if (currentDragUnit == null)
+        UnitBase unitBase = _dragDropSystem.GetCurrentUnitBase();
+
+        if (unitBase == null)
         {
             Debug.Log("No unit to drop");
             return;
         }
 
-        UnitData unit = ComponentProvider.Get<UnitStatusController>(currentDragUnit).Data;
+        UnitData temp = _unit;
+        UnitData unit = unitBase.Data;
+        Vector2Int pos = unitBase.CurrentSlot;
 
-        if (_unit == null)
-        {            
-            _unitSlotController.RemoveInGameSlot(currentDragUnit.GetComponent<UnitBase>(), _slotIdx);
-            OnUnitChanged?.Invoke(unit, _slotIdx);
-            Destroy(currentDragUnit);
+        // ui 에서 생성한 거라면
+        if (pos == Vector2Int.zero)
+        {
+            if(IsEmpty())
+            {
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+            }
+            else
+            {
+                
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+                _unitSlotController.SetSlot(temp, _dragDropSystem.GetCurrentSlotIdx());
+            }
         }
+        else
+        {
+            // 인게임에서 생성한 거라면 (인 게임 Slot -> UI)
+           
+            _unitSlotController.RemoveInGameSlot(unitBase, _slotIdx, true); // 인게임 슬롯에서 제거
+
+            if (temp != null) // 만약 UI 슬롯이 비어있지 않다면
+            {
+                Debug.Log("Temp != null");
+                // 인게임 해당 슬롯에 추가
+                _unitSlotController.AddInGameSlot(temp, _slotIdx, unitBase.CurrentSlot);
+                _unitSlotController.RemoveUnit(temp, _slotIdx);
+                OnUnitChanged?.Invoke(unit, _slotIdx);
+                return;
+            }
+            
+            _unitSlotController.RemoveUnit(unit, _slotIdx);
+            OnUnitChanged?.Invoke(unit, _slotIdx);
+        }
+        
+        Destroy(unitBase.gameObject);
     }
 }

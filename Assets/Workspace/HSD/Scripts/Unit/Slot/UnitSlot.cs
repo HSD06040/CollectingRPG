@@ -24,7 +24,11 @@ public class UnitSlot : MonoBehaviour
 
     public void SetUnit(UnitBase unit)
     {
-        if (unit == null) return;
+        if (unit == null)
+        {
+            ClearSlot();
+            return;
+        }
 
         unit.CurrentSlot = _pos;
         unit.gameObject.transform.position = transform.position;
