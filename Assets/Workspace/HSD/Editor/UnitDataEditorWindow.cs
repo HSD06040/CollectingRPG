@@ -18,13 +18,12 @@ public class UnitDataEditorWindow : EditorWindow
 
     // 폴더블 섹션들
     private bool showMetaDataSection = true;
-    private bool showStatusSection = true;
-    private bool showDamageSection = true;
-    private bool showCritSection = true;
-    private bool showDefenseSection = true;
-    private bool showRangeSection = true;
+    private bool showUnitStatsSection = true;
     private bool showAttackDataSection = true;
     private bool showEnhancementSection = true;
+
+    // 레벨별 스탯 편집
+    private int selectedLevel = 0;
 
     [MenuItem("Collecting_RPG/UnitData_Editor")]
     public static void ShowWindow()
@@ -92,7 +91,6 @@ public class UnitDataEditorWindow : EditorWindow
         if (showMetaDataSection)
         {
             EditorGUI.indentLevel++;
-            currentUnitData.Level = EditorGUILayout.IntField("Level", currentUnitData.Level);
             currentUnitData.Grade = (Grade)EditorGUILayout.EnumPopup("Grade", currentUnitData.Grade);
             currentUnitData.UnitPrefab = (GameObject)EditorGUILayout.ObjectField("Unit Prefab", currentUnitData.UnitPrefab, typeof(GameObject), false);
             currentUnitData.Icon = (Sprite)EditorGUILayout.ObjectField("Icon", currentUnitData.Icon, typeof(Sprite), false);
@@ -100,67 +98,70 @@ public class UnitDataEditorWindow : EditorWindow
             currentUnitData.Name = EditorGUILayout.TextField("Name", currentUnitData.Name);
             currentUnitData.Description = EditorGUILayout.TextArea(currentUnitData.Description, GUILayout.Height(60));
             currentUnitData.Cost = EditorGUILayout.IntField("Cost", currentUnitData.Cost);
-            currentUnitData.CombatPower = EditorGUILayout.IntField("Combat Power", currentUnitData.CombatPower);
             currentUnitData.UpgradeCount = EditorGUILayout.IntField("Upgrade Count", currentUnitData.UpgradeCount);
             EditorGUI.indentLevel--;
             EditorGUILayout.Space(5);
         }
 
-        // Status 섹션
-        showStatusSection = EditorGUILayout.Foldout(showStatusSection, "Status", true, EditorStyles.foldoutHeader);
-        if (showStatusSection)
+        // Unit Stats 섹션
+        showUnitStatsSection = EditorGUILayout.Foldout(showUnitStatsSection, "Unit Stats", true, EditorStyles.foldoutHeader);
+        if (showUnitStatsSection)
         {
             EditorGUI.indentLevel++;
-            currentUnitData.MaxHealth = EditorGUILayout.IntField("Max Health", currentUnitData.MaxHealth);
-            currentUnitData.MaxMana = EditorGUILayout.IntField("Max Mana", currentUnitData.MaxMana);
-            currentUnitData.ManaGain = EditorGUILayout.IntField("Mana Gain", currentUnitData.ManaGain);
-            currentUnitData.AttackSpeed = EditorGUILayout.FloatField("Attack Speed", currentUnitData.AttackSpeed);
-            currentUnitData.MoveSpeed = EditorGUILayout.FloatField("Move Speed", currentUnitData.MoveSpeed);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space(5);
-        }
 
-        // Damage 섹션
-        showDamageSection = EditorGUILayout.Foldout(showDamageSection, "Damage", true, EditorStyles.foldoutHeader);
-        if (showDamageSection)
-        {
-            EditorGUI.indentLevel++;
-            currentUnitData.PhysicalDamage = EditorGUILayout.IntField("Physical Damage", currentUnitData.PhysicalDamage);
-            currentUnitData.MagicDamage = EditorGUILayout.IntField("Magic Damage", currentUnitData.MagicDamage);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space(5);
-        }
+            // 배열 크기 조정
+            int newSize = EditorGUILayout.IntField("레벨 수", currentUnitData.UnitStats?.Length ?? 1);
+            if (newSize < 1) newSize = 1;
 
-        // CritRate 섹션
-        showCritSection = EditorGUILayout.Foldout(showCritSection, "Critical", true, EditorStyles.foldoutHeader);
-        if (showCritSection)
-        {
-            EditorGUI.indentLevel++;
-            currentUnitData.CritChance = EditorGUILayout.IntField("Crit Chance", currentUnitData.CritChance);
-            currentUnitData.CritDamage = EditorGUILayout.IntField("Crit Damage", currentUnitData.CritDamage);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space(5);
-        }
+            if (currentUnitData.UnitStats == null || currentUnitData.UnitStats.Length != newSize)
+            {
+                System.Array.Resize(ref currentUnitData.UnitStats, newSize);
 
-        // Defense 섹션
-        showDefenseSection = EditorGUILayout.Foldout(showDefenseSection, "Defense", true, EditorStyles.foldoutHeader);
-        if (showDefenseSection)
-        {
-            EditorGUI.indentLevel++;
-            currentUnitData.PhysicalDefense = EditorGUILayout.IntField("Physical Defense", currentUnitData.PhysicalDefense);
-            currentUnitData.MagicDefense = EditorGUILayout.IntField("Magic Defense", currentUnitData.MagicDefense);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space(5);
-        }
+                // 새로운 요소들 초기화
+                for (int i = 0; i < newSize; i++)
+                {
+                    if (currentUnitData.UnitStats[i] == null)
+                    {
+                        currentUnitData.UnitStats[i] = CreateDefaultUnitStats();
+                    }
+                }
+            }
 
-        // Range 섹션
-        showRangeSection = EditorGUILayout.Foldout(showRangeSection, "Range", true, EditorStyles.foldoutHeader);
-        if (showRangeSection)
-        {
-            EditorGUI.indentLevel++;
-            currentUnitData.AttackRange = EditorGUILayout.IntField("Attack Range", currentUnitData.AttackRange);
-            currentUnitData.AttackCount = EditorGUILayout.IntField("Attack Count", currentUnitData.AttackCount);
-            currentUnitData.AttackAreaType = (AttackAreaType)EditorGUILayout.EnumPopup("Attack Area Type", currentUnitData.AttackAreaType);
+            // 레벨 선택
+            if (currentUnitData.UnitStats.Length > 0)
+            {
+                selectedLevel = EditorGUILayout.IntSlider("편집할 레벨", selectedLevel, 0, currentUnitData.UnitStats.Length - 1);
+                EditorGUILayout.LabelField($"레벨 {selectedLevel + 1} 스탯 편집", EditorStyles.boldLabel);
+
+                if (selectedLevel < currentUnitData.UnitStats.Length)
+                {
+                    var stats = currentUnitData.UnitStats[selectedLevel];
+                    if (stats != null)
+                    {
+                        DrawUnitStatsEditor(stats);
+                    }
+                }
+
+                // 레벨별 스탯 복사 기능
+                EditorGUILayout.Space(5);
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("이전 레벨에서 복사") && selectedLevel > 0)
+                {
+                    CopyUnitStats(currentUnitData.UnitStats[selectedLevel - 1], currentUnitData.UnitStats[selectedLevel]);
+                }
+                if (GUILayout.Button("모든 레벨에 적용"))
+                {
+                    for (int i = 0; i < currentUnitData.UnitStats.Length; i++)
+                    {
+                        if (i != selectedLevel)
+                        {
+                            CopyUnitStats(currentUnitData.UnitStats[selectedLevel], currentUnitData.UnitStats[i]);
+                        }
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+
             EditorGUI.indentLevel--;
             EditorGUILayout.Space(5);
         }
@@ -193,6 +194,89 @@ public class UnitDataEditorWindow : EditorWindow
         {
             EditorUtility.SetDirty(currentUnitData);
         }
+    }
+
+    private void DrawUnitStatsEditor(UnitStats stats)
+    {
+        EditorGUI.indentLevel++;
+
+        // Status 섹션
+        EditorGUILayout.LabelField("Status", EditorStyles.boldLabel);
+        stats.MaxHealth = EditorGUILayout.IntField("Max Health", stats.MaxHealth);
+        stats.MaxMana = EditorGUILayout.IntField("Max Mana", stats.MaxMana);
+        stats.ManaGain = EditorGUILayout.IntField("Mana Gain", stats.ManaGain);
+        stats.AttackSpeed = EditorGUILayout.FloatField("Attack Speed", stats.AttackSpeed);
+        stats.MoveSpeed = EditorGUILayout.FloatField("Move Speed", stats.MoveSpeed);
+
+        EditorGUILayout.Space(3);
+
+        // Damage 섹션
+        EditorGUILayout.LabelField("Damage", EditorStyles.boldLabel);
+        stats.PhysicalDamage = EditorGUILayout.IntField("Physical Damage", stats.PhysicalDamage);
+        stats.MagicDamage = EditorGUILayout.IntField("Magic Damage", stats.MagicDamage);
+
+        EditorGUILayout.Space(3);
+
+        // Critical 섹션
+        EditorGUILayout.LabelField("Critical", EditorStyles.boldLabel);
+        stats.CritChance = EditorGUILayout.IntField("Crit Chance", stats.CritChance);
+        stats.CritDamage = EditorGUILayout.IntField("Crit Damage", stats.CritDamage);
+
+        EditorGUILayout.Space(3);
+
+        // Defense 섹션
+        EditorGUILayout.LabelField("Defense", EditorStyles.boldLabel);
+        stats.PhysicalDefense = EditorGUILayout.IntField("Physical Defense", stats.PhysicalDefense);
+        stats.MagicDefense = EditorGUILayout.IntField("Magic Defense", stats.MagicDefense);
+
+        EditorGUILayout.Space(3);
+
+        // Range 섹션
+        EditorGUILayout.LabelField("Range", EditorStyles.boldLabel);
+        stats.AttackRange = EditorGUILayout.IntField("Attack Range", stats.AttackRange);
+        stats.AttackCount = EditorGUILayout.IntField("Attack Count", stats.AttackCount);
+        stats.AttackAreaType = (AttackAreaType)EditorGUILayout.EnumPopup("Attack Area Type", stats.AttackAreaType);
+
+        EditorGUI.indentLevel--;
+    }
+
+    private UnitStats CreateDefaultUnitStats()
+    {
+        return new UnitStats
+        {
+            MaxHealth = 100,
+            MaxMana = 50,
+            ManaGain = 5,
+            AttackSpeed = 1.0f,
+            MoveSpeed = 1.0f,
+            PhysicalDamage = 10,
+            MagicDamage = 0,
+            CritChance = 5,
+            CritDamage = 150,
+            PhysicalDefense = 5,
+            MagicDefense = 5,
+            AttackRange = 1,
+            AttackCount = 1,
+            AttackAreaType = AttackAreaType.Single
+        };
+    }
+
+    private void CopyUnitStats(UnitStats source, UnitStats target)
+    {
+        target.MaxHealth = source.MaxHealth;
+        target.MaxMana = source.MaxMana;
+        target.ManaGain = source.ManaGain;
+        target.AttackSpeed = source.AttackSpeed;
+        target.MoveSpeed = source.MoveSpeed;
+        target.PhysicalDamage = source.PhysicalDamage;
+        target.MagicDamage = source.MagicDamage;
+        target.CritChance = source.CritChance;
+        target.CritDamage = source.CritDamage;
+        target.PhysicalDefense = source.PhysicalDefense;
+        target.MagicDefense = source.MagicDefense;
+        target.AttackRange = source.AttackRange;
+        target.AttackCount = source.AttackCount;
+        target.AttackAreaType = source.AttackAreaType;
     }
 
     private void DrawCreateSection()
@@ -247,10 +331,9 @@ public class UnitDataEditorWindow : EditorWindow
     {
         currentUnitData = CreateInstance<UnitData>();
         currentUnitData.Name = "새유닛";
-        currentUnitData.Level = 1;
-        currentUnitData.MaxHealth = 100;
-        currentUnitData.AttackSpeed = 1.0f;
-        currentUnitData.MoveSpeed = 1.0f;
+        currentUnitData.UnitStats = new UnitStats[1];
+        currentUnitData.UnitStats[0] = CreateDefaultUnitStats();
+        selectedLevel = 0;
     }
 
     private void CreateUnitDataAsset()
@@ -326,6 +409,7 @@ public class UnitDataEditorWindow : EditorWindow
         if (unitData != null)
         {
             currentUnitData = unitData;
+            selectedLevel = 0;
             Repaint();
             Debug.Log($"유닛 데이터를 불러왔습니다: {unitData.Name}");
         }
@@ -384,12 +468,21 @@ public class UnitDataEditorWindow : EditorWindow
             EditorGUILayout.BeginVertical();
 
             // 클릭 가능한 라벨로 변경
-            if (GUILayout.Button($"{unitData.Name} (Lv.{unitData.Level})", EditorStyles.label))
+            if (GUILayout.Button($"{unitData.Name} (레벨 {unitData.UnitStats?.Length ?? 0}개)", EditorStyles.label))
             {
                 LoadUnitData(unitData);
             }
 
-            EditorGUILayout.LabelField($"ID: {unitData.ID} | HP: {unitData.MaxHealth} | ATK: {unitData.PhysicalDamage + unitData.MagicDamage}", EditorStyles.miniLabel);
+            // 첫 번째 레벨의 스탯 정보 표시 (존재할 경우)
+            if (unitData.UnitStats != null && unitData.UnitStats.Length > 0 && unitData.UnitStats[0] != null)
+            {
+                var firstStats = unitData.UnitStats[0];
+                EditorGUILayout.LabelField($"ID: {unitData.ID} | HP: {firstStats.MaxHealth} | ATK: {firstStats.PhysicalDamage + firstStats.MagicDamage}", EditorStyles.miniLabel);
+            }
+            else
+            {
+                EditorGUILayout.LabelField($"ID: {unitData.ID} | 스탯 없음", EditorStyles.miniLabel);
+            }
 
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
@@ -405,7 +498,6 @@ public class UnitDataEditorWindow : EditorWindow
 
     private void CopyUnitData(UnitData source, UnitData target)
     {
-        target.Level = source.Level;
         target.Grade = source.Grade;
         target.UnitPrefab = source.UnitPrefab;
         target.Icon = source.Icon;
@@ -413,24 +505,23 @@ public class UnitDataEditorWindow : EditorWindow
         target.Name = source.Name;
         target.Description = source.Description;
         target.Cost = source.Cost;
-        target.CombatPower = source.CombatPower;
         target.UpgradeCount = source.UpgradeCount;
-        target.MaxHealth = source.MaxHealth;
-        target.MaxMana = source.MaxMana;
-        target.ManaGain = source.ManaGain;
-        target.AttackSpeed = source.AttackSpeed;
-        target.MoveSpeed = source.MoveSpeed;
-        target.PhysicalDamage = source.PhysicalDamage;
-        target.MagicDamage = source.MagicDamage;
-        target.CritChance = source.CritChance;
-        target.CritDamage = source.CritDamage;
-        target.PhysicalDefense = source.PhysicalDefense;
-        target.MagicDefense = source.MagicDefense;
-        target.AttackRange = source.AttackRange;
-        target.AttackCount = source.AttackCount;
-        target.AttackAreaType = source.AttackAreaType;
         target.Skill = source.Skill;
         target.AttackData = source.AttackData;
         target.EnhancementData = source.EnhancementData;
+
+        // UnitStats 배열 복사
+        if (source.UnitStats != null)
+        {
+            target.UnitStats = new UnitStats[source.UnitStats.Length];
+            for (int i = 0; i < source.UnitStats.Length; i++)
+            {
+                if (source.UnitStats[i] != null)
+                {
+                    target.UnitStats[i] = new UnitStats();
+                    CopyUnitStats(source.UnitStats[i], target.UnitStats[i]);
+                }
+            }
+        }
     }
 }

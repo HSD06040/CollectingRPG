@@ -8,5 +8,5 @@ public interface IAttacker
     public UnitStatusController GetStatusController();
     public Transform GetTransform();
     public Transform GetTarget();
-    public UnitData GetUnitData();
+    public UnitStatus GetUnitData();
 }

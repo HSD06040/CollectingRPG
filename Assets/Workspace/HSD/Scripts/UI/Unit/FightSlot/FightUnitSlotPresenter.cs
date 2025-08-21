@@ -12,7 +12,7 @@ public class FightUnitSlotPresenter
         _view = view;
         _status = status;
 
-        _view.SetIcon(_status.Data.Icon);
+        _view.SetIcon(_status.Status.Data.Icon);
         _view.SetHp(_status.CurHp.Value, _status.MaxHealth.Value);
         _view.SetMana(_status.CurMana.Value, _status.MaxMana.Value);
 
