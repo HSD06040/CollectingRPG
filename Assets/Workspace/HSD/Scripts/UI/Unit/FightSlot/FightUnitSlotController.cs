@@ -8,12 +8,11 @@ public class FightUnitSlotController : MonoBehaviour
     [SerializeField] GameObject _fightSlotPrefab;
     [SerializeField] Transform _content;
     [SerializeField] GridLayoutGroup _grid;
-    [SerializeField] int _slotCount;
     private UI_FightUnitSlot[] _slots;
 
     private void Awake()
     {
-        init();
+        CreateSlots();
 
         int count = _grid.transform.childCount;
         float width = ((RectTransform)_grid.transform).rect.width;
@@ -26,8 +25,10 @@ public class FightUnitSlotController : MonoBehaviour
         }
     }
 
-    private void init()
+    private void CreateSlots()
     {
+        int _slotCount = UnitController.UnitMaxCount;
+
         _slots = new UI_FightUnitSlot[_slotCount];
 
         for (int i = 0; i < _slotCount; i++)
@@ -38,19 +39,18 @@ public class FightUnitSlotController : MonoBehaviour
         }
     }
 
-    public void SetUnit(UnitBase[] units)
+    public void Init(UnitBase[] units)
     {
-        int count = units.Length;
-
-        for (int i = 0; i < units.Length; i++)
+        for (int i = 0; i < _slots.Length; i++)
         {
-            _slots[i].Init(units[i].StatusController);
-            count--;
-        }
-
-        for (int i = _slots.Length - units.Length; i < _slots.Length; i++)
-        {
-            _slots[i].Init(null);
+            if (i < units.Length)
+            {
+                _slots[i].Init(units[i].StatusController);
+            }
+            else
+            {
+                _slots[i].Init(null);
+            }
         }
     }
 }
