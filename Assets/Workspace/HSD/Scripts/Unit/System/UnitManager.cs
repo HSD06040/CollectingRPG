@@ -13,8 +13,12 @@ public class UnitManager : MonoBehaviour
 
     public void Fight()
     {
-        _unitUIManager._fightSlotController.SetUnit(_unitController.GetUnits());
         _unitController.UnitFight();
+
+        _unitUIManager.Init();
+
+        _unitUIManager.FightSlotController.Init(_unitController.GetUnits());
+        _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
     }
 
     public void RandomSpawn()
@@ -83,7 +87,7 @@ public class UnitManager : MonoBehaviour
             pos = _unitController.RemoveUnit(unit);
         }
 
-        if (pos != Vector2Int.zero)
+        if (pos != Vector2Int.zero && !_unitController.IsUnitMaxCount())
         {
             UnitBase unitBase = Instantiate(newUnit.UnitPrefab).GetComponent<UnitBase>();
             unitBase.Data = newUnit;

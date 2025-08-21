@@ -64,6 +64,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     #region FSM
     public void Fight()
     {
+        Init();
         _fsm.Fight();
     }
 
