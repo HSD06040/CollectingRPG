@@ -10,8 +10,9 @@ using UnityEngine.UI;
 public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [Header("Data Input")]
-    [SerializeField] private CharacterSO _charData;
-    public CharacterSO CharData => _charData;
+    private UnitStatus _status;
+    public UnitStatus Status => _status;
+    [SerializeField] UnitData _unitData;
 
 
     [Header("UI")]
@@ -23,9 +24,6 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
 
-    private UnitStatus _status;
-    public UnitStatus Status => _status;
-    [SerializeField] UnitData _unitData;
     
     private bool _isCollected = true;
     public bool IsCollected => _isCollected;
@@ -127,10 +125,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     #region Data Input
 
-    public void InputData(CharacterSO data)
-    {
-        _charData = data;
-    }    
+    // 데이터 입력 관련 메소드
 
     #endregion
 }
