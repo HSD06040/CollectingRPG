@@ -1,4 +1,5 @@
 using GoogleMobileAds.Api;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,9 +40,8 @@ public class GoogleAdMob : MonoBehaviour
             }
 
             Debug.Log("광고 로드 성공");
+           
             LoadedAd = ad;
-
-            // 광고 로드해서 메모리를 차지하고 있는 상황이니 정리 필요 => Destroy
 
             LoadedAd.OnAdFullScreenContentClosed += () =>
             {
@@ -66,6 +66,8 @@ public class GoogleAdMob : MonoBehaviour
         if(IsReady)
         {
             LoadedAd.Show();
+            // 광고 시청 보상: Diamond 20 증가
+            await Manager.DB.AddDiamondAsync(20);
         }
         else
         {

@@ -211,4 +211,54 @@ public class DBManager : Singleton<DBManager>
             return false;
         }
     }
+
+    /// <summary>
+    /// 유저의 현재 Gold 값을 읽어와 지정한 값만큼 증가시킨 뒤 저장하는 메서드
+    /// </summary>
+    /// <param name="addAmount">증가시킬 Gold 양</param>
+    /// <returns></returns>
+    public async Task AddGoldAsync(int addAmount)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        var goldRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Gold");
+
+        DataSnapshot snapshot = await goldRef.GetValueAsync();
+        
+        int current = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            current = Convert.ToInt32(snapshot.Value);
+        }
+        
+        int next = current + addAmount;
+
+        await goldRef.SetValueAsync(next);
+        Debug.Log($"증가한 Gold: {addAmount} -> {next}");
+    }
+
+    /// <summary>
+    /// 유저의 현재 Diamond 값을 읽어와 지정한 값만큼 증가시킨 뒤 저장하는 메서드
+    /// </summary>
+    /// <param name="addAmount">증가시킬 Diamond 양</param>
+    /// <returns></returns>
+    public async Task AddDiamondAsync(int addAmount)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        var goldRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Diamond");
+
+        DataSnapshot snapshot = await goldRef.GetValueAsync();
+
+        int current = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            current = Convert.ToInt32(snapshot.Value);
+        }
+
+        int next = current + addAmount;
+
+        await goldRef.SetValueAsync(next);
+        Debug.Log($"증가한 Diamond: {addAmount} -> {next}");
+    }
 }

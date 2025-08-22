@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,7 @@ public class LobbyPopupManager : MonoBehaviour
     [Header("Ad")]
     [SerializeField] private Button _adButton;
 
+
     private void Start()
     {
         _playerProfileButton.onClick.AddListener(() =>
@@ -25,8 +27,8 @@ public class LobbyPopupManager : MonoBehaviour
         _adButton.onClick.AddListener(() =>
         {
             Manager.Popup.ShowConfirmationPopup(
-                "Watch Ad", 
-                () => _googleAdMob.ShowAd(), 
+                "Watch Ad",
+                () => _googleAdMob.ShowAd(),
                 () => gameObject.SetActive(false));
         });
     }
