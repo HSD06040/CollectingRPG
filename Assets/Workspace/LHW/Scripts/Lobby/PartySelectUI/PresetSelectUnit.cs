@@ -106,7 +106,7 @@ public class PresetSelectUnit : MonoBehaviour
 
     public void ActiveHighlight()
     {
-        if (_index == _controller.CurrentSelectedPresetIndex)
+        if (_index == TempDataManager.Instance.SelectedPresetIndex)
         {
             _highlightPanel.SetActive(true);
         }

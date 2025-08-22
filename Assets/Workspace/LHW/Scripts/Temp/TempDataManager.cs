@@ -7,6 +7,9 @@ public class TempDataManager : MonoBehaviour
 
     #region Data
 
+    private int _selectedPresetIndex = -1;
+    public int SelectedPresetIndex => _selectedPresetIndex;
+
     private List<TeamPresetData> _presetData = new List<TeamPresetData>();
     public List<TeamPresetData> PresetData => _presetData;
 
@@ -44,5 +47,17 @@ public class TempDataManager : MonoBehaviour
     public void CreatePreset(int size)
     {
         _presetData.Add(new TeamPresetData(size));
+    }
+
+    public TeamPresetData ReadCurrentSelectedPreset()
+    {
+        if (_selectedPresetIndex == -1) return null;
+
+        return _presetData[_selectedPresetIndex];
+    }
+
+    public void SelectPresetIndex(int index)
+    {
+        _selectedPresetIndex = index;
     }
 }
