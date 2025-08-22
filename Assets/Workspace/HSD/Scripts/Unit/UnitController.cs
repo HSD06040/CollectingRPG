@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class UnitController : MonoBehaviour
 {
-    [SerializeField] SynergyController _synergyController;
+    public SynergyController SynergyController;
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UI_UnitSlotController _uiSlotController;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
@@ -16,14 +16,14 @@ public class UnitController : MonoBehaviour
     private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
     private int _currentUnitCount = 0;
 
-    private void Awake()
+    public void Init()
     {
         int rows = _unitSlotManager.SlotCreater.Size.y;
         int cols = _unitSlotManager.SlotCreater.Size.x;
         _unitGrid = new UnitBase[rows, cols];
 
         _unitSlotManager.Init();
-        _unitDragDropSystem.OnUnitDropped += AddUnit;
+        _unitDragDropSystem.OnUnitDropped += AddUnit;        
     }
 
     public void UnitStanby()
@@ -166,7 +166,7 @@ public class UnitController : MonoBehaviour
         Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
         ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
 
-        _synergyController.RemoveSynergy(synergy, classSynergy);
+        SynergyController.RemoveSynergy(synergy, classSynergy);
 
         if (_synergyUnitDic.TryGetValue(synergy, out var synergyList))
             synergyList.Remove(unit);
@@ -204,7 +204,7 @@ public class UnitController : MonoBehaviour
         Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
         ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
 
-        _synergyController.AddSynergy(synergy, classSynergy);
+        SynergyController.AddSynergy(synergy, classSynergy);
 
         if (!_synergyUnitDic.TryGetValue(synergy, out var synergyList))
         {

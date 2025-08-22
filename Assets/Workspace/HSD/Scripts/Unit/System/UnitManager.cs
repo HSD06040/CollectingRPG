@@ -1,17 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [Header("UI")]
     [SerializeField] UnitUIManager _unitUIManager;
+    [SerializeField] UnitStanbyUIManager _unitStanbyUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
+
+    [Header("Unit_Controller")]
     [SerializeField] UnitController _unitController;
     [SerializeField] EnemyController _enemyController;
 
+    [Header("Data")]
     [SerializeField] UnitData[] _testDatas;
     [SerializeField] int _upgradeNeedCount = 3;
+
+    private void Awake()
+    {
+        _unitController.SynergyController.Init();
+        _unitController.Init();
+
+        Subscribe();
+
+        _unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
+    }
+
+    private void OnDestroy()
+    {
+        UnSubscrube();
+    }
+
+    private void Subscribe()
+    {
+        _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+    }
+
+    private void UnSubscrube()
+    {
+        _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+    }
 
     public void Fight()
     {
@@ -96,7 +123,7 @@ public class UnitManager : MonoBehaviour
             unitBase.Status = newUnit;
             unitBase.Init();
 
-            _unitController.AddUnit(unitBase, pos);            
+            _unitController.AddUnit(unitBase, pos);
         }
         else
         {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -191,5 +192,24 @@ public static class Utils
             return $"{(value / 1_000f).ToString("0.#")}k";
 
         return value.ToString();
+    }
+
+    private static StringBuilder sb = new StringBuilder();
+
+    public static void AppendString(string str)
+    {
+        sb.Append(str);
+    }
+
+    public static void AppendLine(string str)
+    {
+        sb.AppendLine(str);
+    }
+
+    public static string GetString()
+    {
+        string result = sb.ToString();
+        sb.Clear();
+        return result;
     }
 }

@@ -35,7 +35,7 @@ public class BattleManager : MonoBehaviour
         UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
         UnitBase newUnit = Instantiate(unit, slot.transform);
 
-        SetSlot(newSlot, newUnit);               
+        SetSlot(newSlot, newUnit);
     }
 
     public void RemoveUnit(UnitSlot slot, UnitBase unit)
