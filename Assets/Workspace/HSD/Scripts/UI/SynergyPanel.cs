@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using UnityEngine;
 
@@ -9,10 +10,22 @@ public class SynergyPanel : MonoBehaviour
     [SerializeField] Transform _content;
 
     private Dictionary<string, SynergySlot> _synergySlots = new(50);
+    private int _currentPage;
+    private int _maxPage;
 
     public void Init(SynergyDatabase db)
     {
-        CreateSynergtSlots(db);
+        CreateSynergtSlots(db); 
+        SetActivate();
+        _maxPage = _content.childCount / 6;
+    }
+
+    public void NextPage()
+    {
+        _currentPage++;
+        if (_currentPage * 6 >= _content.childCount)
+            _currentPage = 0;
+        SetActivate();
     }
 
     private void CreateSynergtSlots(SynergyDatabase db)
@@ -32,5 +45,37 @@ public class SynergyPanel : MonoBehaviour
     public void UpdateSynergySlot(string synergy, int activeCount)
     {
         _synergySlots[synergy].UpdateUI(activeCount);
+        SetHiararchy();
+    }
+    
+
+    private void SetHiararchy()
+    {
+        List<SynergySlot> slots = new List<SynergySlot>(_synergySlots.Values);
+
+        slots.RemoveAll(s => s.ActiveCount <= 0);
+
+        slots.Sort((a, b) => b.ActiveCount.CompareTo(a.ActiveCount));
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            slots[i].transform.SetSiblingIndex(i);
+        }
+
+        SetActivate();
+    }
+
+    private void SetActivate()
+    {
+        int start = 0 + 6 * _currentPage;
+        int end = start + 6;
+
+        for (int i = 0; i < _content.childCount; i++)
+        {
+            if(i >= start && i < end)
+                _content.GetChild(i).gameObject.SetActive(true);
+            else
+                _content.GetChild(i).gameObject.SetActive(false);
+        }
     }
 }
