@@ -26,7 +26,8 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private CollectedCharacterData _collectedCharacterData;
     
     [Header("Data")]
-    [SerializeField] private List<TeamPresetData> _presetData = new List<TeamPresetData>();
+    // TempDataManager 반영 이전
+    //[SerializeField] private List<TeamPresetData> _presetData = new List<TeamPresetData>();
 
     private UnitStatus _selectedUnit;
     private UnitStatus[] _currentPreset;
@@ -51,6 +52,8 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void Awake()
     {
+        // TempDataManager 반영 이전
+        /*
         if(_presetData.Count == 0)
         {
             for(int i = 0; i < 2; i++)
@@ -59,6 +62,9 @@ public class TeamOrganizeManager : MonoBehaviour
             }
         }
         _currentPreset = _presetData[0].Statuses;
+        */
+
+        _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
     }
 
     private void Start()
@@ -289,8 +295,10 @@ public class TeamOrganizeManager : MonoBehaviour
             return;
         }
 
-        // 해당 프리셋이 생성되지 않은 프리셋일 시 확장 가능한지 확인하고, 확장을 진행
-        if (_presetData.Count < index + 1)
+        // 해당 프리셋이 생성되지 않은 프리셋일 시 확장 가능한지 확인하고, 확장을 진행      
+        // TempDataManager 반영 이전
+        //if (_presetData.Count < index + 1)
+        if(TempDataManager.Instance.PresetData.Count < index + 1)
         {
             if (PopupManager.Instance != null)
             {
@@ -308,7 +316,11 @@ public class TeamOrganizeManager : MonoBehaviour
         // TODO : 금액이 부족할 시에 조건 추가
 
         Debug.Log("Used 500 Gold");
-        _presetData.Add(new TeamPresetData(5));
+        
+        // TempDataManager 반영 이전
+        //_presetData.Add(new TeamPresetData(5));
+        TempDataManager.Instance.CreatePreset(5);
+
         // 이 부분은 UI 디자인 변경 시 변경 필요
         _presetAddButton[index - 2].buttonText = $"{(index + 1)}";
         _presetAddButton[index - 2].UpdateUI();
@@ -318,7 +330,10 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void LoadPreset(int index)
     {
-        _currentPreset = _presetData[index].Statuses;
+        // TempDataManager 반영 이전
+        //_currentPreset = _presetData[index].Statuses;
+        _currentPreset = TempDataManager.Instance.PresetData[index].Statuses;
+           
         _currentCost = 0;
         _currentOverallPower = 0;
         for (int i = 0; i < _currentPreset.Length; i++)

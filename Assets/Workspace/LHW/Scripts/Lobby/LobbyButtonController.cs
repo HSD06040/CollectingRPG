@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class LobbyButtonController : MonoBehaviour
 {
+    [Header("Buttons")]
     [SerializeField] private Button _shopButton;
     [SerializeField] private Button _upgradeButton;
     [SerializeField] private Button _stageButton;
@@ -10,7 +11,9 @@ public class LobbyButtonController : MonoBehaviour
     [SerializeField] private Button _gachaButton;
     [SerializeField] private Button _gameStartButton;
     [SerializeField] private Button[] _stageSelectButtons;
+    [SerializeField] private Button _rearrangeButton;
 
+    [Header("Panels")]
     [SerializeField] private GameObject _shopPanel;
     [SerializeField] private GameObject _upgradePanel;
     [SerializeField] private GameObject _stagePanel;
@@ -31,6 +34,7 @@ public class LobbyButtonController : MonoBehaviour
         {
             _stageSelectButtons[i].onClick.AddListener(PartySelectOpen);
         }
+        _rearrangeButton.onClick.AddListener(CharacterCompositionOpen);
 
         StageOpen();
     }
