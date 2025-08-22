@@ -12,7 +12,7 @@ using UnityEngine.UI;
 /// - 일반 메시지 팝업 , 확인/취소 팝업 , 비밀번호 변경 팝업등을 현재 구현하였으며
 /// - Firebase Auth 와 연동 할 예정입니다.
 /// </summary>
-public class PopupManager : MonoBehaviour
+public class PopupManager : Singleton<PopupManager>
 {
     [Header("오류 메세지 확인 팝업")] [SerializeField]
     private GameObject mainPopupPanel;

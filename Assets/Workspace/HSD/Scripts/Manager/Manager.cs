@@ -11,6 +11,7 @@ public static class Manager
     public static FirebaseManager Firebase => FirebaseManager.Instance;
     public static AuthManager Auth => AuthManager.Instance;
     public static DBManager DB => DBManager.Instance;
+    public static PopupManager Popup => PopupManager.Instance;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Init()
@@ -21,5 +22,6 @@ public static class Manager
         FirebaseManager.CreateInstance();
         AuthManager.CreateInstance();
         DBManager.CreateInstance();
+        PopupManager.CreateInstance();
     }
 }
