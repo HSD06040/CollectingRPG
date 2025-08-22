@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// ÇöÀç Á¤»óÀÛµ¿ÇÏÁö ¾Ê¾Æ Å×½ºÆ®Áß
+// í˜„ì¬ ì •ìƒì‘ë™í•˜ì§€ ì•Šì•„ í…ŒìŠ¤íŠ¸ì¤‘
 public class CharacterDataListInput : MonoBehaviour
 {
     [Header("Reference")]
@@ -10,6 +10,7 @@ public class CharacterDataListInput : MonoBehaviour
 
     private void Awake()
     {
+        /*
         for(int i = 0; i < _characterGroups.Length; i++)
         {
             CharacterUnit[] data = _characterGroups[i].GetComponentsInChildren<CharacterUnit>();
@@ -18,5 +19,6 @@ public class CharacterDataListInput : MonoBehaviour
                 data[j].InputData(_characterSOs[(i * data.Length) + (j)]);
             }
         }
+        */
     }
 }
