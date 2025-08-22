@@ -1,22 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public abstract class UnitSkill : ScriptableObject
 {
-    public int NeedMana;
-    public DamageType DamageType;
-    public float BaseCoolTime;
-    private float coolDown;
+    public int ManaCost;    
 
-    public abstract void Active();
-
-    public bool CoolTimeCheckActive()
-    {
-        if (coolDown <= 0)
-            return true;
-
-        coolDown -= Time.deltaTime;
-        return coolDown <= 0;
-    }
+    public abstract void Active(IAttacker attacker);     
 }

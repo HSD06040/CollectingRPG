@@ -8,17 +8,21 @@ public class UnitManager : MonoBehaviour
     [SerializeField] UnitUIManager _unitUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
     [SerializeField] UnitController _unitController;
+    [SerializeField] EnemyController _enemyController;
+
     [SerializeField] UnitData[] _testDatas;
     [SerializeField] int _upgradeNeedCount = 3;
 
     public void Fight()
     {
         _unitController.UnitFight();
+        _enemyController.EnemyFight();
 
         _unitUIManager.Init();
 
         _unitUIManager.FightSlotController.Init(_unitController.GetUnits());
         _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
+        _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
 
     public void RandomSpawn()
@@ -102,7 +106,6 @@ public class UnitManager : MonoBehaviour
 
     private int GetUnitCount(UnitStatus unit)
     {
-        Debug.Log($"SlotCount : {_unitSlotController.GetUnitCount(unit)}, UnitCount : {_unitController.GetUnitCount(unit)}");
         return _unitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);
     }
 }

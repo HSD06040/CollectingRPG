@@ -167,8 +167,7 @@ public class SkillState : AnimationFinishedState
 
     public override void Enter()
     {
-        base.Enter();
-        
+        base.Enter();        
     }
 
     public override void Exit()
@@ -178,7 +177,7 @@ public class SkillState : AnimationFinishedState
 
     public override void Update()
     {
-        base.Update();
+        base.Update();        
     }
 }
 
