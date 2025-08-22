@@ -82,14 +82,16 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         if (Status.Data.Skill == null) return false;
 
-        if (StatusController.CurMana.Value >= Status.Data.Skill.NeedMana)
+        if (StatusController.CurMana.Value >= Status.Data.Skill.ManaCost)
         {
-            StatusController.CurMana.Value -= Status.Data.Skill.NeedMana;
+            StatusController.CurMana.Value -= Status.Data.Skill.ManaCost;
             return true;
         }
         else
             return false;
     }
+
+    public void UseSkill() => Status.Data.Skill.Active(this);
 
     public void FindTarget()
     {
@@ -187,12 +189,16 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return StatusController;
     }
+    public Vector2 GetTargetDir()
+    {
+        return TargetDir;
+    }
     #endregion
 
     #region Gizmos
 #if UNITY_EDITOR
     private void OnDrawGizmos()
-    {
+    {        
         if (Status == null) return;
 
         // 찾는 거리
@@ -203,6 +209,8 @@ public class UnitBase : MonoBehaviour, IAttacker
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
 
+        if (Status.Data == null) return;
+
         if (Status.Data.AttackData == null) return;
         // 공격 범위
         Gizmos.color = Color.red;
@@ -212,7 +220,7 @@ public class UnitBase : MonoBehaviour, IAttacker
             if (MeleeAttackData.SearchType == SearchType.Circle)
             {
                 Vector2 offset = Status.Data.AttackData.AttackPointOffset;
-                offset.x *= transform.GetFacingDir();
+                offset *= TargetDir;
 
                 Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);
             }
@@ -223,6 +231,11 @@ public class UnitBase : MonoBehaviour, IAttacker
             offset.x *= transform.GetFacingDir();
 
             Gizmos.DrawWireSphere(center + offset, .1f);
+        }
+
+        if(Status.Data.Skill != null && Status.Data.Skill is AttackSkill attackSkill)
+        {
+            attackSkill.DrawGizmos(this);
         }
     }
 #endif
