@@ -7,6 +7,7 @@ public class UnitController : MonoBehaviour
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UI_UnitSlotController _uiSlotController;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
+    [SerializeField] BattleManager _battleManager;
     public static readonly int UnitMaxCount = 10;
 
     private UnitBase[,] _unitGrid;
@@ -69,7 +70,8 @@ public class UnitController : MonoBehaviour
             }
             else
             {
-                SetSlot(_unitSlotManager.GetUnitSlot(unit), unit);                
+                SetSlot(_unitSlotManager.GetUnitSlot(unit), unit);
+                _battleManager.AddUnit(_unitSlotManager.GetUnitSlot(unit), unit);
             }
             return;
         }
@@ -83,12 +85,15 @@ public class UnitController : MonoBehaviour
 
                 RemoveUnit(slot, destroyGameObject: false); // 유닛 데이터만 제거 (Destroy 안 함)
                 Destroy(slotUnit.gameObject); // UI로 복제했으니 인게임 오브젝트 제거
+                _battleManager.RemoveUnit(slot, slotUnit);
             }
 
             SetSlot(slot, unit);
             AddSynergyUnit(unit);
             AddList(unit);
             _currentUnitCount++;
+
+            _battleManager.AddUnit(slot, unit);
         }
         else
         {
@@ -98,15 +103,23 @@ public class UnitController : MonoBehaviour
             if (slotUnit != null)
             {
                 ClearSlot(unitSlot, unit);
-                ClearSlot(slot, slotUnit);                
+                ClearSlot(slot, slotUnit);
+
+                _battleManager.RemoveUnit(unitSlot, unit);
+                _battleManager.RemoveUnit(slot, slotUnit);
 
                 SetSlot(slot, unit);
-                SetSlot(unitSlot, slotUnit);             
+                SetSlot(unitSlot, slotUnit);
+                
+                _battleManager.AddUnit(slot, unit);
+                _battleManager.AddUnit(unitSlot, slotUnit);
             }
             else
             {
                 ClearSlot(unitSlot, unit);
-                SetSlot(slot, unit);                
+
+                _battleManager.MoveUnit(unitSlot, slot, unit);
+                SetSlot(slot, unit);
             }
         }
     }
@@ -166,7 +179,10 @@ public class UnitController : MonoBehaviour
         ClearSlot(slot, unit);
 
         if (destroyGameObject)
+        {
             Destroy(unit.gameObject);
+            _battleManager.RemoveUnit(slot, unit);
+        }
         
         _currentUnitCount--;
     }
@@ -205,12 +221,11 @@ public class UnitController : MonoBehaviour
 
         classList.Add(unit);
     }
-
-    public void SetSlot(UnitSlot slot, UnitBase unit)
+    private void SetSlot(UnitSlot slot, UnitBase unit)
     {
         slot.SetUnit(unit);
 
-        _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = unit;
+        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = unit;
     }
 
     private void ClearSlot(UnitSlot slot, UnitBase unit)
