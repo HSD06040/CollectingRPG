@@ -4,11 +4,15 @@ using UnityEngine.UI;
 public class LobbyPopupManager : MonoBehaviour
 {
     [SerializeField] private PlayerDataController _playerDataController;
+    [SerializeField] private GoogleAdMob _googleAdMob;
     
     [Header("PlayerProfile")]
     [SerializeField] private GameObject _playerProfilePopup;
     [SerializeField] private PlayerProfilePopup _profilePopup;
     [SerializeField] private Button _playerProfileButton;
+
+    [Header("Ad")]
+    [SerializeField] private Button _adButton;
 
     private void Start()
     {
@@ -16,6 +20,14 @@ public class LobbyPopupManager : MonoBehaviour
         {
             Debug.Log("프로필 버튼 클릭");
             ShowPopup();
+        });
+
+        _adButton.onClick.AddListener(() =>
+        {
+            Manager.Popup.ShowConfirmationPopup(
+                "Watch Ad", 
+                () => _googleAdMob.ShowAd(), 
+                () => gameObject.SetActive(false));
         });
     }
 
