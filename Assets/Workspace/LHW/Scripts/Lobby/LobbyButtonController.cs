@@ -12,6 +12,7 @@ public class LobbyButtonController : MonoBehaviour
     [SerializeField] private Button _gameStartButton;
     [SerializeField] private Button[] _stageSelectButtons;
     [SerializeField] private Button _rearrangeButton;
+    [SerializeField] private Button[] _disabledPartyButtons;
 
     [Header("Panels")]
     [SerializeField] private GameObject _shopPanel;
@@ -35,6 +36,10 @@ public class LobbyButtonController : MonoBehaviour
             _stageSelectButtons[i].onClick.AddListener(PartySelectOpen);
         }
         _rearrangeButton.onClick.AddListener(CharacterCompositionOpen);
+        for(int i = 0; i < _disabledPartyButtons.Length; i++)
+        {
+            _disabledPartyButtons[i].onClick.AddListener(CharacterCompositionOpen);
+        }
 
         StageOpen();
     }

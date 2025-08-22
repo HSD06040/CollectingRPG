@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,14 +24,29 @@ public class PresetSelectUnit : MonoBehaviour
     [SerializeField] private TMP_Text _synergy1Text;
     [SerializeField] private TMP_Text _synergy2Text;
 
+    private PartySelectPanelController _controller;
+
+    private void Awake()
+    {
+        _controller = GetComponentInParent<PartySelectPanelController>();
+        _activePartyButton.GetComponent<Button>().onClick.AddListener(SelectPreset);
+        _lockedPartyButton.GetComponent<Button>().onClick.AddListener(UnlockPreset);
+    }
 
     private void OnEnable()
     {
         Init();
+        _controller.OnSelectedIndexChanged += ActiveHighlight;
+    }
+
+    private void OnDisable()
+    {
+        _controller.OnSelectedIndexChanged -= ActiveHighlight;
     }
 
     private void Init()
     {
+        _controller.SetSelectedPresetIndex(-1);
         // 프리셋이 활성화가 안 되어 있으면 잠겨 있다고 표시하는 UI 출력
         if(TempDataManager.Instance.PresetData.Count < _index + 1)
         {
@@ -51,6 +67,8 @@ public class PresetSelectUnit : MonoBehaviour
         SetactiveGameobject("ActivePartyButton");
         UpdateUI();
     }
+
+    #region UI Update
 
     private void UpdateUI()
     {
@@ -86,8 +104,46 @@ public class PresetSelectUnit : MonoBehaviour
         _lockedPartyButton.SetActive(activeObject.Equals(_lockedPartyButton.name));
     }
 
-    public void ActiveHighlight(bool highlighted)
+    public void ActiveHighlight()
     {
-        _highlightPanel.SetActive(highlighted);
+        if (_index == _controller.CurrentSelectedPresetIndex)
+        {
+            _highlightPanel.SetActive(true);
+        }
+        else
+        {
+            _highlightPanel.SetActive(false);
+        }
     }
+
+    #endregion
+
+    #region Button Event
+
+    private void SelectPreset()
+    {
+        _controller.SetSelectedPresetIndex(_index);        
+    }
+
+    private void UnlockPreset()
+    {
+        if (TempDataManager.Instance.PresetData.Count < _index + 1)
+        {
+            if (PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowConfirmationPopup("Add Preset?\nConsumes 500 Gold.", () => CreatePreset(), null);
+            }
+        }
+    }
+
+    private void CreatePreset()
+    {
+        // TODO : 금액이 부족할 시에 조건 추가
+
+        Debug.Log("Used 500 Gold");
+        TempDataManager.Instance.CreatePreset(5);
+        SetactiveGameobject("DisabledPartyButton");
+    }
+
+    #endregion
 }

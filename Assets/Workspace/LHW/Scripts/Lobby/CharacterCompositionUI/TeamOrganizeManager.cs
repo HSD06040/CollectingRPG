@@ -2,6 +2,7 @@ using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using TMPro;
 using UnityEngine;
 
@@ -84,6 +85,8 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged += ShowTotalOverallPowerInfo;
         OnCharacterDataChanged += ShowLeaderEffectInfo;
         OnCharacterDataChanged += ShowCharacterCountInfo;
+        OnCharacterDataChanged += ShowButtonPreset;
+        ShowButtonPreset();
     }
 
     private void OnDisable()
@@ -92,6 +95,7 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged -= ShowTotalOverallPowerInfo;
         OnCharacterDataChanged -= ShowLeaderEffectInfo;
         OnCharacterDataChanged -= ShowCharacterCountInfo;
+        OnCharacterDataChanged -= ShowButtonPreset;
     }
 
     #endregion
@@ -276,6 +280,15 @@ public class TeamOrganizeManager : MonoBehaviour
     private void ShowCharacterCountInfo()
     {
         _characterCountText.text = $"Character {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
+    }
+
+    private void ShowButtonPreset()
+    {
+        for(int i = 0; i < TempDataManager.Instance.PresetData.Count - 2; i++)
+        {
+            _presetAddButton[i].buttonText = $"{(i + 3)}";
+            _presetAddButton[i].UpdateUI();
+        }
     }
 
     #endregion
