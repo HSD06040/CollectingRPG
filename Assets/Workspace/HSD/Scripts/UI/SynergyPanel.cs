@@ -20,11 +20,15 @@ public class SynergyPanel : MonoBehaviour
         _maxPage = _content.childCount / 6;
     }
 
-    public void NextPage()
+    public void PageChange(int num)
     {
-        _currentPage++;
-        if (_currentPage * 6 >= _content.childCount)
-            _currentPage = 0;
+        num = Mathf.Clamp(num, -1, 1);
+
+        if (_currentPage + num > _maxPage || _currentPage + num < 0)
+            return;
+
+        _currentPage += num;
+
         SetActivate();
     }
 

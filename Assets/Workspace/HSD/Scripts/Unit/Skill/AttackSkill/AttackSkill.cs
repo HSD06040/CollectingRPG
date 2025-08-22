@@ -198,6 +198,7 @@ public abstract class AttackSkill : UnitSkill
         return searchTargets.ToArray();
     }
 
+#if UNITY_EDITOR
     public void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기
     {
         Transform transform = attacker.GetTransform();
@@ -209,4 +210,5 @@ public abstract class AttackSkill : UnitSkill
         // DrawSolidArc 함수를 이용하여 시야 범위를 나타내는 부채꼴 그리기
         Handles.DrawSolidArc(transform.position, Vector3.back, startDirection, Fov, SizeOrRadius);
     }
+#endif
 }
