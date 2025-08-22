@@ -33,7 +33,7 @@ public class AuthManager : Singleton<AuthManager>
     public async Task SetGuestNicknameAsync(FirebaseUser currentUser)
     {
         UserProfile profile = new UserProfile();
-        profile.DisplayName = $"게스트{Random.Range(1000, 10000)}";
+        profile.DisplayName = $"Guest{Random.Range(1000, 10000)}";
 
         await currentUser.UpdateUserProfileAsync(profile);
         await currentUser.ReloadAsync();
