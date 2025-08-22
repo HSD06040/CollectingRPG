@@ -86,7 +86,6 @@ public class DBManager : Singleton<DBManager>
 
         if (snapshot.Exists)
         {
-            Debug.Log($"닉네임 로드 성공 : {nickname}");
             callback(nickname);
         }
         else
@@ -94,6 +93,33 @@ public class DBManager : Singleton<DBManager>
             Debug.LogWarning("닉네임 데이터 없음");
             callback(null);
         }
+    }
+
+    /// <summary>
+    /// Firebase DB UserData에서 LoabbyScene에 표시되어야 할 모든 데이터를 불러오는 메서드
+    /// </summary>
+    public async Task<PlayerData> LoadLobbyDataAsync()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(uid);
+
+        DataSnapshot snapshot = await userRef.GetValueAsync();
+        string nickname = snapshot.Value.ToString();
+
+        if (!snapshot.Exists)
+        {
+            Debug.LogWarning("데이터 없음");
+        }
+
+        PlayerData data = new PlayerData
+        {
+            PlayerUid = uid,
+            PlayerName = snapshot.Child("Nickname").Value?.ToString() ?? "LoadFailed",
+            Gold = int.TryParse(snapshot.Child("Gold").Value?.ToString(), out int gold) ? gold : 0,
+            Diamond = int.TryParse(snapshot.Child("Diamond").Value?.ToString(), out int diamond) ? diamond : 0
+        };
+
+        return data;
     }
 
     /// <summary>
@@ -107,7 +133,7 @@ public class DBManager : Singleton<DBManager>
     {
         FirebaseAuth auth = FirebaseManager.Auth;
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
-        DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("isTutorialComplete");
+        DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("IsTutorialComplete");
 
         // 튜토리얼 진행 여부 확인
         DataSnapshot snapshot = await userRef.GetValueAsync();
@@ -121,13 +147,13 @@ public class DBManager : Singleton<DBManager>
         // 튜토리얼 진행
         if (snapshot.Value is bool isTutorialComplete)
         {
-            Debug.Log("isTutorialComplete: true / 튜토리얼 진행 계정");
+            Debug.Log("IsTutorialComplete: true / 튜토리얼 진행 계정");
             // 로비 씬으로 전환
             return true;
         }
         else
         {
-            Debug.Log("isTutorialComplete: false / 튜토리얼 미진행 계정");
+            Debug.Log("IsTutorialComplete: false / 튜토리얼 미진행 계정");
             // 튜토리얼 패널 활성화
             return false;
         }
@@ -135,25 +161,54 @@ public class DBManager : Singleton<DBManager>
 
     /// <summary>
     /// 튜토리얼 진행 후 튜토리얼 진행 여부 변수를 true 로 설정하는 메서드
-    /// isTutorialComplete = false
+    /// IsTutorialComplete = false
     /// </summary>
     public async Task SetTutorialInCompleteAsync()
     {
         string userUid = FirebaseManager.Auth.CurrentUser.UserId;
-        DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(userUid).Child("isTutorialComplete");
+        DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(userUid).Child("IsTutorialComplete");
 
         await userRef.SetValueAsync(false);
     }
 
     /// <summary>
     /// 계정의 생성 후 튜토리얼 진행 여부 변수를 false 로 설정하는 메서드
-    /// isTutorialComplete = false
+    /// IsTutorialComplete = false
     /// </summary>
     public async Task SetTutorialCompleteAsync()
     {
         string userUid = FirebaseManager.Auth.CurrentUser.UserId;
-        DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(userUid).Child("isTutorialComplete");
+        DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(userUid).Child("IsTutorialComplete");
 
         await userRef.SetValueAsync(true);
+    }
+
+    /// <summary>
+    /// 유저의 Gold와 Diamond 값을 동시에 저장하는 메서드
+    /// </summary>
+    /// <param name="gold">저장할 골드 값</param>
+    /// <param name="diamond">저장할 다이아 값</param>
+    public async Task<bool> SaveCurrencyAsync(int gold, int diamond)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+
+        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+
+        dictionary[$"UserData/{uid}/Gold"] = gold;
+        dictionary[$"UserData/{uid}/Diamond"] = diamond;
+
+        var task = FirebaseManager.DataReference.UpdateChildrenAsync(dictionary);
+        await task;
+
+        if (task.IsCompletedSuccessfully)
+        {
+            Debug.Log($"골드/다이아 저장 성공: Gold = {gold}, Diamond = {diamond}");
+            return true;
+        }
+        else
+        {
+            Debug.LogError("골드/다이아 저장 실패");
+            return false;
+        }
     }
 }
