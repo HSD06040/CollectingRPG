@@ -248,7 +248,7 @@ public class TeamOrganizeManager : MonoBehaviour
         // 최적 편성 적용
         for (int i = 0; i < bestTeam.Count; i++)
         {
-            _currentPreset[i] = bestTeam[i];
+            _currentPreset[i] = new UnitStatus(bestTeam[i].Data, bestTeam[i].Level);
             _currentCost += bestTeam[i].Data.Cost;
         }
         _currentOverallPower = bestPower;
