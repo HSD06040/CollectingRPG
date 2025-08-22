@@ -1,7 +1,7 @@
 
-public enum ClassSynergy
+public enum ClassType
 {
-    S, B, C, D
+    Tank, Melee, Ranged, Support
 }
 
 public enum Synergy
@@ -26,6 +26,19 @@ public enum SearchType
 public enum Grade
 {
     Normal, Rare, Unique, Legendary
+}
+
+public enum Priority
+{
+    None,
+    Close,
+    Far,
+    LowHp,
+    HightHp,
+    Tank,
+    Melee,
+    Ranged,
+    Support
 }
 
 public enum StatType

@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public struct UnitPlan
 {
-    public ClassSynergy Class;
+    public ClassType Class;
     public int[] PlanLines;
 }
 

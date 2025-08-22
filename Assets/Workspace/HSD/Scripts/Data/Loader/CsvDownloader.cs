@@ -15,7 +15,7 @@ public class CsvDownloader : MonoBehaviour
     /// </summary>
     public async UniTask DownloadDataAsync()
     {        
-        List<UniTask> task = new List<UniTask>
+        UniTask[] task =
         {
             LoadCSV(URL, SetupTest, 4),         
         };

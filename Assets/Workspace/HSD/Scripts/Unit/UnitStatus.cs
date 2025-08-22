@@ -8,7 +8,7 @@ public class UnitStatus
 {
     public UnitData Data;
     public string Address => $"{Data.Name}_{Level}";
-    public int Level;    
+    public int Level;
 
     public int CombatPower
     {
