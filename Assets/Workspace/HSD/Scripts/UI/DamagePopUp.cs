@@ -39,7 +39,7 @@ public class DamagePopUp : MonoBehaviour
 
             transform.position = Vector2.Lerp(_startPos, _endPos, elapsedTime / _startTime);
 
-            await UniTask.Yield(PlayerLoopTiming.Update);
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
 
         elapsedTime = 0f;
@@ -49,18 +49,19 @@ public class DamagePopUp : MonoBehaviour
         while (elapsedTime < _endTime)
         {
             elapsedTime += Time.deltaTime;
-            
+
             Color color = _damageText.color;
             color.a = Mathf.Lerp(1f, 0f, elapsedTime / _endTime);
             _damageText.color = color;
 
             transform.position = Vector2.Lerp(_startPos, _endPos, elapsedTime / _endTime);
 
-            await UniTask.Yield(PlayerLoopTiming.Update);
+            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
         }
 
         Destroy(gameObject);
     }
+
 
     private Vector2 GetRandomStartPos()
     {
