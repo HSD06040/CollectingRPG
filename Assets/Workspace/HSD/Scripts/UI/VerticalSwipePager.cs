@@ -116,6 +116,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
             panel.offsetMin = new Vector2(0, i * panel.rect.height);
         }
     }
+
     public void SetUIToWorldRatio(float ratio)
     {
         _uiToWorldRatio = ratio;

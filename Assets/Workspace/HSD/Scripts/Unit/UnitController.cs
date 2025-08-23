@@ -15,6 +15,20 @@ public class UnitController : MonoBehaviour
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
     private int _currentUnitCount = 0;
+    public int CurrentUnitCount
+    {
+        get => _currentUnitCount;
+        private set
+        {
+            if(_currentUnitCount != value)
+                _currentUnitCount = value;
+
+            OnUnitCountChanged?.Invoke(_currentUnitCount);
+        }
+    }
+
+    public event System.Action<int> OnUnitCountChanged;
+    public event System.Action<int> OnUnitPowerChanged;
 
     public void Init()
     {
@@ -27,8 +41,8 @@ public class UnitController : MonoBehaviour
     }
 
     public void UnitStanby()
-    {
-        foreach (var unit in _unitGrid)
+    {        
+        foreach (var unit in _battleManager.GetUnitGrid())
         {
             if (unit == null)
                 continue;
@@ -42,7 +56,7 @@ public class UnitController : MonoBehaviour
 
     public void UnitFight()
     {
-        foreach (var unit in _unitGrid)
+        foreach (var unit in _battleManager.GetUnitGrid())
         {
             if (unit == null)
                 continue;
@@ -91,7 +105,8 @@ public class UnitController : MonoBehaviour
             SetSlot(slot, unit);
             AddSynergyUnit(unit);
             AddList(unit);
-            _currentUnitCount++;
+            CurrentUnitCount++;
+            OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
 
             _battleManager.AddUnit(slot, unit);
         }
@@ -183,8 +198,9 @@ public class UnitController : MonoBehaviour
             Destroy(unit.gameObject);
             _battleManager.RemoveUnit(slot, unit);
         }
-        
-        _currentUnitCount--;
+
+        CurrentUnitCount--;
+        OnUnitPowerChanged?.Invoke(-unit.Status.CombatPower);
     }
 
     public Vector2Int RemoveUnit(UnitStatus unit)

@@ -32,7 +32,7 @@ public class BattleManager : MonoBehaviour
     }
 
     public void AddUnit(UnitSlot slot, UnitBase unit)
-    {        
+    {
         UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
         UnitBase newUnit = Instantiate(unit, slot.transform);
 
@@ -51,9 +51,9 @@ public class BattleManager : MonoBehaviour
     {
         slot.ClearSlot();
 
-        _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = null;
+        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
 
-        if(isDestroy)
+        if (isDestroy)
             Destroy(unit.gameObject);
     }
 
@@ -62,5 +62,10 @@ public class BattleManager : MonoBehaviour
         slot.SetUnit(unit);
 
         _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = unit;
+    }
+
+    public UnitBase[,] GetUnitGrid()
+    {
+        return _unitGrid;
     }
 }

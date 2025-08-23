@@ -12,12 +12,12 @@ public class UnitUIManager : MonoBehaviour
     public DamageMeterController DamageMeterController;
     public HpMeterController HpMeterController;
 
-    public void Init()
+    public void BattleUIInit()
     {
         _stanbyUI.SetActive(false);
         _battleUI.SetActive(true);
         HpMeterController.gameObject.SetActive(true);
         FightSlotController.gameObject.SetActive(true);
         DamageMeterController.gameObject.SetActive(true);
-    }
+    }    
 }

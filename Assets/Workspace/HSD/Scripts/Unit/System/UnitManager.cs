@@ -19,10 +19,13 @@ public class UnitManager : MonoBehaviour
     {
         _unitController.SynergyController.Init();
         _unitController.Init();
+        _unitStanbyUIManager.Init();
 
         Subscribe();
 
         _unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
+        _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+        _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel.UpdateTotalPower;
     }
 
     private void OnDestroy()
@@ -45,7 +48,7 @@ public class UnitManager : MonoBehaviour
         _unitController.UnitFight();
         _enemyController.EnemyFight();
 
-        _unitUIManager.Init();
+        _unitUIManager.BattleUIInit();
 
         _unitUIManager.FightSlotController.Init(_unitController.GetUnits());
         _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());

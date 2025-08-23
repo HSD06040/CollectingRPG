@@ -1,14 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class UI_UnitSlotController : MonoBehaviour
 {
+    [Header("Dependencies")]
     [SerializeField] UnitDragDropSystem _dragDropSystem;
     [SerializeField] UnitController _unitController;
+
+    [Header("UI Elements")]
     [SerializeField] Transform _content;
     [SerializeField] GameObject _unitSlotPrefab;
-    [SerializeField] int _slotCount;
+    [SerializeField] GridLayoutGroup _gridLayoutGroup;
+    [SerializeField] int _slotCount;    
 
     private UI_UnitSlot[] _unitSlots;
     private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(128);
@@ -22,6 +27,13 @@ public class UI_UnitSlotController : MonoBehaviour
     private void CreateSlots()
     {
         _unitSlots = new UI_UnitSlot[_slotCount];
+
+        Vector2 offset = _gridLayoutGroup.spacing;
+
+        float width = (((RectTransform)_content.transform).rect.width - (offset.x * (_slotCount / 2) * 2)) / (_slotCount / 2);
+        float height = (((RectTransform)_content.transform).rect.height - (offset.y * (_slotCount / 5) * 2)) / (_slotCount / 5);
+
+        _gridLayoutGroup.cellSize = new Vector2(width, height);
 
         for (int i = 0; i < _slotCount; i++)
         {
