@@ -100,7 +100,7 @@ public class UnitController : MonoBehaviour
             UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(unit);
 
             // 스왑
-            if (slotUnit != null)
+            if (slotUnit != null && slotUnit != unit)
             {
                 ClearSlot(unitSlot, unit);
                 ClearSlot(slot, slotUnit);

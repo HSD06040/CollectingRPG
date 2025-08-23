@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class CameraPanel : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    [SerializeField] CameraController _cameraController;
+    [SerializeField] BattleCameraController _cameraController;
+    [SerializeField] BaseCameraController _baseCameraController;
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -14,10 +15,12 @@ public class CameraPanel : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
     {
         // eventData.delta를 카메라 컨트롤러에 전달
         _cameraController.CameraUpdate(eventData.delta);
+        _baseCameraController.OnDrag(-eventData.delta.y);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         _cameraController.EndDrag();
+        _baseCameraController.OnDragEnd();
     }
 }

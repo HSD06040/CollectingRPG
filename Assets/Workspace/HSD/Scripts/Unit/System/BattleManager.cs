@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -49,6 +50,7 @@ public class BattleManager : MonoBehaviour
     public void ClearSlot(UnitSlot slot, UnitBase unit, bool isDestroy = true)
     {
         slot.ClearSlot();
+
         _unitGrid[unit.CurrentSlot.y-1, unit.CurrentSlot.x-1] = null;
 
         if(isDestroy)

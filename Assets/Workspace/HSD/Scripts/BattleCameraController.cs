@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class BattleCameraController : MonoBehaviour
 {
+    [SerializeField] BaseCameraController _baseCameraController;
     [SerializeField] float _sensitivity = 2f;
     [SerializeField] float _xLimit = 10f;
     [SerializeField] float _smoothSpeed = 5f;
@@ -26,16 +27,20 @@ public class CameraController : MonoBehaviour
 
     public void StartDrag()
     {
+        if (!_baseCameraController.IsBattleMode()) return;
         _isDragging = true;
     }
 
     public void EndDrag()
     {
+        if (!_baseCameraController.IsBattleMode()) return;
         _isDragging = false;
     }
 
     public void CameraUpdate(Vector2 dragDelta)
     {
+        if (!_baseCameraController.IsBattleMode()) return;
+
         if (_isDragging)
         {
             UpdateTargetPosition(dragDelta);
@@ -46,7 +51,7 @@ public class CameraController : MonoBehaviour
     {
         Vector2 adjustedDelta = deltaPosition * _sensitivity * 0.01f;
 
-        Vector3 movement = new Vector3(-adjustedDelta.x, 0, 0); // 반대 방향
+        Vector3 movement = new Vector3(-adjustedDelta.x, 0, 0);
 
         _targetPosition += movement;
 
