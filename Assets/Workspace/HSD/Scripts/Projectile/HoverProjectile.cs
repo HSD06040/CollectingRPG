@@ -12,7 +12,6 @@ public class HoverProjectile : Projectile
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
 
-        MoveAndDestroyAsync(3f).Forget(); // 3초 후에 파괴되도록 설정
     }
 
     protected override void OnTriggerEnter2D(Collider2D collision)

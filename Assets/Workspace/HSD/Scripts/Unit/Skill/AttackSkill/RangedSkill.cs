@@ -10,6 +10,8 @@ public class RangedSkill : AttackSkill
 
     public override void Active(IAttacker attacker)
     {
+        base.Active(attacker);
+
         Vector2 offset = AttackPointOffset;
         offset.x *= attacker.GetTransform().GetFacingDir();
 

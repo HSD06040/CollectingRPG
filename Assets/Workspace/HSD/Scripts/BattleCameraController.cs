@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class BattleCameraController : MonoBehaviour
 {
     [SerializeField] float _sensitivity = 2f;
     [SerializeField] float _xLimit = 10f;
@@ -20,7 +20,6 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        // 부드러운 카메라 이동은 항상 업데이트
         MoveCamera();
     }
 
@@ -46,11 +45,10 @@ public class CameraController : MonoBehaviour
     {
         Vector2 adjustedDelta = deltaPosition * _sensitivity * 0.01f;
 
-        Vector3 movement = new Vector3(-adjustedDelta.x, 0, 0); // 반대 방향
+        Vector3 movement = new Vector3(-adjustedDelta.x, 0, 0);
 
         _targetPosition += movement;
 
-        // X축 리미트 적용
         float clampedX = Mathf.Clamp(_targetPosition.x, _initialPosition.x, _initialPosition.x + _xLimit);
         _targetPosition = new Vector3(clampedX, _targetPosition.y, _targetPosition.z);
     }

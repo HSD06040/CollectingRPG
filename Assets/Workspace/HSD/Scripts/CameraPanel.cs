@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CameraPanel : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    [SerializeField] CameraController _cameraController;
+    [SerializeField] BattleCameraController _cameraController;
 
     public void OnBeginDrag(PointerEventData eventData)
     {

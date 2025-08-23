@@ -1,10 +1,18 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 public abstract class UnitSkill : ScriptableObject
 {
-    public int ManaCost;    
+    [Header("Default")]
+    public Sprite Icon;
+    [TextArea] public string Description;
+    public int ManaCost;
+    public event Action<UnitSkill> UseSkill;
 
-    public abstract void Active(IAttacker attacker);     
+    public virtual void Active(IAttacker attacker)
+    {
+        UseSkill?.Invoke(this);
+    }
 }

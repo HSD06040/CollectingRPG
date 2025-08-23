@@ -6,7 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SynergyDatabase", menuName = "Data/Database/Synergy")]
 public class SynergyDatabase : ScriptableObject
 {
-    private readonly Dictionary<string, SynergyData> _synergyEffectDic = new Dictionary<string, SynergyData>(60);
+    public readonly Dictionary<string, SynergyData> _synergyDataDic = new Dictionary<string, SynergyData>(60);
 
     [SerializeField] UnitSynergyData[] _unitSynergyDatas;
     [SerializeField] ClassSynergyData[] _classSynergyDatas;
@@ -20,16 +20,16 @@ public class SynergyDatabase : ScriptableObject
         }
         foreach (var synergyData in _unitSynergyDatas)
         {
-            if (!_synergyEffectDic.ContainsKey(synergyData.Synergy.ToString()))
-                _synergyEffectDic.Add(synergyData.Synergy.ToString(), synergyData);
+            if (!_synergyDataDic.ContainsKey(synergyData.Synergy.ToString()))
+                _synergyDataDic.Add(synergyData.Synergy.ToString(), synergyData);
             else
                 Debug.LogWarning($"Duplicate SynergyName: {synergyData.Synergy.ToString()}");
         }
 
         foreach (var synergyData in _classSynergyDatas)
         {
-            if (!_synergyEffectDic.ContainsKey(synergyData.Synergy.ToString()))
-                _synergyEffectDic.Add(synergyData.Synergy.ToString(), synergyData);
+            if (!_synergyDataDic.ContainsKey(synergyData.Synergy.ToString()))
+                _synergyDataDic.Add(synergyData.Synergy.ToString(), synergyData);
             else
                 Debug.LogWarning($"Duplicate SynergyName: {synergyData.Synergy.ToString()}");
         }
@@ -37,6 +37,6 @@ public class SynergyDatabase : ScriptableObject
 
     public SynergyData GetSynergy(string synergyName)
     {
-        return _synergyEffectDic.TryGetValue(synergyName, out var effect) ? effect : null;
+        return _synergyDataDic.TryGetValue(synergyName, out var effect) ? effect : null;
     }
 }
