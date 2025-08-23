@@ -1,13 +1,11 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PartySelectPanelController : MonoBehaviour
 {
     [SerializeField] private Button _gameStartButton;
-
-    private int _currentSelectedPresetIndex = -1;
-    public int CurrentSelectedPresetIndex => _currentSelectedPresetIndex;
 
     public Action OnSelectedIndexChanged;
 
@@ -25,13 +23,13 @@ public class PartySelectPanelController : MonoBehaviour
 
     public void SetSelectedPresetIndex(int presetIndex)
     {
-        _currentSelectedPresetIndex = presetIndex;
+        TempDataManager.Instance.SelectPresetIndex(presetIndex);
         OnSelectedIndexChanged?.Invoke();
     }
 
     private void ActivateGameStartButton()
     { 
-        if(_currentSelectedPresetIndex != -1)
+        if(TempDataManager.Instance.SelectedPresetIndex != -1)
         {
             _gameStartButton.interactable = true;
         }
@@ -44,6 +42,7 @@ public class PartySelectPanelController : MonoBehaviour
     private void GameStart()
     {
         // 씬 전환
+        SceneManager.LoadScene("Test");
         Debug.Log("게임 시작");
     }
 }

@@ -37,6 +37,15 @@ public class UnitManager : MonoBehaviour
         {
             _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
         }
+        
+        TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
+        for(int i = 0; i < preset.Statuses.Length; i++)
+        {
+            if(preset.Statuses[i].Data != null)
+            {
+                AddUnit(preset.Statuses[i]);
+            }
+        }
     }
 
     private void OnDestroy()
@@ -57,7 +66,7 @@ public class UnitManager : MonoBehaviour
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
     }
-
+    
     public void Fight()
     {
         _unitController.UnitFight();
