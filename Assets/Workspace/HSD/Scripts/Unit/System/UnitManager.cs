@@ -13,6 +13,20 @@ public class UnitManager : MonoBehaviour
     [SerializeField] UnitData[] _testDatas;
     [SerializeField] int _upgradeNeedCount = 3;
 
+    private void Start() => Init();
+
+    private void Init()
+    {
+        TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
+        for(int i = 0; i < preset.Statuses.Length; i++)
+        {
+            if(preset.Statuses[i].Data != null)
+            {
+                AddUnit(preset.Statuses[i]);
+            }
+        }
+    }
+
     public void Fight()
     {
         _unitController.UnitFight();
