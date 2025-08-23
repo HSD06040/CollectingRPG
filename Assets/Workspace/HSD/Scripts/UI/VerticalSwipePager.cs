@@ -16,7 +16,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     [SerializeField] float _tweenDuration = 0.3f;
     [SerializeField] Ease _easeType = Ease.OutCubic;
     [SerializeField] float _uiToWorldRatio = 0.01f;
-    [SerializeField] private int _currentPage = 0;
+    [SerializeField] int _currentPage = 0;
     private int _totalPages;
     private Vector3[] _originalPagePositions;
     private Vector2 _originalUIPosition;

@@ -24,15 +24,20 @@ public class UnitDragDropSystem : MonoBehaviour
         {
             Vector2 worldMouse = GetWorldMouse();
 
-            RaycastHit2D hit = Physics2D.Raycast(worldMouse, Vector2.zero);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);
 
-            if (hit.collider == null || !_targetLayer.Contain(hit.collider.gameObject.layer))
-                return;
+            Debug.Log("레이케스트 시도");
+            if (hits.Length == 0)
+                return;            
 
-            if (hit.collider != null && hit.collider.CompareTag("Unit"))
+            for (int i = 0; i < hits.Length; i++)
             {
-                SetUnit(hit.collider.gameObject);
-            }
+                if (hits[i].collider != null && hits[i].collider.CompareTag("Unit"))
+                {
+                    SetUnit(hits[i].collider.gameObject);
+                    break;
+                }
+            }            
         }
 
         if (IsDragging && _currentUnit != null && Input.GetMouseButton(0))
