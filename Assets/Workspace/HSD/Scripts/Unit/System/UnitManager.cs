@@ -17,6 +17,11 @@ public class UnitManager : MonoBehaviour
 
     private void Awake()
     {
+        Init();
+    }
+
+    private void Init()
+    {
         _unitController.SynergyController.Init();
         _unitController.Init();
         _unitStanbyUIManager.Init();
@@ -31,7 +36,7 @@ public class UnitManager : MonoBehaviour
         for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
         {
             _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
-        }        
+        }
     }
 
     private void OnDestroy()
@@ -41,12 +46,14 @@ public class UnitManager : MonoBehaviour
 
     private void Subscribe()
     {
+        _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
     }
 
     private void UnSubscrube()
     {
+        _unitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
     }
@@ -57,8 +64,7 @@ public class UnitManager : MonoBehaviour
         _enemyController.EnemyFight();
 
         _unitUIManager.BattleUIInit();
-
-        _unitUIManager.FightSlotController.Init(_unitController.GetUnits());
+ 
         _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
         _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }

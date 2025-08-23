@@ -11,16 +11,20 @@ public class UnitController : MonoBehaviour
     public static readonly int UnitMaxCount = 10;
 
     private UnitBase[,] _unitGrid;
-    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300); 
+    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300);
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
+
+    private UnitBase[] _cachedUnitsArray = new UnitBase[UnitMaxCount];
+    private int _cachedUnitsCount = 0;
+
     private int _currentUnitCount = 0;
     public int CurrentUnitCount
     {
         get => _currentUnitCount;
         private set
         {
-            if(_currentUnitCount != value)
+            if (_currentUnitCount != value)
                 _currentUnitCount = value;
 
             OnUnitCountChanged?.Invoke(_currentUnitCount);
@@ -29,6 +33,7 @@ public class UnitController : MonoBehaviour
 
     public event System.Action<int> OnUnitCountChanged;
     public event System.Action<int> OnUnitPowerChanged;
+    public event System.Action<UnitBase[]> OnUnitChanged;
 
     public void Init()
     {
@@ -37,11 +42,11 @@ public class UnitController : MonoBehaviour
         _unitGrid = new UnitBase[rows, cols];
 
         _unitSlotManager.Init();
-        _unitDragDropSystem.OnUnitDropped += AddUnit;        
+        _unitDragDropSystem.OnUnitDropped += AddUnit;
     }
 
     public void UnitStanby()
-    {        
+    {
         foreach (var unit in _battleManager.GetUnitGrid())
         {
             if (unit == null)
@@ -72,12 +77,12 @@ public class UnitController : MonoBehaviour
     /// 유닛을 슬롯에 추가합니다.
     /// </summary>    
     public void AddUnit(UnitSlot slot, UnitBase unit)
-    {       
+    {
         UnitBase slotUnit = slot.Unit;
 
         if (IsUnitMaxCount())
         {
-            if(unit.CurrentSlot == Vector2Int.zero)
+            if (unit.CurrentSlot == Vector2Int.zero)
             {
                 _uiSlotController.SetSlot(unit.Status, _unitDragDropSystem.GetCurrentSlotIdx());
                 Destroy(unit.gameObject);
@@ -105,9 +110,11 @@ public class UnitController : MonoBehaviour
             SetSlot(slot, unit);
             AddSynergyUnit(unit);
             AddList(unit);
+            AddToCachedArray(unit); // 캐시된 배열에 추가
             CurrentUnitCount++;
-            OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
 
+            OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
+            OnUnitChanged?.Invoke(_cachedUnitsArray);
             _battleManager.AddUnit(slot, unit);
         }
         else
@@ -125,7 +132,7 @@ public class UnitController : MonoBehaviour
 
                 SetSlot(slot, unit);
                 SetSlot(unitSlot, slotUnit);
-                
+
                 _battleManager.AddUnit(slot, unit);
                 _battleManager.AddUnit(unitSlot, slotUnit);
             }
@@ -140,9 +147,9 @@ public class UnitController : MonoBehaviour
     }
 
     public void AddUnit(UnitBase newUnit, Vector2Int pos)
-    {                
+    {
         UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);
-        
+
         newUnit.transform.SetParent(slot.transform);
         newUnit.transform.position = slot.transform.position;
 
@@ -191,6 +198,7 @@ public class UnitController : MonoBehaviour
 
         _unitBaseDic[unit.Status.Address].Remove(unit);
 
+        RemoveFromCachedArray(unit); // 캐시된 배열에서 제거
         ClearSlot(slot, unit);
 
         if (destroyGameObject)
@@ -200,7 +208,9 @@ public class UnitController : MonoBehaviour
         }
 
         CurrentUnitCount--;
+
         OnUnitPowerChanged?.Invoke(-unit.Status.CombatPower);
+        OnUnitChanged?.Invoke(_cachedUnitsArray);
     }
 
     public Vector2Int RemoveUnit(UnitStatus unit)
@@ -237,6 +247,7 @@ public class UnitController : MonoBehaviour
 
         classList.Add(unit);
     }
+
     private void SetSlot(UnitSlot slot, UnitBase unit)
     {
         slot.SetUnit(unit);
@@ -261,8 +272,35 @@ public class UnitController : MonoBehaviour
         list.Add(unit);
     }
 
+    private void AddToCachedArray(UnitBase unit)
+    {
+        if (_cachedUnitsCount < UnitMaxCount)
+        {
+            _cachedUnitsArray[_cachedUnitsCount] = unit;
+            _cachedUnitsCount++;
+        }
+    }
+
+    private void RemoveFromCachedArray(UnitBase unit)
+    {
+        for (int i = 0; i < _cachedUnitsCount; i++)
+        {
+            if (_cachedUnitsArray[i] == unit)
+            {
+                for (int j = i; j < _cachedUnitsCount - 1; j++)
+                {
+                    _cachedUnitsArray[j] = _cachedUnitsArray[j + 1];
+                }
+
+                _cachedUnitsArray[_cachedUnitsCount - 1] = null;
+                _cachedUnitsCount--;
+                break;
+            }
+        }
+    }
+
     public UnitSlot GetUnitSlot(UnitBase unit)
-    {        
+    {
         return _unitSlotManager.UnitSlotDic[unit.CurrentSlot];
     }
 
@@ -281,17 +319,32 @@ public class UnitController : MonoBehaviour
         return GetUnitCount(unit.Address);
     }
 
+    /// <summary>
+    /// GC 할당 없이 현재 유닛들을 반환합니다.
+    /// 반환된 배열의 유효한 요소는 처음부터 GetUnitsCount()개까지입니다.
+    /// </summary>
     public UnitBase[] GetUnits()
     {
-        List<UnitBase> units = new List<UnitBase>();
+        return _cachedUnitsArray;
+    }
 
-        foreach (var unit in _unitGrid)
-        {
-            if (unit != null)
-                units.Add(unit);
-        }
+    /// <summary>
+    /// GetUnits()로 반환된 배열에서 유효한 유닛의 개수를 반환합니다.
+    /// </summary>
+    public int GetUnitsCount()
+    {
+        return _cachedUnitsCount;
+    }
 
-        return units.ToArray();
+    /// <summary>
+    /// 특정 인덱스의 유닛을 반환합니다. (범위 체크 포함)
+    /// </summary>
+    public UnitBase GetUnit(int index)
+    {
+        if (index < 0 || index >= _cachedUnitsCount)
+            return null;
+
+        return _cachedUnitsArray[index];
     }
 
     public bool IsUnitMaxCount()
