@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class SynergySlot : MonoBehaviour
 {
     [SerializeField] Image _icon;
+    [SerializeField] Image _upgradeColorImage;
     [SerializeField] TMP_Text _synergyName;
     [SerializeField] TMP_Text _synergyCount;
     [SerializeField] TMP_Text _synergyActive;
@@ -31,6 +32,7 @@ public class SynergySlot : MonoBehaviour
         ActiveCount = activeCount;
         _synergyActive.text = GetUpgradeCountString();
         _synergyCount.text = activeCount.ToString();
+        _upgradeColorImage.color = _synergyData.GetSynergyColor();
     }   
     
     private string GetUpgradeCountString()

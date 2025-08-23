@@ -24,8 +24,14 @@ public class UnitManager : MonoBehaviour
         Subscribe();
 
         _unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
+        _unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
+
         _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
-        _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel.UpdateTotalPower;
+
+        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        {
+            _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+        }        
     }
 
     private void OnDestroy()
@@ -35,11 +41,13 @@ public class UnitManager : MonoBehaviour
 
     private void Subscribe()
     {
+        _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
     }
 
     private void UnSubscrube()
     {
+        _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
     }
 
