@@ -120,7 +120,6 @@ public class UnitManager : MonoBehaviour
         int slotCount = _unitSlotController.GetUnitCount(unit);
         int unitCount = _unitController.GetUnitCount(unit);
 
-        Debug.Log($"SlotCount : {slotCount}, UnitCount : {unitCount}");
         Vector2Int pos = Vector2Int.zero;
 
         for (int i = 0; i < slotCount; i++)
@@ -146,6 +145,8 @@ public class UnitManager : MonoBehaviour
         {
             _unitSlotController.SetSlot(newUnit, _unitSlotController.GetEmptySlot());
         }
+
+        CheckUpgrade(newUnit);
     }
 
     private int GetUnitCount(UnitStatus unit)

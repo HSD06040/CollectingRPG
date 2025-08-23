@@ -11,7 +11,6 @@ public class BaseProjectile : Projectile
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
         _direction = (_target.position - status.transform.position).normalized;
         transform.right = _direction;
-        MoveAndDestroyAsync(3f).Forget(); // 3초 후에 파괴되도록 설정
     }
 
     protected override async UniTask MoveAndDestroyAsync(float duration)
