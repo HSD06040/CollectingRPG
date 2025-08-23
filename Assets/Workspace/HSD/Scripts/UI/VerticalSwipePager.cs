@@ -15,13 +15,24 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     [SerializeField] float _swipeThreshold = 200f;
     [SerializeField] float _tweenDuration = 0.3f;
     [SerializeField] Ease _easeType = Ease.OutCubic;
-
+    [SerializeField] float _worldToUIScale = 1000f;
+    [SerializeField] float _uiToWorldRatio = 0.01f;
     [SerializeField] private int _currentPage = 0;
     private int _totalPages;
+    private Vector3[] _originalPagePositions;
+    private Vector2 _originalUIPosition;
 
     void Start()
     {
         _totalPages = _pages.Length;
+
+        _originalPagePositions = new Vector3[_pages.Length];
+        _originalUIPosition = _content.anchoredPosition;
+
+        for (int i = 0; i < _pages.Length; i++)
+        {
+            _originalPagePositions[i] = _pages[i].position;
+        }
 
         SetAnchorPos();
         MoveToPage(_currentPage, instant: true);
@@ -29,6 +40,9 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (UnitDragDropSystem.IsDragging)
+            return;
+
         if (_currentPage == 0 && 0 < eventData.delta.y)
             return;
         if (_currentPage == _totalPages - 1 && 0 > eventData.delta.y)
@@ -36,14 +50,14 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
         _content.anchoredPosition += new Vector2(0, eventData.delta.y);
 
-        foreach (Transform page in _pages)
-        {
-            page.position += new Vector3(0, eventData.delta.y * (1f / _content.lossyScale.y), 0);
-        }
+        SyncGameObjectsWithUI();
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (UnitDragDropSystem.IsDragging)
+            return;
+
         if (_currentPage == 0 && 0 < eventData.delta.y)
             return;
         if (_currentPage == _totalPages - 1 && 0 > eventData.delta.y)
@@ -64,13 +78,34 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     private void MoveToPage(int pageIndex, bool instant = false)
     {
         float height = ((RectTransform)transform).rect.height;
-
         Vector2 targetPos = new Vector2(0, -pageIndex * height);
 
         if (instant)
+        {
             _content.anchoredPosition = targetPos;
+            SyncGameObjectsWithUI();
+        }
         else
-            _content.DOAnchorPos(targetPos, _tweenDuration).SetEase(_easeType);
+        {
+            _content.DOAnchorPos(targetPos, _tweenDuration)
+                .SetEase(_easeType)
+                .OnUpdate(() => SyncGameObjectsWithUI());
+        }
+    }
+
+    private void SyncGameObjectsWithUI()
+    {
+        // UI가 원래 위치에서 얼마나 움직였는지 계산
+        Vector2 uiOffset = _content.anchoredPosition - _originalUIPosition;
+
+        // UI 오프셋을 월드 좌표로 변환 (Y축만, X축은 필요에 따라 추가)
+        Vector3 worldOffset = new Vector3(0, uiOffset.y * _uiToWorldRatio, 0);
+
+        // 모든 GameObject를 원래 위치 + 오프셋으로 이동
+        for (int i = 0; i < _pages.Length; i++)
+        {
+            _pages[i].position = _originalPagePositions[i] + worldOffset;
+        }
     }
 
     private void SetAnchorPos()
@@ -80,5 +115,19 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
             RectTransform panel = _content.GetChild(i).GetComponent<RectTransform>();
             panel.offsetMin = new Vector2(0, i * panel.rect.height);
         }
+    }
+    public void SetUIToWorldRatio(float ratio)
+    {
+        _uiToWorldRatio = ratio;
+        SyncGameObjectsWithUI();
+    }
+
+    public void ResetOriginalPositions()
+    {
+        for (int i = 0; i < _pages.Length; i++)
+        {
+            _originalPagePositions[i] = _pages[i].position;
+        }
+        _originalUIPosition = _content.anchoredPosition;
     }
 }

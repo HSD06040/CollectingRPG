@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class BattleCameraController : MonoBehaviour
 {
-    [SerializeField] BaseCameraController _baseCameraController;
     [SerializeField] float _sensitivity = 2f;
     [SerializeField] float _xLimit = 10f;
     [SerializeField] float _smoothSpeed = 5f;
@@ -21,26 +20,21 @@ public class BattleCameraController : MonoBehaviour
 
     private void Update()
     {
-        // 부드러운 카메라 이동은 항상 업데이트
         MoveCamera();
     }
 
     public void StartDrag()
     {
-        if (!_baseCameraController.IsBattleMode()) return;
         _isDragging = true;
     }
 
     public void EndDrag()
     {
-        if (!_baseCameraController.IsBattleMode()) return;
         _isDragging = false;
     }
 
     public void CameraUpdate(Vector2 dragDelta)
     {
-        if (!_baseCameraController.IsBattleMode()) return;
-
         if (_isDragging)
         {
             UpdateTargetPosition(dragDelta);
@@ -55,7 +49,6 @@ public class BattleCameraController : MonoBehaviour
 
         _targetPosition += movement;
 
-        // X축 리미트 적용
         float clampedX = Mathf.Clamp(_targetPosition.x, _initialPosition.x, _initialPosition.x + _xLimit);
         _targetPosition = new Vector3(clampedX, _targetPosition.y, _targetPosition.z);
     }
