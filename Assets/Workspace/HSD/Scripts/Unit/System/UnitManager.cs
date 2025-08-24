@@ -71,11 +71,12 @@ public class UnitManager : MonoBehaviour
     
     public void Fight()
     {
+        if(_unitController.GetUnitsCount() == 0)
+            return;
+
         _unitController.UnitFight();
         _enemyController.EnemyFight();
-
-        
-
+      
         FightUISetup();       
     }
 
