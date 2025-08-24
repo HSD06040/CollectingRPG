@@ -17,6 +17,7 @@ public class DamageMeterController : MonoBehaviour
         CreateDamageMeterSlots();        
         DamageMeterSlot.OnDamaged += SortingDamageMeter;
     }
+
     private void OnDestroy()
     {
         DamageMeterSlot.OnDamaged -= SortingDamageMeter;
@@ -28,7 +29,7 @@ public class DamageMeterController : MonoBehaviour
 
         for (int i = 0; i < _damageMeterSlots.Length; i++)
         {
-            if (i < _unitCount)
+            if (units[i] != null && i < _unitCount)
             {
                 UnitStatusController status = units[i].StatusController;
                 _damageMeterSlots[i].Init(status);
