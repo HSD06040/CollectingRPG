@@ -9,18 +9,19 @@ public class SynergyIconSlot : MonoBehaviour
     [SerializeField] Image _upgradeColorImage;
     private SynergyData _synergyData;
     public int ActiveCount;
+    public int UpgradeCount => _synergyData.CurrentUpgradeIdx;
     // ToolTip도 보여야 함
 
     public void Init(SynergyData data)
     {
         _synergyData = data;
         _icon.sprite = data.Icon;
-        ActiveCount = data.CurrentUpgradeIdx;
+        UpdateIcon(0);
     }
 
-    public void UpdateIcon()
+    public void UpdateIcon(int activeCount)
     {
-        ActiveCount = _synergyData.CurrentUpgradeIdx;
+        ActiveCount = activeCount;
         _upgradeColorImage.color = _synergyData.GetSynergyColor();        
     }
 }

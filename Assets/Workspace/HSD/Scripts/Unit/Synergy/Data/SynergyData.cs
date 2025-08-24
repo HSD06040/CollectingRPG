@@ -19,7 +19,7 @@ public abstract class SynergyData : ScriptableObject
     private SynergyEffect _currentEffect;
     public int CurrentUpgradeIdx;
 
-    private void OnEnable()
+    public void Init()
     {
         _currentEffect = null;
         CurrentUpgradeIdx = -1;

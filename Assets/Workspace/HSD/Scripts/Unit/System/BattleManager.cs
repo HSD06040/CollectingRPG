@@ -35,6 +35,8 @@ public class BattleManager : MonoBehaviour
     {
         UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
         UnitBase newUnit = Instantiate(unit, slot.transform);
+        newUnit.SetBattleUnit();
+        newUnit.Init();
 
         SetSlot(newSlot, newUnit);
     }

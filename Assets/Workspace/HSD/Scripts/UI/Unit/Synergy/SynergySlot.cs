@@ -16,6 +16,7 @@ public class SynergySlot : MonoBehaviour
     private int[] _synergyCountArray;    
 
     public int ActiveCount;
+    public int UpgradeCount => _synergyData.CurrentUpgradeIdx;
 
     public void Init(SynergyData data, int activeCount)
     {        

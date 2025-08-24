@@ -7,6 +7,8 @@ using UnityEngine.EventSystems;
 public class UnitDragDropSystem : MonoBehaviour
 {
     public static bool IsDragging;    
+    public ToolTipController ToolTipController;
+
     private GameObject _currentUnit;
     private UnitBase _currentUnitBase;
     private Vector2 _offset;
@@ -22,22 +24,32 @@ public class UnitDragDropSystem : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
+            ToolTipController.UnitToolTip.Close();
             Vector2 worldMouse = GetWorldMouse();
 
             RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);
 
-            Debug.Log("레이케스트 시도");
             if (hits.Length == 0)
                 return;            
-
+            bool isInterfactable = false;
             for (int i = 0; i < hits.Length; i++)
             {
-                if (hits[i].collider != null && hits[i].collider.CompareTag("Unit"))
+                if (hits[i].collider != null && hits[i].collider.CompareTag("UnitTrigger"))
                 {
+                    isInterfactable = true;                
                     SetUnit(hits[i].collider.gameObject);
-                    break;
                 }
-            }            
+                else if (hits[i].collider != null && hits[i].collider.CompareTag("BattleUnit"))
+                {
+                    isInterfactable = true;
+                    ToolTipController.UnitToolTip.Show(ComponentProvider.Get<UnitStatusController>(hits[i].collider.gameObject).Status);
+                }                
+            }
+
+            if(!isInterfactable)
+            {
+                ToolTipController.UnitToolTip.Close();
+            }
         }
 
         if (IsDragging && _currentUnit != null && Input.GetMouseButton(0))
@@ -46,7 +58,7 @@ public class UnitDragDropSystem : MonoBehaviour
             mousePos.z = -Camera.main.transform.position.z;
             Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
 
-            _currentUnit.transform.position = mouseWorldPos + _offset;
+            _currentUnitBase.transform.position = mouseWorldPos + _offset;
         }
 
         if (Input.GetMouseButtonUp(0) && IsDragging)
@@ -57,7 +69,9 @@ public class UnitDragDropSystem : MonoBehaviour
             IsDragging = false;
 
             if (isSlot)
+            {
                 return;
+            }   
 
             if (_currentUnit != null)
             {
@@ -98,7 +112,7 @@ public class UnitDragDropSystem : MonoBehaviour
     private void CheckSlot()
     {
         // 슬롯 체크
-        Collider2D slotCollider = Physics2D.OverlapPoint(_currentUnit.transform.position, LayerMask.GetMask("Slot"));
+        Collider2D slotCollider = Physics2D.OverlapPoint(_currentUnitBase.transform.position, LayerMask.GetMask("Slot"));
 
         if (_currentSlotIdx != -1 && _currentUnitBase != null)
         {
@@ -116,9 +130,9 @@ public class UnitDragDropSystem : MonoBehaviour
             if (_currentUnitBase != null)
             {
                 if (_currentUnitBase.CurrentSlot == Vector2Int.zero)
-                    Destroy(_currentUnit);
+                    Destroy(_currentUnitBase.gameObject);
                 else
-                    _currentUnit.transform.position = _pos; // 원래 위치로 되돌리기
+                    _currentUnitBase.transform.position = _pos; // 원래 위치로 되돌리기
             }
         }
     }
@@ -135,9 +149,9 @@ public class UnitDragDropSystem : MonoBehaviour
     {
         IsDragging = true;
         _currentUnit = unit;
-        _currentUnitBase = _currentUnit.GetComponent<UnitBase>();
+        _currentUnitBase = _currentUnit.GetComponentInParent<UnitBase>();
         _offset = Vector2.zero;
-        _pos = _currentUnit.transform.position;
+        _pos = _currentUnitBase.transform.position;
     }
 
     public void SetUnit(GameObject unit, Action<Collider2D, UnitBase> action, int slotIdx)
@@ -147,10 +161,10 @@ public class UnitDragDropSystem : MonoBehaviour
         _currentSlotIdx = slotIdx;
         IsDragging = true;
         _currentUnit = unit;
-        _currentUnitBase = _currentUnit.GetComponent<UnitBase>();
+        _currentUnitBase = _currentUnit.GetComponentInParent<UnitBase>();
 
         _offset = Vector2.zero;
-        _pos = _currentUnit.transform.position;
+        _pos = _currentUnitBase.transform.position;
     }
 
     private void Clear()

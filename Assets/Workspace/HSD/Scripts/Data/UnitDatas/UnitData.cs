@@ -15,9 +15,7 @@ public class UnitData : ScriptableObject
 
     [TextArea]
     public string Description;
-
     public int Cost;
-    public int UpgradeCount;
 
     [Header("Attack_Data")]
     public UnitSkill Skill;

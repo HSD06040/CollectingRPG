@@ -222,7 +222,7 @@ public static class Utils
             0 => new Color(217f / 255f, 217f / 255f, 217f / 255f),      // 밝은 회색
             1 => new Color(241f / 255f, 229f / 255f, 109f / 255f),      // 노란색
             2 => new Color(63f / 255f, 239f / 255f, 239f / 255f),       // Cyan
-            _ => Color.white
+            _ => new Color(85f / 255f, 85f / 255f, 85f / 255f)
         };
     }
 }

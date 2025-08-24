@@ -27,9 +27,11 @@ public class UnitManager : MonoBehaviour
         _unitStanbyUIManager.Init();
 
         Subscribe();
+        //_unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
+        //_unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
 
-        _unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
-        _unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
+        _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
+        _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
 
         _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
 

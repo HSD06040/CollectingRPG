@@ -59,7 +59,14 @@ public class SynergyPanel : MonoBehaviour
 
         slots.RemoveAll(s => s.ActiveCount <= 0);
 
-        slots.Sort((a, b) => b.ActiveCount.CompareTo(a.ActiveCount));
+        slots.Sort((a, b) =>
+        {
+            int result = b.ActiveCount.CompareTo(a.ActiveCount);
+            if (result == 0)
+                result = b.UpgradeCount.CompareTo(a.UpgradeCount);
+
+            return result;
+        });
 
         for (int i = 0; i < slots.Count; i++)
         {
