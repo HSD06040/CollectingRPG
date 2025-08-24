@@ -1,8 +1,9 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SynergySlot : MonoBehaviour
+public class SynergySlot : MonoBehaviour, IPointerDownHandler
 {
     [SerializeField] Image _icon;
     [SerializeField] Image _upgradeColorImage;
@@ -11,6 +12,7 @@ public class SynergySlot : MonoBehaviour
     [SerializeField] TMP_Text _synergyActive;
 
     private SynergyData _synergyData;
+    private SynergyToolTip _synergyToolTip;
     private const string GRAY = "#808080";
     private const string WHITE = "#FFFFFF";
     private int[] _synergyCountArray;    
@@ -18,11 +20,12 @@ public class SynergySlot : MonoBehaviour
     public int ActiveCount;
     public int UpgradeCount => _synergyData.CurrentUpgradeIdx;
 
-    public void Init(SynergyData data, int activeCount)
+    public void Init(SynergyData data, int activeCount, SynergyToolTip synergyToolTip)
     {        
         _synergyData = data;
         _icon.sprite = data.Icon;
         _synergyName.text = data.SynergyName;
+        _synergyToolTip = synergyToolTip;
         SetSynergyCount();
         UpdateUI(activeCount);
     }
@@ -72,5 +75,12 @@ public class SynergySlot : MonoBehaviour
     private string GetWhiteColorString(string str)
     {
         return $"<color={WHITE}>{str}</color>";
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (_synergyData == null) return;
+
+        _synergyToolTip.Show(eventData, _synergyData);
     }
 }

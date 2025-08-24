@@ -8,6 +8,7 @@ public class SynergySlotPanel : MonoBehaviour
 {
     [SerializeField] GameObject _synergyIconPrefab;
     [SerializeField] Transform _content;
+    [SerializeField] SynergyToolTip _synergyTooltip;
     private Dictionary<string, int> _synergyIconSlotDic = new(50);
     private SynergyIconSlot[] _synergyIconSlots;
 
@@ -24,7 +25,7 @@ public class SynergySlotPanel : MonoBehaviour
         for (int i = 0; i < datas.Length; i++)
         {
             SynergyIconSlot slot = Instantiate(_synergyIconPrefab, _content).GetComponent<SynergyIconSlot>();
-            slot.Init(datas[i]);
+            slot.Init(datas[i], _synergyTooltip);
             
             _synergyIconSlots[i] = slot;
 

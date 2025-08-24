@@ -10,19 +10,26 @@ public class ToolTip : MonoBehaviour
 
     private void Awake()
     {
-        rect = (RectTransform)transform;
+        rect = GetComponent<RectTransform>();
     }
 
     protected virtual void AdjustPosition(Vector2 screenPos)
-    {        
+    {
         Vector2 offset = Vector2.zero;
-        Vector2 screenSize = new Vector2(Screen.safeArea.width, Screen.safeArea.height);
+        Vector2 screenSize = new Vector2(Screen.width, Screen.height);
 
         offset.x = (screenPos.x > screenSize.x / 2f) ? -xOffset : xOffset;
         offset.y = (screenPos.y > screenSize.y / 2f) ? -yOffset : yOffset;
 
         Vector2 finalScreenPos = screenPos + offset;
 
-        rect.position = finalScreenPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rect,
+            finalScreenPos,
+            null,
+            out Vector2 localPoint
+        );
+
+        rect.localPosition = localPoint;
     }
 }

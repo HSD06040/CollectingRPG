@@ -25,6 +25,7 @@ public class UnitDragDropSystem : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             ToolTipController.UnitToolTip.Close();
+            ToolTipController.SynergyToolTip.Close();
             Vector2 worldMouse = GetWorldMouse();
 
             RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);

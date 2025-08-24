@@ -213,7 +213,12 @@ public static class Utils
         sb.Clear();
         return result;
     }
-    
+
+    public static void ClearStringBuilder()
+    {
+        sb.Clear();
+    }
+
     public static Color GetSynergyColor(this SynergyData data)
     {
         return (data.CurrentUpgradeIdx) switch
