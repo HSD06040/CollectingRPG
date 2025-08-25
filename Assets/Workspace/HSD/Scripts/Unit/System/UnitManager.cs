@@ -17,6 +17,7 @@ public class UnitManager : MonoBehaviour
     [Header("Data")]
     [SerializeField] UnitData[] _testDatas;
     [SerializeField] int _upgradeNeedCount = 3;
+    [SerializeField] int _spawnGold = 20;
 
     private void Awake()
     {
@@ -56,6 +57,7 @@ public class UnitManager : MonoBehaviour
         UnSubscrube();
     }
 
+    #region EventHandler
     private void Subscribe()
     {       
         _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
@@ -83,7 +85,9 @@ public class UnitManager : MonoBehaviour
             _unitController.OnUnitPowerChanged -= _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
         }
     }
-    
+    #endregion
+
+    #region Fight
     public void Fight()
     {
         if(_unitController.GetUnitsCount() == 0)
@@ -105,9 +109,16 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.SkillPopUpController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
         _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
+    #endregion
 
     public void RandomSpawn()
     {
+        if (!InGameManager.Instance.SpendGold(_spawnGold))
+        {
+            Debug.Log("골드가 부족합니다.");
+            return;
+        }
+
         UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
         UnitStatus unitStatus = new UnitStatus(unit);
 

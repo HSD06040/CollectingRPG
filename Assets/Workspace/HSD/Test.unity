@@ -6958,6 +6958,7 @@ GameObject:
   - component: {fileID: 1000399871}
   - component: {fileID: 1000399873}
   - component: {fileID: 1000399872}
+  - component: {fileID: 1000399874}
   m_Layer: 5
   m_Name: GoldPanel
   m_TagString: Untagged
@@ -7023,6 +7024,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000399870}
   m_CullTransparentMesh: 1
+--- !u!114 &1000399874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000399870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e179059636ba21d49a000cf13c121e87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _goldText: {fileID: 1291532349}
 --- !u!1 &1024276615
 GameObject:
   m_ObjectHideFlags: 0
@@ -11631,8 +11645,9 @@ GameObject:
   - component: {fileID: 1736584826}
   - component: {fileID: 1736584827}
   - component: {fileID: 1736584828}
+  - component: {fileID: 1736584829}
   m_Layer: 0
-  m_Name: BattleManager
+  m_Name: InGameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11678,6 +11693,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 39e4bf8417186cb49a48c20caa92a55f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1736584829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1736584825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f51b82005d649744a83ed1234b9f45b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1753017546
