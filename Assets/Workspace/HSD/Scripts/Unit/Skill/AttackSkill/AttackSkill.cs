@@ -6,7 +6,6 @@ using UnityEngine;
 public abstract class AttackSkill : UnitSkill
 {
     public Vector2 AttackPointOffset;
-    public float AttackPower;
     public DamageType DamageType;
     public Priority Priority;
 
@@ -14,7 +13,6 @@ public abstract class AttackSkill : UnitSkill
     public Vector2 BoxSize;
     public float Angle;
 
-    public int MaxCount;
     public int SearchCount;
     public float Fov;
 

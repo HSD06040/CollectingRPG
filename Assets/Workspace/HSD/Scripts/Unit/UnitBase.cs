@@ -8,6 +8,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public UnitStatus Status { get; set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
 
+    [field: SerializeField] public BoxCollider2D TriggerCol { get; private set; }
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
     public Vector2Int CurrentSlot { get; set; }
@@ -27,6 +28,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         Anim ??= GetComponentInChildren<Animator>();
         Rb ??= GetComponent<Rigidbody2D>();
         Col ??= GetComponent<CapsuleCollider2D>();
+        TriggerCol ??= GetComponentInChildren<BoxCollider2D>();
 
         AddProviderComponents();
     }
@@ -47,6 +49,12 @@ public class UnitBase : MonoBehaviour, IAttacker
         Col.enabled = true;
 
         StatusController.Init(Status);
+    }
+
+    public void SetBattleUnit()
+    {
+        TriggerCol.enabled = false;
+        tag = "BattleUnit";
     }
 
     #region Provider

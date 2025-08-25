@@ -33,6 +33,11 @@ public class SynergyDatabase : ScriptableObject
             else
                 Debug.LogWarning($"Duplicate SynergyName: {synergyData.Synergy.ToString()}");
         }
+
+        foreach (var synergyData in _synergyDataDic.Values)
+        {
+            synergyData.Init();
+        }
     }
 
     public SynergyData GetSynergy(string synergyName)

@@ -21,6 +21,6 @@ public class RangedSkill : AttackSkill
         Projectile projectile = ComponentProvider.Get<Projectile>(obj);
         Transform target = GetTargetSingle(attacker).transform;
 
-        projectile.Init(target, attacker.GetStatusController(), AttackPower, DamageType, attacker.TargetLayer, projectileSpeed);
+        projectile.Init(target, attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, projectileSpeed);
     }
 }

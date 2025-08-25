@@ -16,6 +16,7 @@ public class DamageMeterPresenter
         _view.SetDamage(_status.TotalDamage.Value);
 
         _status.TotalDamage.AddEvent(OnDamageChanged);
+        Debug.Log("이벤트 등록 완료");
     }
 
     private void OnDamageChanged(int damage)

@@ -32,6 +32,7 @@ public class EnemyController : MonoBehaviour
             unit.transform.position = slot.transform.position;
             unit.transform.SetParent(slot.transform);
             unit.TargetLayer = _targetLayer;
+            unit.SetBattleUnit();
 
             // 레이어 변경 (자식 포함)
             SetLayerRecursively(unit.gameObject, 6);

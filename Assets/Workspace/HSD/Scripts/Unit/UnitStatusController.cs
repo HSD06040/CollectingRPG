@@ -38,6 +38,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     public Property<int> TotalDamage = new Property<int>();
 
     public event Action OnPlayerDied;
+    public Action<UnitStatus> UseSkill;
+
     public bool IsDead => CurHp.Value <= 0;
 
     public void Init(UnitStatus status)

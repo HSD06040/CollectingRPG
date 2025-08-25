@@ -30,6 +30,7 @@ public class DamageMeterSlot : MonoBehaviour, IDamageMeterView
     public void SetDamage(int damage)
     {
         _totalDamage = damage;
+        Debug.Log(_totalDamage);
         _damageText.text = damage.ToString();
         _damageSlider.value = damage;
         OnDamaged?.Invoke();

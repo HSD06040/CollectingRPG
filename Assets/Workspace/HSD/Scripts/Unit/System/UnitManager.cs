@@ -27,16 +27,13 @@ public class UnitManager : MonoBehaviour
         _unitStanbyUIManager.Init();
 
         Subscribe();
+        //_unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
+        //_unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
 
-        _unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
-        _unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
+        _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
+        _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
 
-        _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
-
-        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
-        {
-            _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
-        }
+        
         
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
         for(int i = 0; i < preset.Statuses.Length; i++)
@@ -54,10 +51,17 @@ public class UnitManager : MonoBehaviour
     }
 
     private void Subscribe()
-    {
+    {       
         _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+
+        _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+
+        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        {
+            _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+        }
     }
 
     private void UnSubscrube()
@@ -65,16 +69,32 @@ public class UnitManager : MonoBehaviour
         _unitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+
+        _unitController.OnUnitCountChanged -= _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+
+        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        {
+            _unitController.OnUnitPowerChanged -= _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+        }
     }
     
     public void Fight()
     {
+        if(_unitController.GetUnitsCount() == 0)
+            return;
+
         _unitController.UnitFight();
         _enemyController.EnemyFight();
+      
+        FightUISetup();       
+    }
 
+    private void FightUISetup()
+    {
         _unitUIManager.BattleUIInit();
- 
+
         _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
+        _unitUIManager.SkillPopUpController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
         _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
 
