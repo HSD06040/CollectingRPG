@@ -46,6 +46,8 @@ public class PresetSelectUnit : MonoBehaviour
 
     private void Init()
     {
+        if (TempDataManager.Instance == null) return;
+
         _controller.SetSelectedPresetIndex(-1);
         // 프리셋이 활성화가 안 되어 있으면 잠겨 있다고 표시하는 UI 출력
         if(TempDataManager.Instance.PresetData.Count < _index + 1)
