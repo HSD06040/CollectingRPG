@@ -49,6 +49,7 @@ public class PresetSelectUnit : MonoBehaviour
         if (TempDataManager.Instance == null) return;
 
         _controller.SetSelectedPresetIndex(-1);
+
         // 프리셋이 활성화가 안 되어 있으면 잠겨 있다고 표시하는 UI 출력
         if(TempDataManager.Instance.PresetData.Count < _index + 1)
         {
@@ -77,10 +78,18 @@ public class PresetSelectUnit : MonoBehaviour
         UnitStatus[] preset = TempDataManager.Instance.PresetData[_index].Statuses;
         int damage = 0;
 
+        bool activePresetExists = false;
+
         for (int i = 0; i < preset.Length; i++)
         {
             if (preset[i].Data != null)
             {
+                if(!activePresetExists)
+                {
+                    _controller.SetSelectedPresetIndex(i);
+                    activePresetExists = true;
+                }
+
                 _presetImages[i].color = Color.white;
                 _presetImages[i].sprite = preset[i].Data.Icon;
                 damage += preset[i].CombatPower;
