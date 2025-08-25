@@ -8,9 +8,8 @@ public static class Utils
 {
     private static GameObject _damagePopUpObj;
     private static GameObject _worldCanvas;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void Initialize()
+    
+    public static void Initialize()
     {
         _damagePopUpObj = Addressables.LoadAssetAsync<GameObject>("DamagePopUp").WaitForCompletion();
         GameObject obj = Addressables.LoadAssetAsync<GameObject>("WorldCanvas").WaitForCompletion();
