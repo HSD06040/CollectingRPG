@@ -24,7 +24,7 @@ public class Projectile : MonoBehaviour
     }
 
     public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
-    {
+    {        
         _status = status;
         _target = target;
         _targetLayer = targetLayer;
@@ -32,6 +32,9 @@ public class Projectile : MonoBehaviour
         _pireceCount = status.AttackCount.Value;
         _attackPower = attackPower;
         _speed = speed;
+
+        if(_target == null)
+            _target = Physics2D.OverlapCircle(transform.position, status.AttackRange.Value, targetLayer)?.transform;
 
         MoveAndDestroyAsync(_lifeTime).Forget(); // 발사체 이동 및 파괴 비동기 작업 시작
     }
@@ -53,6 +56,6 @@ public class Projectile : MonoBehaviour
 
     protected virtual async UniTask MoveAndDestroyAsync(float duration)
     {
-
+        await UniTask.Delay(1);
     }
 }

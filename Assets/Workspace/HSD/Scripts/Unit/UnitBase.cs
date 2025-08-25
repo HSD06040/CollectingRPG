@@ -5,7 +5,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
-    [field: SerializeField] public UnitData Data { get; set; }
+    [field: SerializeField] public UnitStatus Status { get; set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
 
     public LayerMask TargetLayer { get; set; }
@@ -46,7 +46,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     {  
         Col.enabled = true;
 
-        StatusController.Init(Data);
+        StatusController.Init(Status);
     }
 
     #region Provider
@@ -75,21 +75,23 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Attack()
     {
-        Data.AttackData.Attack(this);
+        Status.Data.AttackData.Attack(this);
     }
 
     public bool SkillCheck()
     {
-        if (Data.Skill == null) return false;
+        if (Status.Data.Skill == null) return false;
 
-        if (StatusController.CurMana.Value >= Data.Skill.NeedMana)
+        if (StatusController.CurMana.Value >= Status.Data.Skill.ManaCost)
         {
-            StatusController.CurMana.Value -= Data.Skill.NeedMana;
+            StatusController.CurMana.Value -= Status.Data.Skill.ManaCost;
             return true;
         }
         else
             return false;
     }
+
+    public void UseSkill() => Status.Data.Skill.Active(this);
 
     public void FindTarget()
     {
@@ -173,9 +175,9 @@ public class UnitBase : MonoBehaviour, IAttacker
         return Target;
     }
 
-    public UnitData GetUnitData()
+    public UnitStatus GetUnitData()
     {
-        return Data;
+        return Status;
     }
 
     public Transform GetTransform()
@@ -187,13 +189,17 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return StatusController;
     }
+    public Vector2 GetTargetDir()
+    {
+        return TargetDir;
+    }
     #endregion
 
     #region Gizmos
 #if UNITY_EDITOR
     private void OnDrawGizmos()
-    {
-        if (Data == null) return;
+    {        
+        if (Status == null) return;
 
         // 찾는 거리
         Gizmos.color = Color.cyan;
@@ -203,26 +209,33 @@ public class UnitBase : MonoBehaviour, IAttacker
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
 
-        if (Data.AttackData == null) return;
+        if (Status.Data == null) return;
+
+        if (Status.Data.AttackData == null) return;
         // 공격 범위
         Gizmos.color = Color.red;
         Vector2 center = transform.position;
-        if (Data.AttackData is UnitMeleeAttack MeleeAttackData)
+        if (Status.Data.AttackData is UnitMeleeAttack MeleeAttackData)
         {
             if (MeleeAttackData.SearchType == SearchType.Circle)
             {
-                Vector2 offset = Data.AttackData.AttackPointOffset;
-                offset.x *= transform.GetFacingDir();
+                Vector2 offset = Status.Data.AttackData.AttackPointOffset;
+                offset *= TargetDir;
 
                 Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);
             }
         }
-        else if (Data.AttackData is UnitRangedAttack RandAttackData)
+        else if (Status.Data.AttackData is UnitRangedAttack RandAttackData)
         {
-            Vector2 offset = Data.AttackData.AttackPointOffset;
+            Vector2 offset = Status.Data.AttackData.AttackPointOffset;
             offset.x *= transform.GetFacingDir();
 
             Gizmos.DrawWireSphere(center + offset, .1f);
+        }
+
+        if(Status.Data.Skill != null && Status.Data.Skill is AttackSkill attackSkill)
+        {
+            attackSkill.DrawGizmos(this);
         }
     }
 #endif

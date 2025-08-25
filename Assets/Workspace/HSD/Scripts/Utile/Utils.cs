@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -72,15 +74,17 @@ public static class Utils
         return closest;
     }
 
+    #region GetTargetsNonAlloc
     public static GameObject[] GetTargetsNonAlloc(
+        IAttacker attacker,
         Vector2 origin,
         SearchType shape,
         float sizeOrRadius,
         Vector2 boxSize,
         float angle,
-        int maxCount,        
-        LayerMask layerMask,        
-        System.Func<List<GameObject>, int, GameObject[]> filter = null,
+        int maxCount,
+        LayerMask layerMask,
+        System.Func<IAttacker, List<GameObject>, int, GameObject[]> filter = null,
         int maxTargets = 50,
         bool sortByDistance = true)
     {
@@ -105,7 +109,7 @@ public static class Utils
         {
             if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
                 _cachedTargets.Add(_hitBuffer[i].gameObject);
-        }        
+        }
 
         if (sortByDistance && _cachedTargets.Count > 1)
         {
@@ -121,16 +125,104 @@ public static class Utils
 
         GameObject[] result;
 
-        if(filter != null)
-            result = filter.Invoke(_cachedTargets, maxTargets);
+        if (filter != null)
+            result = filter.Invoke(attacker, _cachedTargets, maxTargets);
         else
             result = _cachedTargets.ToArray();
 
         return result;
     }
 
+    public static GameObject GetTargetsNonAllocSingle(
+        IAttacker attacker,
+        SearchType shape,
+        float sizeOrRadius,
+        Vector2 boxSize,
+        float angle,
+        LayerMask layerMask,
+        System.Func<IAttacker, List<GameObject>, GameObject> filter = null)
+    {
+        _cachedTargets.Clear(); // 재사용
+
+        int hitCount = 0;
+
+        Vector2 origin = attacker.GetTransform().position;
+
+        switch (shape)
+        {
+            case SearchType.Circle:
+                hitCount = Physics2D.OverlapCircleNonAlloc(origin, sizeOrRadius, _hitBuffer, layerMask);
+                break;
+            case SearchType.Box:
+                hitCount = Physics2D.OverlapBoxNonAlloc(origin, boxSize, angle, _hitBuffer, layerMask);
+                break;
+            case SearchType.Capsule:
+                hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, angle, _hitBuffer, layerMask);
+                break;
+        }
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
+                _cachedTargets.Add(_hitBuffer[i].gameObject);
+        }
+
+        GameObject result;
+
+        if (filter != null)
+            result = filter.Invoke(attacker, _cachedTargets);
+        else
+            result = _cachedTargets[0];
+
+        return result;
+    }
+    #endregion
+
     public static int GetFacingDir(this Transform transform)
     {
         return transform.localScale.x > 0 ? -1 : 1;
+    }
+
+    public static string ToAbbreviation(long value)
+    {
+        if (value >= 1_000_000_000)
+            return $"{(value / 1_000_000_000f).ToString("0.#")}B";
+        if (value >= 1_000_000)
+            return $"{(value / 1_000_000f).ToString("0.#")}M";
+        if (value >= 1_000)
+            return $"{(value / 1_000f).ToString("0.#")}k";
+
+        return value.ToString();
+    }
+
+    private static StringBuilder sb = new StringBuilder();
+
+    public static void AppendString(string str)
+    {
+        sb.Append(str);
+    }
+
+    public static void AppendLine(string str)
+    {
+        sb.AppendLine(str);
+    }
+
+    public static string GetString()
+    {
+        string result = sb.ToString();
+        sb.Clear();
+        return result;
+    }
+    
+    public static Color GetSynergyColor(this SynergyData data)
+    {
+        return (data.CurrentUpgradeIdx) switch
+        {
+            -1 => new Color(85f / 255f, 85f / 255f, 85f / 255f),        // 짙은 회색
+            0 => new Color(217f / 255f, 217f / 255f, 217f / 255f),      // 밝은 회색
+            1 => new Color(241f / 255f, 229f / 255f, 109f / 255f),      // 노란색
+            2 => new Color(63f / 255f, 239f / 255f, 239f / 255f),       // Cyan
+            _ => Color.white
+        };
     }
 }

@@ -1,20 +1,23 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
+public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler
 {
-    [SerializeField] private UnitData _unit;
+    [SerializeField] private UnitStatus _unit;
     [SerializeField] private Image _unitIcon;
+    [SerializeField] private TMP_Text _unitLevelText;
+
     private UI_UnitSlotController _unitSlotController;
     private UnitDragDropSystem _dragDropSystem;
-    private UnitData _chachedUnit;
+    private UnitStatus _chachedUnit;
     private int _slotIdx;
 
-    public static Action<UnitData, int> OnUnitChanged;
+    public static Action<UnitStatus, int> OnUnitChanged;
 
     public void Init(UnitDragDropSystem dragDropSystem, int slotIdx, UI_UnitSlotController unitSlotController)
     {
@@ -23,7 +26,7 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
         _unitSlotController = unitSlotController;
     }
 
-    public void SetSlot(UnitData unit)
+    public void SetSlot(UnitStatus unit)
     {
         _unit = unit;
 
@@ -34,14 +37,28 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
     {
         if (_unit != null)
         {
-            _unitIcon.sprite = _unit.Icon;
+            _unitIcon.sprite = _unit.Data.Icon;
             _unitIcon.color = Color.white;
+            _unitLevelText.text = (_unit.Level + 1).ToString();
         }
         else
         {
             _unitIcon.sprite = null;
             _unitIcon.color = Color.clear;
+            _unitLevelText.text = "";
+        }                
+    }
+    private void UnitSetting(Collider2D collider, UnitBase unit)
+    {
+        if (collider == null)
+        {
+            SetSlot(_chachedUnit);
+            _unitSlotController.AddUnit(unit.Status, _slotIdx);
+            _chachedUnit = null;
+            return;
         }
+
+        _unitSlotController.RemoveUnit(unit.Status, _slotIdx);
     }
 
     public void ClearSlot()
@@ -54,44 +71,26 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
         return _unit == null;
     }
 
-    public UnitData GetUnit()
+    public UnitStatus GetUnit()
     {
         return _unit;
     }
-
-    private void UnitSetting(Collider2D collider, UnitBase unit)
-    {        
-        if (collider == null)
-        {
-            Debug.Log(_unitSlotController.GetUnitCount(unit.Data));
-            SetSlot(_chachedUnit);
-            _unitSlotController.AddUnit(unit.Data, _slotIdx);
-            _chachedUnit = null;            
-            return;
-        }
-        
-        _unitSlotController.RemoveUnit(unit.Data, _slotIdx);
-    }
-
+    
+    #region Drag&Drop
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (_unit == null) return;
 
         _unitSlotController.RemoveUnit(_unit, _slotIdx);
-        GameObject unit = Instantiate(_unit.UnitPrefab);
+        GameObject unit = Instantiate(_unit.Data.UnitPrefab);
 
         UnitBase unitBase = unit.GetComponent<UnitBase>();
-        unitBase.Data = _unit;
+        unitBase.Status = _unit;
         unitBase.Init();
 
         _dragDropSystem.SetUnit(unit, UnitSetting, _slotIdx);
         _chachedUnit = _unit;
         ClearSlot();
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -104,8 +103,8 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
             return;
         }
 
-        UnitData temp = _unit;
-        UnitData unit = unitBase.Data;
+        UnitStatus temp = _unit;
+        UnitStatus unit = unitBase.Status;
         Vector2Int pos = unitBase.CurrentSlot;
 
         // ui 에서 생성한 거라면
@@ -144,4 +143,10 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
         
         Destroy(unitBase.gameObject);
     }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        
+    }
+    #endregion
 }

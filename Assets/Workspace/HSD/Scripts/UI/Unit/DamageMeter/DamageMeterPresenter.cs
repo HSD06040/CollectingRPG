@@ -12,7 +12,7 @@ public class DamageMeterPresenter
         _view = view;
         _status = status;
         
-        _view.SetIcon(_status.Data.Icon);
+        _view.SetIcon(_status.Status.Data.Icon);
         _view.SetDamage(_status.TotalDamage.Value);
 
         _status.TotalDamage.AddEvent(OnDamageChanged);

@@ -1,34 +1,92 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [Header("UI")]
     [SerializeField] UnitUIManager _unitUIManager;
+    [SerializeField] UnitStanbyUIManager _unitStanbyUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
+
+    [Header("Unit_Controller")]
     [SerializeField] UnitController _unitController;
+    [SerializeField] EnemyController _enemyController;
+
+    [Header("Data")]
     [SerializeField] UnitData[] _testDatas;
     [SerializeField] int _upgradeNeedCount = 3;
 
+    private void Awake()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        _unitController.SynergyController.Init();
+        _unitController.Init();
+        _unitStanbyUIManager.Init();
+
+        Subscribe();
+
+        _unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
+        _unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
+
+        _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+
+        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        {
+            _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+        }
+        
+        TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
+        for(int i = 0; i < preset.Statuses.Length; i++)
+        {
+            if(preset.Statuses[i].Data != null)
+            {
+                AddUnit(preset.Statuses[i]);
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        UnSubscrube();
+    }
+
+    private void Subscribe()
+    {
+        _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
+        _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
+        _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+    }
+
+    private void UnSubscrube()
+    {
+        _unitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
+        _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
+        _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+    }
+    
     public void Fight()
     {
         _unitController.UnitFight();
+        _enemyController.EnemyFight();
 
-        _unitUIManager.Init();
-
-        _unitUIManager.FightSlotController.Init(_unitController.GetUnits());
+        _unitUIManager.BattleUIInit();
+ 
         _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
+        _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
 
     public void RandomSpawn()
     {
         UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
+        UnitStatus unitStatus = new UnitStatus(unit);
 
-        AddUnit(unit);
+        AddUnit(unitStatus);
     }
 
-    public void AddUnit(UnitData unit)
+    public void AddUnit(UnitStatus unit)
     {
         int slotIdx = _unitSlotController.GetEmptySlot();
 
@@ -41,18 +99,18 @@ public class UnitManager : MonoBehaviour
         SetSlot(unit, slotIdx);
     }
 
-    private void SetSlot(UnitData unit, int idx)
+    private void SetSlot(UnitStatus unit, int idx)
     {
         _unitSlotController.SetSlot(unit, idx);
 
         CheckUpgrade(unit);
     }
 
-    private void CheckUpgrade(UnitData unit)
+    private void CheckUpgrade(UnitStatus unit)
     {
-        if (unit.Level == 3)
+        if (unit.Level == 2)
         {
-            Debug.Log($"최종 유닛 {unit.Name} 업그레이드 불가");
+            Debug.Log($"최종 유닛 {unit.Data.Name} 업그레이드 불가");
             return;
         }
 
@@ -62,18 +120,15 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    private void UpgradeUnit(UnitData unit)
+    private void UpgradeUnit(UnitStatus unit)
     {
-        string key = $"Data/Unit/{unit.Name}_{unit.Level + 1}";
-
-        UnitData newUnit = Resources.Load<UnitData>(key);
+        UnitStatus newUnit = new UnitStatus(unit.Data, unit.Level + 1);
 
         int upgradeNeedCount = _upgradeNeedCount;
 
         int slotCount = _unitSlotController.GetUnitCount(unit);
         int unitCount = _unitController.GetUnitCount(unit);
 
-        Debug.Log($"SlotCount : {slotCount}, UnitCount : {unitCount}");
         Vector2Int pos = Vector2Int.zero;
 
         for (int i = 0; i < slotCount; i++)
@@ -89,21 +144,22 @@ public class UnitManager : MonoBehaviour
 
         if (pos != Vector2Int.zero && !_unitController.IsUnitMaxCount())
         {
-            UnitBase unitBase = Instantiate(newUnit.UnitPrefab).GetComponent<UnitBase>();
-            unitBase.Data = newUnit;
+            UnitBase unitBase = Instantiate(newUnit.Data.UnitPrefab).GetComponent<UnitBase>();
+            unitBase.Status = newUnit;
             unitBase.Init();
 
-            _unitController.AddUnit(unitBase, pos);            
+            _unitController.AddUnit(unitBase, pos);
         }
         else
         {
             _unitSlotController.SetSlot(newUnit, _unitSlotController.GetEmptySlot());
         }
+
+        CheckUpgrade(newUnit);
     }
 
-    private int GetUnitCount(UnitData unit)
+    private int GetUnitCount(UnitStatus unit)
     {
-        Debug.Log($"SlotCount : {_unitSlotController.GetUnitCount(unit)}, UnitCount : {_unitController.GetUnitCount(unit)}");
         return _unitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);
     }
 }

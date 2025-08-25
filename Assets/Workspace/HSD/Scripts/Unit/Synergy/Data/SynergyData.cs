@@ -11,26 +11,38 @@ public class SynergyLevelData
 
 public abstract class SynergyData : ScriptableObject
 {
+    public Sprite Icon;
     public string SynergyName;
     public string Description;
     public SynergyLevelData[] SynergyLevelData;
+
     private SynergyEffect _currentEffect;
+    public int CurrentUpgradeIdx;
+
+    private void OnEnable()
+    {
+        _currentEffect = null;
+        CurrentUpgradeIdx = -1;
+    }
 
     public void Check(int newCount)
     {
         SynergyEffect newEffect = null;
 
-        foreach (var levelData in SynergyLevelData)
+        CurrentUpgradeIdx = -1;
+
+        for (int i = 0; i < SynergyLevelData.Length; i++)
         {
-            if(newCount >= levelData.SynergyNeedCount)
+            if (newCount >= SynergyLevelData[i].SynergyNeedCount)
             {
-                newEffect = levelData.SynergyEffect;
+                newEffect = SynergyLevelData[i].SynergyEffect;
+                CurrentUpgradeIdx = i;
             }
             else
             {
                 break;
             }
-        }
+        }        
 
         if (_currentEffect != newEffect)
         {

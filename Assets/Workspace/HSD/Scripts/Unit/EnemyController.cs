@@ -7,12 +7,13 @@ public class EnemyController : MonoBehaviour
     [SerializeField] UnitGridDataSO _gridDataSO;
     [SerializeField] UnitSlotManager _slotManager;
     [SerializeField] LayerMask _targetLayer;
-    private UnitBase[,] _unitBases;
+    private UnitBase[,] _unitGrid;
 
     private void Awake()
     {
         _slotManager.Init();
-        _unitBases = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];
+        _unitGrid = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];
+
         SetUnit();
     }
 
@@ -25,7 +26,8 @@ public class EnemyController : MonoBehaviour
             int x = unitDatas.position.x;
             int y = unitDatas.position.y;
 
-            UnitBase unit = Instantiate(unitDatas.unitData.UnitPrefab).GetComponent<UnitBase>();
+            UnitBase unit = Instantiate(unitDatas.unitStatus.Data.UnitPrefab).GetComponent<UnitBase>();
+            unit.Status = unitDatas.unitStatus;
 
             unit.transform.position = slot.transform.position;
             unit.transform.SetParent(slot.transform);
@@ -37,13 +39,13 @@ public class EnemyController : MonoBehaviour
             if (unit.transform.localScale.x < 0)
                 unit.transform.localScale = new Vector3(-unit.transform.localScale.x, unit.transform.localScale.y, unit.transform.localScale.z);
 
-            _unitBases[y, x] = unit;
+            _unitGrid[y, x] = unit;
         }
     }
 
     public void EnemyFight()
     {
-        foreach (var unit in _unitBases)
+        foreach (var unit in _unitGrid)
         {
             if (unit == null)
                 continue;
@@ -60,5 +62,18 @@ public class EnemyController : MonoBehaviour
         {
             SetLayerRecursively(child.gameObject, layer);
         }
+    }
+
+    public UnitBase[] GetUnits()
+    {
+        List<UnitBase> units = new List<UnitBase>();
+
+        foreach (var unit in _unitGrid)
+        {
+            if (unit != null)
+                units.Add(unit);
+        }
+
+        return units.ToArray();
     }
 }

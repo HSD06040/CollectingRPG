@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.VFX;
 
 public class FightUnitSlotController : MonoBehaviour
 {
@@ -43,7 +44,7 @@ public class FightUnitSlotController : MonoBehaviour
     {
         for (int i = 0; i < _slots.Length; i++)
         {
-            if (i < units.Length)
+            if (units[i] != null)
             {
                 _slots[i].Init(units[i].StatusController);
             }
