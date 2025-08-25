@@ -7,7 +7,7 @@ public class TempDataManager : MonoBehaviour
 
     #region Data
 
-    private int _selectedPresetIndex = -1;
+    private int _selectedPresetIndex = 0;
     public int SelectedPresetIndex => _selectedPresetIndex;
 
     private List<TeamPresetData> _presetData = new List<TeamPresetData>();

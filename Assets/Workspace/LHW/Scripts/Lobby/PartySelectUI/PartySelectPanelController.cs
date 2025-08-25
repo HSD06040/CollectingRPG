@@ -23,8 +23,11 @@ public class PartySelectPanelController : MonoBehaviour
 
     public void SetSelectedPresetIndex(int presetIndex)
     {
-        TempDataManager.Instance.SelectPresetIndex(presetIndex);
-        OnSelectedIndexChanged?.Invoke();
+        if (TempDataManager.Instance != null)
+        {
+            TempDataManager.Instance.SelectPresetIndex(presetIndex);
+            OnSelectedIndexChanged?.Invoke();
+        }
     }
 
     private void ActivateGameStartButton()
