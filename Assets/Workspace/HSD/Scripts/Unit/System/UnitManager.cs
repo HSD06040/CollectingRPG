@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [Header("BattleManager")]
+    [SerializeField] BattleManager _battleManager;
+
     [Header("UI")]
     [SerializeField] UnitUIManager _unitUIManager;
     [SerializeField] UnitStanbyUIManager _unitStanbyUIManager;
@@ -85,6 +88,8 @@ public class UnitManager : MonoBehaviour
     {
         if(_unitController.GetUnitsCount() == 0)
             return;
+
+        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
 
         _unitController.UnitFight();
         _enemyController.EnemyFight();

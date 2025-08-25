@@ -8,7 +8,7 @@ public class UnitController : MonoBehaviour
 
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
-    [SerializeField] BattleManager _battleManager;
+    [SerializeField] BattleUnitManager _battleUnitManager;
 
     public static readonly int UnitMaxCount = 10;
 
@@ -46,7 +46,7 @@ public class UnitController : MonoBehaviour
 
     public void UnitStanby()
     {
-        foreach (var unit in _battleManager.GetUnitGrid())
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
             if (unit == null)
                 continue;
@@ -60,7 +60,7 @@ public class UnitController : MonoBehaviour
 
     public void UnitFight()
     {
-        foreach (var unit in _battleManager.GetUnitGrid())
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
             if (unit == null)
                 continue;
@@ -89,7 +89,7 @@ public class UnitController : MonoBehaviour
             else
             {
                 SetSlot(_unitSlotManager.GetUnitSlot(unit), unit);
-                _battleManager.AddUnit(_unitSlotManager.GetUnitSlot(unit), unit);
+                _battleUnitManager.AddUnit(_unitSlotManager.GetUnitSlot(unit), unit);
             }
             return;
         }
@@ -103,7 +103,7 @@ public class UnitController : MonoBehaviour
 
                 RemoveUnit(slot, destroyGameObject: false); // 유닛 데이터만 제거 (Destroy 안 함)
                 Destroy(slotUnit.gameObject); // UI로 복제했으니 인게임 오브젝트 제거
-                _battleManager.RemoveUnit(slot, slotUnit);
+                _battleUnitManager.RemoveUnit(slot, slotUnit);
             }
 
             SetSlot(slot, unit);
@@ -112,7 +112,7 @@ public class UnitController : MonoBehaviour
             CurrentUnitCount++;
 
             OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
-            _battleManager.AddUnit(slot, unit);
+            _battleUnitManager.AddUnit(slot, unit);
             OnUnitChanged?.Invoke(GetUnits());
         }
         else
@@ -125,20 +125,20 @@ public class UnitController : MonoBehaviour
                 ClearSlot(unitSlot, unit);
                 ClearSlot(slot, slotUnit);
 
-                _battleManager.RemoveUnit(unitSlot, unit);
-                _battleManager.RemoveUnit(slot, slotUnit);
+                _battleUnitManager.RemoveUnit(unitSlot, unit);
+                _battleUnitManager.RemoveUnit(slot, slotUnit);
 
                 SetSlot(slot, unit);
                 SetSlot(unitSlot, slotUnit);
 
-                _battleManager.AddUnit(slot, unit);
-                _battleManager.AddUnit(unitSlot, slotUnit);
+                _battleUnitManager.AddUnit(slot, unit);
+                _battleUnitManager.AddUnit(unitSlot, slotUnit);
             }
             else
             {
                 ClearSlot(unitSlot, unit);
 
-                _battleManager.MoveUnit(unitSlot, slot, unit);
+                _battleUnitManager.MoveUnit(unitSlot, slot, unit);
                 SetSlot(slot, unit);
             }
         }
@@ -201,7 +201,7 @@ public class UnitController : MonoBehaviour
         if (destroyGameObject)
         {
             Destroy(unit.gameObject);
-            _battleManager.RemoveUnit(slot, unit);
+            _battleUnitManager.RemoveUnit(slot, unit);
         }
 
         CurrentUnitCount--;
@@ -296,7 +296,7 @@ public class UnitController : MonoBehaviour
     /// </summary>
     public UnitBase[] GetUnits()
     {
-        return _battleManager.GetUnits();
+        return _battleUnitManager.GetUnits();
     }
 
     /// <summary>
@@ -304,7 +304,7 @@ public class UnitController : MonoBehaviour
     /// </summary>
     public int GetUnitsCount()
     {
-        return _battleManager.GetUnitsCount();
+        return _battleUnitManager.GetUnitsCount();
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public class UnitController : MonoBehaviour
     /// </summary>
     public UnitBase GetUnit(int index)
     {
-        return _battleManager.GetUnit(index);
+        return _battleUnitManager.GetUnit(index);
     }
 
     public bool IsUnitMaxCount()

@@ -1,133 +1,84 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.UI.CanvasScaler;
 
 public class BattleManager : MonoBehaviour
 {
-    [SerializeField] UnitSlotManager _unitSlotManager;
-    private UnitBase[,] _unitGrid;
-    private int UnitMaxCount => UnitController.UnitMaxCount;
-    private UnitBase[] _cachedUnitsArray = new UnitBase[UnitController.UnitMaxCount];
-    private int _cachedUnitsCount = 0;
+    public static event Action OnBattleEnded;
 
-    private void Awake()
+    [SerializeField] LayerMask playerLayer;
+
+    [Header("UnitCount")]
+    private int playerUnitCount;
+    private int enemyUnitCount;
+
+    public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
-        int rows = _unitSlotManager.SlotCreater.Size.y;
-        int cols = _unitSlotManager.SlotCreater.Size.x;
-        _unitGrid = new UnitBase[rows, cols];
+        UnitBase[] notNullPlayerUnits = GetNotNullUnits(playerUnits);
+        UnitBase[] notNullEnemyUnits = GetNotNullUnits(enemyUnits);
 
-        _unitSlotManager.Init();
+        RegisterEvent(notNullPlayerUnits);
+        RegisterEvent(notNullEnemyUnits);
+
+        playerUnitCount = notNullPlayerUnits.Length;
+        enemyUnitCount = notNullEnemyUnits.Length;
     }
 
-    public void MoveUnit(UnitSlot oldSlot, UnitSlot slot, UnitBase unit)
+    private void CheckBattleEnded(UnitStatusController statusCon)
     {
-        UnitSlot newOldSlot = _unitSlotManager.GetUnitSlot(oldSlot.GetPos());
-        UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
-        UnitBase unitBase = _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1];
+        if (!statusCon.IsDead) return;
 
-        ClearSlot(newOldSlot, unitBase, false);
-
-        SetSlot(newSlot, unitBase);
-    }
-
-    public void AddUnit(UnitSlot slot, UnitBase unit)
-    {
-        UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
-        UnitBase newUnit = Instantiate(unit, slot.transform);
-        AddToCachedArray(newUnit);
-        newUnit.SetBattleUnit();
-        newUnit.Init();
-
-        SetSlot(newSlot, newUnit);
-    }
-
-    public void RemoveUnit(UnitSlot slot, UnitBase unit)
-    {
-        UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
-        UnitBase unitBase = _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1];
-
-        RemoveFromCachedArray(unitBase);
-
-        ClearSlot(newSlot, unitBase);
-    }
-
-    public void ClearSlot(UnitSlot slot, UnitBase unit, bool isDestroy = true)
-    {
-        slot.ClearSlot();
-
-        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
-
-        if (isDestroy)
-            Destroy(unit.gameObject);
-    }
-
-    public void SetSlot(UnitSlot slot, UnitBase unit)
-    {
-        slot.SetUnit(unit);
-
-        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = unit;
-    }
-
-    public UnitBase[,] GetUnitGrid()
-    {
-        return _unitGrid;
-    }
-
-    private void AddToCachedArray(UnitBase unit)
-    {
-        if (_cachedUnitsCount < UnitMaxCount)
+        if (playerLayer.Contain(statusCon.gameObject.layer))
         {
-            _cachedUnitsArray[_cachedUnitsCount] = unit;
-            _cachedUnitsCount++;
+            playerUnitCount--;
+        }
+        else
+        {
+            enemyUnitCount--;
+        }
+        Debug.Log($"플레이어 유닛 수: {playerUnitCount}, 적 유닛 수: {enemyUnitCount}");
+        statusCon.OnUnitDied -= CheckBattleEnded;
+
+        if (playerUnitCount > 0 && enemyUnitCount > 0)
+            return;
+
+        if (playerUnitCount <= 0)
+        {
+            Debug.Log("플레이어 패배");
+        }
+        else if (enemyUnitCount <= 0)
+        {
+            Debug.Log("플레이어 승리");
+        }
+
+        OnBattleEnded?.Invoke();
+    }
+
+    private UnitBase[] GetNotNullUnits(UnitBase[] units)
+    {
+        List<UnitBase> notNullUnits = new List<UnitBase>();
+        foreach (var unit in units)
+        {
+            if (unit != null)
+                notNullUnits.Add(unit);
+        }
+        return notNullUnits.ToArray();
+    }
+
+    private void RegisterEvent(UnitBase[] units)
+    {
+        for (int i = 0; i < units.Length; i++)
+        {
+            units[i].StatusController.OnUnitDied += CheckBattleEnded;
         }
     }
 
-    private void RemoveFromCachedArray(UnitBase unit)
+    private void UnRegisterEvent(UnitBase[] units)
     {
-        for (int i = 0; i < _cachedUnitsCount; i++)
+        for (int i = 0; i < units.Length; i++)
         {
-            if (_cachedUnitsArray[i] == unit)
-            {
-                for (int j = i; j < _cachedUnitsCount - 1; j++)
-                {
-                    _cachedUnitsArray[j] = _cachedUnitsArray[j + 1];
-                }
-
-                _cachedUnitsArray[_cachedUnitsCount - 1] = null;
-                _cachedUnitsCount--;
-                break;
-            }
+            units[i].StatusController.OnUnitDied -= CheckBattleEnded;
         }
-    }
-    /// <summary>
-    /// GC 할당 없이 현재 유닛들을 반환합니다.
-    /// 반환된 배열의 유효한 요소는 처음부터 GetUnitsCount()개까지입니다.
-    /// </summary>
-    public UnitBase[] GetUnits()
-    {
-        return _cachedUnitsArray;
-    }
-
-    /// <summary>
-    /// GetUnits()로 반환된 배열에서 유효한 유닛의 개수를 반환합니다.
-    /// </summary>
-    public int GetUnitsCount()
-    {
-        return _cachedUnitsCount;
-    }
-
-    /// <summary>
-    /// 특정 인덱스의 유닛을 반환합니다. (범위 체크 포함)
-    /// </summary>
-    public UnitBase GetUnit(int index)
-    {
-        if (index < 0 || index >= _cachedUnitsCount)
-            return null;
-
-        return _cachedUnitsArray[index];
     }
 }
