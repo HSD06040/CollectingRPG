@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,15 +13,20 @@ public class SynergyToolTip : ToolTip
     [SerializeField] TMP_Text _description;
     [SerializeField] TMP_Text _effectDescription;
     private const string WHITE = "#FFFFFF";
+    private bool isOpenTimer;
 
     public void Show(PointerEventData data, SynergyData synergyData)
     {
         gameObject.SetActive(true);
         Setup(synergyData);
+        OpenTimer().Forget();
     }
 
     public void Close()
     {
+        if (isOpenTimer)
+            return;
+
         gameObject.SetActive(false);        
     }
 
@@ -54,5 +60,12 @@ public class SynergyToolTip : ToolTip
     private string GetWhiteColorString(string str)
     {
         return $"<color={WHITE}>{str}</color>";
+    }
+
+    private UniTask OpenTimer()
+    {
+        isOpenTimer = true;
+
+        return UniTask.Delay(100).ContinueWith(() => isOpenTimer = false);
     }
 }
