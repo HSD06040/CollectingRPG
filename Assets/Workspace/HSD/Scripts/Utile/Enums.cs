@@ -18,6 +18,12 @@ public enum DamageType
 {
     Physical, Magic
 }
+
+public enum TargetType
+{
+    Enemy, Ally, Self
+}
+
 public enum SearchType
 {
     Circle, Box, Capsule
