@@ -17,6 +17,7 @@ public class UnitManager : MonoBehaviour
 
     private void Awake()
     {
+        Utils.Initialize();
         Init();
     }
 
