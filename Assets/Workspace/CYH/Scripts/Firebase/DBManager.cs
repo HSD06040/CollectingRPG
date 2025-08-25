@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Firebase.Auth;
 using Firebase.Database;
+using Firebase.Extensions;
 
 public class DBManager : Singleton<DBManager>
 {
@@ -120,6 +121,32 @@ public class DBManager : Singleton<DBManager>
         };
 
         return data;
+    }
+
+    /// <summary>
+    /// UserData 경로의 현재 유저 UID를 삭제하는 메서드
+    /// </summary>
+    public void DeleteUserUid()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+
+        Debug.Log($" (DB Delete) 현재 로그인된 유저 uid : {uid}");
+        Dictionary<string, object> dictionary = new Dictionary<string, object>
+        {
+            [$"UserData/{uid}"] = null,
+        };
+
+        FirebaseManager.DataReference.UpdateChildrenAsync(dictionary).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                Debug.Log("UserData 삭제 성공");
+            }
+            else
+            {
+                Debug.LogError($"UserData삭제 실패: {task.Exception}");
+            }
+        });
     }
 
     /// <summary>
