@@ -2499,6 +2499,7 @@ GameObject:
   - component: {fileID: 369737089}
   - component: {fileID: 369737088}
   - component: {fileID: 369737087}
+  - component: {fileID: 369737090}
   m_Layer: 5
   m_Name: FightButton
   m_TagString: Untagged
@@ -2620,6 +2621,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 369737085}
   m_CullTransparentMesh: 1
+--- !u!114 &369737090
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 369737085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0073937bac1c1245bbc05fb625681d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverScale: 0.8
+  normalScale: 1
+  animationDuration: 0.3
+  ease: 28
+  enablePunch: 0
+  punchStrength: 0.1
+  punchVibration: 1
 --- !u!1 &382350844
 GameObject:
   m_ObjectHideFlags: 0
@@ -5492,6 +5512,7 @@ GameObject:
   - component: {fileID: 857286796}
   - component: {fileID: 857286795}
   - component: {fileID: 857286794}
+  - component: {fileID: 857286797}
   m_Layer: 5
   m_Name: SpawnButton
   m_TagString: Untagged
@@ -5613,6 +5634,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 857286792}
   m_CullTransparentMesh: 1
+--- !u!114 &857286797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857286792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0073937bac1c1245bbc05fb625681d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverScale: 0.8
+  normalScale: 1
+  animationDuration: 0.3
+  ease: 28
+  enablePunch: 0
+  punchStrength: 0.1
+  punchVibration: 1
 --- !u!1 &858728741
 GameObject:
   m_ObjectHideFlags: 0
