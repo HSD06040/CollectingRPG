@@ -751,7 +751,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 1333506943
+  m_SortingLayerID: -1795753689
   m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &94856751
@@ -1267,8 +1267,8 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 1333506943
-  m_SortingOrder: 1
+  m_SortingLayerID: 0
+  m_SortingOrder: 10
   m_TargetDisplay: 0
 --- !u!224 &144563089
 RectTransform:
@@ -1435,7 +1435,7 @@ GameObject:
   - component: {fileID: 175408721}
   - component: {fileID: 175408720}
   - component: {fileID: 175408722}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1610,7 +1610,7 @@ GameObject:
   - component: {fileID: 185726851}
   - component: {fileID: 185726853}
   - component: {fileID: 185726854}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: UnitSlotPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1709,7 +1709,7 @@ GameObject:
   - component: {fileID: 197642110}
   - component: {fileID: 197642109}
   - component: {fileID: 197642111}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: UnitTotalPowerPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2873,7 +2873,7 @@ GameObject:
   - component: {fileID: 499981958}
   - component: {fileID: 499981957}
   - component: {fileID: 499981959}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: UnitCountPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5352,7 +5352,7 @@ GameObject:
   m_Component:
   - component: {fileID: 831695317}
   - component: {fileID: 831695319}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Texts
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6048,7 +6048,7 @@ GameObject:
   - component: {fileID: 883624372}
   - component: {fileID: 883624374}
   - component: {fileID: 883624373}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7017,134 +7017,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000399870}
   m_CullTransparentMesh: 1
---- !u!1 &1006926071
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1006926075}
-  - component: {fileID: 1006926074}
-  - component: {fileID: 1006926072}
-  m_Layer: 0
-  m_Name: OverlayCamera
-  m_TagString: MainCamera
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1006926072
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1006926071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RenderShadows: 0
-  m_RequiresDepthTextureOption: 2
-  m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 1
-  m_Cameras: []
-  m_RendererIndex: -1
-  m_VolumeLayerMask:
-    serializedVersion: 2
-    m_Bits: 1
-  m_VolumeTrigger: {fileID: 0}
-  m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
-  m_Dithering: 0
-  m_ClearDepth: 0
-  m_AllowXRRendering: 1
-  m_AllowHDROutput: 1
-  m_UseScreenCoordOverride: 0
-  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
-  m_RequiresDepthTexture: 0
-  m_RequiresColorTexture: 0
-  m_Version: 2
-  m_TaaSettings:
-    m_Quality: 3
-    m_FrameInfluence: 0.1
-    m_JitterScale: 1
-    m_MipBias: 0
-    m_VarianceClampScale: 0.9
-    m_ContrastAdaptiveSharpening: 0
---- !u!20 &1006926074
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1006926071}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.4457547, g: 0.49090824, b: 0.5, a: 1}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 4
-  m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 69.6
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 20.698008
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
-  m_SensorSize: {x: 36.86, y: 23.9}
-  m_LensShift: {x: 0, y: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 100
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: 0.52
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 192
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
---- !u!4 &1006926075
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1006926071}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2137366915}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1024276615
 GameObject:
   m_ObjectHideFlags: 0
@@ -7156,7 +7028,7 @@ GameObject:
   - component: {fileID: 1024276616}
   - component: {fileID: 1024276618}
   - component: {fileID: 1024276617}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: PowerTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8532,7 +8404,7 @@ GameObject:
   - component: {fileID: 1296191911}
   - component: {fileID: 1296191913}
   - component: {fileID: 1296191912}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Count
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10962,13 +10834,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1640576610}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -9.12, y: 2.4, z: -10}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.07999992, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 187535051}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2137366915}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1652856746
 GameObject:
@@ -10981,7 +10853,7 @@ GameObject:
   - component: {fileID: 1652856747}
   - component: {fileID: 1652856749}
   - component: {fileID: 1652856748}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: TotalPower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12757,7 +12629,7 @@ GameObject:
   - component: {fileID: 1899099963}
   - component: {fileID: 1899099965}
   - component: {fileID: 1899099964}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Unit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14381,7 +14253,7 @@ Camera:
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 63
+    m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -14406,7 +14278,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1006926075}
+  - {fileID: 1640576611}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2137366916
@@ -14425,8 +14297,7 @@ MonoBehaviour:
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
-  m_Cameras:
-  - {fileID: 1006926074}
+  m_Cameras: []
   m_RendererIndex: -1
   m_VolumeLayerMask:
     serializedVersion: 2
@@ -14482,6 +14353,5 @@ SceneRoots:
   - {fileID: 859023220}
   - {fileID: 651601983}
   - {fileID: 1366227296}
-  - {fileID: 1640576611}
   - {fileID: 134434908}
   - {fileID: 858728742}
