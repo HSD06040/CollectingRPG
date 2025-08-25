@@ -1,14 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
+public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler
 {
     [SerializeField] private UnitStatus _unit;
     [SerializeField] private Image _unitIcon;
+    [SerializeField] private TMP_Text _unitLevelText;
+
     private UI_UnitSlotController _unitSlotController;
     private UnitDragDropSystem _dragDropSystem;
     private UnitStatus _chachedUnit;
@@ -36,12 +39,26 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
         {
             _unitIcon.sprite = _unit.Data.Icon;
             _unitIcon.color = Color.white;
+            _unitLevelText.text = (_unit.Level + 1).ToString();
         }
         else
         {
             _unitIcon.sprite = null;
             _unitIcon.color = Color.clear;
+            _unitLevelText.text = "";
+        }                
+    }
+    private void UnitSetting(Collider2D collider, UnitBase unit)
+    {
+        if (collider == null)
+        {
+            SetSlot(_chachedUnit);
+            _unitSlotController.AddUnit(unit.Status, _slotIdx);
+            _chachedUnit = null;
+            return;
         }
+
+        _unitSlotController.RemoveUnit(unit.Status, _slotIdx);
     }
 
     public void ClearSlot()
@@ -58,20 +75,8 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
     {
         return _unit;
     }
-
-    private void UnitSetting(Collider2D collider, UnitBase unit)
-    {        
-        if (collider == null)
-        {
-            SetSlot(_chachedUnit);
-            _unitSlotController.AddUnit(unit.Status, _slotIdx);
-            _chachedUnit = null;            
-            return;
-        }
-        
-        _unitSlotController.RemoveUnit(unit.Status, _slotIdx);
-    }
-
+    
+    #region Drag&Drop
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (_unit == null) return;
@@ -86,11 +91,6 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
         _dragDropSystem.SetUnit(unit, UnitSetting, _slotIdx);
         _chachedUnit = _unit;
         ClearSlot();
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -143,4 +143,10 @@ public class UI_UnitSlot : MonoBehaviour, IDragHandler, IBeginDragHandler
         
         Destroy(unitBase.gameObject);
     }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        
+    }
+    #endregion
 }

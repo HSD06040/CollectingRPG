@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -191,5 +193,36 @@ public static class Utils
             return $"{(value / 1_000f).ToString("0.#")}k";
 
         return value.ToString();
+    }
+
+    private static StringBuilder sb = new StringBuilder();
+
+    public static void AppendString(string str)
+    {
+        sb.Append(str);
+    }
+
+    public static void AppendLine(string str)
+    {
+        sb.AppendLine(str);
+    }
+
+    public static string GetString()
+    {
+        string result = sb.ToString();
+        sb.Clear();
+        return result;
+    }
+    
+    public static Color GetSynergyColor(this SynergyData data)
+    {
+        return (data.CurrentUpgradeIdx) switch
+        {
+            -1 => new Color(85f / 255f, 85f / 255f, 85f / 255f),        // 짙은 회색
+            0 => new Color(217f / 255f, 217f / 255f, 217f / 255f),      // 밝은 회색
+            1 => new Color(241f / 255f, 229f / 255f, 109f / 255f),      // 노란색
+            2 => new Color(63f / 255f, 239f / 255f, 239f / 255f),       // Cyan
+            _ => Color.white
+        };
     }
 }

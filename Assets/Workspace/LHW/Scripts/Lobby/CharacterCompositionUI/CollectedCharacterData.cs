@@ -7,9 +7,10 @@ using UnityEngine;
 public class CollectedCharacterData : MonoBehaviour
 {
     [Header("Reference")]
-    [SerializeField] private CharacterUnit[] _characters;
-    [SerializeField] private List<CharacterSO> _collectedCharData = new List<CharacterSO>();
-    public List<CharacterSO> CollectedCharData => _collectedCharData;
+    [SerializeField] private CharacterUnit[] _charUnits;
+    
+    [SerializeField] private List<UnitStatus> _collectedUnit = new List<UnitStatus>();
+    public List<UnitStatus> CollectedUnit => _collectedUnit;
 
     private int _characterCount;
     public int CharacterCount => _characterCount;
@@ -17,16 +18,19 @@ public class CollectedCharacterData : MonoBehaviour
     private int _collectedCharacterCount;
     public int CollectedCharacterCount => _collectedCharacterCount;
 
-    private void Awake()
+    private void Start()
     {
-        for(int i = 0; i < _characters.Length; i++)
+        for(int i = 0; i < _charUnits.Length; i++)
         {
-            if(_characters[i].IsCollected)
-            {
-                _collectedCharData.Add(_characters[i].CharData);
-            }
+            // 획득여부 체크는 나중에 추가
+            //if(_charUnits[i].IsCollected)
+            //{
+            //_collectedCharData.Add(_charUnits[i].CharData);
+
+            _collectedUnit.Add(_charUnits[i].Status);
+            //}
         }
-        _characterCount = _characters.Length;
-        _collectedCharacterCount = _collectedCharData.Count;
+        _characterCount = _charUnits.Length;
+        _collectedCharacterCount = _collectedUnit.Count;
     }
 }

@@ -41,4 +41,9 @@ public class UnitSlot : MonoBehaviour
     {
         Unit = null;
     }
+
+    public Vector2Int GetPos()
+    {
+        return _pos;
+    }
 }

@@ -20,6 +20,7 @@ public abstract class AttackSkill : UnitSkill
 
     public override void Active(IAttacker attacker)
     {        
+        base.Active(attacker);
     }
 
     protected GameObject[] GetTargets(IAttacker attacker)

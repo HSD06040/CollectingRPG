@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class UnitDragDropSystem : MonoBehaviour
 {
-    private bool _isDragging;    
+    public static bool IsDragging;    
     private GameObject _currentUnit;
     private UnitBase _currentUnitBase;
     private Vector2 _offset;
@@ -35,7 +35,7 @@ public class UnitDragDropSystem : MonoBehaviour
             }
         }
 
-        if (_isDragging && _currentUnit != null && Input.GetMouseButton(0))
+        if (IsDragging && _currentUnit != null && Input.GetMouseButton(0))
         {
             Vector3 mousePos = Input.mousePosition;
             mousePos.z = -Camera.main.transform.position.z;
@@ -44,12 +44,12 @@ public class UnitDragDropSystem : MonoBehaviour
             _currentUnit.transform.position = mouseWorldPos + _offset;
         }
 
-        if (Input.GetMouseButtonUp(0) && _isDragging)
+        if (Input.GetMouseButtonUp(0) && IsDragging)
         {
             bool isSlot;
             CheckUISlot(out isSlot);
 
-            _isDragging = false;
+            IsDragging = false;
 
             if (isSlot)
                 return;
@@ -128,7 +128,7 @@ public class UnitDragDropSystem : MonoBehaviour
 
     public void SetUnit(GameObject unit)
     {
-        _isDragging = true;
+        IsDragging = true;
         _currentUnit = unit;
         _currentUnitBase = _currentUnit.GetComponent<UnitBase>();
         _offset = Vector2.zero;
@@ -140,7 +140,7 @@ public class UnitDragDropSystem : MonoBehaviour
         OnSlotChanged = action;
 
         _currentSlotIdx = slotIdx;
-        _isDragging = true;
+        IsDragging = true;
         _currentUnit = unit;
         _currentUnitBase = _currentUnit.GetComponent<UnitBase>();
 
