@@ -86,8 +86,6 @@ public class UI_UnitSlotController : MonoBehaviour
         {
             slotList.Add(idx);
         }
-
-        Debug.Log($"[슬롯] ! 유닛 : {unit.Data.Name}, 레벨 : {unit.Level}, 갯수 : {GetUnitCount(unit)}");
     }
 
     public void RemoveUnit(UnitStatus unit, int idx)

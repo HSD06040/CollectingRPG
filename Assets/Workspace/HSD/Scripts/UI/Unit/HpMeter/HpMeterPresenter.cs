@@ -17,7 +17,8 @@ public class HpMeterPresenter
     {
         foreach (var unit in _models)
         {
-            unit.StatusController.CurHp.AddEvent(_view.Reflash);
+            if(unit != null)
+                unit.StatusController.CurHp.AddEvent(_view.Reflash);
         }
     }
 
@@ -25,7 +26,8 @@ public class HpMeterPresenter
     {
         foreach (var unit in _models)
         {
-            unit.StatusController.CurHp.RemoveEvent(_view.Reflash);
+            if (unit != null)
+                unit.StatusController.CurHp.RemoveEvent(_view.Reflash);
         }
     }
 }

@@ -8,6 +8,7 @@ public class SynergyPanel : MonoBehaviour
 {
     [SerializeField] GameObject _synergySlotPrefab;
     [SerializeField] Transform _content;
+    [SerializeField] SynergyToolTip _synergyTooltip;
 
     private Dictionary<string, SynergySlot> _synergySlots = new(50);
     private int _currentPage;
@@ -37,7 +38,7 @@ public class SynergyPanel : MonoBehaviour
         foreach (var data in db._synergyDataDic.Values)
         {
             SynergySlot slot = Instantiate(_synergySlotPrefab, _content).GetComponent<SynergySlot>();
-            slot.Init(data, 0);
+            slot.Init(data, 0, _synergyTooltip);
 
             if(data is ClassSynergyData classSynergy)
                 _synergySlots.Add(classSynergy.Synergy.ToString(), slot);
@@ -59,7 +60,14 @@ public class SynergyPanel : MonoBehaviour
 
         slots.RemoveAll(s => s.ActiveCount <= 0);
 
-        slots.Sort((a, b) => b.ActiveCount.CompareTo(a.ActiveCount));
+        slots.Sort((a, b) =>
+        {
+            int result = b.ActiveCount.CompareTo(a.ActiveCount);
+            if (result == 0)
+                result = b.UpgradeCount.CompareTo(a.UpgradeCount);
+
+            return result;
+        });
 
         for (int i = 0; i < slots.Count; i++)
         {

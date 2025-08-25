@@ -6,12 +6,13 @@ public class SynergyController : MonoBehaviour
 {
     private readonly Dictionary<string, int> _synergyCountDic = new(60);
 
-    public SynergyDatabase SynergyDB;
+    public static SynergyDatabase SynergyDB;    // 추후 싱글톤 적재예정
 
     public event Action<string, int> OnSynergyChanged;
 
     public void Init()
     {
+        SynergyDB = Resources.Load<SynergyDatabase>("Database/SynergyDatabase");
         SynergyDB.Init();
     }
 
