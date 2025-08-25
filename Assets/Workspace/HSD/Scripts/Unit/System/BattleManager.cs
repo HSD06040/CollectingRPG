@@ -10,6 +10,9 @@ public class BattleManager : MonoBehaviour
 {
     [SerializeField] UnitSlotManager _unitSlotManager;
     private UnitBase[,] _unitGrid;
+    private int UnitMaxCount => UnitController.UnitMaxCount;
+    private UnitBase[] _cachedUnitsArray = new UnitBase[UnitController.UnitMaxCount];
+    private int _cachedUnitsCount = 0;
 
     private void Awake()
     {
@@ -35,6 +38,7 @@ public class BattleManager : MonoBehaviour
     {
         UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
         UnitBase newUnit = Instantiate(unit, slot.transform);
+        AddToCachedArray(newUnit);
         newUnit.SetBattleUnit();
         newUnit.Init();
 
@@ -45,6 +49,8 @@ public class BattleManager : MonoBehaviour
     {
         UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
         UnitBase unitBase = _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1];
+
+        RemoveFromCachedArray(unitBase);
 
         ClearSlot(newSlot, unitBase);
     }
@@ -69,5 +75,59 @@ public class BattleManager : MonoBehaviour
     public UnitBase[,] GetUnitGrid()
     {
         return _unitGrid;
+    }
+
+    private void AddToCachedArray(UnitBase unit)
+    {
+        if (_cachedUnitsCount < UnitMaxCount)
+        {
+            _cachedUnitsArray[_cachedUnitsCount] = unit;
+            _cachedUnitsCount++;
+        }
+    }
+
+    private void RemoveFromCachedArray(UnitBase unit)
+    {
+        for (int i = 0; i < _cachedUnitsCount; i++)
+        {
+            if (_cachedUnitsArray[i] == unit)
+            {
+                for (int j = i; j < _cachedUnitsCount - 1; j++)
+                {
+                    _cachedUnitsArray[j] = _cachedUnitsArray[j + 1];
+                }
+
+                _cachedUnitsArray[_cachedUnitsCount - 1] = null;
+                _cachedUnitsCount--;
+                break;
+            }
+        }
+    }
+    /// <summary>
+    /// GC 할당 없이 현재 유닛들을 반환합니다.
+    /// 반환된 배열의 유효한 요소는 처음부터 GetUnitsCount()개까지입니다.
+    /// </summary>
+    public UnitBase[] GetUnits()
+    {
+        return _cachedUnitsArray;
+    }
+
+    /// <summary>
+    /// GetUnits()로 반환된 배열에서 유효한 유닛의 개수를 반환합니다.
+    /// </summary>
+    public int GetUnitsCount()
+    {
+        return _cachedUnitsCount;
+    }
+
+    /// <summary>
+    /// 특정 인덱스의 유닛을 반환합니다. (범위 체크 포함)
+    /// </summary>
+    public UnitBase GetUnit(int index)
+    {
+        if (index < 0 || index >= _cachedUnitsCount)
+            return null;
+
+        return _cachedUnitsArray[index];
     }
 }

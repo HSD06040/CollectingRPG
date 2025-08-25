@@ -22,67 +22,106 @@ public class UnitDragDropSystem : MonoBehaviour
 
     private void Update()
     {
+#if UNITY_EDITOR || UNITY_STANDALONE
+        // --- 에디터/PC 전용 입력 ---
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            ToolTipController.UnitToolTip.Close();
-            ToolTipController.SynergyToolTip.Close();
-            Vector2 worldMouse = GetWorldMouse();
-
-            RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);
-
-            if (hits.Length == 0)
-                return;            
-            bool isInterfactable = false;
-            for (int i = 0; i < hits.Length; i++)
-            {
-                if (hits[i].collider != null && hits[i].collider.CompareTag("UnitTrigger"))
-                {
-                    isInterfactable = true;                
-                    SetUnit(hits[i].collider.gameObject);
-                }
-                else if (hits[i].collider != null && hits[i].collider.CompareTag("BattleUnit"))
-                {
-                    isInterfactable = true;
-                    ToolTipController.UnitToolTip.Show(ComponentProvider.Get<UnitStatusController>(hits[i].collider.gameObject).Status);
-                }                
-            }
-
-            if(!isInterfactable)
-            {
-                ToolTipController.UnitToolTip.Close();
-            }
+            HandleClick();
         }
 
         if (IsDragging && _currentUnit != null && Input.GetMouseButton(0))
         {
-            Vector3 mousePos = Input.mousePosition;
-            mousePos.z = -Camera.main.transform.position.z;
-            Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mousePos);
-
-            _currentUnitBase.transform.position = mouseWorldPos + _offset;
+            DragUnit(Input.mousePosition);
         }
 
         if (Input.GetMouseButtonUp(0) && IsDragging)
         {
-            bool isSlot;
-            CheckUISlot(out isSlot);
+            ReleaseUnit();
+        }
 
-            IsDragging = false;
+#elif UNITY_ANDROID
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
 
-            if (isSlot)
+            if (touch.phase == TouchPhase.Began)
             {
-                return;
-            }   
-
-            if (_currentUnit != null)
-            {
-                CheckSlot();
+                HandleClick();
             }
 
-            Clear();
+            if (IsDragging && _currentUnit != null && touch.phase == TouchPhase.Moved)
+            {
+                DragUnit(touch.position);
+            }
+
+            if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+            {
+                if (IsDragging)
+                {
+                    ReleaseUnit();
+                }
+            }
         }
+#endif
     }
 
+    private void HandleClick()
+    {
+        ToolTipController.UnitToolTip.Close();
+        ToolTipController.SynergyToolTip.Close();
+        Vector2 worldMouse = GetWorldMouse();
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);
+
+        if (hits.Length == 0)
+            return;
+
+        bool isInterfactable = false;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider != null && hits[i].collider.CompareTag("UnitTrigger"))
+            {
+                isInterfactable = true;
+                SetUnit(hits[i].collider.gameObject);
+            }
+            else if (hits[i].collider != null && hits[i].collider.CompareTag("BattleUnit"))
+            {
+                isInterfactable = true;
+                ToolTipController.UnitToolTip.Show(ComponentProvider.Get<UnitStatusController>(hits[i].collider.gameObject).Status);
+            }
+        }
+
+        if (!isInterfactable)
+        {
+            ToolTipController.UnitToolTip.Close();
+        }
+    }
+    private void DragUnit(Vector3 inputPosition)
+    {
+        inputPosition.z = -Camera.main.transform.position.z;
+        Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(inputPosition);
+
+        _currentUnitBase.transform.position = mouseWorldPos + _offset;
+    }
+    private void ReleaseUnit()
+    {
+        bool isSlot;
+        CheckUISlot(out isSlot);
+
+        IsDragging = false;
+
+        if (isSlot)
+        {
+            return;
+        }
+
+        if (_currentUnit != null)
+        {
+            CheckSlot();
+        }
+
+        Clear();
+    }
     private static void CheckUISlot(out bool isSlot)
     {
         PointerEventData pointerData = new PointerEventData(EventSystem.current)

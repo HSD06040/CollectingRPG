@@ -15,9 +15,6 @@ public class UnitController : MonoBehaviour
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
 
-    private UnitBase[] _cachedUnitsArray = new UnitBase[UnitMaxCount];
-    private int _cachedUnitsCount = 0;
-
     private int _currentUnitCount = 0;
     public int CurrentUnitCount
     {
@@ -110,12 +107,11 @@ public class UnitController : MonoBehaviour
             SetSlot(slot, unit);
             AddSynergyUnit(unit);
             AddList(unit);
-            AddToCachedArray(unit); // 캐시된 배열에 추가
             CurrentUnitCount++;
 
             OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
-            OnUnitChanged?.Invoke(_cachedUnitsArray);
             _battleManager.AddUnit(slot, unit);
+            OnUnitChanged?.Invoke(GetUnits());
         }
         else
         {
@@ -198,7 +194,6 @@ public class UnitController : MonoBehaviour
 
         _unitBaseDic[unit.Status.Address].Remove(unit);
 
-        RemoveFromCachedArray(unit); // 캐시된 배열에서 제거
         ClearSlot(slot, unit);
 
         if (destroyGameObject)
@@ -210,7 +205,7 @@ public class UnitController : MonoBehaviour
         CurrentUnitCount--;
 
         OnUnitPowerChanged?.Invoke(-unit.Status.CombatPower);
-        OnUnitChanged?.Invoke(_cachedUnitsArray);
+        OnUnitChanged?.Invoke(GetUnits());
     }
 
     public Vector2Int RemoveUnit(UnitStatus unit)
@@ -272,32 +267,7 @@ public class UnitController : MonoBehaviour
         list.Add(unit);
     }
 
-    private void AddToCachedArray(UnitBase unit)
-    {
-        if (_cachedUnitsCount < UnitMaxCount)
-        {
-            _cachedUnitsArray[_cachedUnitsCount] = unit;
-            _cachedUnitsCount++;
-        }
-    }
-
-    private void RemoveFromCachedArray(UnitBase unit)
-    {
-        for (int i = 0; i < _cachedUnitsCount; i++)
-        {
-            if (_cachedUnitsArray[i] == unit)
-            {
-                for (int j = i; j < _cachedUnitsCount - 1; j++)
-                {
-                    _cachedUnitsArray[j] = _cachedUnitsArray[j + 1];
-                }
-
-                _cachedUnitsArray[_cachedUnitsCount - 1] = null;
-                _cachedUnitsCount--;
-                break;
-            }
-        }
-    }
+    
 
     public UnitSlot GetUnitSlot(UnitBase unit)
     {
@@ -318,14 +288,13 @@ public class UnitController : MonoBehaviour
     {
         return GetUnitCount(unit.Address);
     }
-
     /// <summary>
     /// GC 할당 없이 현재 유닛들을 반환합니다.
     /// 반환된 배열의 유효한 요소는 처음부터 GetUnitsCount()개까지입니다.
     /// </summary>
     public UnitBase[] GetUnits()
     {
-        return _cachedUnitsArray;
+        return _battleManager.GetUnits();
     }
 
     /// <summary>
@@ -333,7 +302,7 @@ public class UnitController : MonoBehaviour
     /// </summary>
     public int GetUnitsCount()
     {
-        return _cachedUnitsCount;
+        return _battleManager.GetUnitsCount();
     }
 
     /// <summary>
@@ -341,10 +310,7 @@ public class UnitController : MonoBehaviour
     /// </summary>
     public UnitBase GetUnit(int index)
     {
-        if (index < 0 || index >= _cachedUnitsCount)
-            return null;
-
-        return _cachedUnitsArray[index];
+        return _battleManager.GetUnit(index);
     }
 
     public bool IsUnitMaxCount()

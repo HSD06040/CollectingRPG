@@ -25,7 +25,14 @@ public class DamageMeterController : MonoBehaviour
 
     public void Init(UnitBase[] units)
     {
-        _unitCount = units.Length;
+        int count = 0;
+        for (int i = 0; i < units.Length; i++)
+        {
+            if (units[i] != null)
+                count++;
+        }
+
+        _unitCount = count;
 
         for (int i = 0; i < _damageMeterSlots.Length; i++)
         {

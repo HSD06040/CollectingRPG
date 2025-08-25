@@ -33,12 +33,7 @@ public class UnitManager : MonoBehaviour
         _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
         _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
 
-        _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
-
-        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
-        {
-            _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
-        }
+        
         
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
         for(int i = 0; i < preset.Statuses.Length; i++)
@@ -56,10 +51,17 @@ public class UnitManager : MonoBehaviour
     }
 
     private void Subscribe()
-    {
+    {       
         _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+
+        _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+
+        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        {
+            _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+        }
     }
 
     private void UnSubscrube()
@@ -67,6 +69,13 @@ public class UnitManager : MonoBehaviour
         _unitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+
+        _unitController.OnUnitCountChanged -= _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+
+        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        {
+            _unitController.OnUnitPowerChanged -= _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+        }
     }
     
     public void Fight()
