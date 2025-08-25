@@ -4,10 +4,12 @@ using UnityEngine;
 public class UnitController : MonoBehaviour
 {
     public SynergyController SynergyController;
+    public UI_UnitSlotController _uiSlotController;
+
     [SerializeField] UnitSlotManager _unitSlotManager;
-    [SerializeField] UI_UnitSlotController _uiSlotController;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
     [SerializeField] BattleManager _battleManager;
+
     public static readonly int UnitMaxCount = 10;
 
     private UnitBase[,] _unitGrid;
@@ -267,7 +269,7 @@ public class UnitController : MonoBehaviour
         list.Add(unit);
     }
 
-    
+
 
     public UnitSlot GetUnitSlot(UnitBase unit)
     {
@@ -316,5 +318,20 @@ public class UnitController : MonoBehaviour
     public bool IsUnitMaxCount()
     {
         return _currentUnitCount >= UnitMaxCount;
+    }
+
+    public UnitSlot GetEmptyLineSlot(int line)
+    {        
+        for (int y = 1; y <= _unitSlotManager.SlotCreater.Size.y; y++)
+        {
+            Vector2Int pos = new Vector2Int(line, y);
+
+            if (_unitGrid[y - 1, line - 1] == null)
+            {
+                return _unitSlotManager.GetUnitSlot(pos);
+            }
+        }
+
+        return null;
     }
 }

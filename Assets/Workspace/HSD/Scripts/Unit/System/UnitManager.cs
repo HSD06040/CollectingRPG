@@ -8,8 +8,8 @@ public class UnitManager : MonoBehaviour
     [SerializeField] UI_UnitSlotController _unitSlotController;
 
     [Header("Unit_Controller")]
-    [SerializeField] UnitController _unitController;
-    [SerializeField] EnemyController _enemyController;
+    public UnitController _unitController;
+    public EnemyController _enemyController;
 
     [Header("Data")]
     [SerializeField] UnitData[] _testDatas;
@@ -32,15 +32,17 @@ public class UnitManager : MonoBehaviour
 
         _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
         _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
-
-        
-        
+               
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
-        for(int i = 0; i < preset.Statuses.Length; i++)
+
+        if (preset == null)
+            return;
+
+        for (int i = 0; i < preset.Statuses.Length; i++)
         {
             if(preset.Statuses[i].Data != null)
             {
-                AddUnit(preset.Statuses[i]);
+                AddSlotUnit(preset.Statuses[i]);
             }
         }
     }
@@ -103,10 +105,10 @@ public class UnitManager : MonoBehaviour
         UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
         UnitStatus unitStatus = new UnitStatus(unit);
 
-        AddUnit(unitStatus);
+        AddSlotUnit(unitStatus);
     }
 
-    public void AddUnit(UnitStatus unit)
+    public void AddSlotUnit(UnitStatus unit)
     {
         int slotIdx = _unitSlotController.GetEmptySlot();
 
@@ -117,6 +119,15 @@ public class UnitManager : MonoBehaviour
         }
 
         SetSlot(unit, slotIdx);
+    }
+
+    public void AddBattleUnit(UnitStatus unit, UnitSlot slot)
+    {
+        UnitBase unitBase = Instantiate(unit.Data.UnitPrefab).GetComponent<UnitBase>();
+        unitBase.Status = unit;
+        unitBase.Init();
+
+        _unitController.AddUnit(slot, unitBase);
     }
 
     private void SetSlot(UnitStatus unit, int idx)

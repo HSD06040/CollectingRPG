@@ -75,7 +75,12 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
     {
         return _unit;
     }
-    
+
+    public int GetSlotIdx()
+    {
+        return _slotIdx;
+    }
+
     #region Drag&Drop
     public void OnBeginDrag(PointerEventData eventData)
     {
