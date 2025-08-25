@@ -2,13 +2,31 @@ using UnityEngine;
 
 public class UnitBase : MonoBehaviour, IAttacker
 {
-    [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
     [field: SerializeField] public UnitStatus Status { get; set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
-
     [field: SerializeField] public BoxCollider2D TriggerCol { get; private set; }
+    [field: SerializeField] public Transform Target 
+    { 
+        get
+        {
+            if(_target == null)
+            {
+                _target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
+            }
+
+            return _target;
+        }
+
+        set
+        {
+            _target = value;            
+        }
+    }
+
+    private Transform _target;
+
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
     public Vector2Int CurrentSlot { get; set; }
