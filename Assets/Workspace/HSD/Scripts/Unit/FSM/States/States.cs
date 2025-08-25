@@ -167,7 +167,8 @@ public class SkillState : AnimationFinishedState
 
     public override void Enter()
     {
-        base.Enter();        
+        base.Enter();
+        _status.UseSkill?.Invoke(_status.Status);
     }
 
     public override void Exit()

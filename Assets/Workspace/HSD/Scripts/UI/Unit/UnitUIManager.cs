@@ -15,6 +15,7 @@ public class UnitUIManager : MonoBehaviour
     public FightUnitSlotController FightSlotController;
     public DamageMeterController DamageMeterController;
     public HpMeterController HpMeterController;
+    public SkillPopUpController SkillPopUpController;
 
     public void BattleUIInit()
     {

@@ -230,4 +230,27 @@ public static class Utils
             _ => new Color(85f / 255f, 85f / 255f, 85f / 255f)
         };
     }
+
+    public static Color GetGradeColor(this UnitStatus status)
+    {
+        return (status.Data.Grade) switch
+        {
+            Grade.Normal => new Color32(0x4D, 0xC5, 0x5B, 0xFF),
+            Grade.Rare => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
+            Grade.Unique => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
+            Grade.Legendary => new Color32(0xF2, 0x93, 0x38, 0xFF),
+            _ => Color.grey,
+        };
+    }
+
+    public static Color GetEnemyLevelColor(this UnitStatus status)
+    {
+        return (status.Level) switch
+        {
+            2 => new Color32(0x55, 0x55, 0x55, 0xFF), // Boss : 단색 회색
+            1 => new Color32(0xC7, 0x40, 0x40, 0xFF), // Elite : 단색 빨강
+            0 => new Color32(0xB0, 0xB0, 0xB0, 0xFF), // Normal : 단색 회색
+            _ => Color.grey
+        };
+    }
 }

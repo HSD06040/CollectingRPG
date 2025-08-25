@@ -12,10 +12,10 @@ public abstract class UnitSkill : ScriptableObject
     public int MaxCount;
     public float Power;
     public int ManaCost;
-    public event Action<UnitSkill> UseSkill;
+    
 
     public virtual void Active(IAttacker attacker)
     {
-        UseSkill?.Invoke(this);
+        
     }
 }

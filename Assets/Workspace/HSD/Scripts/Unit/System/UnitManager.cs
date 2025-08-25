@@ -94,6 +94,7 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.BattleUIInit();
 
         _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
+        _unitUIManager.SkillPopUpController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
         _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
 
