@@ -1,71 +1,84 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.UI.CanvasScaler;
 
 public class BattleManager : MonoBehaviour
 {
-    [SerializeField] UnitSlotManager _unitSlotManager;
-    private UnitBase[,] _unitGrid;
+    public static event Action OnBattleEnded;
 
-    private void Awake()
+    [SerializeField] LayerMask playerLayer;
+
+    [Header("UnitCount")]
+    private int playerUnitCount;
+    private int enemyUnitCount;
+
+    public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
-        int rows = _unitSlotManager.SlotCreater.Size.y;
-        int cols = _unitSlotManager.SlotCreater.Size.x;
-        _unitGrid = new UnitBase[rows, cols];
+        UnitBase[] notNullPlayerUnits = GetNotNullUnits(playerUnits);
+        UnitBase[] notNullEnemyUnits = GetNotNullUnits(enemyUnits);
 
-        _unitSlotManager.Init();
+        RegisterEvent(notNullPlayerUnits);
+        RegisterEvent(notNullEnemyUnits);
+
+        playerUnitCount = notNullPlayerUnits.Length;
+        enemyUnitCount = notNullEnemyUnits.Length;
     }
 
-    public void MoveUnit(UnitSlot oldSlot, UnitSlot slot, UnitBase unit)
+    private void CheckBattleEnded(UnitStatusController statusCon)
     {
-        UnitSlot newOldSlot = _unitSlotManager.GetUnitSlot(oldSlot.GetPos());
-        UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
-        UnitBase unitBase = _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1];
+        if (!statusCon.IsDead) return;
 
-        ClearSlot(newOldSlot, unitBase, false);
+        if (playerLayer.Contain(statusCon.gameObject.layer))
+        {
+            playerUnitCount--;
+        }
+        else
+        {
+            enemyUnitCount--;
+        }
+        Debug.Log($"플레이어 유닛 수: {playerUnitCount}, 적 유닛 수: {enemyUnitCount}");
+        statusCon.OnUnitDied -= CheckBattleEnded;
 
-        SetSlot(newSlot, unitBase);
+        if (playerUnitCount > 0 && enemyUnitCount > 0)
+            return;
+
+        if (playerUnitCount <= 0)
+        {
+            Debug.Log("플레이어 패배");
+        }
+        else if (enemyUnitCount <= 0)
+        {
+            Debug.Log("플레이어 승리");
+        }
+
+        OnBattleEnded?.Invoke();
     }
 
-    public void AddUnit(UnitSlot slot, UnitBase unit)
+    private UnitBase[] GetNotNullUnits(UnitBase[] units)
     {
-        UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
-        UnitBase newUnit = Instantiate(unit, slot.transform);
-
-        SetSlot(newSlot, newUnit);
+        List<UnitBase> notNullUnits = new List<UnitBase>();
+        foreach (var unit in units)
+        {
+            if (unit != null)
+                notNullUnits.Add(unit);
+        }
+        return notNullUnits.ToArray();
     }
 
-    public void RemoveUnit(UnitSlot slot, UnitBase unit)
+    private void RegisterEvent(UnitBase[] units)
     {
-        UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
-        UnitBase unitBase = _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1];
-
-        ClearSlot(newSlot, unitBase);
+        for (int i = 0; i < units.Length; i++)
+        {
+            units[i].StatusController.OnUnitDied += CheckBattleEnded;
+        }
     }
 
-    public void ClearSlot(UnitSlot slot, UnitBase unit, bool isDestroy = true)
+    private void UnRegisterEvent(UnitBase[] units)
     {
-        slot.ClearSlot();
-
-        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
-
-        if (isDestroy)
-            Destroy(unit.gameObject);
-    }
-
-    public void SetSlot(UnitSlot slot, UnitBase unit)
-    {
-        slot.SetUnit(unit);
-
-        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = unit;
-    }
-
-    public UnitBase[,] GetUnitGrid()
-    {
-        return _unitGrid;
+        for (int i = 0; i < units.Length; i++)
+        {
+            units[i].StatusController.OnUnitDied -= CheckBattleEnded;
+        }
     }
 }

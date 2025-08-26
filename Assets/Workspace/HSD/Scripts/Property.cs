@@ -12,7 +12,7 @@ public class Property<T>
         {
             _value = value; 
 
-            _onChange?.Invoke(_value); 
+            _onChanged?.Invoke(_value); 
         }
     }
 
@@ -21,15 +21,15 @@ public class Property<T>
         Value = default;
     }
 
-    private event Action<T> _onChange;
+    private event Action<T> _onChanged;
 
     public void AddEvent(Action<T> action)
     {
-        _onChange += action;
+        _onChanged += action;
     }
 
     public void RemoveEvent(Action<T> action)
     {
-        _onChange -= action;
+        _onChanged -= action;
     }
 }

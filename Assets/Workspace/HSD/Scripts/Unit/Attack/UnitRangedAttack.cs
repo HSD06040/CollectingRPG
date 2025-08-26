@@ -19,7 +19,7 @@ public class UnitRangedAttack : UnitAttackData
         GameObject obj = Instantiate(projectilePrefab, spawnPoint, Quaternion.identity);
         Projectile projectile = ComponentProvider.Get<Projectile>(obj);
 
-        attacker.GetStatusController().GetMana();
+        attacker.GetStatusController().GetMana();        
 
         projectile.Init(attacker.GetTarget(), attacker.GetStatusController(), AttackPower, DamageType, attacker.TargetLayer, projectileSpeed);
     }

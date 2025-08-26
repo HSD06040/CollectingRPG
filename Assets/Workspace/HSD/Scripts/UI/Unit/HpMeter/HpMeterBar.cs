@@ -30,7 +30,8 @@ public class HpMeterBar : MonoBehaviour
 
         foreach (var unit in units)
         {
-            max += unit.StatusController.MaxHealth.Value;
+            if(unit != null)
+                max += unit.StatusController.MaxHealth.Value;
         }
 
         return max;
@@ -42,7 +43,8 @@ public class HpMeterBar : MonoBehaviour
 
         foreach (var unit in _units)
         {
-            currentHp += unit.StatusController.CurHp.Value;
+            if(unit != null)
+                currentHp += unit.StatusController.CurHp.Value;
         }
 
         _hpText.text = Utils.ToAbbreviation(currentHp);

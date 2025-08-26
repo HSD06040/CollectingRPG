@@ -167,7 +167,8 @@ public class SkillState : AnimationFinishedState
 
     public override void Enter()
     {
-        base.Enter();        
+        base.Enter();
+        _status.UseSkill?.Invoke(_status.Status);
     }
 
     public override void Exit()
@@ -185,7 +186,7 @@ public class DeadState : BaseState
 {
     public DeadState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
-        _status.OnPlayerDied += () => _stateMachine.ChangeState(_fsm.DeadState);
+        _status.OnUnitDied += ChangeDeadState;
     }
 
     public override void Enter()
@@ -203,5 +204,10 @@ public class DeadState : BaseState
     public override void Update()
     {
         base.Update();
+    }
+
+    private void ChangeDeadState(UnitStatusController _unitStatusController)
+    {
+        _stateMachine.ChangeState(_fsm.DeadState);
     }
 }

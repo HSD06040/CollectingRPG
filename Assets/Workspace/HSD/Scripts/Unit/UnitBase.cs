@@ -2,11 +2,30 @@ using UnityEngine;
 
 public class UnitBase : MonoBehaviour, IAttacker
 {
-    [field: SerializeField] public Transform Target { get; private set; }
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
     [field: SerializeField] public UnitStatus Status { get; set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
+    [field: SerializeField] public BoxCollider2D TriggerCol { get; private set; }
+    [field: SerializeField] public Transform Target 
+    { 
+        get
+        {
+            if(_target == null)
+            {
+                _target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
+            }
+
+            return _target;
+        }
+
+        set
+        {
+            _target = value;            
+        }
+    }
+
+    private Transform _target;
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
@@ -27,6 +46,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         Anim ??= GetComponentInChildren<Animator>();
         Rb ??= GetComponent<Rigidbody2D>();
         Col ??= GetComponent<CapsuleCollider2D>();
+        TriggerCol ??= GetComponentInChildren<BoxCollider2D>();
 
         AddProviderComponents();
     }
@@ -47,6 +67,12 @@ public class UnitBase : MonoBehaviour, IAttacker
         Col.enabled = true;
 
         StatusController.Init(Status);
+    }
+
+    public void SetBattleUnit()
+    {
+        TriggerCol.enabled = false;
+        tag = "BattleUnit";
     }
 
     #region Provider

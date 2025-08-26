@@ -8,7 +8,6 @@ public class LogoutButton : MonoBehaviour
 
     private void Reset()
     {
-        // 에디터에서 버튼 자동 할당 시도
         if (_logoutButton == null)
             _logoutButton = GetComponent<Button>();
     }
@@ -32,7 +31,7 @@ public class LogoutButton : MonoBehaviour
 
     private void OnClick_Logout()
     {
-        var auth = FirebaseManager.Auth; // FirebaseAuth.DefaultInstance 래퍼라고 가정
+        var auth = FirebaseManager.Auth;
         if (auth == null)
         {
             Debug.LogError("[Auth] FirebaseAuth 인스턴스가 없습니다.");
