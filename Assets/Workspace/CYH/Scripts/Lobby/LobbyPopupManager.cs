@@ -15,12 +15,15 @@ public class LobbyPopupManager : MonoBehaviour
     [Header("Ad")]
     [SerializeField] private Button _adButton;
 
+    [Header("AccountLink")]
+    [SerializeField] private GameObject _googleLinkPopup;
+    [SerializeField] private Button _accountLinkButton;
+
 
     private void Start()
     {
         _playerProfileButton.onClick.AddListener(() =>
         {
-            Debug.Log("프로필 버튼 클릭");
             ShowPopup();
         });
 
@@ -30,6 +33,11 @@ public class LobbyPopupManager : MonoBehaviour
                 "Watch Ad",
                 () => _googleAdMob.ShowAd(),
                 () => gameObject.SetActive(false));
+        });
+
+        _accountLinkButton.onClick.AddListener(() =>
+        {
+            _googleLinkPopup.SetActive(true);
         });
     }
 
