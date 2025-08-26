@@ -21,7 +21,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     [Header("CritRate")]
     public Stat<int> CritChance;
-    public Stat<int> CritDamage;
 
     [Header("Defense")]
     public Stat<int> PhysicalDefense;
@@ -37,7 +36,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     public Property<int> CurMana = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
 
-    public event Action OnPlayerDied;
+    public event Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> UseSkill;
 
     public bool IsDead => CurHp.Value <= 0;
@@ -61,7 +60,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable
         MagicDamage.SetBaseStat(stat.MagicDamage);
 
         CritChance.SetBaseStat(stat.CritChance);
-        CritDamage.SetBaseStat(stat.CritDamage);
 
         PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
         MagicDefense.SetBaseStat(stat.MagicDefense);
@@ -76,6 +74,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public void TakeDamage(int amount)
     {
+        if(IsDead)
+            return;
+
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount,0, int.MaxValue);
 
         if(CurHp.Value == 0)
@@ -86,7 +87,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        OnPlayerDied?.Invoke();
+        OnUnitDied?.Invoke(this);
     }
 
     public void GetMana()

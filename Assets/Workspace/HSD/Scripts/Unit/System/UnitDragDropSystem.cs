@@ -67,10 +67,9 @@ public class UnitDragDropSystem : MonoBehaviour
 
     private void HandleClick()
     {
-        ToolTipController.UnitToolTip.Close();
+        ToolTipController.UnitToolTip.Close();   
         ToolTipController.SynergyToolTip.Close();
         Vector2 worldMouse = GetWorldMouse();
-
         RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);
 
         if (hits.Length == 0)
@@ -88,12 +87,14 @@ public class UnitDragDropSystem : MonoBehaviour
             {
                 isInterfactable = true;
                 ToolTipController.UnitToolTip.Show(ComponentProvider.Get<UnitStatusController>(hits[i].collider.gameObject).Status);
+                ToolTipController.SynergyToolTip.Close();
             }
         }
 
         if (!isInterfactable)
         {
             ToolTipController.UnitToolTip.Close();
+            ToolTipController.SynergyToolTip.Close();
         }
     }
     private void DragUnit(Vector3 inputPosition)
@@ -122,7 +123,7 @@ public class UnitDragDropSystem : MonoBehaviour
 
         Clear();
     }
-    private static void CheckUISlot(out bool isSlot)
+    private void CheckUISlot(out bool isSlot)
     {
         PointerEventData pointerData = new PointerEventData(EventSystem.current)
         {
@@ -130,7 +131,7 @@ public class UnitDragDropSystem : MonoBehaviour
         };
 
         List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(pointerData, results);
+        EventSystem.current.RaycastAll(pointerData, results);  
 
         isSlot = false;
         foreach (var result in results)

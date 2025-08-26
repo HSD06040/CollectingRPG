@@ -18,7 +18,6 @@ public class UnitStats
 
     [Header("CritRate")]
     public int CritChance;
-    public int CritDamage;
 
     [Header("Defense")]
     public int PhysicalDefense;
