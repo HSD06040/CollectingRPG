@@ -220,7 +220,6 @@ public class UnitDataEditorWindow : EditorWindow
         // Critical 섹션
         EditorGUILayout.LabelField("Critical", EditorStyles.boldLabel);
         stats.CritChance = EditorGUILayout.IntField("Crit Chance", stats.CritChance);
-        stats.CritDamage = EditorGUILayout.IntField("Crit Damage", stats.CritDamage);
 
         EditorGUILayout.Space(3);
 
@@ -252,7 +251,6 @@ public class UnitDataEditorWindow : EditorWindow
             PhysicalDamage = 10,
             MagicDamage = 0,
             CritChance = 5,
-            CritDamage = 150,
             PhysicalDefense = 5,
             MagicDefense = 5,
             AttackRange = 1,
@@ -271,7 +269,6 @@ public class UnitDataEditorWindow : EditorWindow
         target.PhysicalDamage = source.PhysicalDamage;
         target.MagicDamage = source.MagicDamage;
         target.CritChance = source.CritChance;
-        target.CritDamage = source.CritDamage;
         target.PhysicalDefense = source.PhysicalDefense;
         target.MagicDefense = source.MagicDefense;
         target.AttackRange = source.AttackRange;

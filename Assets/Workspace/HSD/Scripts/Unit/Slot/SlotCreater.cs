@@ -7,7 +7,7 @@ public class SlotCreater : MonoBehaviour
 {
     [SerializeField] GameObject _slotPrefab;
     [SerializeField] Transform _slotParent;
-    [SerializeField] Vector2 _offset;    
+    private static Vector2 _offset = new Vector2(1.6f, 1.6f);
     public Vector2Int Size;    
 
     public Dictionary<Vector2Int, UnitSlot> Init()
@@ -30,7 +30,14 @@ public class SlotCreater : MonoBehaviour
 
     private Vector2 GetPos(int x, int y)
     {
-        Vector2 pos = _slotParent.position;
-        return pos + new Vector2(x * _offset.x, y * _offset.y);
+        Vector2 parentPos = _slotParent.position;
+
+        float totalWidth = (Size.x - 1) * _offset.x;
+        float totalHeight = (Size.y - 1) * _offset.y;
+
+        float xOffset = -totalWidth / 2f;
+        float yOffset = -totalHeight / 2f;
+
+        return parentPos + new Vector2(x * _offset.x + xOffset, y * _offset.y + yOffset);
     }
 }
