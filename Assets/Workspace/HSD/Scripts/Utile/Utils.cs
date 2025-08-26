@@ -43,7 +43,6 @@ public static class Utils
             GetComponent<DamagePopUp>().Init(totalDamage, isCrit);
 
         status.TotalDamage.Value += totalDamage;
-        Debug.Log($"{status.Status.Data.Name}가 {totalDamage} 공격을 하여 총 {status.TotalDamage.Value}가 되었습니다.");
         enemy.TakeDamage(totalDamage);
     }
 

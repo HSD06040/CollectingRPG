@@ -2,18 +2,22 @@ using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [Header("BattleManager")]
+    [SerializeField] BattleManager _battleManager;
+
     [Header("UI")]
     [SerializeField] UnitUIManager _unitUIManager;
     [SerializeField] UnitStanbyUIManager _unitStanbyUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
 
     [Header("Unit_Controller")]
-    [SerializeField] UnitController _unitController;
-    [SerializeField] EnemyController _enemyController;
+    public UnitController _unitController;
+    public EnemyController _enemyController;
 
     [Header("Data")]
     [SerializeField] UnitData[] _testDatas;
     [SerializeField] int _upgradeNeedCount = 3;
+    [SerializeField] int _spawnGold = 20;
 
     private void Awake()
     {
@@ -33,15 +37,17 @@ public class UnitManager : MonoBehaviour
 
         _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
         _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
-
-        
-        
+               
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
-        for(int i = 0; i < preset.Statuses.Length; i++)
+
+        if (preset == null)
+            return;
+
+        for (int i = 0; i < preset.Statuses.Length; i++)
         {
             if(preset.Statuses[i].Data != null)
             {
-                AddUnit(preset.Statuses[i]);
+                AddSlotUnit(preset.Statuses[i]);
             }
         }
     }
@@ -51,6 +57,7 @@ public class UnitManager : MonoBehaviour
         UnSubscrube();
     }
 
+    #region EventHandler
     private void Subscribe()
     {       
         _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
@@ -78,11 +85,15 @@ public class UnitManager : MonoBehaviour
             _unitController.OnUnitPowerChanged -= _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
         }
     }
-    
+    #endregion
+
+    #region Fight
     public void Fight()
     {
         if(_unitController.GetUnitsCount() == 0)
             return;
+
+        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
 
         _unitController.UnitFight();
         _enemyController.EnemyFight();
@@ -98,16 +109,23 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.SkillPopUpController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
         _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
+    #endregion
 
     public void RandomSpawn()
     {
+        if (!InGameManager.Instance.SpendGold(_spawnGold))
+        {
+            Debug.Log("골드가 부족합니다.");
+            return;
+        }
+
         UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
         UnitStatus unitStatus = new UnitStatus(unit);
 
-        AddUnit(unitStatus);
+        AddSlotUnit(unitStatus);
     }
 
-    public void AddUnit(UnitStatus unit)
+    public void AddSlotUnit(UnitStatus unit)
     {
         int slotIdx = _unitSlotController.GetEmptySlot();
 
@@ -118,6 +136,15 @@ public class UnitManager : MonoBehaviour
         }
 
         SetSlot(unit, slotIdx);
+    }
+
+    public void AddBattleUnit(UnitStatus unit, UnitSlot slot)
+    {
+        UnitBase unitBase = Instantiate(unit.Data.UnitPrefab).GetComponent<UnitBase>();
+        unitBase.Status = unit;
+        unitBase.Init();
+
+        _unitController.AddUnit(slot, unitBase);
     }
 
     private void SetSlot(UnitStatus unit, int idx)

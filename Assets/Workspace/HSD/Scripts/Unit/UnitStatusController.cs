@@ -37,7 +37,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable
     public Property<int> CurMana = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
 
-    public event Action OnPlayerDied;
+    public event Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> UseSkill;
 
     public bool IsDead => CurHp.Value <= 0;
@@ -76,6 +76,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public void TakeDamage(int amount)
     {
+        if(IsDead)
+            return;
+
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount,0, int.MaxValue);
 
         if(CurHp.Value == 0)
@@ -86,7 +89,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        OnPlayerDied?.Invoke();
+        OnUnitDied?.Invoke(this);
     }
 
     public void GetMana()
