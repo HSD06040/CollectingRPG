@@ -12,10 +12,13 @@ public class PlayerDataController : MonoBehaviour
     private PlayerData _data;
     public PlayerData Data { get { return _data; } }
 
+    public Action<PlayerData> OnUpdateUI;
+
 
     private void Start()
     {
         InitAsync();
+        OnUpdateUI += _view.UpdateUI;
     }
 
     private void OnEnable()
@@ -71,7 +74,7 @@ public class PlayerDataController : MonoBehaviour
             Diamond = int.TryParse(snapshot.Child("Diamond").Value?.ToString(), out int diamond) ? diamond : 0
         };
 
-        Debug.Log(FirebaseManager.Auth.CurrentUser.UserId);
+        Debug.Log($"[OnPlayerDataChanged] UI 업데이트 / UID: {FirebaseManager.Auth.CurrentUser.UserId}");
         Debug.Log(snapshot.Child("Nickname").Value);
         Debug.Log(snapshot.Child("Gold").Value);
         Debug.Log(snapshot.Child("Diamond").Value);

@@ -1,16 +1,20 @@
-using Firebase.Auth;
-using Firebase.Extensions;
-using Google;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Firebase.Auth;
+using Firebase.Extensions;
+using Google;
 
 public class AccountLinkPopup : MonoBehaviour
 {
+    [SerializeField] private PlayerDataController _playerDataController;
+    
     [SerializeField] private Button _closeButton;
     [SerializeField] private Button _googleLinkButton;
     [SerializeField] private Button _deleteButton;
     [SerializeField] private Button _signOutButton;
+
 
     private void Start()
     {
@@ -20,6 +24,8 @@ public class AccountLinkPopup : MonoBehaviour
         _signOutButton.onClick.AddListener(() =>
         {
             Manager.Auth.UserSignOut();
+            GoogleSignIn.DefaultInstance.SignOut();
+            GoogleSignIn.DefaultInstance.Disconnect();
             SceneManager.LoadScene("CYH_Sign-in");
         });
 
@@ -68,15 +74,44 @@ public class AccountLinkPopup : MonoBehaviour
 
                 if (linkTask.IsFaulted)
                 {
-                    Debug.LogError("구글 계정 전환 실패");
+                    Debug.LogError($"구글 계정 전환 실패 / 원인: {linkTask.Exception}");
+                    Debug.LogWarning("이미 생성된 구글 계정 / 해당 계정으로 로그인 시도");
 
-                    GoogleSignIn.DefaultInstance.SignOut();
-                    GoogleSignIn.DefaultInstance.Disconnect();
+                    // 1. 게스트 계정 삭제
+                    await Manager.DB.DeleteUserUid();
+                    await Manager.Auth.DeleteUser_sync();
+
+                    // 2. 해당 credential로 로그인
+                    Task signInTask = FirebaseManager.Auth.SignInWithCredentialAsync(credential);
+                    await signInTask;
+
+                    if (signInTask.IsCanceled || signInTask.IsFaulted)
+                    {
+                        Debug.LogError($"기존 구글 계정으로 로그인 실패: {signInTask.Exception}");
+
+                        GoogleSignIn.DefaultInstance.SignOut();
+                        GoogleSignIn.DefaultInstance.Disconnect();
+                        return;
+                    }
+
+                    Debug.Log($"기존 구글 계정 로그인 성공 / currentUser UID: {currentUser.UserId}");
+
+                    if (currentUser == null)
+                    {
+                        Debug.Log("currentUser == null");
+                    }
+                    else
+                    {
+                        Debug.Log("currentUser != null");
+                    }
+
+                    PlayerData data = await Manager.DB.LoadLobbyDataAsync();
+                    _playerDataController.OnUpdateUI?.Invoke(data);
+                    Debug.Log("UI 업데이트 이벤트 호출 : _playerDataController.UpdateUI(data)");
                     return;
                 }
 
                 Firebase.Auth.AuthResult linkedUser = linkTask.Result;
-
                 string googleDisplayName = googleUser.DisplayName;
 
                 // DB에 google 계정 닉네임 저장

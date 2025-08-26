@@ -1,9 +1,9 @@
-using System.Threading.Tasks;
-using System.Linq;
-using UnityEngine;
 using Firebase.Auth;
 using Firebase.Extensions;
 using Google;
+using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine;
 
 public class AuthManager : Singleton<AuthManager>
 {
@@ -12,16 +12,22 @@ public class AuthManager : Singleton<AuthManager>
     /// </summary>
     public void UserSignOut()
     {
+        FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
         FirebaseManager.Auth.SignOut();
-        Debug.Log("로그아웃");
 
         //TODO: [CYH] 게스트/구글 계정 예외 처리
-        GoogleSignIn.DefaultInstance.SignOut();
-        GoogleSignIn.DefaultInstance.Disconnect();
+        bool isGoogleUser = currentUser.ProviderData.Any(provider => provider.ProviderId == "google.com");
+        if (isGoogleUser)
+        {
+            Debug.Log("구글 계정 로그아웃 시도");
+            GoogleSignIn.DefaultInstance.SignOut();
+            GoogleSignIn.DefaultInstance.Disconnect();
+        }
+        Debug.Log("로그아웃 성공");
     }
 
     /// <summary>
-    /// 현재 로그인된 계정을 FirebaseAuth에서 삭제하는 메서드
+    /// 현재 로그인된 계정을 FirebaseAuth에서 삭제하는 메서드 (로그아웃)
     /// </summary>
     public void DeleteUser()
     {
@@ -33,13 +39,15 @@ public class AuthManager : Singleton<AuthManager>
                 if (task.IsCanceled)
                 {
                     Debug.LogError("유저 삭제 취소");
+                    return;
                 }
                 if (task.IsFaulted)
                 {
-                    Debug.LogError("유저 삭제 실패");
+                    Debug.LogError($"유저 삭제 실패: {task.Exception}");
+                    return;
                 }
 ;
-                Debug.Log("유저 삭제 성공");
+                Debug.Log("[DeleteUser] 유저 삭제 성공");
 
                 // 현재 로그인된 유저가 있으면 로그아웃
                 if (currentUser != null)
@@ -50,17 +58,25 @@ public class AuthManager : Singleton<AuthManager>
                     {
                         GoogleSignIn.DefaultInstance.SignOut();
                         GoogleSignIn.DefaultInstance.Disconnect();
+
+                        FirebaseManager.Auth.SignOut();
                     }
-
-                    FirebaseManager.Auth.SignOut();
                 }
-
-                FirebaseManager.Auth.SignOut();
-                GoogleSignIn.DefaultInstance.SignOut();
-                GoogleSignIn.DefaultInstance.Disconnect();
             });
     }
-    
+
+    /// <summary>
+    /// 현재 로그인된 계정을 FirebaseAuth에서 삭제하는 메서드 (로그아웃 x)
+    /// </summary>
+    public async Task DeleteUser_sync()
+    {
+        FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
+
+        Task deleteTask = currentUser.DeleteAsync();
+        await deleteTask;
+        Debug.Log("[DeleteUser_2] 유저 삭제 성공");
+    }
+
     /// <summary>
     /// 익명계정의 DisplayName을 "게스트 + 랜덤숫자"로 변경하는 메서드 
     /// </summary>

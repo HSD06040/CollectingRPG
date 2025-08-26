@@ -51,7 +51,7 @@ public class GoogleLink : MonoBehaviour
 
                 if (linkTask.IsFaulted)
                 {
-                    Debug.LogError("구글 계정 전환 실패");
+                    Debug.LogError($"구글 계정 전환 실패{task.Exception}");
 
                     GoogleSignIn.DefaultInstance.SignOut();
                     GoogleSignIn.DefaultInstance.Disconnect();

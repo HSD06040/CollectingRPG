@@ -102,6 +102,7 @@ public class DBManager : Singleton<DBManager>
     public async Task<PlayerData> LoadLobbyDataAsync()
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        Debug.Log($"[LoadLobbyDataAsync] uid: {uid}");
         DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(uid);
 
         DataSnapshot snapshot = await userRef.GetValueAsync();
@@ -126,27 +127,31 @@ public class DBManager : Singleton<DBManager>
     /// <summary>
     /// UserData 경로의 현재 유저 UID를 삭제하는 메서드
     /// </summary>
-    public void DeleteUserUid()
+    public async Task DeleteUserUid()
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
 
-        Debug.Log($" (DB Delete) 현재 로그인된 유저 uid : {uid}");
+        Debug.Log($"[DeleteUserUid] 현재 로그인된 유저 uid : {uid}");
         Dictionary<string, object> dictionary = new Dictionary<string, object>
         {
             [$"UserData/{uid}"] = null,
         };
+        Debug.Log("[DeleteUserUid] UserData 삭제 성공1");
 
-        FirebaseManager.DataReference.UpdateChildrenAsync(dictionary).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCompletedSuccessfully)
-            {
-                Debug.Log("UserData 삭제 성공");
-            }
-            else
-            {
-                Debug.LogError($"UserData삭제 실패: {task.Exception}");
-            }
-        });
+        Task updateTask = FirebaseManager.DataReference.UpdateChildrenAsync(dictionary);
+        await updateTask;
+        Debug.Log("[DeleteUserUid] UserData 삭제 성공2");
+        //FirebaseManager.DataReference.UpdateChildrenAsync(dictionary).ContinueWithOnMainThread(task =>
+        //{
+        //    if (task.IsCompletedSuccessfully)
+        //    {
+        //        Debug.Log("UserData 삭제 성공");
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError($"UserData삭제 실패: {task.Exception}");
+        //    }
+        //});
     }
 
     /// <summary>
