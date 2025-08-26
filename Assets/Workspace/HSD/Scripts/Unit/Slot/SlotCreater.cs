@@ -19,8 +19,12 @@ public class SlotCreater : MonoBehaviour
             for (int j = 0; j < Size.x; j++)
             {
                 UnitSlot slot = Instantiate(_slotPrefab, GetPos(j, i), Quaternion.identity, _slotParent).GetComponent<UnitSlot>();
-                Vector2Int pos = new Vector2Int(j + 1, i + 1);
-                slot.Init(j + 1, pos);
+
+                int reversedX = Size.x - j;
+
+                Vector2Int pos = new Vector2Int(reversedX, i + 1);
+                slot.Init(reversedX, pos);
+
                 unitSlotDic.Add(pos, slot);
             }
         }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -11,11 +9,11 @@ public class GoldPanel : MonoBehaviour
     {
         InGameManager.Instance.Gold.AddEvent(GoldTextUpdate);
         GoldTextUpdate(InGameManager.Instance.Gold.Value);
-    }   
+    }
 
     private void OnDisable()
     {
-        InGameManager.Instance.Gold.RemoveEvent(GoldTextUpdate);
+        InGameManager.Instance?.Gold.RemoveEvent(GoldTextUpdate);
     }
 
     private void GoldTextUpdate(int amount)
