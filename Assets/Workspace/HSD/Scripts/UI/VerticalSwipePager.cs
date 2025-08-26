@@ -105,7 +105,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         {
             Vector3 basePos;
 
-            if (_currentPage == 0 && i == 1)
+            if (i == 1)
             {
                 basePos = Camera.main.transform.position + (Vector3)_cameraOffset;
             }
