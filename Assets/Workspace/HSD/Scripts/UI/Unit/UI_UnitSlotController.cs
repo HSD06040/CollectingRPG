@@ -16,6 +16,7 @@ public class UI_UnitSlotController : MonoBehaviour
     [SerializeField] int _slotCount;    
 
     private UI_UnitSlot[] _unitSlots;
+    private UnitStatus[] _cachedUnitsArray = new UnitStatus[UnitController.UnitMaxCount];
     private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(128);
 
     private void Awake()
@@ -58,6 +59,8 @@ public class UI_UnitSlotController : MonoBehaviour
         _unitSlotDic[unit.Address].Remove(idx);
 
         _unitSlots[idx].ClearSlot();
+
+        RemoveCahchedArray(idx);
     }
 
     public int GetEmptySlot()
@@ -81,11 +84,12 @@ public class UI_UnitSlotController : MonoBehaviour
 
         var slotList = _unitSlotDic[unit.Address];
 
-
         if (!slotList.Contains(idx))
         {
             slotList.Add(idx);
         }
+
+        AddCahchedArray(unit, idx);
     }
 
     public void RemoveUnit(UnitStatus unit, int idx)
@@ -154,5 +158,25 @@ public class UI_UnitSlotController : MonoBehaviour
     public int GetUnitCount(UnitStatus unit)
     {
         return GetUnitCount(unit.Address);
+    }
+
+    private void AddCahchedArray(UnitStatus unit, int idx)
+    {
+        _cachedUnitsArray[idx] = unit;
+    }
+
+    private void RemoveCahchedArray(int idx)
+    {
+        _cachedUnitsArray[idx] = null;
+    }
+
+    public UnitStatus[] GetUnits()
+    {
+        return _cachedUnitsArray;
+    }
+
+    public UI_UnitSlot[] GetUnitSlots()
+    {
+        return _unitSlots;
     }
 }
