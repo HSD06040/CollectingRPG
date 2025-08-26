@@ -77,8 +77,7 @@ public class GuestSignIn : MonoBehaviour
                 // 튜토리얼 isTutorialComplete = true Data 변경
                 SetTutorialCompleteAsync();
                 _isClicked = false;
-                SceneManager.LoadScene("LobbyScene_Copy");
-                SceneManager.LoadScene("LobbyScene_Copy");
+                SceneManager.LoadScene("USW_LobbyScene");
             }
         });
     }
@@ -88,11 +87,11 @@ public class GuestSignIn : MonoBehaviour
         bool isTutorialCompleted = await Manager.DB.CheckTutorialCompletedAsync();
         if (isTutorialCompleted)
         {
-            SceneManager.LoadScene("LobbyScene_Copy");
+            SceneManager.LoadScene("USW_LobbyScene");
         }
         else
         {
-            SceneManager.LoadScene("LobbyScene_Copy");
+            SceneManager.LoadScene("USW_LobbyScene");
             // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
             //tutorialPanel.SetActive(true);
             //SigninPanel.SetActive(false);
