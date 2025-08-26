@@ -3,6 +3,7 @@ using System.Text;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.UI;
 
 public static class Utils
 {
@@ -250,5 +251,26 @@ public static class Utils
             0 => new Color32(0xB0, 0xB0, 0xB0, 0xFF), // Normal : 단색 회색
             _ => Color.grey
         };
+    }
+
+    public static void SetupGridLayoutGroup(this GridLayoutGroup gridLayoutGroup, Transform content, int columns, int rows, int offset = 10)
+    {
+        RectTransform rectTransform = content as RectTransform;
+        Vector2 spacing = gridLayoutGroup.spacing;
+
+        gridLayoutGroup.padding = new RectOffset(offset, offset, offset, offset);
+
+        float totalWidth = rectTransform.rect.width
+                         - gridLayoutGroup.padding.left - gridLayoutGroup.padding.right
+                         - (spacing.x * (columns - 1));
+
+        float totalHeight = rectTransform.rect.height
+                          - gridLayoutGroup.padding.top - gridLayoutGroup.padding.bottom
+                          - (spacing.y * (rows - 1));
+
+        float cellWidth = totalWidth / columns;
+        float cellHeight = totalHeight / rows;
+
+        gridLayoutGroup.cellSize = new Vector2(cellWidth, cellHeight);
     }
 }
