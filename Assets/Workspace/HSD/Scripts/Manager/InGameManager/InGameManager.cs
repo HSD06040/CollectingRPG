@@ -6,7 +6,20 @@ public class InGameManager : MonoBehaviour
     [SerializeField] int _startingGold = 100;
 
     #region Singleton Pattern
-    public static InGameManager Instance { get; private set; }
+    private static InGameManager instance;
+    public static InGameManager Instance 
+    {
+        get
+        {
+            if(instance == null)
+            {
+                instance = FindObjectOfType<InGameManager>();
+            }
+
+            return instance;
+        }
+        private set => instance = value; 
+    }
 
     private void Awake()
     {
@@ -15,7 +28,7 @@ public class InGameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
+        
         Instance = this;
     }
     #endregion

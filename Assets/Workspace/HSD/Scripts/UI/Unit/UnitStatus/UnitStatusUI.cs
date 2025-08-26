@@ -21,7 +21,6 @@ public class UnitStatusUI : MonoBehaviour
         _physicalDefenseText.text = stat.PhysicalDefense.ToString();
         _magicDefenseText.text = stat.MagicDefense.ToString();
         _critChanceText.text = stat.CritChance.ToString("F1");
-        _cirtDamageText.text = stat.CritDamage.ToString();
         _attackSpeedText.text = stat.AttackSpeed.ToString("F2");
         _attackRangeText.text = stat.AttackRange.ToString();
     }
