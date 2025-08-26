@@ -32,7 +32,7 @@ public static class Utils
         if (status.CritChance.Value > Random.Range(0f, 100f))
         {
             isCrit = true;
-            total *= status.CritDamage.Value / 100;
+            total *= 1.5f;
         }
 
         float totalDefense = defense / (defense + 100f);

@@ -17,7 +17,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     [SerializeField] Ease _easeType = Ease.OutCubic;
     [SerializeField] float _uiToWorldRatio = 0.01f;
     [SerializeField] int _currentPage = 0;
-    [SerializeField] float _cameraXOffset;
+    [SerializeField] Vector2 _cameraOffset;
     private int _totalPages;
     private Vector3[] _originalPagePositions;
     private Vector2 _originalUIPosition;
@@ -107,7 +107,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
             if (_currentPage == 0 && i == 1)
             {
-                basePos = Camera.main.transform.position + new Vector3(_cameraXOffset, 0, 0);
+                basePos = Camera.main.transform.position + (Vector3)_cameraOffset;
             }
             else
             {

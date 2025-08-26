@@ -21,7 +21,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     [Header("CritRate")]
     public Stat<int> CritChance;
-    public Stat<int> CritDamage;
 
     [Header("Defense")]
     public Stat<int> PhysicalDefense;
@@ -61,7 +60,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable
         MagicDamage.SetBaseStat(stat.MagicDamage);
 
         CritChance.SetBaseStat(stat.CritChance);
-        CritDamage.SetBaseStat(stat.CritDamage);
 
         PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
         MagicDefense.SetBaseStat(stat.MagicDefense);
