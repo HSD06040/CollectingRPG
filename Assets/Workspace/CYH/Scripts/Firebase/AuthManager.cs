@@ -74,7 +74,7 @@ public class AuthManager : Singleton<AuthManager>
 
         Task deleteTask = currentUser.DeleteAsync();
         await deleteTask;
-        Debug.Log("[DeleteUser_2] 유저 삭제 성공");
+        Debug.Log("[DeleteUser_sync] 유저 삭제 성공");
     }
 
     /// <summary>

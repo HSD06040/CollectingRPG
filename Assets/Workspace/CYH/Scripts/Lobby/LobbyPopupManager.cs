@@ -20,7 +20,6 @@ public class LobbyPopupManager : MonoBehaviour
     {
         _playerProfileButton.onClick.AddListener(() =>
         {
-            Debug.Log("프로필 버튼 클릭");
             ShowPopup();
         });
 

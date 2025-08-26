@@ -9,7 +9,7 @@ using Google;
 public class AccountLinkPopup : MonoBehaviour
 {
     [SerializeField] private PlayerDataController _playerDataController;
-    
+
     [SerializeField] private Button _closeButton;
     [SerializeField] private Button _googleLinkButton;
     [SerializeField] private Button _deleteButton;
@@ -18,6 +18,18 @@ public class AccountLinkPopup : MonoBehaviour
 
     private void Start()
     {
+
+        FirebaseUser currentUser = FirebaseManager.Auth.CurrentUser;
+
+        if (currentUser != null && currentUser.IsAnonymous)
+        {
+            SetButtonsInteractable(false);
+        }
+        else
+        {
+            SetButtonsInteractable(true);
+        }
+
         _closeButton.onClick.AddListener(() => gameObject.SetActive(false));
         _googleLinkButton.onClick.AddListener(() => OnClick_LinkWithGoogle());
 
@@ -31,7 +43,7 @@ public class AccountLinkPopup : MonoBehaviour
 
         _deleteButton.onClick.AddListener(() =>
         {
-            Manager.DB.DeleteUserUid();
+            Manager.DB.DeleteUserUidAsync();
             Manager.Auth.DeleteUser();
             SceneManager.LoadScene("CYH_Sign-in");
         });
@@ -39,6 +51,8 @@ public class AccountLinkPopup : MonoBehaviour
 
     /// <summary>
     /// 게스트 계정 -> 구글 계정으로 전환하는 메서드
+    /// 구글 계정 연동 시 선택한 구글 계정이 이미 존재하는 계정일 때,
+    /// 현재 로그인 중인 계정 삭제 후 해당 구글 계정으로 로그인
     /// </summary>
     public void OnClick_LinkWithGoogle()
     {
@@ -74,11 +88,13 @@ public class AccountLinkPopup : MonoBehaviour
 
                 if (linkTask.IsFaulted)
                 {
+                    // 구글 계정 연동 시 선택한 구글 계정이 이미 존재하는 계정일 때,
+                    // 현재 로그인 중인 계정 삭제 후 해당 구글 계정으로 로그인
                     Debug.LogError($"구글 계정 전환 실패 / 원인: {linkTask.Exception}");
                     Debug.LogWarning("이미 생성된 구글 계정 / 해당 계정으로 로그인 시도");
 
                     // 1. 게스트 계정 삭제
-                    await Manager.DB.DeleteUserUid();
+                    await Manager.DB.DeleteUserUidAsync();
                     await Manager.Auth.DeleteUser_sync();
 
                     // 2. 해당 credential로 로그인
@@ -95,6 +111,7 @@ public class AccountLinkPopup : MonoBehaviour
                     }
 
                     Debug.Log($"기존 구글 계정 로그인 성공 / currentUser UID: {currentUser.UserId}");
+                    SetButtonsInteractable(true);
 
                     if (currentUser == null)
                     {
@@ -106,8 +123,7 @@ public class AccountLinkPopup : MonoBehaviour
                     }
 
                     PlayerData data = await Manager.DB.LoadLobbyDataAsync();
-                    _playerDataController.OnUpdateUI?.Invoke(data);
-                    Debug.Log("UI 업데이트 이벤트 호출 : _playerDataController.UpdateUI(data)");
+                    _playerDataController.RefreshUI(data);
                     return;
                 }
 
@@ -118,6 +134,8 @@ public class AccountLinkPopup : MonoBehaviour
                 await Manager.DB.SaveNicknameAsync(googleDisplayName);
                 await currentUser.ReloadAsync();
 
+                SetButtonsInteractable(true);
+
                 Debug.Log("------유저 정보(GoogleLink)------");
                 await Manager.DB.LoadNicknameAsync((nickname) =>
                 {
@@ -127,5 +145,11 @@ public class AccountLinkPopup : MonoBehaviour
                 Debug.Log($"이메일 : {currentUser.Email}");
             });
         });
+    }
+
+    private void SetButtonsInteractable(bool isActive)
+    {
+        _deleteButton.interactable = isActive;
+        _signOutButton.interactable = isActive;
     }
 }
