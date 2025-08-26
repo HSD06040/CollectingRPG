@@ -5,12 +5,12 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Probability", menuName ="Data/Probability")]
 public class ItemProbabilitySO : ScriptableObject
 {
-    [field:SerializeField] public List<ProbableItems> itemsProbability { get; private set; }
+    [field:SerializeField] public List<ProbableItems> ItemsProbability { get; private set; }
 }
 
 [Serializable]
 public class ProbableItems
 {
-    public UnitData CharData;
+    public Grade ItemGrade;
     public float Probability;
 }
