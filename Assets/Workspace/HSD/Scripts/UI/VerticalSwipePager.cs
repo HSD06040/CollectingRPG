@@ -16,12 +16,13 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     [SerializeField] float _tweenDuration = 0.3f;
     [SerializeField] Ease _easeType = Ease.OutCubic;
     [SerializeField] float _uiToWorldRatio = 0.01f;
-    [SerializeField] private int _currentPage = 0;
+    [SerializeField] int _currentPage = 0;
+    [SerializeField] Vector2 _cameraOffset;
     private int _totalPages;
     private Vector3[] _originalPagePositions;
     private Vector2 _originalUIPosition;
 
-    void Start()
+    private void Start()
     {
         _totalPages = _pages.Length;
 
@@ -82,7 +83,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         if (instant)
         {
             _content.anchoredPosition = targetPos;
-            SyncGameObjectsWithUI();
+            SyncGameObjectsWithUI();    
         }
         else
         {
@@ -100,10 +101,20 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         // UI 오프셋을 월드 좌표로 변환 (Y축만, X축은 필요에 따라 추가)
         Vector3 worldOffset = new Vector3(0, uiOffset.y * _uiToWorldRatio, 0);
 
-        // 모든 GameObject를 원래 위치 + 오프셋으로 이동
         for (int i = 0; i < _pages.Length; i++)
         {
-            _pages[i].position = _originalPagePositions[i] + worldOffset;
+            Vector3 basePos;
+
+            if (_currentPage == 0 && i == 1)
+            {
+                basePos = Camera.main.transform.position + (Vector3)_cameraOffset;
+            }
+            else
+            {
+                basePos = _originalPagePositions[i];
+            }
+
+            _pages[i].position = basePos + worldOffset;
         }
     }
 

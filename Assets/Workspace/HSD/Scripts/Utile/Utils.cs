@@ -8,9 +8,8 @@ public static class Utils
 {
     private static GameObject _damagePopUpObj;
     private static GameObject _worldCanvas;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void Initialize()
+    
+    public static void Initialize()
     {
         _damagePopUpObj = Addressables.LoadAssetAsync<GameObject>("DamagePopUp").WaitForCompletion();
         GameObject obj = Addressables.LoadAssetAsync<GameObject>("WorldCanvas").WaitForCompletion();
@@ -33,7 +32,7 @@ public static class Utils
         if (status.CritChance.Value > Random.Range(0f, 100f))
         {
             isCrit = true;
-            total *= status.CritDamage.Value / 100;
+            total *= 1.5f;
         }
 
         float totalDefense = defense / (defense + 100f);
@@ -44,7 +43,6 @@ public static class Utils
             GetComponent<DamagePopUp>().Init(totalDamage, isCrit);
 
         status.TotalDamage.Value += totalDamage;
-
         enemy.TakeDamage(totalDamage);
     }
 
@@ -213,7 +211,12 @@ public static class Utils
         sb.Clear();
         return result;
     }
-    
+
+    public static void ClearStringBuilder()
+    {
+        sb.Clear();
+    }
+
     public static Color GetSynergyColor(this SynergyData data)
     {
         return (data.CurrentUpgradeIdx) switch
@@ -222,7 +225,30 @@ public static class Utils
             0 => new Color(217f / 255f, 217f / 255f, 217f / 255f),      // 밝은 회색
             1 => new Color(241f / 255f, 229f / 255f, 109f / 255f),      // 노란색
             2 => new Color(63f / 255f, 239f / 255f, 239f / 255f),       // Cyan
-            _ => Color.white
+            _ => new Color(85f / 255f, 85f / 255f, 85f / 255f)
+        };
+    }
+
+    public static Color GetGradeColor(this UnitStatus status)
+    {
+        return (status.Data.Grade) switch
+        {
+            Grade.Normal => new Color32(0x4D, 0xC5, 0x5B, 0xFF),
+            Grade.Rare => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
+            Grade.Unique => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
+            Grade.Legendary => new Color32(0xF2, 0x93, 0x38, 0xFF),
+            _ => Color.grey,
+        };
+    }
+
+    public static Color GetEnemyLevelColor(this UnitStatus status)
+    {
+        return (status.Level) switch
+        {
+            2 => new Color32(0x55, 0x55, 0x55, 0xFF), // Boss : 단색 회색
+            1 => new Color32(0xC7, 0x40, 0x40, 0xFF), // Elite : 단색 빨강
+            0 => new Color32(0xB0, 0xB0, 0xB0, 0xFF), // Normal : 단색 회색
+            _ => Color.grey
         };
     }
 }

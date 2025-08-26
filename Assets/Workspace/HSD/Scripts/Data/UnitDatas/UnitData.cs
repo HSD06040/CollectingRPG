@@ -11,13 +11,12 @@ public class UnitData : ScriptableObject
     public GameObject UnitPrefab; // Test
     public Sprite Icon;
     public int ID;
+    public int PerferredLine;
     public string Name;
 
     [TextArea]
     public string Description;
-
     public int Cost;
-    public int UpgradeCount;
 
     [Header("Attack_Data")]
     public UnitSkill Skill;

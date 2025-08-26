@@ -4,19 +4,18 @@ using UnityEngine;
 public class UnitController : MonoBehaviour
 {
     public SynergyController SynergyController;
+    public UI_UnitSlotController _uiSlotController;
+
     [SerializeField] UnitSlotManager _unitSlotManager;
-    [SerializeField] UI_UnitSlotController _uiSlotController;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
-    [SerializeField] BattleManager _battleManager;
+    [SerializeField] BattleUnitManager _battleUnitManager;
+
     public static readonly int UnitMaxCount = 10;
 
     private UnitBase[,] _unitGrid;
     private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300);
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
-
-    private UnitBase[] _cachedUnitsArray = new UnitBase[UnitMaxCount];
-    private int _cachedUnitsCount = 0;
 
     private int _currentUnitCount = 0;
     public int CurrentUnitCount
@@ -47,7 +46,7 @@ public class UnitController : MonoBehaviour
 
     public void UnitStanby()
     {
-        foreach (var unit in _battleManager.GetUnitGrid())
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
             if (unit == null)
                 continue;
@@ -61,7 +60,7 @@ public class UnitController : MonoBehaviour
 
     public void UnitFight()
     {
-        foreach (var unit in _battleManager.GetUnitGrid())
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
             if (unit == null)
                 continue;
@@ -90,7 +89,7 @@ public class UnitController : MonoBehaviour
             else
             {
                 SetSlot(_unitSlotManager.GetUnitSlot(unit), unit);
-                _battleManager.AddUnit(_unitSlotManager.GetUnitSlot(unit), unit);
+                _battleUnitManager.AddUnit(_unitSlotManager.GetUnitSlot(unit), unit);
             }
             return;
         }
@@ -104,18 +103,17 @@ public class UnitController : MonoBehaviour
 
                 RemoveUnit(slot, destroyGameObject: false); // 유닛 데이터만 제거 (Destroy 안 함)
                 Destroy(slotUnit.gameObject); // UI로 복제했으니 인게임 오브젝트 제거
-                _battleManager.RemoveUnit(slot, slotUnit);
+                _battleUnitManager.RemoveUnit(slot, slotUnit);
             }
 
             SetSlot(slot, unit);
             AddSynergyUnit(unit);
             AddList(unit);
-            AddToCachedArray(unit); // 캐시된 배열에 추가
             CurrentUnitCount++;
 
             OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
-            OnUnitChanged?.Invoke(_cachedUnitsArray);
-            _battleManager.AddUnit(slot, unit);
+            _battleUnitManager.AddUnit(slot, unit);
+            OnUnitChanged?.Invoke(GetUnits());
         }
         else
         {
@@ -127,20 +125,20 @@ public class UnitController : MonoBehaviour
                 ClearSlot(unitSlot, unit);
                 ClearSlot(slot, slotUnit);
 
-                _battleManager.RemoveUnit(unitSlot, unit);
-                _battleManager.RemoveUnit(slot, slotUnit);
+                _battleUnitManager.RemoveUnit(unitSlot, unit);
+                _battleUnitManager.RemoveUnit(slot, slotUnit);
 
                 SetSlot(slot, unit);
                 SetSlot(unitSlot, slotUnit);
 
-                _battleManager.AddUnit(slot, unit);
-                _battleManager.AddUnit(unitSlot, slotUnit);
+                _battleUnitManager.AddUnit(slot, unit);
+                _battleUnitManager.AddUnit(unitSlot, slotUnit);
             }
             else
             {
                 ClearSlot(unitSlot, unit);
 
-                _battleManager.MoveUnit(unitSlot, slot, unit);
+                _battleUnitManager.MoveUnit(unitSlot, slot, unit);
                 SetSlot(slot, unit);
             }
         }
@@ -198,19 +196,18 @@ public class UnitController : MonoBehaviour
 
         _unitBaseDic[unit.Status.Address].Remove(unit);
 
-        RemoveFromCachedArray(unit); // 캐시된 배열에서 제거
         ClearSlot(slot, unit);
 
         if (destroyGameObject)
         {
             Destroy(unit.gameObject);
-            _battleManager.RemoveUnit(slot, unit);
+            _battleUnitManager.RemoveUnit(slot, unit);
         }
 
         CurrentUnitCount--;
 
         OnUnitPowerChanged?.Invoke(-unit.Status.CombatPower);
-        OnUnitChanged?.Invoke(_cachedUnitsArray);
+        OnUnitChanged?.Invoke(GetUnits());
     }
 
     public Vector2Int RemoveUnit(UnitStatus unit)
@@ -272,32 +269,7 @@ public class UnitController : MonoBehaviour
         list.Add(unit);
     }
 
-    private void AddToCachedArray(UnitBase unit)
-    {
-        if (_cachedUnitsCount < UnitMaxCount)
-        {
-            _cachedUnitsArray[_cachedUnitsCount] = unit;
-            _cachedUnitsCount++;
-        }
-    }
 
-    private void RemoveFromCachedArray(UnitBase unit)
-    {
-        for (int i = 0; i < _cachedUnitsCount; i++)
-        {
-            if (_cachedUnitsArray[i] == unit)
-            {
-                for (int j = i; j < _cachedUnitsCount - 1; j++)
-                {
-                    _cachedUnitsArray[j] = _cachedUnitsArray[j + 1];
-                }
-
-                _cachedUnitsArray[_cachedUnitsCount - 1] = null;
-                _cachedUnitsCount--;
-                break;
-            }
-        }
-    }
 
     public UnitSlot GetUnitSlot(UnitBase unit)
     {
@@ -318,14 +290,13 @@ public class UnitController : MonoBehaviour
     {
         return GetUnitCount(unit.Address);
     }
-
     /// <summary>
     /// GC 할당 없이 현재 유닛들을 반환합니다.
     /// 반환된 배열의 유효한 요소는 처음부터 GetUnitsCount()개까지입니다.
     /// </summary>
     public UnitBase[] GetUnits()
     {
-        return _cachedUnitsArray;
+        return _battleUnitManager.GetUnits();
     }
 
     /// <summary>
@@ -333,7 +304,7 @@ public class UnitController : MonoBehaviour
     /// </summary>
     public int GetUnitsCount()
     {
-        return _cachedUnitsCount;
+        return _battleUnitManager.GetUnitsCount();
     }
 
     /// <summary>
@@ -341,14 +312,26 @@ public class UnitController : MonoBehaviour
     /// </summary>
     public UnitBase GetUnit(int index)
     {
-        if (index < 0 || index >= _cachedUnitsCount)
-            return null;
-
-        return _cachedUnitsArray[index];
+        return _battleUnitManager.GetUnit(index);
     }
 
     public bool IsUnitMaxCount()
     {
         return _currentUnitCount >= UnitMaxCount;
+    }
+
+    public UnitSlot GetEmptyLineSlot(int line)
+    {        
+        for (int y = 1; y <= _unitSlotManager.SlotCreater.Size.y; y++)
+        {
+            Vector2Int pos = new Vector2Int(line, y);
+
+            if (_unitGrid[y - 1, line - 1] == null)
+            {
+                return _unitSlotManager.GetUnitSlot(pos);
+            }
+        }
+
+        return null;
     }
 }

@@ -2,7 +2,6 @@ using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime;
 using TMPro;
 using UnityEngine;
 
@@ -66,15 +65,14 @@ public class TeamOrganizeManager : MonoBehaviour
         */
 
         _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
-    }
-
+    }    
     private void Start()
     {
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
         ShowLeaderEffectInfo();
         ShowCharacterCountInfo();
-    }
+    }    
 
     #region Event
 
@@ -262,12 +260,12 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowCostInfo()
     {
-        _costInfoText.text = $"{_currentCost} / {_totalCost}";
+        _costInfoText.text = $"충성도 {_currentCost} / {_totalCost}";
     }
 
     private void ShowTotalOverallPowerInfo()
     {
-        _totalOverallPowerText.text = $"OverallPower : {_currentOverallPower}";
+        _totalOverallPowerText.text = $"팀 전투력 {_currentOverallPower}";
     }
 
     
@@ -279,7 +277,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowCharacterCountInfo()
     {
-        _characterCountText.text = $"Character {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
+        _characterCountText.text = $"보유 영웅 {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
     }
 
     private void ShowButtonPreset()

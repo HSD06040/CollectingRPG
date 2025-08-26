@@ -8,6 +8,7 @@ public class SynergySlotPanel : MonoBehaviour
 {
     [SerializeField] GameObject _synergyIconPrefab;
     [SerializeField] Transform _content;
+    [SerializeField] SynergyToolTip _synergyTooltip;
     private Dictionary<string, int> _synergyIconSlotDic = new(50);
     private SynergyIconSlot[] _synergyIconSlots;
 
@@ -24,7 +25,7 @@ public class SynergySlotPanel : MonoBehaviour
         for (int i = 0; i < datas.Length; i++)
         {
             SynergyIconSlot slot = Instantiate(_synergyIconPrefab, _content).GetComponent<SynergyIconSlot>();
-            slot.Init(datas[i]);
+            slot.Init(datas[i], _synergyTooltip);
             
             _synergyIconSlots[i] = slot;
 
@@ -37,7 +38,7 @@ public class SynergySlotPanel : MonoBehaviour
 
     public void UpdateSynergySlot(string synergy, int activeCount)
     {
-        _synergyIconSlots[_synergyIconSlotDic[synergy]].UpdateIcon();
+        _synergyIconSlots[_synergyIconSlotDic[synergy]].UpdateIcon(activeCount);
         SetHiararchy();
     }
 
@@ -48,7 +49,14 @@ public class SynergySlotPanel : MonoBehaviour
 
         slots.RemoveAll(s => s.ActiveCount <= 0);
 
-        slots.Sort((a, b) => b.ActiveCount.CompareTo(a.ActiveCount));
+        slots.Sort((a, b) =>
+        {
+            int result = b.ActiveCount.CompareTo(a.ActiveCount);
+            if(result == 0)
+                result = b.UpgradeCount.CompareTo(a.UpgradeCount);
+
+            return result;
+        });
 
         for (int i = 0; i < slots.Count; i++)
         {

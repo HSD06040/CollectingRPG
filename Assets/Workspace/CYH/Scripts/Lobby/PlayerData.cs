@@ -5,4 +5,5 @@ public class PlayerData
     public string PlayerName;
     public int Gold;
     public int Diamond;
+    
 }

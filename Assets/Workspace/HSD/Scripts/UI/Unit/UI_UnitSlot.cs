@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler
+public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPointerUpHandler, IPointerDownHandler
 {
     [SerializeField] private UnitStatus _unit;
     [SerializeField] private Image _unitIcon;
@@ -75,7 +75,12 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         return _unit;
     }
-    
+
+    public int GetSlotIdx()
+    {
+        return _slotIdx;
+    }
+
     #region Drag&Drop
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -145,6 +150,18 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler
     }
 
     public void OnDrag(PointerEventData eventData)
+    {
+        
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (_unit == null) return;
+
+        _dragDropSystem.ToolTipController.UnitToolTip.Show(_unit);
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
     {
         
     }

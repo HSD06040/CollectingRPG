@@ -54,7 +54,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void OnEnable()
     {
-        _manager.OnCharacterDataChanged += UIUpdate;
+        if (_manager != null) _manager.OnCharacterDataChanged += UIUpdate;
 
         if (_isCollected)
         {
@@ -68,7 +68,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void OnDisable()
     {
-        _manager.OnCharacterDataChanged -= UIUpdate;
+        if(_manager != null) _manager.OnCharacterDataChanged -= UIUpdate;
     }
 
     #endregion
@@ -117,8 +117,8 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         //_costImg.sprite = 아이콘 추가 예정
         //_jobSynergyImg.sprite = 아이콘 추가 예정
         //_roleSynergyImg.sprite = 아이콘 추가 예정
-        _overallPowerText.text = $"Damage {_status.CombatPower}";
-        _levelText.text = $"Lv{_status.Level}";
+        _overallPowerText.text = $"{_status.CombatPower}";
+        _levelText.text = $"Lv.{_status.Level}";
     }
 
     #endregion

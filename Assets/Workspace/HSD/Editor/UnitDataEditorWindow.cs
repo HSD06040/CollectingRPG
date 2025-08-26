@@ -98,7 +98,7 @@ public class UnitDataEditorWindow : EditorWindow
             currentUnitData.Name = EditorGUILayout.TextField("Name", currentUnitData.Name);
             currentUnitData.Description = EditorGUILayout.TextArea(currentUnitData.Description, GUILayout.Height(60));
             currentUnitData.Cost = EditorGUILayout.IntField("Cost", currentUnitData.Cost);
-            currentUnitData.UpgradeCount = EditorGUILayout.IntField("Upgrade Count", currentUnitData.UpgradeCount);
+            currentUnitData.EnhancementData.UpgradeCount = EditorGUILayout.IntField("Upgrade Count", currentUnitData.EnhancementData.UpgradeCount);
             EditorGUI.indentLevel--;
             EditorGUILayout.Space(5);
         }
@@ -220,7 +220,6 @@ public class UnitDataEditorWindow : EditorWindow
         // Critical 섹션
         EditorGUILayout.LabelField("Critical", EditorStyles.boldLabel);
         stats.CritChance = EditorGUILayout.IntField("Crit Chance", stats.CritChance);
-        stats.CritDamage = EditorGUILayout.IntField("Crit Damage", stats.CritDamage);
 
         EditorGUILayout.Space(3);
 
@@ -252,7 +251,6 @@ public class UnitDataEditorWindow : EditorWindow
             PhysicalDamage = 10,
             MagicDamage = 0,
             CritChance = 5,
-            CritDamage = 150,
             PhysicalDefense = 5,
             MagicDefense = 5,
             AttackRange = 1,
@@ -271,7 +269,6 @@ public class UnitDataEditorWindow : EditorWindow
         target.PhysicalDamage = source.PhysicalDamage;
         target.MagicDamage = source.MagicDamage;
         target.CritChance = source.CritChance;
-        target.CritDamage = source.CritDamage;
         target.PhysicalDefense = source.PhysicalDefense;
         target.MagicDefense = source.MagicDefense;
         target.AttackRange = source.AttackRange;
@@ -505,7 +502,7 @@ public class UnitDataEditorWindow : EditorWindow
         target.Name = source.Name;
         target.Description = source.Description;
         target.Cost = source.Cost;
-        target.UpgradeCount = source.UpgradeCount;
+        target.EnhancementData.UpgradeCount = source.EnhancementData.UpgradeCount;
         target.Skill = source.Skill;
         target.AttackData = source.AttackData;
         target.EnhancementData = source.EnhancementData;
