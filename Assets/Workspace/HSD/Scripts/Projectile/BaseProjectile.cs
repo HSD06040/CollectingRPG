@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class BaseProjectile : Projectile
 {
-    public override void Init( Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
+    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
-        _direction = (_target.position - status.transform.position).normalized;
+        _direction = (_target.position - transform.position).normalized;
         transform.right = _direction;
     }
 

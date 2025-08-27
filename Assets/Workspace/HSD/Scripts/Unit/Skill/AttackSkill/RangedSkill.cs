@@ -19,7 +19,7 @@ public class RangedSkill : AttackSkill
 
         GameObject obj = Instantiate(_projectilePrefab, spawnPoint, Quaternion.identity);
         Projectile projectile = ComponentProvider.Get<Projectile>(obj);
-        Transform target = GetTargetSingle(attacker).transform;
+        Transform target = GetTargetSingle(attacker)?.transform;
 
         if(target == null)
             target = Utils.GetClosestTargetNonAlloc(spawnPoint, 100f, attacker.TargetLayer);
