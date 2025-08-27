@@ -30,7 +30,7 @@ public class UI_UnitSlotController : MonoBehaviour
     {
         _unitSlots = new UI_UnitSlot[_slotCount];
 
-        _gridLayoutGroup.SetupGridLayoutGroup(_content, 5, 2, _offset);
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, 5, 2, _offset, true);
 
         for (int i = 0; i < _slotCount; i++)
         {

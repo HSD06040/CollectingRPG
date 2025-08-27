@@ -234,7 +234,7 @@ public static class Utils
     {
         return (status.Data.Grade) switch
         {
-            Grade.Normal => new Color32(0x4D, 0xC5, 0x5B, 0xFF),
+            Grade.Normal => Color.white,
             Grade.Rare => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
             Grade.Unique => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
             Grade.Legendary => new Color32(0xF2, 0x93, 0x38, 0xFF),
@@ -253,24 +253,51 @@ public static class Utils
         };
     }
 
-    public static void SetupGridLayoutGroup(this GridLayoutGroup gridLayoutGroup, Transform content, int columns, int rows, int offset = 10)
+    public static void SetupGridLayoutGroup(
+    this GridLayoutGroup gridLayoutGroup,
+    Transform content,
+    int columns,
+    int rows,
+    int offset = 10,
+    bool keepSquare = false)
     {
         RectTransform rectTransform = content as RectTransform;
-        Vector2 spacing = gridLayoutGroup.spacing;
+        if (rectTransform == null) return;
 
         gridLayoutGroup.padding = new RectOffset(offset, offset, offset, offset);
 
-        float totalWidth = rectTransform.rect.width
-                         - gridLayoutGroup.padding.left - gridLayoutGroup.padding.right
-                         - (spacing.x * (columns - 1));
+        float availableWidth = rectTransform.rect.width
+                             - gridLayoutGroup.padding.left - gridLayoutGroup.padding.right;
 
-        float totalHeight = rectTransform.rect.height
-                          - gridLayoutGroup.padding.top - gridLayoutGroup.padding.bottom
-                          - (spacing.y * (rows - 1));
+        float availableHeight = rectTransform.rect.height
+                              - gridLayoutGroup.padding.top - gridLayoutGroup.padding.bottom;
 
-        float cellWidth = totalWidth / columns;
-        float cellHeight = totalHeight / rows;
+        if (!keepSquare)
+        {
+            // 기존 방식
+            float totalWidth = availableWidth - (gridLayoutGroup.spacing.x * (columns - 1));
+            float totalHeight = availableHeight - (gridLayoutGroup.spacing.y * (rows - 1));
 
-        gridLayoutGroup.cellSize = new Vector2(cellWidth, cellHeight);
+            float cellWidth = totalWidth / columns;
+            float cellHeight = totalHeight / rows;
+
+            gridLayoutGroup.cellSize = new Vector2(cellWidth, cellHeight);
+        }
+        else
+        {
+            // 정사각형 셀 크기
+            float cellWidth = availableWidth / columns;
+            float cellHeight = (availableHeight - (gridLayoutGroup.spacing.y * (rows - 1))) / rows;
+            float cellSize = Mathf.Min(cellWidth, cellHeight);
+
+            gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
+
+            // spacing.x 재계산
+            float totalCellWidth = cellSize * columns;
+            float remainingWidth = Mathf.Max(0, availableWidth - totalCellWidth);
+            float spacingX = columns > 1 ? remainingWidth / (columns - 1) : 0;
+
+            gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
+        }
     }
 }

@@ -7,7 +7,7 @@ public class SlotCreater : MonoBehaviour
 {
     [SerializeField] GameObject _slotPrefab;
     [SerializeField] Transform _slotParent;
-    private static Vector2 _offset = new Vector2(1.6f, 1.6f);
+    private static Vector2 _offset = new Vector2(1.7f, 1.6f);
     public Vector2Int Size;    
 
     public Dictionary<Vector2Int, UnitSlot> Init()

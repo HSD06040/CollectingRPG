@@ -5,7 +5,7 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 {
-    [Header("UI Content (페이지 묶음)")]
+    [Header("UI Content")]
     [SerializeField] RectTransform _content;
 
     [Header("게임 오브젝트 페이지들")]
@@ -98,7 +98,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         // UI가 원래 위치에서 얼마나 움직였는지 계산
         Vector2 uiOffset = _content.anchoredPosition - _originalUIPosition;
 
-        // UI 오프셋을 월드 좌표로 변환 (Y축만, X축은 필요에 따라 추가)
+        // UI 오프셋을 월드 좌표로 변환
         Vector3 worldOffset = new Vector3(0, uiOffset.y * _uiToWorldRatio, 0);
 
         for (int i = 0; i < _pages.Length; i++)
@@ -123,22 +123,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         for (int i = 0; i < _content.childCount; i++)
         {
             RectTransform panel = _content.GetChild(i).GetComponent<RectTransform>();
-            panel.offsetMin = new Vector2(0, i * panel.rect.height);
+            panel.anchoredPosition = new Vector2(0, i * panel.rect.height);
         }
-    }
-
-    public void SetUIToWorldRatio(float ratio)
-    {
-        _uiToWorldRatio = ratio;
-        SyncGameObjectsWithUI();
-    }
-
-    public void ResetOriginalPositions()
-    {
-        for (int i = 0; i < _pages.Length; i++)
-        {
-            _originalPagePositions[i] = _pages[i].position;
-        }
-        _originalUIPosition = _content.anchoredPosition;
     }
 }
