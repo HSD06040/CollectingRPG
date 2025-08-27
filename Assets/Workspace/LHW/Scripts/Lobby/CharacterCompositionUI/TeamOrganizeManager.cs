@@ -360,4 +360,49 @@ public class TeamOrganizeManager : MonoBehaviour
     }
 
     #endregion
+
+    #region Synergy
+
+    public Dictionary<ClassType, int> GetClassSynergyCount()
+    {
+        Dictionary<ClassType, int> classSynergyCount = new();
+
+        foreach(var unit in _currentPreset)
+        {
+            if(unit.Data == null) continue;
+            if(unit.Data.EnhancementData == null) continue;
+
+            ClassType classSynergy = unit.Data.EnhancementData.ClassSynergy;
+
+            if (!classSynergyCount.ContainsKey(classSynergy))
+                classSynergyCount[classSynergy] = 0;
+
+            classSynergyCount[classSynergy]++;
+            Debug.Log($"{classSynergy.ToString()} : {classSynergyCount[classSynergy]}");
+        }
+        
+        return classSynergyCount;
+    }
+
+    public Dictionary<Synergy, int> GetSynergyCount()
+    {
+        Dictionary<Synergy, int> synergyCounts = new();
+
+        foreach (var unit in _currentPreset)
+        {
+            if (unit.Data == null) continue;
+            if (unit.Data.EnhancementData == null) continue;
+
+            Synergy synergy = unit.Data.EnhancementData.Synergy;
+
+            if (!synergyCounts.ContainsKey(synergy))
+                synergyCounts[synergy] = 0;
+
+            synergyCounts[synergy]++;
+        }
+
+        return synergyCounts;
+    }
+
+    #endregion
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -14,7 +15,6 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     public UnitStatus Status => _status;
     [SerializeField] UnitData _unitData;
 
-
     [Header("UI")]
     [SerializeField] private TMP_Text _charText;
     [SerializeField] private Image _characterImg;
@@ -23,6 +23,9 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] private Image _roleSynergyImg;
     [SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
+
+    [Header("Reference")]
+    [SerializeField] Sprite[] costSprites;
 
     
     private bool _isCollected = true;
@@ -114,9 +117,9 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
-        //_costImg.sprite = 아이콘 추가 예정
-        //_jobSynergyImg.sprite = 아이콘 추가 예정
-        //_roleSynergyImg.sprite = 아이콘 추가 예정
+        _costImg.sprite = costSprites[_status.Data.Cost-1];
+        _jobSynergyImg.sprite = SynergyController.SynergyDB.GetSynergy(_status.Data.EnhancementData.Synergy.ToString()).Icon;
+        _roleSynergyImg.sprite = SynergyController.SynergyDB.GetSynergy(_status.Data.EnhancementData.ClassSynergy.ToString()).Icon;
         _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
     }
