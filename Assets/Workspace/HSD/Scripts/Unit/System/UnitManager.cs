@@ -97,8 +97,9 @@ public class UnitManager : MonoBehaviour
 
         _unitController.UnitFight();
         _enemyController.EnemyFight();
-      
-        FightUISetup();       
+        
+        FightUISetup();
+        InGameManager.Instance.BattleStart();
     }
 
     private void FightUISetup()

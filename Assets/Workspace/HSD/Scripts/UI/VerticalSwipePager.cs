@@ -1,28 +1,46 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
-using static UnityEngine.Rendering.DebugUI;
 
 public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 {
     [Header("UI Content")]
     [SerializeField] RectTransform _content;
 
-    [Header("게임 오브젝트 페이지들")]
+    [Header("GameObject Pages")]
     [SerializeField] Transform[] _pages;
 
-    [Header("설정값")]
+    [Header("Settings")]
     [SerializeField] float _swipeThreshold = 200f;
     [SerializeField] float _tweenDuration = 0.3f;
     [SerializeField] Ease _easeType = Ease.OutCubic;
     [SerializeField] float _uiToWorldRatio = 0.01f;
     [SerializeField] int _currentPage = 0;
     [SerializeField] Vector2 _cameraOffset;
+
     private int _totalPages;
     private Vector3[] _originalPagePositions;
     private Vector2 _originalUIPosition;
+    private bool _isBattle => InGameManager.Instance.IsBattle;
 
+    #region LifeCycle
     private void Start()
+    {
+        Init();
+    }
+
+    private void OnEnable()
+    {
+        InGameManager.Instance.OnBattleStart += MoveToBattlePage;
+    }
+
+    private void OnDisable()
+    {
+        InGameManager.Instance.OnBattleStart -= MoveToBattlePage;
+    }
+    #endregion
+
+    private void Init()
     {
         _totalPages = _pages.Length;
 
@@ -40,7 +58,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (UnitDragDropSystem.IsDragging)
+        if (UnitDragDropSystem.IsDragging || _isBattle)
             return;
 
         if (_currentPage == 0 && 0 < eventData.delta.y)
@@ -55,7 +73,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (UnitDragDropSystem.IsDragging)
+        if (UnitDragDropSystem.IsDragging || _isBattle)
             return;
 
         if (_currentPage == 0 && 0 < eventData.delta.y)
@@ -125,5 +143,10 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
             RectTransform panel = _content.GetChild(i).GetComponent<RectTransform>();
             panel.anchoredPosition = new Vector2(0, i * panel.rect.height);
         }
+    }
+
+    private void MoveToBattlePage()
+    {
+        MoveToPage(1);
     }
 }
