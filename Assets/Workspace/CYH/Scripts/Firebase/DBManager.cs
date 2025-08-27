@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Firebase.Auth;
 using Firebase.Database;
+using Firebase.Extensions;
 
 public class DBManager : Singleton<DBManager>
 {
@@ -101,6 +102,7 @@ public class DBManager : Singleton<DBManager>
     public async Task<PlayerData> LoadLobbyDataAsync()
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        Debug.Log($"[LoadLobbyDataAsync] uid: {uid}");
         DatabaseReference userRef = FirebaseManager.DataReference.Child("UserData").Child(uid);
 
         DataSnapshot snapshot = await userRef.GetValueAsync();
@@ -120,6 +122,23 @@ public class DBManager : Singleton<DBManager>
         };
 
         return data;
+    }
+
+    /// <summary>
+    /// UserData 경로의 현재 유저 UID를 삭제하는 메서드
+    /// </summary>
+    public async Task DeleteUserUidAsync()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+
+        Debug.Log($"[DeleteUserUid] 현재 로그인된 유저 uid : {uid}");
+        Dictionary<string, object> dictionary = new Dictionary<string, object>
+        {
+            [$"UserData/{uid}"] = null,
+        };
+
+        Task updateTask = FirebaseManager.DataReference.UpdateChildrenAsync(dictionary);
+        await updateTask;
     }
 
     /// <summary>

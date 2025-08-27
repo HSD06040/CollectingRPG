@@ -6,16 +6,19 @@ public class PlayerDataController : MonoBehaviour
 {
     [SerializeField] private PlayerDataView _view;
  
-    public Action<PlayerData> PlayerProfilePopupUpdated;
     private DatabaseReference _userRef;
-    
     private PlayerData _data;
+
     public PlayerData Data { get { return _data; } }
+
+    public Action<PlayerData> OnPlayerProfilePopupUpdated;
+    public Action<PlayerData> OnUpdateUI;
 
 
     private void Start()
     {
         InitAsync();
+        OnUpdateUI += _view.UpdateUI;
     }
 
     private void OnEnable()
@@ -32,7 +35,14 @@ public class PlayerDataController : MonoBehaviour
     {
         _data = await DBManager.Instance.LoadLobbyDataAsync();
         _view.UpdateUI(_data);
-        PlayerProfilePopupUpdated?.Invoke(_data);
+        RefreshUI(_data);
+    }
+
+    public void RefreshUI(PlayerData data)
+    {
+        _data = data;
+        OnUpdateUI?.Invoke(data);
+        OnPlayerProfilePopupUpdated?.Invoke(data);
     }
 
     private void StartListeningToPlayerData()
@@ -71,13 +81,13 @@ public class PlayerDataController : MonoBehaviour
             Diamond = int.TryParse(snapshot.Child("Diamond").Value?.ToString(), out int diamond) ? diamond : 0
         };
 
-        Debug.Log(FirebaseManager.Auth.CurrentUser.UserId);
+        Debug.Log($"[OnPlayerDataChanged] UI 업데이트 / UID: {FirebaseManager.Auth.CurrentUser.UserId}");
         Debug.Log(snapshot.Child("Nickname").Value);
         Debug.Log(snapshot.Child("Gold").Value);
         Debug.Log(snapshot.Child("Diamond").Value);
 
         _data = data;
         _view.UpdateUI(data);
-        PlayerProfilePopupUpdated?.Invoke(data);
+        OnPlayerProfilePopupUpdated?.Invoke(data);
     }
 }
