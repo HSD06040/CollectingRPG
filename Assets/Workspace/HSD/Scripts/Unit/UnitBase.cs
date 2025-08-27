@@ -190,27 +190,22 @@ public class UnitBase : MonoBehaviour, IAttacker
         if (Target == null) return Vector2.zero;
         return (Target.position - transform.position).normalized;
     }
-
     public float GetAttackTime()
     {
         return 1 / StatusController.AttackSpeed.Value;
     }
-
     public Transform GetTarget()
     {
         return Target;
     }
-
     public UnitStatus GetUnitData()
     {
         return Status;
     }
-
     public Transform GetTransform()
     {
         return transform;
     }
-
     public UnitStatusController GetStatusController()
     {
         return StatusController;
@@ -245,7 +240,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         {
             if (MeleeAttackData.SearchType == SearchType.Circle)
             {
-                Vector2 offset = Status.Data.AttackData.AttackPointOffset;
+                Vector2 offset = new Vector2(Status.Data.AttackData.AttackPointOffset.x, Status.Data.AttackData.AttackPointOffset.x);
                 offset *= TargetDir;
 
                 Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);

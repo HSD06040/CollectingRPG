@@ -37,7 +37,7 @@ public class UnitManager : MonoBehaviour
 
         _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
         _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
-               
+                       
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
 
         if (preset == null)
@@ -97,8 +97,9 @@ public class UnitManager : MonoBehaviour
 
         _unitController.UnitFight();
         _enemyController.EnemyFight();
-      
-        FightUISetup();       
+        
+        FightUISetup();
+        InGameManager.Instance.BattleStart();
     }
 
     private void FightUISetup()

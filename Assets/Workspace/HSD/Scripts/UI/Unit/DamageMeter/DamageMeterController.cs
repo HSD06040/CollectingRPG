@@ -2,11 +2,13 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DamageMeterController : MonoBehaviour
 {
     [SerializeField] GameObject _damageMeterPrefab;
     [SerializeField] Transform _content;
+    [SerializeField] GridLayoutGroup _gridLayoutGroup;
     private DamageMeterSlot[] _damageMeterSlots;
     private List<DamageMeterSlot> _activeSlots = new List<DamageMeterSlot>();
     private CancellationTokenSource _cts;
@@ -14,6 +16,8 @@ public class DamageMeterController : MonoBehaviour
 
     private void Awake()
     {
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, 1, 5, 10);
+
         CreateDamageMeterSlots();        
         DamageMeterSlot.OnDamaged += SortingDamageMeter;
     }
@@ -24,7 +28,7 @@ public class DamageMeterController : MonoBehaviour
     }
 
     public void Init(UnitBase[] units)
-    {
+    {        
         int count = 0;
         for (int i = 0; i < units.Length; i++)
         {

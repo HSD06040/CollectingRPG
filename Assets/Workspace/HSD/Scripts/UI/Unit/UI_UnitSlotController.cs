@@ -13,7 +13,8 @@ public class UI_UnitSlotController : MonoBehaviour
     [SerializeField] Transform _content;
     [SerializeField] GameObject _unitSlotPrefab;
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
-    [SerializeField] int _slotCount;    
+    [SerializeField] int _slotCount;
+    [SerializeField] int _offset;
 
     private UI_UnitSlot[] _unitSlots;
     private UnitStatus[] _cachedUnitsArray = new UnitStatus[UnitController.UnitMaxCount];
@@ -29,12 +30,7 @@ public class UI_UnitSlotController : MonoBehaviour
     {
         _unitSlots = new UI_UnitSlot[_slotCount];
 
-        Vector2 offset = _gridLayoutGroup.spacing;
-
-        float width = (((RectTransform)_content.transform).rect.width - (offset.x * (_slotCount / 2) * 2)) / (_slotCount / 2);
-        float height = (((RectTransform)_content.transform).rect.height - (offset.y * (_slotCount / 5) * 2)) / (_slotCount / 5);
-
-        _gridLayoutGroup.cellSize = new Vector2(width, height);
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, 5, 2, _offset, true);
 
         for (int i = 0; i < _slotCount; i++)
         {

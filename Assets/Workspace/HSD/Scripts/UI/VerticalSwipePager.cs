@@ -1,28 +1,46 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
-using static UnityEngine.Rendering.DebugUI;
 
 public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 {
-    [Header("UI Content (페이지 묶음)")]
+    [Header("UI Content")]
     [SerializeField] RectTransform _content;
 
-    [Header("게임 오브젝트 페이지들")]
+    [Header("GameObject Pages")]
     [SerializeField] Transform[] _pages;
 
-    [Header("설정값")]
+    [Header("Settings")]
     [SerializeField] float _swipeThreshold = 200f;
     [SerializeField] float _tweenDuration = 0.3f;
     [SerializeField] Ease _easeType = Ease.OutCubic;
     [SerializeField] float _uiToWorldRatio = 0.01f;
     [SerializeField] int _currentPage = 0;
     [SerializeField] Vector2 _cameraOffset;
+
     private int _totalPages;
     private Vector3[] _originalPagePositions;
     private Vector2 _originalUIPosition;
+    private bool _isBattle => InGameManager.Instance.IsBattle;
 
+    #region LifeCycle
     private void Start()
+    {
+        Init();
+    }
+
+    private void OnEnable()
+    {
+        InGameManager.Instance.OnBattleStart += MoveToBattlePage;
+    }
+
+    private void OnDisable()
+    {
+        InGameManager.Instance.OnBattleStart -= MoveToBattlePage;
+    }
+    #endregion
+
+    private void Init()
     {
         _totalPages = _pages.Length;
 
@@ -40,7 +58,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (UnitDragDropSystem.IsDragging)
+        if (UnitDragDropSystem.IsDragging || _isBattle)
             return;
 
         if (_currentPage == 0 && 0 < eventData.delta.y)
@@ -55,7 +73,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (UnitDragDropSystem.IsDragging)
+        if (UnitDragDropSystem.IsDragging || _isBattle)
             return;
 
         if (_currentPage == 0 && 0 < eventData.delta.y)
@@ -98,14 +116,14 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         // UI가 원래 위치에서 얼마나 움직였는지 계산
         Vector2 uiOffset = _content.anchoredPosition - _originalUIPosition;
 
-        // UI 오프셋을 월드 좌표로 변환 (Y축만, X축은 필요에 따라 추가)
+        // UI 오프셋을 월드 좌표로 변환
         Vector3 worldOffset = new Vector3(0, uiOffset.y * _uiToWorldRatio, 0);
 
         for (int i = 0; i < _pages.Length; i++)
         {
             Vector3 basePos;
 
-            if (_currentPage == 0 && i == 1)
+            if (i == 1)
             {
                 basePos = Camera.main.transform.position + (Vector3)_cameraOffset;
             }
@@ -123,22 +141,12 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         for (int i = 0; i < _content.childCount; i++)
         {
             RectTransform panel = _content.GetChild(i).GetComponent<RectTransform>();
-            panel.offsetMin = new Vector2(0, i * panel.rect.height);
+            panel.anchoredPosition = new Vector2(0, i * panel.rect.height);
         }
     }
 
-    public void SetUIToWorldRatio(float ratio)
+    private void MoveToBattlePage()
     {
-        _uiToWorldRatio = ratio;
-        SyncGameObjectsWithUI();
-    }
-
-    public void ResetOriginalPositions()
-    {
-        for (int i = 0; i < _pages.Length; i++)
-        {
-            _originalPagePositions[i] = _pages[i].position;
-        }
-        _originalUIPosition = _content.anchoredPosition;
+        MoveToPage(1);
     }
 }
