@@ -7,6 +7,7 @@ public class RandomGachaSystem : MonoBehaviour
     [Header("Reference")]
     [SerializeField] private CharacterDatabase _data;
     [SerializeField] private ItemProbabilitySO _prob;
+    [SerializeField] private GachaResultUI _resultUI;
 
     [Header("UI")]
     [SerializeField] private Button _dailyButton;
@@ -37,23 +38,18 @@ public class RandomGachaSystem : MonoBehaviour
         }
     }
 
-    private void ReturnData()
+    // 확률 변동 없는 캐릭터 뽑기
+    private UnitData ReturnData()
     {
         Grade grade = _gradeRandom.GetRandomItem();
-
-        UnitData unit = _data.GetRandomUnitByGrade(grade);
-
-        Debug.Log($"뽑힌 등급: {grade}, 캐릭터: {unit?.Name}");
+        return _data.GetRandomUnitByGrade(grade);
     }
 
-    private void ReturnDataBySub()
+    // 확률 변동 있는 캐릭터 뽑기
+    private UnitData ReturnDataBySub()
     {
-        // grade에 해당하는 캐릭터를 랜덤으로 뽑기
         Grade grade = _gradeRandom.GetRandomItemBySub();
-
-        UnitData unit = _data.GetRandomUnitByGrade(grade);
-
-        Debug.Log($"뽑힌 등급: {grade}, 캐릭터: {unit?.Name}");
+        return _data.GetRandomUnitByGrade(grade);
     }
 
     // 확률 변동이 없는 가중치 확률
@@ -63,8 +59,11 @@ public class RandomGachaSystem : MonoBehaviour
 
         for(int i = 0; i < number; i++)
         {
-            ReturnData();
+            UnitData data = ReturnData();
+            _resultUI.HeroGachaUpdate(data, i);            
         }
+
+        _resultUI.gameObject.SetActive(true);
     }
 
     // 천장이 있는 가중치 확률
