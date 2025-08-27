@@ -45,7 +45,7 @@ public class PartySelectPanelController : MonoBehaviour
     private void GameStart()
     {
         // 씬 전환
-        SceneManager.LoadScene("Test");
+        SceneManager.LoadScene("USW_GameScene");
         Debug.Log("게임 시작");
     }
 }
