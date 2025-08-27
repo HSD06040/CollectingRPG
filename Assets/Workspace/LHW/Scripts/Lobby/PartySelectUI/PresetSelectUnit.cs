@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,7 +53,6 @@ public class PresetSelectUnit : MonoBehaviour
         if(TempDataManager.Instance.PresetData.Count < _index + 1)
         {
             SetactiveGameobject("LockedPartyButton");
-            Debug.Log("잠김");
             return;
         }
 
@@ -62,13 +60,13 @@ public class PresetSelectUnit : MonoBehaviour
         if (TempDataManager.Instance.PresetData[_index].Statuses[0].Data == null)
         {
             SetactiveGameobject("DisabledPartyButton");
-            Debug.Log("비활성화됨");
             return;
         }
 
         // 프리셋이 사용 가능한 상태이면 하단의 과정 진행
         SetactiveGameobject("ActivePartyButton");
         UpdateUI();
+        ActiveHighlight();
     }
 
     #region UI Update
@@ -100,12 +98,11 @@ public class PresetSelectUnit : MonoBehaviour
                 _presetImages[i].sprite = _xImage;
             }
         }
-        _leaderName.text = preset[0].Data.Name;
-        _partyDamageText.text = $"Party Damage : {damage}";
+        _leaderName.text = $"리더 : {preset[0].Data.Name}";
+        _partyDamageText.text = $"파티 전투력 : {damage}";
         // 시너지 입력 방식은 시너지 활성화 기능 구현 이후 진행
         //_synergy1Text.text = preset[0].Data.EnhancementData.ClassSynergy.ToString();
         //_synergy2Text.text = preset[0].Data.EnhancementData.ClassSynergy.ToString();
-        Debug.Log("활성화됨");
     }
 
     private void SetactiveGameobject(string activeObject)
