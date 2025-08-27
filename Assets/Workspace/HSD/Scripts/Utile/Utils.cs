@@ -3,6 +3,7 @@ using System.Text;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.UI;
 
 public static class Utils
 {
@@ -231,9 +232,9 @@ public static class Utils
 
     public static Color GetGradeColor(this UnitStatus status)
     {
-        return (status.Data.Grade) switch
+        return status.Data.Grade switch
         {
-            Grade.Normal => new Color32(0x4D, 0xC5, 0x5B, 0xFF),
+            Grade.Normal => new Color(173f / 255f, 255f / 255f, 47f / 255f),
             Grade.Rare => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
             Grade.Unique => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
             Grade.Legendary => new Color32(0xF2, 0x93, 0x38, 0xFF),
@@ -250,5 +251,53 @@ public static class Utils
             0 => new Color32(0xB0, 0xB0, 0xB0, 0xFF), // Normal : 단색 회색
             _ => Color.grey
         };
+    }
+
+    public static void SetupGridLayoutGroup(
+    this GridLayoutGroup gridLayoutGroup,
+    Transform content,
+    int columns,
+    int rows,
+    int offset = 10,
+    bool keepSquare = false)
+    {
+        RectTransform rectTransform = content as RectTransform;
+        if (rectTransform == null) return;
+
+        gridLayoutGroup.padding = new RectOffset(offset, offset, offset, offset);
+
+        float availableWidth = rectTransform.rect.width
+                             - gridLayoutGroup.padding.left - gridLayoutGroup.padding.right;
+
+        float availableHeight = rectTransform.rect.height
+                              - gridLayoutGroup.padding.top - gridLayoutGroup.padding.bottom;
+
+        if (!keepSquare)
+        {
+            // 기존 방식
+            float totalWidth = availableWidth - (gridLayoutGroup.spacing.x * (columns - 1));
+            float totalHeight = availableHeight - (gridLayoutGroup.spacing.y * (rows - 1));
+
+            float cellWidth = totalWidth / columns;
+            float cellHeight = totalHeight / rows;
+
+            gridLayoutGroup.cellSize = new Vector2(cellWidth, cellHeight);
+        }
+        else
+        {
+            // 정사각형 셀 크기
+            float cellWidth = availableWidth / columns;
+            float cellHeight = (availableHeight - (gridLayoutGroup.spacing.y * (rows - 1))) / rows;
+            float cellSize = Mathf.Min(cellWidth, cellHeight);
+
+            gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
+
+            // spacing.x 재계산
+            float totalCellWidth = cellSize * columns;
+            float remainingWidth = Mathf.Max(0, availableWidth - totalCellWidth);
+            float spacingX = columns > 1 ? remainingWidth / (columns - 1) : 0;
+
+            gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
+        }
     }
 }

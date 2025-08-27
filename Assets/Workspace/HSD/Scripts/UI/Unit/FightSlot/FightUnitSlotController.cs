@@ -12,15 +12,17 @@ public class FightUnitSlotController : MonoBehaviour
     {
         CreateSlots();
 
-        int count = _grid.transform.childCount;
-        float width = ((RectTransform)_grid.transform).rect.width;
-        float height = ((RectTransform)_grid.transform).rect.height;
+        _grid.SetupGridLayoutGroup(_content, 10, 1, 0, true);
 
-        if (count > 0)
-        {
-            float cellWidth = width / count;
-            _grid.cellSize = new Vector2(cellWidth, height);
-        }
+        //int count = _grid.transform.childCount;
+        //float width = ((RectTransform)_grid.transform).rect.width;
+        //float height = ((RectTransform)_grid.transform).rect.height;
+
+        //if (count > 0)
+        //{
+        //    float cellWidth = width / count;
+        //    _grid.cellSize = new Vector2(cellWidth, height);
+        //}
     }
 
     private void CreateSlots()
