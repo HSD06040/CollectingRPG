@@ -13,7 +13,8 @@ public class UnitController : MonoBehaviour
     public static readonly int UnitMaxCount = 10;
 
     private UnitBase[,] _unitGrid;
-    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(300);
+    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(256);
+    private Dictionary<UnitData, int> _unitCountDic = new Dictionary<UnitData, int>(64);
     private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
     private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
 
@@ -108,7 +109,9 @@ public class UnitController : MonoBehaviour
 
             SetSlot(slot, unit);
             AddSynergyUnit(unit);
+            AddUnitCount(unit);
             AddList(unit);
+            
             CurrentUnitCount++;
 
             OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
@@ -182,19 +185,10 @@ public class UnitController : MonoBehaviour
         UnitBase unit = slot.Unit;
 
         _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
-
-        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
-        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
-
-        SynergyController.RemoveSynergy(synergy, classSynergy);
-
-        if (_synergyUnitDic.TryGetValue(synergy, out var synergyList))
-            synergyList.Remove(unit);
-
-        if (_classSynergyUnitDic.TryGetValue(classSynergy, out var classList))
-            classList.Remove(unit);
-
         _unitBaseDic[unit.Status.Address].Remove(unit);
+
+        RemoveUnitCount(unit);
+        RemoveSynergy(unit);
 
         ClearSlot(slot, unit);
 
@@ -223,7 +217,12 @@ public class UnitController : MonoBehaviour
     #endregion
 
     private void AddSynergyUnit(UnitBase unit)
-    {
+    {        
+        if (_unitCountDic.ContainsKey(unit.Status.Data) && _unitCountDic[unit.Status.Data] >= 1)
+        {
+            return;
+        }
+
         Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
         ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
 
@@ -243,6 +242,25 @@ public class UnitController : MonoBehaviour
         }
 
         classList.Add(unit);
+    }
+
+    private void RemoveSynergy(UnitBase unit)
+    {
+        if (_unitCountDic[unit.Status.Data] >= 1)
+        {
+            return;
+        }
+
+        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
+        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
+
+        SynergyController.RemoveSynergy(synergy, classSynergy);
+
+        if (_synergyUnitDic.TryGetValue(synergy, out var synergyList))
+            synergyList.Remove(unit);
+
+        if (_classSynergyUnitDic.TryGetValue(classSynergy, out var classList))
+            classList.Remove(unit);
     }
 
     private void SetSlot(UnitSlot slot, UnitBase unit)
@@ -269,7 +287,19 @@ public class UnitController : MonoBehaviour
         list.Add(unit);
     }
 
+    private void AddUnitCount(UnitBase unit)
+    {
+        if (!_unitCountDic.ContainsKey(unit.Status.Data))
+            _unitCountDic.Add(unit.Status.Data, 0);
 
+        _unitCountDic[unit.Status.Data]++;
+    }
+
+    private void RemoveUnitCount(UnitBase unit)
+    {
+        if (_unitCountDic.ContainsKey(unit.Status.Data))
+            _unitCountDic[unit.Status.Data]--;
+    }
 
     public UnitSlot GetUnitSlot(UnitBase unit)
     {

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SynergyPanel : MonoBehaviour
 {
     [SerializeField] GameObject _synergySlotPrefab;
     [SerializeField] Transform _content;
     [SerializeField] SynergyToolTip _synergyTooltip;
+    [SerializeField] GridLayoutGroup _gridLayoutGroup;
+    [SerializeField] int _offset;
 
     private Dictionary<string, SynergySlot> _synergySlots = new(50);
     private int _currentPage;
@@ -16,6 +19,8 @@ public class SynergyPanel : MonoBehaviour
 
     public void Init(SynergyDatabase db)
     {
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, 3, 2, _offset);
+
         CreateSynergtSlots(db); 
         SetActivate();
         _maxPage = _content.childCount / 6;
