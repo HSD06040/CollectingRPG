@@ -41,18 +41,17 @@ public class PlayerProfilePopup : MonoBehaviour
         _isDataBind = enable;                                       
 
         if (_isDataBind)                                            
-            _controller.PlayerProfilePopupUpdated += Apply;         
+            _controller.OnPlayerProfilePopupUpdated += Apply;         
         else 
-            _controller.PlayerProfilePopupUpdated -= Apply;        
+            _controller.OnPlayerProfilePopupUpdated -= Apply;        
     }
 
     private void OnDisable()
     {
         if (_isDataBind)                                            
         {
-            _controller.PlayerProfilePopupUpdated -= Apply;
+            _controller.OnPlayerProfilePopupUpdated -= Apply;
             _isDataBind = false;                                    
         }
     }
-
 }
