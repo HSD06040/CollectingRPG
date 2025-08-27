@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Firebase.Auth;
 using Firebase.Extensions;
+using TMPro;
 using Google;
 
 public class AccountLinkPopup : MonoBehaviour
@@ -14,7 +15,12 @@ public class AccountLinkPopup : MonoBehaviour
     [SerializeField] private Button _googleLinkButton;
     [SerializeField] private Button _deleteButton;
     [SerializeField] private Button _signOutButton;
+    [SerializeField] private TextMeshProUGUI _deleteButtonText;
+    [SerializeField] private TextMeshProUGUI _signOutButtonText;
+    [SerializeField] private TextMeshProUGUI _googleLinkText;
 
+    Color activeColor = Color.red;
+    Color inactiveColor = Color.gray;
 
     private void Start()
     {
@@ -24,10 +30,12 @@ public class AccountLinkPopup : MonoBehaviour
         if (currentUser != null && currentUser.IsAnonymous)
         {
             SetButtonsInteractable(false);
+            SetGoogleText(false);
         }
         else
         {
             SetButtonsInteractable(true);
+            SetGoogleText(true);
         }
 
         _closeButton.onClick.AddListener(() => gameObject.SetActive(false));
@@ -112,6 +120,7 @@ public class AccountLinkPopup : MonoBehaviour
 
                     Debug.Log($"기존 구글 계정 로그인 성공 / currentUser UID: {currentUser.UserId}");
                     SetButtonsInteractable(true);
+                    SetGoogleText(false);
 
                     if (currentUser == null)
                     {
@@ -135,12 +144,15 @@ public class AccountLinkPopup : MonoBehaviour
                 await currentUser.ReloadAsync();
 
                 SetButtonsInteractable(true);
+                SetGoogleText(false);
 
                 Debug.Log("------유저 정보(GoogleLink)------");
+
                 await Manager.DB.LoadNicknameAsync((nickname) =>
                 {
                     Debug.Log($"유저 ID : {nickname}");
                 });
+
                 Debug.Log($"유저 ID: {currentUser.UserId}");
                 Debug.Log($"이메일 : {currentUser.Email}");
             });
@@ -151,5 +163,13 @@ public class AccountLinkPopup : MonoBehaviour
     {
         _deleteButton.interactable = isActive;
         _signOutButton.interactable = isActive;
+
+        _deleteButtonText.color = isActive ? activeColor : inactiveColor;
+        _signOutButtonText.color = isActive ? activeColor : inactiveColor;
+    }
+
+    private void SetGoogleText(bool isGuest)
+    {
+        _googleLinkText.text = isGuest ? "Google로 로그인 " : "Google로 연동됨";
     }
 }
