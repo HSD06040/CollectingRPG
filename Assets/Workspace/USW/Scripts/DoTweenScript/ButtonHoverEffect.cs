@@ -12,7 +12,7 @@ public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerEx
     
     [Header("Dotween animation Settings")]
     [SerializeField] float animationDuration = 0.3f;
-    [SerializeField] Ease ease = Ease.OutBack;
+    [SerializeField] Ease ease = Ease.InOutBack;
     
     [Header("DoTween additional Settings")]
     [SerializeField] bool enablePunch = false;

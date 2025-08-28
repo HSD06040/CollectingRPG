@@ -11,6 +11,8 @@ public class PlayerDataView : MonoBehaviour
     //[SerializeField] private TMP_Text _goldText;
     //[SerializeField] private TMP_Text _diamondText;
 
+    private List<TMP_Text> staminaTimerTexts = new List<TMP_Text>();
+    
 
     private void OnEnable()
     {
@@ -18,6 +20,18 @@ public class PlayerDataView : MonoBehaviour
         {
             cachedTexts.Clear();
         } 
+        
+        staminaTimerTexts.Clear();
+    }
+    
+    private void Start()
+    {
+        // PlayerDataController의 스테미나 타이머 이벤트 구독
+        var controller = FindObjectOfType<PlayerDataController>();
+        if (controller != null)
+        {
+            controller.OnStaminaRecoveryTimer += UpdateStaminaTimer;
+        }
     }
 
     public void UpdateUI(PlayerData data)
@@ -28,7 +42,7 @@ public class PlayerDataView : MonoBehaviour
         foreach (var field in fields)
         {
             var value = field.GetValue(data);
-            string textValue = FormatValue(field.Name, value);
+            string textValue = FormatValue(field.Name, value,data);
             UpdateTextsByName(field.Name + "Text", textValue);
         }
 
@@ -66,15 +80,77 @@ public class PlayerDataView : MonoBehaviour
             }
         }
     }
+    
+    // 스테미나 타이머 텍스트 업데이트
+    private void UpdateStaminaTimer(int remainingSeconds)
+    {
+        if (staminaTimerTexts.Count == 0)
+        {
+            // 스테미나 타이머 텍스트들 찾기 
+            var allTexts = FindObjectsOfType<TMP_Text>(true);
+            foreach (var text in allTexts)
+            {
+                if (text.name.Equals("StaminaTimerText", StringComparison.OrdinalIgnoreCase))
+                {
+                    staminaTimerTexts.Add(text);
+                }
+            }
+        }
+
+        string timerText = remainingSeconds > 0 ? FormatTime(remainingSeconds) : "FULL";
+        
+        foreach (var text in staminaTimerTexts)
+        {
+            if (text != null)
+            {
+                text.text = timerText;
+            }
+        }
+    }
 
     // 값 포맷팅
-    private string FormatValue(string fieldName, object value)
+    private string FormatValue(string fieldName, object value, PlayerData data = null)
     {
-        return fieldName switch
+        // MaxStamina는 일단 필드에 존재하긴 하니깐 FormatValue 가 호출됨 그래서 집어는 넣어야함. 
+        // return fieldName switch
+        // {
+        //     "Gold" => $"{value:N0}", 
+        //     "Diamond" => $"{value:N0}", 
+        //     "Stamina" => data != null ? $"{data.Stamina}/{data.MaxStamina}" : $"{value}",
+        //     "MaxStamina" => "",
+        //     _ => value?.ToString() ?? ""
+        //     
+        // };
+        Debug.Log($"fieldName : {fieldName}, value:{value}, data==null: {data==null}");
+        
+        string result = fieldName switch
         {
             "Gold" => $"{value:N0}", 
             "Diamond" => $"{value:N0}", 
+            "Stamina" => data != null ? $"{data.Stamina}/{data.MaxStamina}" : $"{value}",
+            "MaxStamina" => "",
             _ => value?.ToString() ?? ""
+            
         };
+        Debug.Log($"result: {result}");
+        return result;
+    }
+    
+    // 시간 포맷팅
+    private string FormatTime(int totalSeconds)
+    {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return $"{minutes:D2}:{seconds:D2}";
+    }
+    
+    private void OnDestroy()
+    {
+        // 이벤트 구독 해제
+        var controller = FindObjectOfType<PlayerDataController>();
+        if (controller != null)
+        {
+            controller.OnStaminaRecoveryTimer -= UpdateStaminaTimer;
+        }
     }
 }

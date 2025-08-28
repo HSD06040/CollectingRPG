@@ -24,8 +24,8 @@ public class PlayerProfilePopup : MonoBehaviour
             return;
         }
 
-        _playerNameText.text = $"Name: {data.PlayerName}";
-        _playerUidText.text = $"UID: {data.PlayerUid}";
+        _playerNameText.text = $"{data.PlayerName}";
+        _playerUidText.text = $"{data.PlayerUid}";
     }
 
     /// <summary>
