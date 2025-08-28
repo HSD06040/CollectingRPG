@@ -193,7 +193,7 @@ public class DBManager : Singleton<DBManager>
     }
 
     /// <summary>
-    /// 튜토리얼 진행 후 튜토리얼 진행 여부 변수를 true 로 설정하는 메서드
+    /// 튜토리얼 진행 후 튜토리얼 진행 여부 변수를 false 로 설정하는 메서드
     /// IsTutorialComplete = false
     /// </summary>
     public async Task SetTutorialInCompleteAsync()
@@ -206,8 +206,8 @@ public class DBManager : Singleton<DBManager>
     }
 
     /// <summary>
-    /// 계정의 생성 후 튜토리얼 진행 여부 변수를 false 로 설정하는 메서드
-    /// IsTutorialComplete = false
+    /// 계정의 생성 후 튜토리얼 진행 여부 변수를 true 로 설정하는 메서드
+    /// IsTutorialComplete = true
     /// </summary>
     public async Task SetTutorialCompleteAsync()
     {
