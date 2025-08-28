@@ -1,9 +1,11 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
-public class UnitStatusController : MonoBehaviour, IDamageable
+public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 {
     public UnitStatus Status { get; set; }
 
@@ -34,10 +36,14 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public Property<int> CurHp = new Property<int>();
     public Property<int> CurMana = new Property<int>();
+    public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
 
     public event Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> UseSkill;
+
+    private readonly Dictionary<BuffKey, CancellationTokenSource> _activeBuffs = new Dictionary<BuffKey, CancellationTokenSource>(10);
+
 
     public bool IsDead => CurHp.Value <= 0;
 
@@ -85,6 +91,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable
         }
     }
 
+    public void IncreaseHealth(int amount)
+    {
+        CurHp.Value = Mathf.Clamp(CurHp.Value + amount, 0, MaxHealth.Value);
+    }
+
+    public void IncreaseMana(int amount)
+    {
+        CurMana.Value = Mathf.Clamp(CurMana.Value + amount, 0, MaxMana.Value);
+    }
+
     private void Die()
     {
         OnUnitDied?.Invoke(this);
@@ -92,6 +108,111 @@ public class UnitStatusController : MonoBehaviour, IDamageable
 
     public void GetMana()
     {
-        CurMana.Value += ManaGain.Value;
+        IncreaseMana(ManaGain.Value);
+    }
+
+    public void ApplyEffect(BuffEffectData buffEffectData, int value, string source)
+    {
+        var key = new BuffKey(buffEffectData.StatType, source);
+
+        if (_activeBuffs.TryGetValue(key, out var cts))
+        {
+            cts.Cancel();
+            cts.Dispose();
+            _activeBuffs.Remove(key);
+        }
+        else
+        {
+            AddStat(buffEffectData.StatType, value, source);
+        }
+
+        var newCts = new CancellationTokenSource();
+        _activeBuffs[key] = newCts;
+
+        ClearEffectAsync(buffEffectData, value, source, newCts.Token).Forget();
+    }
+
+    private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, int value, string source, CancellationToken token)
+    {
+        try
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.Duration), cancellationToken: token);
+
+            RemoveStat(buffEffectData.StatType, source);
+            _activeBuffs.Remove(new BuffKey(buffEffectData.StatType, source));
+        }
+        catch (OperationCanceledException)
+        {
+            // 갱신으로 취소된 경우 RemoveStat 안 함
+        }
+    }
+
+    public void AddStat(StatType statType, int value, string source)
+    {
+        switch(statType)
+        {
+            case StatType.MaxHealth:
+                MaxHealth.AddModifier(value, source);
+                IncreaseHealth(value);
+                break;
+            case StatType.MaxMana:
+                MaxMana.AddModifier(value, source);
+                break;
+            case StatType.ManaGain:
+                ManaGain.AddModifier(value, source);
+                break;
+            case StatType.PhysicalDamage:
+                PhysicalDamage.AddModifier(value, source);
+                break;
+            case StatType.MagicDamage:
+                MagicDamage.AddModifier(value, source);
+                break;
+            case StatType.CritChance:
+                CritChance.AddModifier(value, source);
+                break;
+            case StatType.PhysicalDefense:
+                PhysicalDefense.AddModifier(value, source);
+                break;
+            case StatType.MagicDefense:
+                MagicDefense.AddModifier(value, source);
+                break;
+            case StatType.CurHp:
+                IncreaseHealth(value);
+                break;
+            case StatType.CurMana:
+                IncreaseMana(value);
+                break;
+        }
+    }
+
+    public void RemoveStat(StatType statType, string source)
+    {
+        switch (statType)
+        {
+            case StatType.MaxHealth:
+                MaxHealth.RemoveModifier(source);
+                break;
+            case StatType.MaxMana:
+                MaxMana.RemoveModifier(source);
+                break;
+            case StatType.ManaGain:
+                ManaGain.RemoveModifier(source);
+                break;
+            case StatType.PhysicalDamage:
+                PhysicalDamage.RemoveModifier(source);
+                break;
+            case StatType.MagicDamage:
+                MagicDamage.RemoveModifier(source);
+                break;
+            case StatType.CritChance:
+                CritChance.RemoveModifier(source);
+                break;
+            case StatType.PhysicalDefense:
+                PhysicalDefense.RemoveModifier(source);
+                break;
+            case StatType.MagicDefense:
+                MagicDefense.RemoveModifier(source);
+                break;
+        }
     }
 }

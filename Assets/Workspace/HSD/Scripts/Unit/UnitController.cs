@@ -45,7 +45,7 @@ public class UnitController : MonoBehaviour
         _unitDragDropSystem.OnUnitDropped += AddUnit;
     }
 
-    public void UnitStanby()
+    public void UnitStanbyAndSetSlotPosition()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
@@ -53,12 +53,24 @@ public class UnitController : MonoBehaviour
                 continue;
 
             unit.transform.position = _unitSlotManager.GetUnitSlot(unit.CurrentSlot).transform.position;
-            unit.Stanby();
+            unit.Standby();
         }
 
         _unitDragDropSystem.enabled = true;
     }
 
+    public void UnitsStanby()
+    {
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
+        {
+            if (unit == null || unit.StatusController.IsDead)
+                continue;
+
+            unit.Standby();
+        }
+
+        _unitDragDropSystem.enabled = true;
+    }
     public void UnitFight()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
