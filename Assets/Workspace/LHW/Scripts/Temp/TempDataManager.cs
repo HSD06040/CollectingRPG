@@ -3,17 +3,9 @@ using UnityEngine;
 
 public class TempDataManager : MonoBehaviour
 {
+    #region Singleton
+
     public static TempDataManager Instance { get; private set; }
-
-    #region Data
-
-    private int _selectedPresetIndex = 0;
-    public int SelectedPresetIndex => _selectedPresetIndex;
-
-    private List<TeamPresetData> _presetData = new List<TeamPresetData>();
-    public List<TeamPresetData> PresetData => _presetData;
-
-    #endregion
 
     private void Awake()
     {
@@ -24,9 +16,21 @@ public class TempDataManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject); 
+        DontDestroyOnLoad(gameObject);
         Init();
     }
+
+    #endregion
+
+    #region Data
+
+    private int _selectedPresetIndex = 0;
+    public int SelectedPresetIndex => _selectedPresetIndex;
+
+    private List<TeamPresetData> _presetData = new List<TeamPresetData>();
+    public List<TeamPresetData> PresetData => _presetData;
+
+    #endregion    
 
     private void Init()
     {

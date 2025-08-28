@@ -24,8 +24,8 @@ public class RandomGachaSystem : MonoBehaviour
     {
         RandomInit(_prob);
         _dailyButton.onClick.AddListener(() => ItemSelect(1));
-        _oneGachaButton.onClick.AddListener(() => ItemSelect(1));
-        _tenGachaButton.onClick.AddListener(() => ItemSelect(10));
+        _oneGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(1));
+        _tenGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(10));
     }
 
     private void RandomInit(ItemProbabilitySO probability)
@@ -52,6 +52,18 @@ public class RandomGachaSystem : MonoBehaviour
         return _data.GetRandomUnitByGrade(grade);
     }
 
+    private void FreeOrAdButtonClick()
+    {
+
+    }
+
+    private void ConsumeGoodsButtonClick(int number)
+    {
+        // 재화 상태 확인 절차 진행
+
+        ItemSelect(number);
+    }
+
     // 확률 변동이 없는 가중치 확률
     private void ItemSelect(int number)
     {
@@ -65,6 +77,8 @@ public class RandomGachaSystem : MonoBehaviour
 
         _resultUI.gameObject.SetActive(true);
     }
+
+    
 
     // 천장이 있는 가중치 확률
     private void ItemSelectBySub(int number)
