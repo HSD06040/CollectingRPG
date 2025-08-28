@@ -1,12 +1,12 @@
 
 public enum ClassType
 {
-    Tank, Melee, Ranged, Support
+    Tank = 0, Melee, Ranged, Support
 }
 
 public enum Synergy
 {
-    A, B, C, D
+    A = 4, B, C, D, Length
 }
 
 public enum AttackAreaType

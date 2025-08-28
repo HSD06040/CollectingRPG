@@ -7,7 +7,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public UnitStatus Status { get; set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
     [field: SerializeField] public BoxCollider2D TriggerCol { get; private set; }
-    [field: SerializeField] public Transform Target 
+    [SerializeField] public Transform Target 
     { 
         get
         {

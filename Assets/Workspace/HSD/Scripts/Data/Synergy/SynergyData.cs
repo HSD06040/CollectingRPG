@@ -26,7 +26,7 @@ public abstract class SynergyData : ScriptableObject
         CurrentUpgradeIdx = -1;
     }
 
-    public void Check(int newCount)
+    public void Check(int newCount, UnitBase[] units)
     {
         SynergyEffect newEffect = null;
 
@@ -47,8 +47,8 @@ public abstract class SynergyData : ScriptableObject
 
         if (_currentEffect != newEffect)
         {
-            _currentEffect?.RemoveEffect();
-            newEffect?.ApplyEffect();
+            _currentEffect?.RemoveEffect(units);
+            newEffect?.ApplyEffect(units);
             _currentEffect = newEffect;
         }
     }

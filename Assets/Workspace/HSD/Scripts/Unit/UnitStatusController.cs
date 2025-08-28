@@ -47,10 +47,12 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public bool IsDead => CurHp.Value <= 0;
 
+    #region Init&Clear
     public void Init(UnitStatus status)
     {
         Status = status;
         SetBaseStat(status.GetCurrentStat());
+        ClearAllStat();
     }
 
     private void SetBaseStat(UnitStats stat)
@@ -77,6 +79,36 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         CurMana.Value = MaxMana.Value;
         TotalDamage.Value = 0;
     }
+
+    private void ClearAllStat()
+    {
+        // 모든 스탯의 모디파이어 제거
+        MaxHealth.ClearModifiers();
+        MaxMana.ClearModifiers();
+        ManaGain.ClearModifiers();
+
+        AttackSpeed.ClearModifiers();
+        MoveSpeed.ClearModifiers();
+
+        PhysicalDamage.ClearModifiers();
+        MagicDamage.ClearModifiers();
+
+        CritChance.ClearModifiers();
+
+        PhysicalDefense.ClearModifiers();
+        MagicDefense.ClearModifiers();
+
+        AttackRange.ClearModifiers();
+        AttackCount.ClearModifiers();
+
+        foreach (var cts in _activeBuffs.Values)
+        {
+            cts.Cancel();
+            cts.Dispose();
+        }
+        _activeBuffs.Clear();
+    }
+    #endregion
 
     public void TakeDamage(int amount)
     {

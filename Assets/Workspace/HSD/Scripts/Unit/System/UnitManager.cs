@@ -27,7 +27,6 @@ public class UnitManager : MonoBehaviour
 
     private void Init()
     {
-        _unitController.SynergyController.Init();
         _unitController.Init();
         _unitStanbyUIManager.Init();
 

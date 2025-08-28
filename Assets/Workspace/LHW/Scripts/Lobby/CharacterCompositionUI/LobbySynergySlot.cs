@@ -9,7 +9,7 @@ public class LobbySynergySlot : MonoBehaviour
     public int UpgradeCount => ActiveCount / 2;
     public void SetSynergy(Synergy synergy)
     {
-        _icon.sprite = SynergyController.SynergyDB.GetSynergy(synergy.ToString()).Icon;
+        _icon.sprite = SynergyController.SynergyDB.GetSynergy((int)synergy).Icon;
     }
 
     public void SetActiveCount(int count)
