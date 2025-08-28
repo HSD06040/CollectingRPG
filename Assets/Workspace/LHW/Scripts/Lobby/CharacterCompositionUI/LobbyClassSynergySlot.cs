@@ -10,7 +10,7 @@ public class LobbyClassSynergySlot : MonoBehaviour
 
     public void SetSynergy(ClassType classSynergy)
     {
-        _icon.sprite = SynergyController.SynergyDB.GetSynergy(classSynergy.ToString()).Icon;
+        _icon.sprite = SynergyController.SynergyDB.GetSynergy((int)classSynergy).Icon;
     }
 
     public void SetActiveCount(int count)

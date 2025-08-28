@@ -13,7 +13,7 @@ public class SynergyPanel : MonoBehaviour
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
     [SerializeField] int _offset;
 
-    private Dictionary<string, SynergySlot> _synergySlots = new(50);
+    private Dictionary<int, SynergySlot> _synergySlots = new(50);
     private int _currentPage;
     private int _maxPage;
 
@@ -46,13 +46,13 @@ public class SynergyPanel : MonoBehaviour
             slot.Init(data, 0, _synergyTooltip);
 
             if(data is ClassSynergyData classSynergy)
-                _synergySlots.Add(classSynergy.Synergy.ToString(), slot);
+                _synergySlots.Add((int)classSynergy.Synergy, slot);
             else if (data is UnitSynergyData unitSynergy)
-                _synergySlots.Add(unitSynergy.Synergy.ToString(), slot);            
+                _synergySlots.Add((int)unitSynergy.Synergy, slot);            
         }
     }
 
-    public void UpdateSynergySlot(string synergy, int activeCount)
+    public void UpdateSynergySlot(int synergy, int activeCount)
     {
         _synergySlots[synergy].UpdateUI(activeCount);
         SetHiararchy();

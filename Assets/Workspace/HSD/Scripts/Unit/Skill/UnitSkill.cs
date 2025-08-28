@@ -10,7 +10,7 @@ public abstract class UnitSkill : ScriptableObject
     public string SkillName;
     [TextArea] public string Description;
     public int MaxCount;
-    public float Power;
+    public float Power = 1;
     public int ManaCost;
     
 

@@ -4,68 +4,45 @@ using UnityEngine;
 
 public class SynergyController : MonoBehaviour
 {
-    private readonly Dictionary<string, int> _synergyCountDic = new(60);
+    private int[] _synergyCounts;
 
     public static SynergyDatabase SynergyDB;    // 추후 싱글톤 적재예정
 
-    public event Action<string, int> OnSynergyChanged;
+    public event Action<int, int> OnSynergyChanged;
 
     public void Init()
     {
         SynergyDB = Resources.Load<SynergyDatabase>("Database/SynergyDatabase");
         SynergyDB.Init();
+        _synergyCounts = new int[(int)Synergy.Length];
     }
 
     public void AddSynergy(Synergy unitSynergy, ClassType classSynergy)
     {
-        string unitSynergyName = unitSynergy.ToString();
-        string classSynergyName = classSynergy.ToString();
+        int unitSynergyIdx = (int)unitSynergy;
+        int classSynergyIdx = (int)classSynergy;
 
-        if (!_synergyCountDic.ContainsKey(unitSynergyName))
-        {
-            _synergyCountDic.Add(unitSynergyName, 0);
-        }
-        _synergyCountDic[unitSynergyName]++;
+        _synergyCounts[unitSynergyIdx]++;
+        _synergyCounts[classSynergyIdx]++;        
 
-        //
-
-        if (!_synergyCountDic.ContainsKey(classSynergyName))
-        {
-            _synergyCountDic.Add(classSynergyName, 0);
-        }
-        _synergyCountDic[classSynergyName]++;
-
-        CheckSynergy(unitSynergyName);
-        CheckSynergy(classSynergyName);
-
-        OnSynergyChanged?.Invoke(unitSynergyName, _synergyCountDic[unitSynergyName]);
-        OnSynergyChanged?.Invoke(classSynergyName, _synergyCountDic[classSynergyName]);
+        OnSynergyChanged?.Invoke(unitSynergyIdx, _synergyCounts[unitSynergyIdx]);
+        OnSynergyChanged?.Invoke(classSynergyIdx, _synergyCounts[classSynergyIdx]);
     }
 
     public void RemoveSynergy(Synergy unitSynergy, ClassType classSynergy)
     {
-        string unitSynergyName = unitSynergy.ToString();
-        string classSynergyName = classSynergy.ToString();
+        int unitSynergyIdx = (int)unitSynergy;
+        int classSynergyIdx = (int)classSynergy;
 
-        _synergyCountDic[unitSynergyName]--;
-        _synergyCountDic[classSynergyName]--;
+        _synergyCounts[unitSynergyIdx]--;
+        _synergyCounts[classSynergyIdx]--;
 
-        CheckSynergy(unitSynergyName);
-        CheckSynergy(classSynergyName);
-
-        OnSynergyChanged?.Invoke(unitSynergyName, _synergyCountDic[unitSynergyName]);
-        OnSynergyChanged?.Invoke(classSynergyName, _synergyCountDic[classSynergyName]);
+        OnSynergyChanged?.Invoke(unitSynergyIdx, _synergyCounts[unitSynergyIdx]);
+        OnSynergyChanged?.Invoke(classSynergyIdx, _synergyCounts[classSynergyIdx]);
     }
 
-    private void CheckSynergy(string synergyName)
+    public int GetSynergyUnitCount(int synergyIdx)
     {
-        if (string.IsNullOrEmpty(synergyName)) return;
-
-        int count = _synergyCountDic.TryGetValue(synergyName, out var val) ? val : 0;
-        SynergyData synergy = SynergyDB.GetSynergy(synergyName);
-
-        if (synergy == null) return;
-
-        synergy.Check(count);
+        return _synergyCounts[synergyIdx];
     }
 }

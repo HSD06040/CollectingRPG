@@ -6,7 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SynergyDatabase", menuName = "Data/Database/Synergy")]
 public class SynergyDatabase : ScriptableObject
 {
-    public readonly Dictionary<string, SynergyData> _synergyDataDic = new Dictionary<string, SynergyData>(60);
+    public readonly Dictionary<int, SynergyData> _synergyDataDic = new Dictionary<int, SynergyData>(128);
 
     [SerializeField] UnitSynergyData[] _unitSynergyDatas;
     [SerializeField] ClassSynergyData[] _classSynergyDatas;
@@ -20,16 +20,16 @@ public class SynergyDatabase : ScriptableObject
         }
         foreach (var synergyData in _unitSynergyDatas)
         {
-            if (!_synergyDataDic.ContainsKey(synergyData.Synergy.ToString()))
-                _synergyDataDic.Add(synergyData.Synergy.ToString(), synergyData);
+            if (!_synergyDataDic.ContainsKey((int)synergyData.Synergy))
+                _synergyDataDic.Add((int)synergyData.Synergy, synergyData);
             else
-                Debug.LogWarning($"Duplicate SynergyName: {synergyData.Synergy.ToString()}");
+                Debug.LogWarning($"Duplicate SynergyName: {(int)synergyData.Synergy}");
         }
 
         foreach (var synergyData in _classSynergyDatas)
         {
-            if (!_synergyDataDic.ContainsKey(synergyData.Synergy.ToString()))
-                _synergyDataDic.Add(synergyData.Synergy.ToString(), synergyData);
+            if (!_synergyDataDic.ContainsKey((int)synergyData.Synergy))
+                _synergyDataDic.Add((int)synergyData.Synergy, synergyData);
             else
                 Debug.LogWarning($"Duplicate SynergyName: {synergyData.Synergy.ToString()}");
         }
@@ -40,8 +40,8 @@ public class SynergyDatabase : ScriptableObject
         }
     }
 
-    public SynergyData GetSynergy(string synergyName)
+    public SynergyData GetSynergy(int synergyIdx)
     {
-        return _synergyDataDic.TryGetValue(synergyName, out var effect) ? effect : null;
+        return _synergyDataDic.TryGetValue(synergyIdx, out var effect) ? effect : null;
     }
 }

@@ -39,7 +39,7 @@ public class BaseFSM : MonoBehaviour
         DeadState ??= new DeadState(this, _deadHash);
     }
 
-    public void Stanby()
+    public void Standby()
     {
         if(_fightRoutine != null)
         {
