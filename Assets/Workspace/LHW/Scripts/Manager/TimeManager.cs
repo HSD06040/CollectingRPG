@@ -1,25 +1,32 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 
 [Serializable]
 public class RewardInfo
 {
-    public string date; // 초기화 시간
-    public int state; // 획득 여부
+    public long dateTicks; // DateTime을 Ticks로 저장
+    public int state;      // 획득 여부 또는 스택 수
 
-    public RewardInfo(string date, int state)
+    public RewardInfo(long dateTicks, int state)
     {
-        this.date = date;
+        this.dateTicks = dateTicks;
         this.state = state;
+    }
+
+    public DateTime GetDateTime()
+    {
+        return new DateTime(dateTicks);
+    }
+
+    public void SetDateTime(DateTime dateTime)
+    {
+        dateTicks = dateTime.Ticks;
     }
 }
 
 public class TimeManager : MonoBehaviour
 {
     #region Singleton
-
     public static TimeManager Instance { get; private set; }
     private void Awake()
     {
@@ -33,88 +40,128 @@ public class TimeManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         Init();
     }
-
     #endregion
 
-    [SerializeField] private RewardInfo _dailyGachaRewardInfo;
-    private DateTime _dailyResetTime;
+    [SerializeField] private RewardInfo _dailyFreeGachaRewardInfo;
+
+    [SerializeField] private RewardInfo _dailyAdGachaRewardInfo;
+
+    [SerializeField] private GoogleAdMob _adMob;
 
     private void Init()
     {
-        LoadDailyGachaResetTimeInfo();
+        LoadDailyFreeGachaResetTimeInfo();
+        LoadAdGachaResetTimeInfo();
     }
 
-    #region Data Load&Save
+    #region Data Load & Save
 
-    private void LoadDailyGachaResetTimeInfo()
+    private void LoadDailyFreeGachaResetTimeInfo()
     {
-        // TODO : 데이터베이스에서 정보를 로드
-        // 우선은 테스트용으로 로컬에서 수치를 직접 넣어 테스트를 진행
-        _dailyGachaRewardInfo = new RewardInfo("2025/08/29 06:00", 0);
+        // 테스트용: 오늘 아침 6시, 가챠횟수 1회
+        DateTime todayReset = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 6, 0, 0);
+        _dailyFreeGachaRewardInfo = new RewardInfo(todayReset.Ticks, 1);
 
-        _dailyResetTime = DateTime.ParseExact(_dailyGachaRewardInfo.date, "yyyy/MM/dd HH:mm", null);
-
-        // 날짜에 따라 가챠 값을 초기화
-        if (_dailyGachaRewardInfo.state == 1 && IsDailyResetTime(_dailyResetTime))
+        if (_dailyFreeGachaRewardInfo.state == 0 && IsDailyFreeGachaResetTime(_dailyFreeGachaRewardInfo.GetDateTime()))
         {
-            _dailyGachaRewardInfo.state = 0;
+            _dailyFreeGachaRewardInfo.state = 1;
         }
     }
-    
-    public void SaveDailyGachaResetTimeInfo()
+
+    public void SaveDailyFreeGachaResetTimeInfo()
     {
-        // TODO : 데이터베이스에 정보를 업로드
-        // 우선은 테스트용으로 로컬에서 수치를 직접 넣어 테스트를 진행
         DateTime now = DateTime.Now;
-
         DateTime todayReset = new DateTime(now.Year, now.Month, now.Day, 6, 0, 0);
+        DateTime nextResetDate = (now.Hour < 6) ? todayReset : todayReset.AddDays(1);
 
-        DateTime nextResetDate;
-        
-        // now 기준으로 오전 6시 이전일 경우 당일 오전 6시로 nextResetDate를 설정
-        if (now.Hour < 6)
-        {
-            nextResetDate = todayReset;
-        }
-        // now 기준으로 오전 6시 이후일 경우 다음 날 오전 6시로 nextResetDate를 설정
-        else
-        {
-            nextResetDate = todayReset.AddDays(1);
-        }
+        _dailyFreeGachaRewardInfo.SetDateTime(nextResetDate);
+        _dailyFreeGachaRewardInfo.state = 0;
 
-        _dailyGachaRewardInfo.date = nextResetDate.ToString();
-        _dailyGachaRewardInfo.state = 1;
-        Debug.Log($"다음 가챠 초기화 시간 : {_dailyGachaRewardInfo.date}");
+        Debug.Log($"다음 무료 가챠 초기화 시간 : {nextResetDate}");
+    }
+
+    private void LoadAdGachaResetTimeInfo()
+    {
+        // 테스트용 초기값: 13시간 전, 가챠 횟수 1회
+        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-13).Ticks, 1);
+
+        if (_dailyAdGachaRewardInfo.state < 2 && IsDailyAdGachaResetTime(out int stack))
+        {
+            _dailyAdGachaRewardInfo.state += stack;
+            if (_dailyAdGachaRewardInfo.state > 2) _dailyAdGachaRewardInfo.state = 2;
+        }
+    }
+
+    public void SaveAdGachaResetTimeInfo()
+    {
+        if (_dailyAdGachaRewardInfo.state > 0)
+        {
+            if (_adMob.IsReady)
+            {
+                _adMob.LoadedAd.Show();
+            }
+            _dailyAdGachaRewardInfo.state -= 1;
+            Debug.Log($"광고 가챠 스택 감소: {_dailyAdGachaRewardInfo.state}, 마지막 갱신: {_dailyAdGachaRewardInfo.GetDateTime()}");
+        }
     }
 
     #endregion
-    public bool CanObtainedGachaReward(DateTime date)
+
+    public bool CanObtainedFreeGachaReward()
     {
-        // 정보를 바탕으로 보상 획득 가능 여부 체크
+        if (_dailyFreeGachaRewardInfo.state == 1) return true;
+        if (IsDailyFreeGachaResetTime(_dailyFreeGachaRewardInfo.GetDateTime())) return true;
+        return false;
+    }
 
-        if (_dailyGachaRewardInfo.state == 1) return false;
+    public bool CanObtainAdGachaReward()
+    {
+        if (_dailyAdGachaRewardInfo.state <= 0) return false;
 
-        if (IsDailyResetTime(date))
+        if (IsDailyAdGachaResetTime(out int stack))
         {
+            _dailyAdGachaRewardInfo.state += stack;
+            if (_dailyAdGachaRewardInfo.state > 2) _dailyAdGachaRewardInfo.state = 2;
             return true;
         }
+
+        return true;
+    }
+
+    private bool IsDailyFreeGachaResetTime(DateTime date)
+    {
+        DateTime now = DateTime.Now;
+
+        if (now.Year > date.Year && now.Hour >= date.Hour) return true;
+        if (now.Year == date.Year && now.Month > date.Month && now.Hour >= date.Hour) return true;
+        if (now.Year == date.Year && now.Month == date.Month && now.Day > date.Day && now.Hour >= date.Hour) return true;
 
         return false;
     }
 
-    private bool IsDailyResetTime(DateTime date)
+    /// <summary>
+    /// 12시간 단위 누적 스택 계산
+    /// </summary>
+    private bool IsDailyAdGachaResetTime(out int stack)
     {
         DateTime now = DateTime.Now;
+        DateTime lastTime = _dailyAdGachaRewardInfo.GetDateTime();
+        TimeSpan difference = now - lastTime;
 
-        // 연도가 바뀌고 24시간을 지났으면 하루는 무조건 지났으므로 true
-        if(now.Year > date.Year && now.Hour >= date.Hour) return true;
+        stack = 0;
 
-        // 연도가 같고 한달 말일에서 다음달 초일을 지나고 24시간이 지났으면 하루는 무조건 지났으므로 true
-        if(now.Year == date.Year && now.Month > date.Month && now.Hour >= date.Hour) return true;
+        if (difference.TotalHours >= 12)
+        {
+            int stackCount = (int)(difference.TotalHours / 12);
+            stack = Mathf.Min(stackCount, 2); // 최대 2 스택
 
-        // 연도가 같고 달이 같고 하루가 지난 상태에서 24시간이 지났으면 하루는 무조건 지났으므로 true
-        if(now.Year == date.Year && now.Month == date.Month && now.Day >= date.Day && now.Hour >= date.Hour) return true;
-        
+            // 마지막 갱신 시간 이동
+            _dailyAdGachaRewardInfo.SetDateTime(lastTime.AddHours(12 * stack));
+
+            Debug.Log($"스택 증가: {stack}, 새로운 마지막 갱신 시간: {_dailyAdGachaRewardInfo.GetDateTime()}");
+            return true;
+        }
+
         return false;
     }
 }
