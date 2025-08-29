@@ -23,7 +23,7 @@ public class RandomGachaSystem : MonoBehaviour
     private void Awake()
     {
         RandomInit(_prob);
-        _dailyButton.onClick.AddListener(() => ItemSelect(1));
+        _dailyButton.onClick.AddListener(FreeOrAdButtonClick);
         _oneGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(1));
         _tenGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(10));
     }
@@ -54,7 +54,31 @@ public class RandomGachaSystem : MonoBehaviour
 
     private void FreeOrAdButtonClick()
     {
+        // 일일 뽑기가 가능한지 확인
+        // 가능하면 ItemSelect(1) 진행
+        // 불가능할 시 광고 뽑기 진행 여부 확인
+        if(DailyFreeGacha()) return;
+        // 광고 뽑기가 가능한지 확인
+        // 가능하면 ItemSelect(1) 진행
+        // 불가능할 시 Return(경고팝업 띄우기)
+    }
 
+    private bool DailyFreeGacha()
+    {
+        if (TimeManager.Instance.CanObtainedGachaReward(DateTime.Now))
+        {
+            ItemSelect(1);
+            TimeManager.Instance.SaveDailyGachaResetTimeInfo();
+            return true;
+        }
+        else
+        {
+            if(PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowPopup("이미 일일 무료 가챠를 사용했습니다.");
+            }
+            return false;
+        }
     }
 
     private void ConsumeGoodsButtonClick(int number)
