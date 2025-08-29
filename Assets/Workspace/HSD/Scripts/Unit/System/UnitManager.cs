@@ -27,7 +27,6 @@ public class UnitManager : MonoBehaviour
 
     private void Init()
     {
-        _unitController.SynergyController.Init();
         _unitController.Init();
         _unitStanbyUIManager.Init();
 
@@ -59,7 +58,8 @@ public class UnitManager : MonoBehaviour
 
     #region EventHandler
     private void Subscribe()
-    {       
+    {
+        BattleManager.OnBattleEnded += GameEndedUnitStandby;
         _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
@@ -100,6 +100,12 @@ public class UnitManager : MonoBehaviour
         
         FightUISetup();
         InGameManager.Instance.BattleStart();
+    }
+
+    public void GameEndedUnitStandby()
+    {
+        _unitController.UnitsStanby();
+        _enemyController.EnemyStanby();        
     }
 
     private void FightUISetup()
