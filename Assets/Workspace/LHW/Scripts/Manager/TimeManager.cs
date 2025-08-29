@@ -42,11 +42,16 @@ public class TimeManager : MonoBehaviour
     }
     #endregion
 
-    [SerializeField] private RewardInfo _dailyFreeGachaRewardInfo;
-
-    [SerializeField] private RewardInfo _dailyAdGachaRewardInfo;
-
+    [Header("Reference")]
     [SerializeField] private GoogleAdMob _adMob;
+    
+    private RewardInfo _dailyFreeGachaRewardInfo;
+    public RewardInfo DailyFreeGachaRewardInfo => _dailyFreeGachaRewardInfo;
+
+    private RewardInfo _dailyAdGachaRewardInfo;
+    public RewardInfo DailyAdGachaRewardInfo => _dailyAdGachaRewardInfo;
+
+    public Action OnDailyGachaInfoChanged;
 
     private void Init()
     {
@@ -66,6 +71,7 @@ public class TimeManager : MonoBehaviour
         {
             _dailyFreeGachaRewardInfo.state = 1;
         }
+        OnDailyGachaInfoChanged?.Invoke();
     }
 
     public void SaveDailyFreeGachaResetTimeInfo()
@@ -78,18 +84,20 @@ public class TimeManager : MonoBehaviour
         _dailyFreeGachaRewardInfo.state = 0;
 
         Debug.Log($"다음 무료 가챠 초기화 시간 : {nextResetDate}");
+        OnDailyGachaInfoChanged?.Invoke();
     }
 
     private void LoadAdGachaResetTimeInfo()
     {
         // 테스트용 초기값: 13시간 전, 가챠 횟수 1회
-        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-13).Ticks, 1);
+        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-11).Ticks, 1);
 
         if (_dailyAdGachaRewardInfo.state < 2 && IsDailyAdGachaResetTime(out int stack))
         {
             _dailyAdGachaRewardInfo.state += stack;
             if (_dailyAdGachaRewardInfo.state > 2) _dailyAdGachaRewardInfo.state = 2;
         }
+        OnDailyGachaInfoChanged?.Invoke();
     }
 
     public void SaveAdGachaResetTimeInfo()
@@ -103,6 +111,7 @@ public class TimeManager : MonoBehaviour
             _dailyAdGachaRewardInfo.state -= 1;
             Debug.Log($"광고 가챠 스택 감소: {_dailyAdGachaRewardInfo.state}, 마지막 갱신: {_dailyAdGachaRewardInfo.GetDateTime()}");
         }
+        OnDailyGachaInfoChanged?.Invoke();
     }
 
     #endregion
