@@ -7,6 +7,6 @@ public abstract class SynergyEffect : ScriptableObject
     [TextArea]
     public string Description;
 
-    public abstract void ApplyEffect();
-    public abstract void RemoveEffect();
+    public abstract void ApplyEffect(UnitBase[] units);
+    public abstract void RemoveEffect(UnitBase[] units);
 }

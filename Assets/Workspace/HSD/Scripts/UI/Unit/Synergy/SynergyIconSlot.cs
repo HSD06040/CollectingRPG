@@ -12,7 +12,6 @@ public class SynergyIconSlot : MonoBehaviour, IPointerDownHandler
     private SynergyToolTip _synergyToolTip;
     public int ActiveCount;
     public int UpgradeCount => _synergyData.CurrentUpgradeIdx;
-    // ToolTip도 보여야 함
 
     public void Init(SynergyData data, SynergyToolTip synergyToolTip)
     {

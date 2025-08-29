@@ -55,6 +55,16 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    public void EnemyStanby()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit == null || unit.StatusController.IsDead)
+                continue;
+            unit.Standby();
+        }
+    }
+
     private void SetLayerRecursively(GameObject obj, int layer)
     {
         obj.layer = layer;

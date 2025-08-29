@@ -1,12 +1,12 @@
 
 public enum ClassType
 {
-    Tank, Melee, Ranged, Support
+    Tank = 0, Melee, Ranged, Support
 }
 
 public enum Synergy
 {
-    A, B, C, D
+    A = 4, B, C, D, Length
 }
 
 public enum AttackAreaType
@@ -21,7 +21,7 @@ public enum DamageType
 
 public enum TargetType
 {
-    Enemy, Ally, Self
+    Enemy, Ally, Self, SameSynergy
 }
 
 public enum SearchType
@@ -67,8 +67,13 @@ public enum StatType
     // Defense
     PhysicalDefense,
     MagicDefense,
+    Shield,
 
     // Range
     AttackRange,
-    AttackCount
+    AttackCount,
+
+    // Default
+    CurHp,
+    CurMana,
 }

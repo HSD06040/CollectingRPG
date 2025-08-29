@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class PanelCtrl : MonoBehaviour
@@ -32,4 +33,8 @@ public class PanelCtrl : MonoBehaviour
         //settingPanel.SetActive(false);
         acountPanel.SetActive(true);
     }
+
+    
+
+    
 }

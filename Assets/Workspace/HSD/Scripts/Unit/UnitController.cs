@@ -3,21 +3,24 @@ using UnityEngine;
 
 public class UnitController : MonoBehaviour
 {
+    #region Components
     public SynergyController SynergyController;
     public UI_UnitSlotController _uiSlotController;
 
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
     [SerializeField] BattleUnitManager _battleUnitManager;
+    #endregion
 
-    public static readonly int UnitMaxCount = 10;
-
+    #region Unit
     private UnitBase[,] _unitGrid;
     private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(256);
     private Dictionary<UnitData, int> _unitCountDic = new Dictionary<UnitData, int>(64);
-    private Dictionary<Synergy, List<UnitBase>> _synergyUnitDic = new Dictionary<Synergy, List<UnitBase>>(64);
-    private Dictionary<ClassType, List<UnitBase>> _classSynergyUnitDic = new Dictionary<ClassType, List<UnitBase>>(64);
+    private Dictionary<int, List<UnitBase>> _synergyUnitDic = new Dictionary<int, List<UnitBase>>(256);
+    #endregion
 
+    #region Data
+    public static readonly int UnitMaxCount = 10;
     private int _currentUnitCount = 0;
     public int CurrentUnitCount
     {
@@ -30,10 +33,13 @@ public class UnitController : MonoBehaviour
             OnUnitCountChanged?.Invoke(_currentUnitCount);
         }
     }
+    #endregion
 
+    #region Events
     public event System.Action<int> OnUnitCountChanged;
     public event System.Action<int> OnUnitPowerChanged;
     public event System.Action<UnitBase[]> OnUnitChanged;
+    #endregion
 
     public void Init()
     {
@@ -41,11 +47,14 @@ public class UnitController : MonoBehaviour
         int cols = _unitSlotManager.SlotCreater.Size.x;
         _unitGrid = new UnitBase[rows, cols];
 
+        SynergyController.Init();
         _unitSlotManager.Init();
         _unitDragDropSystem.OnUnitDropped += AddUnit;
+        SynergyController.OnSynergyChanged += CheckSynergy;
     }
 
-    public void UnitStanby()
+    #region UnitSetting
+    public void UnitStanbyAndSetSlotPosition()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
@@ -53,12 +62,24 @@ public class UnitController : MonoBehaviour
                 continue;
 
             unit.transform.position = _unitSlotManager.GetUnitSlot(unit.CurrentSlot).transform.position;
-            unit.Stanby();
+            unit.Standby();
         }
 
         _unitDragDropSystem.enabled = true;
     }
 
+    public void UnitsStanby()
+    {
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
+        {
+            if (unit == null || unit.StatusController.IsDead)
+                continue;
+
+            unit.Standby();
+        }
+
+        _unitDragDropSystem.enabled = true;
+    }
     public void UnitFight()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
@@ -71,6 +92,7 @@ public class UnitController : MonoBehaviour
 
         _unitDragDropSystem.enabled = false;
     }
+    #endregion
 
     #region AddUnit
     /// <summary>
@@ -111,7 +133,7 @@ public class UnitController : MonoBehaviour
             AddSynergyUnit(unit);
             AddUnitCount(unit);
             AddList(unit);
-            
+
             CurrentUnitCount++;
 
             OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
@@ -216,8 +238,51 @@ public class UnitController : MonoBehaviour
     }
     #endregion
 
+    #region Slot
+    private void SetSlot(UnitSlot slot, UnitBase unit)
+    {
+        slot.SetUnit(unit);
+
+        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = unit;
+    }
+
+    private void ClearSlot(UnitSlot slot, UnitBase unit)
+    {
+        slot.ClearSlot();
+
+        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
+    }
+    #endregion
+
+    private void AddList(UnitBase unit)
+    {
+        if (!_unitBaseDic.TryGetValue(unit.Status.Address, out var list))
+        {
+            list = new List<UnitBase>(16);
+            _unitBaseDic.Add(unit.Status.Address, list);
+        }
+        list.Add(unit);
+    }
+
+    #region UnitCount
+    private void AddUnitCount(UnitBase unit)
+    {
+        if (!_unitCountDic.ContainsKey(unit.Status.Data))
+            _unitCountDic.Add(unit.Status.Data, 0);
+
+        _unitCountDic[unit.Status.Data]++;
+    }
+
+    private void RemoveUnitCount(UnitBase unit)
+    {
+        if (_unitCountDic.ContainsKey(unit.Status.Data))
+            _unitCountDic[unit.Status.Data]--;
+    }
+    #endregion
+
+    #region Synergy
     private void AddSynergyUnit(UnitBase unit)
-    {        
+    {
         if (_unitCountDic.ContainsKey(unit.Status.Data) && _unitCountDic[unit.Status.Data] >= 1)
         {
             return;
@@ -228,20 +293,8 @@ public class UnitController : MonoBehaviour
 
         SynergyController.AddSynergy(synergy, classSynergy);
 
-        if (!_synergyUnitDic.TryGetValue(synergy, out var synergyList))
-        {
-            synergyList = new List<UnitBase>(16);
-            _synergyUnitDic[synergy] = synergyList;
-        }
-        synergyList.Add(unit);
-
-        if (!_classSynergyUnitDic.TryGetValue(classSynergy, out var classList))
-        {
-            classList = new List<UnitBase>(16);
-            _classSynergyUnitDic[classSynergy] = classList;
-        }
-
-        classList.Add(unit);
+        AddSynergyUnit(unit, (int)synergy);
+        AddSynergyUnit(unit, (int)classSynergy);
     }
 
     private void RemoveSynergy(UnitBase unit)
@@ -256,51 +309,37 @@ public class UnitController : MonoBehaviour
 
         SynergyController.RemoveSynergy(synergy, classSynergy);
 
+        RemoveSynergyUnit(unit, (int)synergy);
+        RemoveSynergyUnit(unit, (int)classSynergy);
+    }
+
+    private void AddSynergyUnit(UnitBase unit, int synergy)
+    {
+        if (!_synergyUnitDic.TryGetValue(synergy, out var synergyList))
+        {
+            synergyList = new List<UnitBase>(16);
+            _synergyUnitDic[synergy] = synergyList;
+        }
+        synergyList.Add(unit);
+    }
+
+    private void RemoveSynergyUnit(UnitBase unit, int synergy)
+    {
         if (_synergyUnitDic.TryGetValue(synergy, out var synergyList))
             synergyList.Remove(unit);
-
-        if (_classSynergyUnitDic.TryGetValue(classSynergy, out var classList))
-            classList.Remove(unit);
     }
 
-    private void SetSlot(UnitSlot slot, UnitBase unit)
+    private void CheckSynergy(int synergyIdx, int synergyCount)
     {
-        slot.SetUnit(unit);
+        SynergyData synergy = SynergyController.SynergyDB.GetSynergy(synergyIdx);
 
-        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = unit;
+        if (synergy == null) return;
+
+        synergy.Check(synergyCount, GetUnits());
     }
+    #endregion
 
-    private void ClearSlot(UnitSlot slot, UnitBase unit)
-    {
-        slot.ClearSlot();
-
-        _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = null;
-    }
-
-    private void AddList(UnitBase unit)
-    {
-        if (!_unitBaseDic.TryGetValue(unit.Status.Address, out var list))
-        {
-            list = new List<UnitBase>(16);
-            _unitBaseDic.Add(unit.Status.Address, list);
-        }
-        list.Add(unit);
-    }
-
-    private void AddUnitCount(UnitBase unit)
-    {
-        if (!_unitCountDic.ContainsKey(unit.Status.Data))
-            _unitCountDic.Add(unit.Status.Data, 0);
-
-        _unitCountDic[unit.Status.Data]++;
-    }
-
-    private void RemoveUnitCount(UnitBase unit)
-    {
-        if (_unitCountDic.ContainsKey(unit.Status.Data))
-            _unitCountDic[unit.Status.Data]--;
-    }
-
+    #region Gettters
     public UnitSlot GetUnitSlot(UnitBase unit)
     {
         return _unitSlotManager.UnitSlotDic[unit.CurrentSlot];
@@ -351,7 +390,7 @@ public class UnitController : MonoBehaviour
     }
 
     public UnitSlot GetEmptyLineSlot(int line)
-    {        
+    {
         for (int y = 1; y <= _unitSlotManager.SlotCreater.Size.y; y++)
         {
             Vector2Int pos = new Vector2Int(line, y);
@@ -364,4 +403,5 @@ public class UnitController : MonoBehaviour
 
         return null;
     }
+    #endregion
 }

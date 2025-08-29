@@ -9,7 +9,7 @@ public class SynergySlotPanel : MonoBehaviour
     [SerializeField] GameObject _synergyIconPrefab;
     [SerializeField] Transform _content;
     [SerializeField] SynergyToolTip _synergyTooltip;
-    private Dictionary<string, int> _synergyIconSlotDic = new(50);
+    private Dictionary<int, int> _synergyIconSlotDic = new(50);
     private SynergyIconSlot[] _synergyIconSlots;
 
     public void Init(SynergyDatabase db)
@@ -30,13 +30,13 @@ public class SynergySlotPanel : MonoBehaviour
             _synergyIconSlots[i] = slot;
 
             if (datas[i] is ClassSynergyData classSynergy)
-                _synergyIconSlotDic.Add(classSynergy.Synergy.ToString(), i);
+                _synergyIconSlotDic.Add((int)classSynergy.Synergy, i);
             else if (datas[i] is UnitSynergyData unitSynergy)
-                _synergyIconSlotDic.Add(unitSynergy.Synergy.ToString(), i);
+                _synergyIconSlotDic.Add((int)unitSynergy.Synergy, i);
         }        
     }
 
-    public void UpdateSynergySlot(string synergy, int activeCount)
+    public void UpdateSynergySlot(int synergy, int activeCount)
     {
         _synergyIconSlots[_synergyIconSlotDic[synergy]].UpdateIcon(activeCount);
         SetHiararchy();
