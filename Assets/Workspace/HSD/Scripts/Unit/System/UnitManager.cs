@@ -99,7 +99,7 @@ public class UnitManager : MonoBehaviour
         _enemyController.EnemyFight();
         
         FightUISetup();
-        InGameManager.Instance.BattleStart();
+        _battleManager.BattleStart();
     }
 
     public void GameEndedUnitStandby()

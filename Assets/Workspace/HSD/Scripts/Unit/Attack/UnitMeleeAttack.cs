@@ -13,6 +13,8 @@ public class UnitMeleeAttack : UnitAttackData
 
     public override void Attack(IAttacker attacker)
     {
+        base.Attack(attacker);
+
         UnitStatusController status = attacker.GetStatusController();
         Transform transform = attacker.GetTransform();
 

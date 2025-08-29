@@ -1,4 +1,7 @@
 
+#region Synergy
+using System;
+
 public enum ClassType
 {
     Tank = 0, Melee, Ranged, Support
@@ -7,6 +10,65 @@ public enum ClassType
 public enum Synergy
 {
     A = 4, B, C, D, Length
+}
+#endregion
+
+
+public enum Grade
+{
+    Normal, Rare, Unique, Legendary
+}
+
+#region Type
+/// <summary>
+/// 이벤트 트리거 타입
+/// </summary>
+public enum TriggerType
+{
+    Base,
+    OnBattleStart,
+    OnAttack,
+    OnInterval,
+    OnBattleEnded,
+}
+
+/// <summary>
+/// 효과 대상 타입
+/// </summary>
+public enum EffectTargetType
+{
+    Enemy,
+    Ally,
+    SameSynergy,
+    Column,
+    Row,
+    ColumnAndRow,
+    Cross
+}
+
+/// <summary>
+/// 버프디버프, 즉시증가
+/// </summary>
+public enum EffectType
+{
+    Buff_Debuff,    
+    Increase,    
+}
+
+/// <summary>
+/// 효과 공격 타입
+/// </summary>
+public enum EffectAttackType
+{
+    None,
+    Effect,    
+}
+
+public enum TargetType
+{
+    Enemy,
+    Ally,
+    Self,
 }
 
 public enum AttackAreaType
@@ -19,20 +81,12 @@ public enum DamageType
     Physical, Magic
 }
 
-public enum TargetType
-{
-    Enemy, Ally, Self, SameSynergy
-}
-
 public enum SearchType
 {
     Circle, Box, Capsule
 }
 
-public enum Grade
-{
-    Normal, Rare, Unique, Legendary
-}
+#endregion
 
 public enum Priority
 {

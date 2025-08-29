@@ -38,11 +38,13 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<int> CurMana = new Property<int>();
     public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
+    public UnitPassiveController PassiveController { get; set; }
 
     public event Action<UnitStatusController> OnUnitDied;
-    public Action<UnitStatus> UseSkill;
+    public Action<UnitStatus> OnUseSkill;
+    public Action OnAttack;
 
-    private readonly Dictionary<BuffKey, CancellationTokenSource> _activeBuffs = new Dictionary<BuffKey, CancellationTokenSource>(10);
+    private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
 
 
     public bool IsDead => CurHp.Value <= 0;
@@ -50,6 +52,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Init&Clear
     public void Init(UnitStatus status)
     {
+        PassiveController = new UnitPassiveController(this);
         Status = status;
         SetBaseStat(status.GetCurrentStat());
         ClearAllStat();
@@ -145,7 +148,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void ApplyEffect(BuffEffectData buffEffectData, int value, string source)
     {
-        var key = new BuffKey(buffEffectData.StatType, source);
+        var key = new SourceKey(buffEffectData.StatType, source);
 
         if (_activeBuffs.TryGetValue(key, out var cts))
         {
@@ -171,7 +174,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.Duration), cancellationToken: token);
 
             RemoveStat(buffEffectData.StatType, source);
-            _activeBuffs.Remove(new BuffKey(buffEffectData.StatType, source));
+            _activeBuffs.Remove(new SourceKey(buffEffectData.StatType, source));
         }
         catch (OperationCanceledException)
         {

@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
+    public static event Action OnBattleStarted;
     public static event Action OnBattleEnded;
 
     [SerializeField] LayerMask playerLayer;
@@ -15,6 +16,8 @@ public class BattleManager : MonoBehaviour
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
+        ClearEvent();
+
         UnitBase[] notNullPlayerUnits = GetNotNullUnits(playerUnits);
         UnitBase[] notNullEnemyUnits = GetNotNullUnits(enemyUnits);
 
@@ -23,6 +26,11 @@ public class BattleManager : MonoBehaviour
 
         playerUnitCount = notNullPlayerUnits.Length;
         enemyUnitCount = notNullEnemyUnits.Length;
+    }
+
+    public void BattleStart()
+    {
+        OnBattleStarted?.Invoke();
     }
 
     private void CheckBattleEnded(UnitStatusController statusCon)
@@ -80,5 +88,11 @@ public class BattleManager : MonoBehaviour
         {
             units[i].StatusController.OnUnitDied -= CheckBattleEnded;
         }
+    }
+
+    private void ClearEvent()
+    {
+        OnBattleStarted = null;
+        OnBattleEnded = null;
     }
 }

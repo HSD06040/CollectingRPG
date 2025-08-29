@@ -19,8 +19,9 @@ public abstract class SynergyData : ScriptableObject
 
     private SynergyEffect _currentEffect;
     public int CurrentUpgradeIdx;
+    protected int _synergy;
 
-    public void Init()
+    public virtual void Init()
     {
         _currentEffect = null;
         CurrentUpgradeIdx = -1;
@@ -47,8 +48,8 @@ public abstract class SynergyData : ScriptableObject
 
         if (_currentEffect != newEffect)
         {
-            _currentEffect?.RemoveEffect(units);
-            newEffect?.ApplyEffect(units);
+            _currentEffect?.RemoveEffect(units, _synergy);
+            newEffect?.ApplyEffect(units, _synergy);
             _currentEffect = newEffect;
         }
     }

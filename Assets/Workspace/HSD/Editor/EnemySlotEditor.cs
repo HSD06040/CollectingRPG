@@ -148,13 +148,13 @@ public class EnemySlotEditor : EditorWindow
 
         EditorGUILayout.BeginVertical(GUI.skin.box);
 
-        for (int y = 0; y < GRID_HEIGHT; y++)
+        for (int y = GRID_HEIGHT; y > 0; y--)
         {
             EditorGUILayout.BeginHorizontal();
 
-            for (int x = 0; x < GRID_WIDTH; x++)
+            for (int x = GRID_WIDTH; x > 0; x--)
             {
-                Vector2Int position = new Vector2Int(x, y);
+                Vector2Int position = new Vector2Int(x-1, y-1);
                 UnitStatus unitStatus = currentGridData.GetUnitStatus(position);
 
                 Rect slotRect = GUILayoutUtility.GetRect(SLOT_SIZE, SLOT_SIZE);
@@ -444,6 +444,7 @@ public class EnemySlotEditor : EditorWindow
             currentGridData.SetUnitStatus(gridUnitData.position, loadedStatus);
         }
 
+        if(currentGridData != null)
         EditorUtility.SetDirty(currentGridData);
 
         // 수정 모드 활성화
