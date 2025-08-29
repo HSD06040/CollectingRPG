@@ -34,19 +34,20 @@ public class UnitPassive
                 break;
 
             case TriggerType.OnAttack:
-                _owner.OnAttack += EffectActive;
+                _owner.OnAttack += EffectTypeActive;
                 break;
 
             case TriggerType.OnInterval:
-                OnInterval(_cts.Token).Forget();
+                BattleManager.OnBattleStarted += OnInterval;
+                BattleManager.OnBattleEnded += () => TokenClear();
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted += EffectActive;               
+                BattleManager.OnBattleStarted += EffectTypeActive;
                 break;  
                 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded += EffectActive;
+                BattleManager.OnBattleEnded += EffectTypeActive;
                 break;
         }
     }
@@ -56,17 +57,27 @@ public class UnitPassive
     /// </summary>
     public void Deactive()
     {
+        TokenClear();
+
+        // 이벤트 구독 해제
+        _owner.OnAttack -= EffectTypeActive;
+        BattleManager.OnBattleStarted -= EffectTypeActive;
+        BattleManager.OnBattleEnded -= EffectTypeActive;
+    }
+
+    private void TokenClear()
+    {
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = new CancellationTokenSource();
-
-        // 이벤트 구독 해제
-        _owner.OnAttack -= EffectActive;
-        BattleManager.OnBattleStarted -= EffectActive;
-        BattleManager.OnBattleEnded -= EffectActive;
     }
 
-    private async UniTask OnInterval(CancellationToken token)
+    private void OnInterval()
+    {
+        OnIntervalEffect(_cts.Token).Forget();
+    }
+
+    private async UniTask OnIntervalEffect(CancellationToken token)
     {
         while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
         {
@@ -83,15 +94,9 @@ public class UnitPassive
         }
     }
 
-    private void EffectActive()
-    {
-        if (_currentActivations >= _effect.MaxActivations) return;
-
-        EffectTypeActive();
-    }
-
     private void EffectTypeActive()
     {
+        Debug.Log($"패시브 효과 발동: 스텟증가");
         switch (_effect.EffectType)
         {
             case EffectType.Buff_Debuff:

@@ -22,6 +22,7 @@ public class UnitPassiveController
         if(!_passives.ContainsKey(effect.Key))
         {
             _passives.Add(effect.Key, new UnitPassive(effect, _owner, multiplier));
+            _passives[effect.Key].Active();
         }
     }
 
@@ -29,6 +30,7 @@ public class UnitPassiveController
     {
         if (_passives.ContainsKey(effect.Key))
         {
+            _passives[effect.Key].Deactive();
             _passives.Remove(effect.Key);
         }
     }

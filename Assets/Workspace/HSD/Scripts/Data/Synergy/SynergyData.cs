@@ -44,13 +44,12 @@ public abstract class SynergyData : ScriptableObject
             {
                 break;
             }
-        }        
-
-        if (_currentEffect != newEffect)
-        {
-            _currentEffect?.RemoveEffect(units, _synergy);
-            newEffect?.ApplyEffect(units, _synergy);
-            _currentEffect = newEffect;
         }
+
+        _currentEffect?.RemoveEffect(units, _synergy);
+
+        newEffect?.ApplyEffect(units, _synergy);
+
+        _currentEffect = newEffect;
     }
 }

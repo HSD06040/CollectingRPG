@@ -32,12 +32,9 @@ public class SynergyEffect : ScriptableObject
     [Header("TargetType")]
     public EffectTargetType TargetType;
 
-    private UnitBase[] _currentUnits;
-
     public void ApplyEffect(UnitBase[] units, int synergy)
     {
-        _currentUnits = units;
-
+        Debug.Log("ApplyEffect");
         if (TargetType == EffectTargetType.Cross)
         {
             ActiveCross(units, synergy);
@@ -62,8 +59,15 @@ public class SynergyEffect : ScriptableObject
     {
         foreach (UnitBase unit in units)
         {
-            int synergyCount = 0;
+            if (unit == null) continue;
 
+            int unitSynergy = (int)unit.Status.Data.EnhancementData.Synergy;
+            int unitClassSynergy = (int)unit.Status.Data.EnhancementData.ClassSynergy;
+
+            if (!(unitSynergy == synergy) && !(unitClassSynergy == synergy))
+                continue;
+
+            int synergyCount = 0;
             var currentSlot = unit.CurrentSlot;
 
             var directions = new Vector2Int[]
@@ -72,20 +76,21 @@ public class SynergyEffect : ScriptableObject
                     new Vector2Int(0, -1),
                     new Vector2Int(-1, 0),
                     new Vector2Int(1, 0)
-            };
+            };            
 
             foreach (var dir in directions)
             {
                 var targetPos = new Vector2Int(currentSlot.x + dir.x, currentSlot.y + dir.y);
 
-                // 해당 위치에 유닛이 있는지 찾기
-                var targetUnit = units.FirstOrDefault(u => u.CurrentSlot.x == targetPos.x &&
+                // 해당 위치에 유닛이 있는지 찾기                
+                var targetUnit = units.FirstOrDefault(u => u != null &&
+                                                           u.CurrentSlot.x == targetPos.x &&
                                                            u.CurrentSlot.y == targetPos.y);
 
                 if (targetUnit != null)
                 {
-                    int unitSynergy = (int)targetUnit.Status.Data.EnhancementData.Synergy;
-                    int unitClassSynergy = (int)targetUnit.Status.Data.EnhancementData.ClassSynergy;
+                    unitSynergy = (int)targetUnit.Status.Data.EnhancementData.Synergy;
+                    unitClassSynergy = (int)targetUnit.Status.Data.EnhancementData.ClassSynergy;
 
                     if (unitSynergy == synergy || unitClassSynergy == synergy)
                     {
@@ -95,7 +100,7 @@ public class SynergyEffect : ScriptableObject
             }
 
             if (synergyCount == 0)
-                return;
+                continue;
 
             unit.StatusController.PassiveController.AddPassiveEffect(this, synergyCount, true);
         }
@@ -113,6 +118,8 @@ public class SynergyEffect : ScriptableObject
             case EffectTargetType.SameSynergy:
                 foreach (var unit in units)
                 {
+                    if (unit == null) continue;
+
                     if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
                         (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
                         unitBases.Add(unit);
@@ -123,6 +130,8 @@ public class SynergyEffect : ScriptableObject
 
                 foreach (var unit in units)
                 {
+                    if (unit == null) continue;
+
                     if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
                         (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
                     {
@@ -133,6 +142,8 @@ public class SynergyEffect : ScriptableObject
 
                 foreach (var unit in units)
                 {
+                    if (unit == null) continue;
+
                     int unitColumn = unit.CurrentSlot.x;
                     if (targetColumns.Contains(unitColumn))
                     {
@@ -145,6 +156,8 @@ public class SynergyEffect : ScriptableObject
 
                 foreach (var unit in units)
                 {
+                    if (unit == null) continue;
+
                     if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
                         (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
                     {
@@ -155,6 +168,8 @@ public class SynergyEffect : ScriptableObject
 
                 foreach (var unit in units)
                 {
+                    if (unit == null) continue;
+
                     int unitRow = unit.CurrentSlot.y;
                     if (targetRows.Contains(unitRow))
                     {
@@ -167,6 +182,8 @@ public class SynergyEffect : ScriptableObject
                 var targetRowsSet = new HashSet<int>();
                 foreach (var unit in units)
                 {
+                    if (unit == null) continue;
+
                     if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
                         (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
                     {
@@ -178,6 +195,8 @@ public class SynergyEffect : ScriptableObject
                 }
                 foreach (var unit in units)
                 {
+                    if (unit == null) continue;
+
                     int unitColumn = unit.CurrentSlot.x;
                     int unitRow = unit.CurrentSlot.y;
                     if (targetCols.Contains(unitColumn) || targetRowsSet.Contains(unitRow))

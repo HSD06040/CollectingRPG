@@ -128,12 +128,20 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void IncreaseHealth(int amount)
     {
+        Debug.Log($"IncreaseHealth: {amount}");
         CurHp.Value = Mathf.Clamp(CurHp.Value + amount, 0, MaxHealth.Value);
     }
 
     public void IncreaseMana(int amount)
     {
+        Debug.Log($"IncreaseMana: {amount}");
         CurMana.Value = Mathf.Clamp(CurMana.Value + amount, 0, MaxMana.Value);
+    }
+
+    public void IncreaseShield(int amount)
+    {
+        Debug.Log($"IncreaseShield: {amount}");
+        Shield.Value += amount;
     }
 
     private void Die()
@@ -184,7 +192,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void AddStat(StatType statType, int value, string source)
     {
-        switch(statType)
+        Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
+        switch (statType)
         {
             case StatType.MaxHealth:
                 MaxHealth.AddModifier(value, source);
@@ -216,6 +225,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
                 break;
             case StatType.CurMana:
                 IncreaseMana(value);
+                break;
+            case StatType.Shield:
+                IncreaseShield(value);
                 break;
         }
     }

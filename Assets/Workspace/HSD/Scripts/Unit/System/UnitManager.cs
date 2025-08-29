@@ -93,8 +93,6 @@ public class UnitManager : MonoBehaviour
         if(_unitController.GetUnitsCount() == 0)
             return;
 
-        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
-
         _unitController.UnitFight();
         _enemyController.EnemyFight();
         
@@ -105,7 +103,8 @@ public class UnitManager : MonoBehaviour
     public void GameEndedUnitStandby()
     {
         _unitController.UnitsStanby();
-        _enemyController.EnemyStanby();        
+        _enemyController.EnemyStanby();
+        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
 
     private void FightUISetup()

@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Key: 480058c7-7315-4c26-9c56-b9acad5a5e7f
   Description: 
-  _isPassive: 0
   EffectAttackType: 0
   Prefab: {fileID: 0}
   ObjRef:
@@ -23,8 +22,16 @@ MonoBehaviour:
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   Address: 
-  EffectType: 0
-  TriggerType: 0
+  EffectType: 1
+  SynergyBuffDatas: []
+  StatModifiers:
+  - StatType: 11
+    Value: 100
+  - StatType: 5
+    Value: 20
+  - StatType: 6
+    Value: 10
+  TriggerType: 1
   Interval: 0
   MaxActivations: 0
-  TargetType: 0
+  TargetType: 6
