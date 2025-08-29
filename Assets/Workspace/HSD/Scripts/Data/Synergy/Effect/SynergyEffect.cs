@@ -13,8 +13,12 @@ public class SynergyEffect : ScriptableObject
     [TextArea]
     public string Description;
 
+    public bool IsAttack;
+    public bool IsBuff;
+
     [Header("AttackType")]
     public EffectAttackType EffectAttackType;
+    public float Power;
     public GameObject Prefab;
     public AssetReference ObjRef;
     public string Address;
@@ -32,27 +36,43 @@ public class SynergyEffect : ScriptableObject
     [Header("TargetType")]
     public EffectTargetType TargetType;
 
+    [Header("NextEffect")]
+    public SynergyEffect NextEffect;
+
     public void ApplyEffect(UnitBase[] units, int synergy)
     {
-        Debug.Log("ApplyEffect");
         if (TargetType == EffectTargetType.Cross)
         {
             ActiveCross(units, synergy);
             return;
         }
 
-        foreach (var unit in GetTarget(units, synergy))
+        if(EffectAttackType == EffectAttackType.Self)
         {
-            unit.StatusController.PassiveController.AddPassiveEffect(this);
+            foreach (var unit in GetTarget(units, synergy))
+            {
+                unit.StatusController.PassiveController.AddPassiveEffect(this);
+            }
         }
+        else
+        {
+            SynergyEffectManager.Instance.AddEffect(this);
+        }    
     }
 
     public void RemoveEffect(UnitBase[] units, int synergy)
     {
-        foreach (var unit in GetTarget(units, synergy))
+        if (EffectAttackType == EffectAttackType.Self)
         {
-            unit.StatusController.PassiveController.RemovePassiveEffect(this);
+            foreach (var unit in GetTarget(units, synergy))
+            {
+                unit.StatusController.PassiveController.RemovePassiveEffect(this);
+            }
         }
+        else
+        {
+            SynergyEffectManager.Instance.RemoveEffect(this);
+        }            
     }
 
     private void ActiveCross(UnitBase[] units, int synergy)

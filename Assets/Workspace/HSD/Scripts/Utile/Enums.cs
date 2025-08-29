@@ -51,17 +51,17 @@ public enum EffectTargetType
 /// </summary>
 public enum EffectType
 {
-    Buff_Debuff,    
+    Buff_Debuff,
     Increase,    
 }
 
 /// <summary>
-/// 효과 공격 타입
+/// 효과 공격 타입, 각자공격 or 전체공격
 /// </summary>
 public enum EffectAttackType
 {
-    None,
-    Effect,    
+    Self,
+    All,    
 }
 
 public enum TargetType

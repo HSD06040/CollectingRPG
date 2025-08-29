@@ -12,7 +12,7 @@ public class UnitPassive
 
     private CancellationTokenSource _cts; // Interval 루프 중단용
 
-    public UnitPassive(SynergyEffect effect, UnitStatusController owner, int mulriplier)
+    public UnitPassive(SynergyEffect effect, UnitStatusController owner, int mulriplier = 1)
     {
         _currentActivations = 0;
         _effect = effect;
@@ -30,11 +30,11 @@ public class UnitPassive
         switch (_effect.TriggerType)
         {
             case TriggerType.Base:
-                EffectTypeActive();
+                EffectActive();
                 break;
 
             case TriggerType.OnAttack:
-                _owner.OnAttack += EffectTypeActive;
+                _owner.OnAttack += EffectActive;
                 break;
 
             case TriggerType.OnInterval:
@@ -43,11 +43,11 @@ public class UnitPassive
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted += EffectTypeActive;
+                BattleManager.OnBattleStarted += EffectActive;
                 break;  
                 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded += EffectTypeActive;
+                BattleManager.OnBattleEnded += EffectActive;
                 break;
         }
     }
@@ -60,9 +60,9 @@ public class UnitPassive
         TokenClear();
 
         // 이벤트 구독 해제
-        _owner.OnAttack -= EffectTypeActive;
-        BattleManager.OnBattleStarted -= EffectTypeActive;
-        BattleManager.OnBattleEnded -= EffectTypeActive;
+        _owner.OnAttack -= EffectActive;
+        BattleManager.OnBattleStarted -= EffectActive;
+        BattleManager.OnBattleEnded -= EffectActive;
     }
 
     private void TokenClear()
@@ -74,15 +74,16 @@ public class UnitPassive
 
     private void OnInterval()
     {
-        OnIntervalEffect(_cts.Token).Forget();
+        OnIntervalEffectAsync(_cts.Token).Forget();
     }
 
-    private async UniTask OnIntervalEffect(CancellationToken token)
+    private async UniTask OnIntervalEffectAsync(CancellationToken token)
     {
         while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
         {
             _currentActivations++;
-            EffectTypeActive();
+            EffectActive();
+            AttackActive();
             try
             {
                 await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
@@ -92,11 +93,30 @@ public class UnitPassive
                 break;
             }
         }
+
+        if(_effect.NextEffect != null)
+        {
+            while (true)
+            {
+                NextEffectActive();
+                NextAttackActive();
+                try
+                {
+                    await UniTask.WaitForSeconds(_effect.NextEffect.Interval, cancellationToken: token);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+            }
+        }
     }
 
-    private void EffectTypeActive()
+    private void EffectActive()
     {
-        Debug.Log($"패시브 효과 발동: 스텟증가");
+        if (!_effect.IsBuff)
+            return;
+
         switch (_effect.EffectType)
         {
             case EffectType.Buff_Debuff:
@@ -121,5 +141,52 @@ public class UnitPassive
                 }
                 break;
         }
+    }
+
+    private void NextEffectActive()
+    {
+        if (!_effect.NextEffect.IsBuff)
+            return;
+
+        switch (_effect.NextEffect.NextEffect.EffectType)
+        {
+            case EffectType.Buff_Debuff:
+                for (int i = 0; i < _effect.NextEffect.SynergyBuffDatas.Length; i++)
+                {
+                    SynergyBuffData data = _effect.NextEffect.SynergyBuffDatas[i];
+                    _owner.ApplyEffect(
+                        new BuffEffectData { StatType = data.StatType, Duration = data.Duration },
+                        data.Value * _mulriplier, _effect.NextEffect.Key);
+                }
+                break;
+
+            case EffectType.Increase:
+                foreach (var stat in _effect.NextEffect.StatModifiers)
+                {
+                    if (stat.StatType == StatType.CurHp)
+                        _owner.IncreaseHealth(stat.Value * _mulriplier);
+                    else if (stat.StatType == StatType.CurMana)
+                        _owner.IncreaseMana(stat.Value * _mulriplier);
+                    else
+                        _owner.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.NextEffect.Key);
+                }
+                break;
+        }
+    }
+
+    private void AttackActive()
+    {
+        if (!_effect.IsAttack)
+            return;
+
+        GameObject.Instantiate(_effect.Prefab, _owner.transform.position, Quaternion.identity);
+    }
+
+    private void NextAttackActive()
+    {
+        if (!_effect.NextEffect.IsAttack)
+            return;
+
+        GameObject.Instantiate(_effect.NextEffect.Prefab, _owner.transform.position, Quaternion.identity);
     }
 }
