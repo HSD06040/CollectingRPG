@@ -26,6 +26,10 @@ public class UnitData : ScriptableObject
     public UnitEnhancementData EnhancementData; // 적일 경우 더미 데이터로 존재 (추후 기획에 따라 달라질 수 있음)
     public UnitStats[] UnitStats;
 
+    [Header("Upgrade")]
+    public int UpgradeCount;
+    public UnitUpgradeData UpgradeData;
+
     public UnitStats GetUnitStat(int level)
     {
         return UnitStats[level];

@@ -42,6 +42,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public event Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> OnUseSkill;
+    public Action OnSkill;
     public Action OnAttack;
 
     private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
@@ -154,7 +155,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         IncreaseMana(ManaGain.Value);
     }
 
-    public void ApplyEffect(BuffEffectData buffEffectData, int value, string source)
+    public void ApplyEffect(BuffEffectData buffEffectData, float value, string source)
     {
         var key = new SourceKey(buffEffectData.StatType, source);
 
@@ -172,10 +173,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         var newCts = new CancellationTokenSource();
         _activeBuffs[key] = newCts;
 
-        ClearEffectAsync(buffEffectData, value, source, newCts.Token).Forget();
+        ClearEffectAsync(buffEffectData, source, newCts.Token).Forget();
     }
 
-    private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, int value, string source, CancellationToken token)
+    private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, string source, CancellationToken token)
     {
         try
         {
@@ -190,44 +191,47 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
     }
 
-    public void AddStat(StatType statType, int value, string source)
+    public void AddStat(StatType statType, float value, string source)
     {
         Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
         switch (statType)
         {
             case StatType.MaxHealth:
-                MaxHealth.AddModifier(value, source);
-                IncreaseHealth(value);
+                MaxHealth.AddModifier((int)value, source);
+                IncreaseHealth((int)value);
                 break;
             case StatType.MaxMana:
-                MaxMana.AddModifier(value, source);
+                MaxMana.AddModifier((int)value, source);
                 break;
             case StatType.ManaGain:
-                ManaGain.AddModifier(value, source);
+                ManaGain.AddModifier((int)value, source);
                 break;
             case StatType.PhysicalDamage:
-                PhysicalDamage.AddModifier(value, source);
+                PhysicalDamage.AddModifier((int)value, source);
                 break;
             case StatType.MagicDamage:
-                MagicDamage.AddModifier(value, source);
+                MagicDamage.AddModifier((int)value, source);
                 break;
             case StatType.CritChance:
-                CritChance.AddModifier(value, source);
+                CritChance.AddModifier((int)value, source);
                 break;
             case StatType.PhysicalDefense:
-                PhysicalDefense.AddModifier(value, source);
+                PhysicalDefense.AddModifier((int)value, source);
                 break;
             case StatType.MagicDefense:
-                MagicDefense.AddModifier(value, source);
+                MagicDefense.AddModifier((int)value, source);
+                break;
+            case StatType.AttackSpeed:
+                AttackSpeed.AddModifier(value, source);
                 break;
             case StatType.CurHp:
-                IncreaseHealth(value);
+                IncreaseHealth((int)value);
                 break;
             case StatType.CurMana:
-                IncreaseMana(value);
+                IncreaseMana((int)value);
                 break;
             case StatType.Shield:
-                IncreaseShield(value);
+                IncreaseShield((int)value);
                 break;
         }
     }
@@ -260,6 +264,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             case StatType.MagicDefense:
                 MagicDefense.RemoveModifier(source);
                 break;
+            case StatType.AttackSpeed:
+                AttackSpeed.RemoveModifier(source);
+                break;                
         }
     }
 }

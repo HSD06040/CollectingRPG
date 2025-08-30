@@ -5,5 +5,5 @@ using UnityEngine;
 
 public interface IEffectable
 {
-    void ApplyEffect(BuffEffectData buffEffectData, int value, string source);
+    void ApplyEffect(BuffEffectData buffEffectData, float value, string source);
 }

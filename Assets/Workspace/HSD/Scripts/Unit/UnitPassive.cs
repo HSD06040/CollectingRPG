@@ -36,7 +36,9 @@ public class UnitPassive
             case TriggerType.OnAttack:
                 _owner.OnAttack += EffectActive;
                 break;
-
+            case TriggerType.OnUseSkill:
+                _owner.OnSkill += EffectActive;
+                break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted += OnInterval;
                 BattleManager.OnBattleEnded += () => TokenClear();
@@ -81,9 +83,7 @@ public class UnitPassive
     {
         while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
         {
-            _currentActivations++;
-            EffectActive();
-            AttackActive();
+            EffectAvtives();
             try
             {
                 await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
@@ -98,8 +98,7 @@ public class UnitPassive
         {
             while (true)
             {
-                NextEffectActive();
-                NextAttackActive();
+                NextEffectActives();
                 try
                 {
                     await UniTask.WaitForSeconds(_effect.NextEffect.Interval, cancellationToken: token);
@@ -112,11 +111,44 @@ public class UnitPassive
         }
     }
 
+    private void EffectAvtives()
+    {
+        if(_currentActivations < _effect.MaxActivations)
+        {
+            EffectActive();
+            AttackActive();
+        }
+        else
+        {
+            NextEffectActives();
+        }
+
+        _currentActivations++;
+    }
+
+    private void NextEffectActives()
+    {
+        NextEffectActive();
+        NextAttackActive();
+    }
+
     private void EffectActive()
     {
         if (!_effect.IsBuff)
             return;
 
+        EffectTypeActive(_effect);
+    }
+    private void NextEffectActive()
+    {
+        if (!_effect.NextEffect.IsBuff)
+            return;
+
+        EffectTypeActive(_effect.NextEffect);
+    }
+
+    private void EffectTypeActive(SynergyEffect _effect)
+    {
         switch (_effect.EffectType)
         {
             case EffectType.Buff_Debuff:
@@ -133,42 +165,13 @@ public class UnitPassive
                 foreach (var stat in _effect.StatModifiers)
                 {
                     if (stat.StatType == StatType.CurHp)
-                        _owner.IncreaseHealth(stat.Value * _mulriplier);
+                        _owner.IncreaseHealth(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else if (stat.StatType == StatType.CurMana)
-                        _owner.IncreaseMana(stat.Value * _mulriplier);
+                        _owner.IncreaseMana(Mathf.RoundToInt(stat.Value * _mulriplier));
+                    else if (stat.StatType == StatType.Shield)
+                        _owner.IncreaseShield(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else
                         _owner.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.Key);
-                }
-                break;
-        }
-    }
-
-    private void NextEffectActive()
-    {
-        if (!_effect.NextEffect.IsBuff)
-            return;
-
-        switch (_effect.NextEffect.NextEffect.EffectType)
-        {
-            case EffectType.Buff_Debuff:
-                for (int i = 0; i < _effect.NextEffect.SynergyBuffDatas.Length; i++)
-                {
-                    SynergyBuffData data = _effect.NextEffect.SynergyBuffDatas[i];
-                    _owner.ApplyEffect(
-                        new BuffEffectData { StatType = data.StatType, Duration = data.Duration },
-                        data.Value * _mulriplier, _effect.NextEffect.Key);
-                }
-                break;
-
-            case EffectType.Increase:
-                foreach (var stat in _effect.NextEffect.StatModifiers)
-                {
-                    if (stat.StatType == StatType.CurHp)
-                        _owner.IncreaseHealth(stat.Value * _mulriplier);
-                    else if (stat.StatType == StatType.CurMana)
-                        _owner.IncreaseMana(stat.Value * _mulriplier);
-                    else
-                        _owner.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.NextEffect.Key);
                 }
                 break;
         }

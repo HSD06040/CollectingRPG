@@ -9,7 +9,13 @@ public enum ClassType
 
 public enum Synergy
 {
-    A = 4, B, C, D, Length
+    KingdomGuard = 4,     // 왕국 경비대
+    ForestPatrol,         // 숲의 순찰자
+    HighMageOrder,        // 고위 마법사단
+    SacredOrder,          // 신성 교단
+    NightStreetAssassins, // 밤거리 암살단
+    UndergroundOrg,      // 지하 조직
+    Length
 }
 #endregion
 
@@ -28,6 +34,7 @@ public enum TriggerType
     Base,
     OnBattleStart,
     OnAttack,
+    OnUseSkill,
     OnInterval,
     OnBattleEnded,
 }

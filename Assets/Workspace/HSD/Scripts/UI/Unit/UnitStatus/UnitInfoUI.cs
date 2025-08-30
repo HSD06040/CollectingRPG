@@ -30,7 +30,7 @@ public class UnitInfoUI : MonoBehaviour
         _unitNameText.text = status.Data.Name;
         _unitIcon.sprite = status.Data.Icon;
 
-        _levelText.text = status.Data.EnhancementData.UpgradeCount.ToString();
+        _levelText.text = status.Data.UpgradeCount.ToString();
         _powerText.text = status.CombatPower.ToString();
 
         _synergyImage.sprite = SynergyController.SynergyDB.GetSynergy((int)status.Data.EnhancementData.Synergy).Icon;

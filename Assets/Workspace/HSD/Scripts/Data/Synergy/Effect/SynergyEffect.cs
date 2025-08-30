@@ -13,6 +13,7 @@ public class SynergyEffect : ScriptableObject
     [TextArea]
     public string Description;
 
+    public bool IsActivationsClear;
     public bool IsAttack;
     public bool IsBuff;
 
@@ -47,17 +48,22 @@ public class SynergyEffect : ScriptableObject
             return;
         }
 
-        if(EffectAttackType == EffectAttackType.Self)
+        if (EffectAttackType == EffectAttackType.Self)
         {
             foreach (var unit in GetTarget(units, synergy))
             {
+                if (unit == null)
+                    Debug.Log("UnitNull");
+                if (unit.StatusController.PassiveController == null)
+                    Debug.Log("PassiveControllerNull");
+
                 unit.StatusController.PassiveController.AddPassiveEffect(this);
             }
         }
         else
         {
             SynergyEffectManager.Instance.AddEffect(this);
-        }    
+        }
     }
 
     public void RemoveEffect(UnitBase[] units, int synergy)
@@ -72,7 +78,7 @@ public class SynergyEffect : ScriptableObject
         else
         {
             SynergyEffectManager.Instance.RemoveEffect(this);
-        }            
+        }
     }
 
     private void ActiveCross(UnitBase[] units, int synergy)
@@ -96,7 +102,7 @@ public class SynergyEffect : ScriptableObject
                     new Vector2Int(0, -1),
                     new Vector2Int(-1, 0),
                     new Vector2Int(1, 0)
-            };            
+            };
 
             foreach (var dir in directions)
             {
@@ -128,10 +134,17 @@ public class SynergyEffect : ScriptableObject
 
     protected UnitBase[] GetTarget(UnitBase[] units, int synergy)
     {
-        if (TargetType == EffectTargetType.Ally)
-            return units;
-
         List<UnitBase> unitBases = new List<UnitBase>();
+
+        if (TargetType == EffectTargetType.Ally)
+        {
+            foreach (var unit in units)
+            {
+                if(unit != null)
+                    unitBases.Add(unit);
+            }
+            return unitBases.ToArray();
+        }            
 
         switch (TargetType)
         {

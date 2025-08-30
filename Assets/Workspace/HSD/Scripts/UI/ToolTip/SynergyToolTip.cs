@@ -49,9 +49,9 @@ public class SynergyToolTip : ToolTip
             SynergyLevelData levelData = synergyData.SynergyLevelData[i];
 
             if(synergyData.CurrentUpgradeIdx == i)
-                Utils.AppendLine(GetWhiteColorString($"({levelData.SynergyNeedCount}) {levelData.SynergyEffect.Description}"));
+                Utils.AppendLine(GetWhiteColorString($"({levelData.SynergyNeedCount}) {levelData.Effects[0].Description}"));
             else
-                Utils.AppendLine($"({levelData.SynergyNeedCount}) {levelData.SynergyEffect.Description}");
+                Utils.AppendLine($"({levelData.SynergyNeedCount}) {levelData.Effects[0].Description}");
         }
 
         return Utils.GetString();

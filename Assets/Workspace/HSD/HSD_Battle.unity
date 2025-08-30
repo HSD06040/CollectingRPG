@@ -2809,6 +2809,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0213d327ee461674dbd620f59eacfcdb, type: 2}
   - {fileID: 11400000, guid: 16de7f9473f1a3940bab2394a06f970d, type: 2}
   - {fileID: 11400000, guid: 4d8d836002f01244d8f7ceac65e179ea, type: 2}
+  - {fileID: 11400000, guid: 85a6674545b24534db1fbc2ab49dd1da, type: 2}
+  - {fileID: 11400000, guid: 444367369381e09478630a4d809d3ba2, type: 2}
+  - {fileID: 11400000, guid: 5bc46853b22c1274e92248a5310b5bfa, type: 2}
+  - {fileID: 11400000, guid: d4dca0a06ecb7cb4197f0d879d3aa2f3, type: 2}
   _upgradeNeedCount: 3
   _spawnGold: 20
 --- !u!4 &651601983
@@ -3393,6 +3397,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 795155411}
   m_CullTransparentMesh: 1
+--- !u!1 &801392580
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 801392582}
+  - component: {fileID: 801392583}
+  m_Layer: 0
+  m_Name: SynergyEffectManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &801392582
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 801392580}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.128567, y: 29.753113, z: -0.04433465}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &801392583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 801392580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0055f634729d7c4a9bf75f2e64a1c1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &850872639
 GameObject:
   m_ObjectHideFlags: 0
@@ -4665,7 +4713,7 @@ MonoBehaviour:
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: -35
+  m_lineSpacing: 0
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -9636,7 +9684,7 @@ PrefabInstance:
     - target: {fileID: 49026833435746516, guid: 2588494ee9e8b854eaa0aecdd2b87841,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 39
+      value: 38.999985
       objectReference: {fileID: 0}
     - target: {fileID: 518210865316743104, guid: 2588494ee9e8b854eaa0aecdd2b87841,
         type: 3}
@@ -9816,6 +9864,7 @@ SceneRoots:
   - {fileID: 859023220}
   - {fileID: 651601983}
   - {fileID: 1736584826}
+  - {fileID: 801392582}
   - {fileID: 1366227296}
   - {fileID: 134434908}
   - {fileID: 858728742}

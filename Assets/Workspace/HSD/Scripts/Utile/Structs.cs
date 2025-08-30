@@ -4,7 +4,7 @@ using System;
 public struct SynergyStatModifier
 {
     public StatType StatType;
-    public int Value;
+    public float Value;
 }
 
 [Serializable]
@@ -12,7 +12,7 @@ public struct SynergyBuffData
 {
     public StatType StatType;
     public float Duration;
-    public int Value;
+    public float Value;
 }
 
 [Serializable]
