@@ -483,18 +483,39 @@ public class DBManager : Singleton<DBManager>
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
 
-        // 1) 메일 DB 중 IsSent = true인 메일만 필터링
+        // 1) User메일 DB에서 이미 있는 mailId 체크
+        DataSnapshot userMailSnapShot = await FirebaseDatabase.DefaultInstance.GetReference($"UserData/{uid}/MailData").GetValueAsync();
+
+        List<string> existingId = new List<string>();
+        if (userMailSnapShot.Exists)
+        {
+            foreach (var child in userMailSnapShot.Children)
+            {
+                existingId.Add(child.Key);
+                Debug.Log($"이미 유저가 가지고 있는 메일ID : Mail_{child.Key}");
+            }
+        }
+
+        // 2) Master메일 DB에서 IsSent = true인 메일만 필터링
         Query sentMail = FirebaseDatabase.DefaultInstance.GetReference("MailBox/MailData").OrderByChild("IsSent").EqualTo(true);
 
         DataSnapshot snapShot = await sentMail.GetValueAsync();
 
-        // 2) ExpireDate > currentTime 값이 0보다 큰 메일만 필터링
+        // 3) ExpireDate > currentTime 값이 0보다 큰 메일만 필터링
         long currentTime = await Manager.DB.LoadSeverTimeAsync();
-
         Debug.Log($"Init : currentTime {currentTime}");
 
         foreach (var mail in snapShot.Children)
         {
+            string mailId = mail.Key;
+
+            // 이미 유저가 있는 메일 -> 스킵
+            if (existingId.Contains(mailId))
+            {
+                Debug.Log($"유저 DB에 Mail_{mailId} 존재");
+                continue;
+            }
+
             string expireDateStr = mail.Child("ExpireDate").Value?.ToString();
             Debug.Log($"expireDateStr : {expireDateStr}");
 
@@ -530,15 +551,15 @@ public class DBManager : Singleton<DBManager>
     }
 
 
-    public async void SetReceivedTimeAsync(int mailId)
-    {
-        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+    //public async void SetReceivedTimeAsync(int mailId)
+    //{
+    //    string uid = FirebaseManager.Auth.CurrentUser.UserId;
 
-        var snapShot = await FirebaseManager.DataReference.Child("UserData").Child("uid").Child($"{mailId}").Child("ReceivedDate")
-            .GetValueAsync();
-        long rewardTime = snapShot.Exists ? long.Parse(snapShot.Value.ToString()) : 0;
-        DateTime lastRewardTime = DateTimeOffset.FromUnixTimeMilliseconds(rewardTime).UtcDateTime;
-    }
+    //    var snapShot = await FirebaseManager.DataReference.Child("UserData").Child("uid").Child($"{mailId}").Child("ReceivedDate")
+    //        .GetValueAsync();
+    //    long rewardTime = snapShot.Exists ? long.Parse(snapShot.Value.ToString()) : 0;
+    //    DateTime lastRewardTime = DateTimeOffset.FromUnixTimeMilliseconds(rewardTime).UtcDateTime;
+    //}
 
     #endregion 
 }
