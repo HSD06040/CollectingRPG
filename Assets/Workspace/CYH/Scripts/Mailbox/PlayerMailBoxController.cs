@@ -7,7 +7,6 @@ public class PlayerMailBoxController : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            LoadServerTime();
             Init();
         }
     }

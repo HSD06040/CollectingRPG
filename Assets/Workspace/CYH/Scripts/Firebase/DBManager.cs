@@ -512,6 +512,15 @@ public class DBManager : Singleton<DBManager>
                 Debug.Log($"우편_ {mail.Key} 사용 가능 (SendDate = {expireDateStr}/{expireDate}, currentTime = {currentTime})");
 
                 //TODO: [CYH] Userdata-Uid-MailData에 해당 메일의 id 저장
+                DatabaseReference userMailRef = FirebaseDatabase.DefaultInstance.GetReference($"UserData/{uid}/MailData/{mail.Key}");
+                await userMailRef.SetValueAsync(true);
+
+                await userMailRef.SetValueAsync(new Dictionary<string, object>
+                {
+                    ["ReceivedDate "] = currentTime,
+                    ["IsRead"] = "false",
+                    ["IsReceived"] = "false"
+                });
             }
             else
             {
