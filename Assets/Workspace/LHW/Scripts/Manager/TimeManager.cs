@@ -89,8 +89,8 @@ public class TimeManager : MonoBehaviour
 
     private void LoadAdGachaResetTimeInfo()
     {
-        // 테스트용 초기값: 13시간 전, 가챠 횟수 1회
-        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-24).Ticks, 1);
+        // 테스트용 초기값: 11시간 전, 가챠 횟수 1회
+        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-11).AddMinutes(-3).Ticks, 1);
 
         if (_dailyAdGachaRewardInfo.state < 2 && IsDailyAdGachaResetTime(out int stack))
         {

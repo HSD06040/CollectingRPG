@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using TMPro;
-using UnityEditor.ShaderGraph.Drawing;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class GachaUIController : MonoBehaviour
@@ -149,9 +147,20 @@ public class GachaUIController : MonoBehaviour
         {
             if(TimeManager.Instance != null && _adCooltimeImage.activeSelf == true)
             {
+                DateTime lastTime = TimeManager.Instance.DailyAdGachaRewardInfo.GetDateTime();
+                DateTime now = DateTime.Now;
 
+                TimeSpan cooltime = now - lastTime;
+
+                // 다음 초기화 시간만 표기하도록
+                while(cooltime.TotalHours > 12)
+                {
+                    lastTime.AddHours(12);
+                }
+
+                _adCooltimeText.text = $"{cooltime.Hours}시간 {cooltime.Minutes}분";
             }
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(1);
         }
     }
 
