@@ -1,13 +1,15 @@
+using Firebase.Auth;
+using Firebase.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
-using Firebase.Auth;
-using Firebase.Database;
-using Firebase.Extensions;
 
 public class DBManager : Singleton<DBManager>
 {
+
+    #region Nickname/LobbyData
+
     /// <summary>
     /// 유저 닉네임(displayname)을 DB에 저장하는 메서드
     /// </summary>
@@ -112,14 +114,14 @@ public class DBManager : Singleton<DBManager>
         {
             Debug.LogWarning("데이터 없음");
         }
-        
+
         // 기본 스테미나 데이터 설정
         int stamina = int.TryParse(snapshot.Child("Stamina").Value?.ToString(), out int staminaValue) ? staminaValue : 30;
         long lastRecoveryTime = long.TryParse(snapshot.Child("LastStaminaRecoveryTime").Value?.ToString(), out long recoveryTime) ? recoveryTime : DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-    
+
         // 시간 기반 스테미나 회복 계산
         var (recoveredStamina, newRecoveryTime) = CalculateStaminaRecovery(stamina, lastRecoveryTime);
-    
+
         // 스테미나가 회복되었다면 DB에 저장
         if (recoveredStamina != stamina || newRecoveryTime != lastRecoveryTime)
         {
@@ -153,6 +155,11 @@ public class DBManager : Singleton<DBManager>
         Task updateTask = FirebaseManager.DataReference.UpdateChildrenAsync(dictionary);
         await updateTask;
     }
+
+    #endregion
+
+
+    #region Tutorial
 
     /// <summary>
     /// 계정 로그인 시 튜토리얼 진행 여부를 체크하는 메서드
@@ -217,6 +224,11 @@ public class DBManager : Singleton<DBManager>
 
         await userRef.SetValueAsync(true);
     }
+
+    #endregion
+
+
+    #region Currency
 
     /// <summary>
     /// 유저의 Gold와 Diamond 값을 동시에 저장하는 메서드
@@ -322,6 +334,11 @@ public class DBManager : Singleton<DBManager>
         Debug.Log($"감소한 Diamond: {addAmount} -> {next}");
     }
 
+    #endregion
+
+
+    #region Stamina
+
     /// <summary>
     /// 스테미나 데이터를 Firebase에 저장
     /// </summary>
@@ -392,7 +409,7 @@ public class DBManager : Singleton<DBManager>
         long lastRecoveryTime)
     {
         const int MAX_STAMINA = 30;
-        const int RECOVERY_INTERVAL_SECONDS = 60; 
+        const int RECOVERY_INTERVAL_SECONDS = 60;
 
         if (currentStamina >= MAX_STAMINA)
         {
@@ -433,4 +450,86 @@ public class DBManager : Singleton<DBManager>
 
         return (int)timeUntilNext;
     }
+
+    #endregion
+
+
+    #region Mail
+
+    /// <summary>
+    /// Firebase 서버 시간을 읽어오는 메서드
+    /// RTDB - ServerTime에 현재 시간 저장 및 로드
+    /// currentTime -> DateTime: DateTimeOffset.FromUnixTimeMilliseconds(currentTime).UtcDateTime.ToLocalTime()
+    /// </summary>
+    /// <returns>현재 시간</returns>
+    public async Task<long> LoadSeverTimeAsync()
+    {
+        DatabaseReference timeRef = FirebaseManager.DataReference.Child("ServerTime");
+
+        await FirebaseManager.DataReference.Child("ServerTime").SetValueAsync(ServerValue.Timestamp);
+
+        DataSnapshot snapShot = await timeRef.GetValueAsync();
+
+        long currentTime = snapShot.Exists ? Convert.ToInt64(snapShot.Value) : 0;
+
+        return currentTime;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public async Task SyncMailsOnLoginAsync()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+
+        // 1) 메일 DB 중 IsSent = true인 메일만 필터링
+        Query sentMail = FirebaseDatabase.DefaultInstance.GetReference("MailBox/MailData").OrderByChild("IsSent").EqualTo(true);
+
+        DataSnapshot snapShot = await sentMail.GetValueAsync();
+
+        // 2) ExpireDate > currentTime 값이 0보다 큰 메일만 필터링
+        long currentTime = await Manager.DB.LoadSeverTimeAsync();
+
+        Debug.Log($"Init : currentTime {currentTime}");
+
+        foreach (var mail in snapShot.Children)
+        {
+            string expireDateStr = mail.Child("ExpireDate").Value?.ToString();
+            Debug.Log($"expireDateStr : {expireDateStr}");
+
+            // 1. 타입 변환: string -> DateTime 
+            DateTime expireDateDT = DateTime.Parse(expireDateStr);
+            Debug.Log($"ExpireDateDT : {expireDateDT}");
+
+            // 2. 타입 변환: DateTime -> UnixTimeMillis(long)
+            long expireDate = new DateTimeOffset(expireDateDT).ToUnixTimeMilliseconds();
+            Debug.Log($"ExpireDate : {expireDate}");
+
+            // 3. 서버 현재시간과 비교
+            if (expireDate > currentTime)
+            {
+                Debug.Log($"우편_ {mail.Key} 사용 가능 (SendDate = {expireDateStr}/{expireDate}, currentTime = {currentTime})");
+
+                //TODO: [CYH] Userdata-Uid-MailData에 해당 메일의 id 저장
+            }
+            else
+            {
+                Debug.Log($"우편_ {mail.Key} 만료 (SendDate = {expireDateStr}/{expireDate}, currentTime = {currentTime})");
+            }
+        }
+    }
+
+
+    public async void SetReceivedTimeAsync(int mailId)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+
+        var snapShot = await FirebaseManager.DataReference.Child("UserData").Child("uid").Child($"{mailId}").Child("ReceivedDate")
+            .GetValueAsync();
+        long rewardTime = snapShot.Exists ? long.Parse(snapShot.Value.ToString()) : 0;
+        DateTime lastRewardTime = DateTimeOffset.FromUnixTimeMilliseconds(rewardTime).UtcDateTime;
+    }
+
+    #endregion 
 }
