@@ -4,8 +4,8 @@ using UnityEngine;
 public class InGameManager : MonoBehaviour
 {
     public Property<int> Gold = new(); 
-    [SerializeField] int _startingGold = 100;
     public bool IsBattle = false;
+    [SerializeField] int _startingGold = 100;
 
     #region Singleton Pattern
     private static InGameManager instance;

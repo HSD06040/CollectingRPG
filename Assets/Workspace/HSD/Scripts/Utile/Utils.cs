@@ -300,4 +300,19 @@ public static class Utils
             gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
         }
     }
+
+    public static int GetSynergyUnitsTotalLevel(this UnitBase[] units, Synergy synergy)
+    {
+        int count = 0;
+
+        foreach (var unit in units)
+        {
+            if(unit != null && unit.Status.Data.EnhancementData.Synergy == synergy)
+            {
+                count += unit.Status.Level + 1;
+            }
+        }
+
+        return count;
+    }
 }

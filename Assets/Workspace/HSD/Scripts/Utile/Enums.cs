@@ -26,6 +26,16 @@ public enum Grade
 }
 
 #region Type
+
+/// <summary>
+/// 유닛 또는 공격하는 오브젝트 소환
+/// </summary>
+public enum SpawnType
+{
+    Unit,
+    AttackObject
+}
+
 /// <summary>
 /// 이벤트 트리거 타입
 /// </summary>
@@ -33,6 +43,7 @@ public enum TriggerType
 {
     Base,
     OnBattleStart,
+    OnDied,
     OnAttack,
     OnUseSkill,
     OnInterval,

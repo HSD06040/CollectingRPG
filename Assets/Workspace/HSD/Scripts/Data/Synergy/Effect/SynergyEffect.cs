@@ -12,12 +12,22 @@ public class SynergyEffect : ScriptableObject
     public string Key = Guid.NewGuid().ToString();
     [TextArea]
     public string Description;
-
     public bool IsActivationsClear;
     public bool IsAttack;
+    public bool IsSpawn;
     public bool IsBuff;
 
-    [Header("AttackType")]
+    [Header("SpawnType (유닛 소환)")]
+    public bool IsUnitPosition;         // 소환 위치 정의 (유닛위치 or 전장 중앙)
+    public bool IsMultiplier;           // 시너지 유닛의 Level에 따른 배수 적용 여부
+    public SpawnType SpawnType;         // 유닛소환 타입
+    public UnitStats SpawnUnitStats;    // 가중치
+    public Synergy SpawnSynergy;        // 유닛을 소환하는 시너지
+    public GameObject SpawnPrefab;      
+    public AssetReference SpawnObjRef;
+    public string SpawnAddress;
+
+    [Header("AttackType (공격)")]
     public EffectAttackType EffectAttackType;
     public float Power;
     public GameObject Prefab;
@@ -62,7 +72,7 @@ public class SynergyEffect : ScriptableObject
         }
         else
         {
-            SynergyEffectManager.Instance.AddEffect(this);
+            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, units, isChange: true);
         }
     }
 
@@ -77,7 +87,7 @@ public class SynergyEffect : ScriptableObject
         }
         else
         {
-            SynergyEffectManager.Instance.RemoveEffect(this);
+            SynergyEffectManager.Instance.GlobalPassiveController.RemovePassiveEffect(this);
         }
     }
 

@@ -8,11 +8,11 @@ public class BattleManager : MonoBehaviour
     public static event Action OnBattleStarted;
     public static event Action OnBattleEnded;
 
-    [SerializeField] LayerMask playerLayer;
+    [SerializeField] LayerMask _playerLayer;
 
     [Header("UnitCount")]
-    private int playerUnitCount;
-    private int enemyUnitCount;
+    private int _playerUnitCount;
+    private int _enemyUnitCount;
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
@@ -24,8 +24,8 @@ public class BattleManager : MonoBehaviour
         RegisterEvent(notNullPlayerUnits);
         RegisterEvent(notNullEnemyUnits);
 
-        playerUnitCount = notNullPlayerUnits.Length;
-        enemyUnitCount = notNullEnemyUnits.Length;
+        _playerUnitCount = notNullPlayerUnits.Length;
+        _enemyUnitCount = notNullEnemyUnits.Length;
     }
 
     public void BattleStart()
@@ -37,25 +37,25 @@ public class BattleManager : MonoBehaviour
     {
         if (!statusCon.IsDead) return;
 
-        if (playerLayer.Contain(statusCon.gameObject.layer))
+        if (_playerLayer.Contain(statusCon.gameObject.layer))
         {
-            playerUnitCount--;
+            _playerUnitCount--;
         }
         else
         {
-            enemyUnitCount--;
+            _enemyUnitCount--;
         }
-        Debug.Log($"플레이어 유닛 수: {playerUnitCount}, 적 유닛 수: {enemyUnitCount}");
+        Debug.Log($"플레이어 유닛 수: {_playerUnitCount}, 적 유닛 수: {_enemyUnitCount}");
         statusCon.OnUnitDied -= CheckBattleEnded;
 
-        if (playerUnitCount > 0 && enemyUnitCount > 0)
+        if (_playerUnitCount > 0 && _enemyUnitCount > 0)
             return;
 
-        if (playerUnitCount <= 0)
+        if (_playerUnitCount <= 0)
         {
             Debug.Log("플레이어 패배");
         }
-        else if (enemyUnitCount <= 0)
+        else if (_enemyUnitCount <= 0)
         {
             Debug.Log("플레이어 승리");
         }

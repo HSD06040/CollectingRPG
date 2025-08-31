@@ -21,7 +21,7 @@ public class UnitPassive
 
         _cts = new CancellationTokenSource();
     }
-
+    #region Active & Deactive
     /// <summary>
     /// 패시브 발동 시작
     /// </summary>
@@ -41,7 +41,7 @@ public class UnitPassive
                 break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted += OnInterval;
-                BattleManager.OnBattleEnded += () => TokenClear();
+                BattleManager.OnBattleEnded += TokenClear;
                 break;
 
             case TriggerType.OnBattleStart:
@@ -61,11 +61,29 @@ public class UnitPassive
     {
         TokenClear();
 
-        // 이벤트 구독 해제
-        _owner.OnAttack -= EffectActive;
-        BattleManager.OnBattleStarted -= EffectActive;
-        BattleManager.OnBattleEnded -= EffectActive;
+        switch (_effect.TriggerType)
+        {
+            case TriggerType.OnAttack:
+                _owner.OnAttack -= EffectActive;
+                break;
+            case TriggerType.OnUseSkill:
+                _owner.OnSkill -= EffectActive;
+                break;
+            case TriggerType.OnInterval:
+                BattleManager.OnBattleStarted -= OnInterval;
+                BattleManager.OnBattleEnded -= TokenClear;
+                break;
+
+            case TriggerType.OnBattleStart:
+                BattleManager.OnBattleStarted -= EffectActive;
+                break;
+
+            case TriggerType.OnBattleEnded:
+                BattleManager.OnBattleEnded -= EffectActive;
+                break;
+        }
     }
+    #endregion
 
     private void TokenClear()
     {
@@ -74,6 +92,7 @@ public class UnitPassive
         _cts = new CancellationTokenSource();
     }
 
+    #region Interval
     private void OnInterval()
     {
         OnIntervalEffectAsync(_cts.Token).Forget();
@@ -83,7 +102,7 @@ public class UnitPassive
     {
         while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
         {
-            EffectAvtives();
+            EffectActives();
             try
             {
                 await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
@@ -110,8 +129,11 @@ public class UnitPassive
             }
         }
     }
+    #endregion
 
-    private void EffectAvtives()
+#region EffectActives
+
+    private void EffectActives()
     {
         if(_currentActivations < _effect.MaxActivations)
         {
@@ -125,29 +147,28 @@ public class UnitPassive
 
         _currentActivations++;
     }
-
     private void NextEffectActives()
     {
         NextEffectActive();
         NextAttackActive();
     }
 
+    #region BuffEffect
     private void EffectActive()
     {
         if (!_effect.IsBuff)
             return;
 
-        EffectTypeActive(_effect);
+        BuffEffectActive(_effect);
     }
     private void NextEffectActive()
     {
         if (!_effect.NextEffect.IsBuff)
             return;
 
-        EffectTypeActive(_effect.NextEffect);
+        BuffEffectActive(_effect.NextEffect);
     }
-
-    private void EffectTypeActive(SynergyEffect _effect)
+    private void BuffEffectActive(SynergyEffect _effect)
     {
         switch (_effect.EffectType)
         {
@@ -176,7 +197,9 @@ public class UnitPassive
                 break;
         }
     }
+    #endregion
 
+    #region AttackEffect
     private void AttackActive()
     {
         if (!_effect.IsAttack)
@@ -184,7 +207,6 @@ public class UnitPassive
 
         GameObject.Instantiate(_effect.Prefab, _owner.transform.position, Quaternion.identity);
     }
-
     private void NextAttackActive()
     {
         if (!_effect.NextEffect.IsAttack)
@@ -192,4 +214,7 @@ public class UnitPassive
 
         GameObject.Instantiate(_effect.NextEffect.Prefab, _owner.transform.position, Quaternion.identity);
     }
+    #endregion
+
+#endregion
 }

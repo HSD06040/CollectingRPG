@@ -10,6 +10,14 @@ public class SynergyEffectEditor : Editor
     private SerializedProperty isActivationsClearProp;
     private SerializedProperty isAttackProp;
     private SerializedProperty isBuffProp;
+    private SerializedProperty isSpawnProp;
+
+    private SerializedProperty isUnitPositionProp;
+    private SerializedProperty IsMultiplierProp;
+    private SerializedProperty spawnSynergyProp;
+    private SerializedProperty spawnPrefabProp;
+    private SerializedProperty spawnObjRefProp;
+    private SerializedProperty spawnAddressProp;
 
     private SerializedProperty effectAttackTypeProp;
     private SerializedProperty powerProp;
@@ -36,6 +44,14 @@ public class SynergyEffectEditor : Editor
         isActivationsClearProp = serializedObject.FindProperty("IsActivationsClear");
         isAttackProp = serializedObject.FindProperty("IsAttack");
         isBuffProp = serializedObject.FindProperty("IsBuff");
+        isSpawnProp = serializedObject.FindProperty("IsSpawn");
+
+        isUnitPositionProp = serializedObject.FindProperty("IsUnitPosition");
+        IsMultiplierProp = serializedObject.FindProperty("IsMultiplier");
+        spawnSynergyProp = serializedObject.FindProperty("SpawnSynergy");
+        spawnPrefabProp = serializedObject.FindProperty("SpawnPrefab");
+        spawnObjRefProp = serializedObject.FindProperty("SpawnObjRef");
+        spawnAddressProp = serializedObject.FindProperty("SpawnAddress");
 
         effectAttackTypeProp = serializedObject.FindProperty("EffectAttackType");
         powerProp = serializedObject.FindProperty("Power");
@@ -67,16 +83,35 @@ public class SynergyEffectEditor : Editor
         EditorGUILayout.Space(5);
 
         EditorGUILayout.PropertyField(isActivationsClearProp);
+        EditorGUILayout.PropertyField(isSpawnProp);
         EditorGUILayout.PropertyField(isAttackProp);
         EditorGUILayout.PropertyField(isBuffProp);
 
         EditorGUILayout.Space(10);
 
+        if (isSpawnProp.boolValue)
+        {
+            DrawHeader("Spawn Settings");
+            DrawColoredSection(() =>
+            {
+                EditorGUILayout.PropertyField(isUnitPositionProp, new GUIContent("Spawn at Unit Position"));
+                EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("Is Multiplier"));
+                EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("Spawn Synergy"));
+                EditorGUILayout.PropertyField(spawnPrefabProp, new GUIContent("Spawn Prefab"));
+                EditorGUILayout.PropertyField(spawnObjRefProp, new GUIContent("Spawn Obj Ref"));
+                EditorGUILayout.PropertyField(spawnAddressProp, new GUIContent("Spawn Address"));
+
+            }, new Color(1f, 1f, 0.9f, 0.3f));
+
+            EditorGUILayout.Space(10);
+        }
+
         if (isAttackProp.boolValue)
         {
             DrawHeader("Attack Settings");
 
-            DrawColoredSection(() => {
+            DrawColoredSection(() =>
+            {
                 EditorGUILayout.PropertyField(effectAttackTypeProp);
                 DrawColoredField("Power", powerProp, Color.red);
                 EditorGUILayout.PropertyField(prefabProp);
@@ -91,7 +126,8 @@ public class SynergyEffectEditor : Editor
         {
             DrawHeader("Effect Settings");
 
-            DrawColoredSection(() => {
+            DrawColoredSection(() =>
+            {
                 EditorGUILayout.PropertyField(effectTypeProp);
 
                 EffectType currentEffectType = (EffectType)effectTypeProp.enumValueIndex;
@@ -123,11 +159,8 @@ public class SynergyEffectEditor : Editor
             EditorGUILayout.PropertyField(intervalProp, new GUIContent("Interval (seconds)"));
         }
 
-        if (!isActivationsClearProp.boolValue)
-        {
-            EditorGUILayout.Space(5);
-            EditorGUILayout.PropertyField(maxActivationsProp, new GUIContent("Max Activations"));
-        }
+        EditorGUILayout.Space(5);
+        EditorGUILayout.PropertyField(maxActivationsProp, new GUIContent("Max Activations"));
 
         EditorGUILayout.Space(10);
 
@@ -174,17 +207,14 @@ public class SynergyEffectEditor : Editor
         EditorGUILayout.Space(5);
         var rect = EditorGUILayout.GetControlRect(false, 25);
 
-        // 기본 색상 또는 지정된 색상 사용
         Color bgColor = backgroundColor ?? GetHeaderColor(title);
         EditorGUI.DrawRect(rect, bgColor);
 
-        // 테두리 그리기
         EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, 1), Color.black);
         EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - 1, rect.width, 1), Color.black);
 
         var labelRect = new Rect(rect.x + 10, rect.y + 2, rect.width - 20, rect.height - 4);
 
-        // 텍스트 스타일 설정
         var headerStyle = new GUIStyle(EditorStyles.boldLabel);
         headerStyle.normal.textColor = Color.white;
         headerStyle.fontSize = 12;
@@ -197,6 +227,7 @@ public class SynergyEffectEditor : Editor
         return title switch
         {
             "MetaData" => new Color(0.2f, 0.4f, 0.8f, 0.8f),        // 파란색
+            "Spawn Settings" => new Color(0.6f, 0.6f, 0.2f, 0.8f),  // 노란색
             "Attack Settings" => new Color(0.8f, 0.2f, 0.2f, 0.8f), // 빨간색
             "Effect Settings" => new Color(0.2f, 0.8f, 0.2f, 0.8f),  // 초록색
             "Trigger Settings" => new Color(0.8f, 0.6f, 0.2f, 0.8f), // 주황색

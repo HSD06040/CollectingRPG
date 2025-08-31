@@ -42,23 +42,36 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public event Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> OnUseSkill;
+    
+    public event Action OnDied;
     public Action OnSkill;
     public Action OnAttack;
 
     private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
 
+    [HideInInspector] public float StatMultiplier = 0;
 
     public bool IsDead => CurHp.Value <= 0;
 
-    #region Init&Clear
-    public void Init(UnitStatus status)
+#region Init&Clear
+    public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
         PassiveController = new UnitPassiveController(this);
         Status = status;
-        SetBaseStat(status.GetCurrentStat());
+
+        if(plusUnitStat == null)
+        {
+            SetBaseStat(status.GetCurrentStat());
+        }            
+        else
+        {
+            SetBaseStat(status.GetCurrentStat(), plusUnitStat);
+        }
+
         ClearAllStat();
     }
 
+    #region SetStat
     private void SetBaseStat(UnitStats stat)
     {
         MaxHealth.SetBaseStat(stat.MaxHealth);
@@ -83,6 +96,53 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         CurMana.Value = MaxMana.Value;
         TotalDamage.Value = 0;
     }
+
+    private void SetBaseStat(UnitStats baseStat, UnitStats plusStat)
+    {
+        var stat = new UnitStats
+        {
+            MaxHealth = Mathf.RoundToInt(baseStat.MaxHealth + plusStat.MaxHealth * StatMultiplier),
+            MaxMana = Mathf.RoundToInt(baseStat.MaxMana + plusStat.MaxMana * StatMultiplier),
+            ManaGain = Mathf.RoundToInt(baseStat.ManaGain + plusStat.ManaGain * StatMultiplier),
+
+            AttackSpeed = baseStat.AttackSpeed + plusStat.AttackSpeed * StatMultiplier,
+            MoveSpeed = baseStat.MoveSpeed + plusStat.MoveSpeed * StatMultiplier,
+
+            PhysicalDamage = Mathf.RoundToInt(baseStat.PhysicalDamage + plusStat.PhysicalDamage * StatMultiplier),
+            MagicDamage = Mathf.RoundToInt(baseStat.MagicDamage + plusStat.MagicDamage * StatMultiplier),
+
+            CritChance = Mathf.RoundToInt(baseStat.CritChance + plusStat.CritChance * StatMultiplier),
+
+            PhysicalDefense = Mathf.RoundToInt(baseStat.PhysicalDefense + plusStat.PhysicalDefense * StatMultiplier),
+            MagicDefense = Mathf.RoundToInt(baseStat.MagicDefense + plusStat.MagicDefense * StatMultiplier),
+
+            AttackRange = Mathf.RoundToInt(baseStat.AttackRange + plusStat.AttackRange * StatMultiplier),
+            AttackCount = Mathf.RoundToInt(baseStat.AttackCount + plusStat.AttackCount * StatMultiplier),
+        };
+
+        MaxHealth.SetBaseStat(stat.MaxHealth);
+        MaxMana.SetBaseStat(stat.MaxMana);
+        ManaGain.SetBaseStat(stat.ManaGain);
+
+        AttackSpeed.SetBaseStat(stat.AttackSpeed);
+        MoveSpeed.SetBaseStat(stat.MoveSpeed);
+
+        PhysicalDamage.SetBaseStat(stat.PhysicalDamage);
+        MagicDamage.SetBaseStat(stat.MagicDamage);
+
+        CritChance.SetBaseStat(stat.CritChance);
+
+        PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
+        MagicDefense.SetBaseStat(stat.MagicDefense);
+
+        AttackRange.SetBaseStat(stat.AttackRange);
+        AttackCount.SetBaseStat(stat.AttackCount);
+
+        CurHp.Value = MaxHealth.Value;
+        CurMana.Value = MaxMana.Value;
+        TotalDamage.Value = 0;
+    }
+    #endregion
 
     private void ClearAllStat()
     {
@@ -112,7 +172,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
         _activeBuffs.Clear();
     }
-    #endregion
+#endregion
 
     public void TakeDamage(int amount)
     {
@@ -148,6 +208,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     private void Die()
     {
         OnUnitDied?.Invoke(this);
+        OnDied?.Invoke();
     }
 
     public void GetMana()
