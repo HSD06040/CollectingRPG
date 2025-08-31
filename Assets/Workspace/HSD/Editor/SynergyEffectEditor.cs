@@ -14,6 +14,8 @@ public class SynergyEffectEditor : Editor
 
     private SerializedProperty isUnitPositionProp;
     private SerializedProperty IsMultiplierProp;
+    private SerializedProperty SpawnTypeProp;
+    private SerializedProperty SpawnUnitStatsProp;
     private SerializedProperty spawnSynergyProp;
     private SerializedProperty spawnPrefabProp;
     private SerializedProperty spawnObjRefProp;
@@ -48,6 +50,8 @@ public class SynergyEffectEditor : Editor
 
         isUnitPositionProp = serializedObject.FindProperty("IsUnitPosition");
         IsMultiplierProp = serializedObject.FindProperty("IsMultiplier");
+        SpawnTypeProp = serializedObject.FindProperty("SpawnType");
+        SpawnUnitStatsProp = serializedObject.FindProperty("SpawnUnitStats");
         spawnSynergyProp = serializedObject.FindProperty("SpawnSynergy");
         spawnPrefabProp = serializedObject.FindProperty("SpawnPrefab");
         spawnObjRefProp = serializedObject.FindProperty("SpawnObjRef");
@@ -76,30 +80,35 @@ public class SynergyEffectEditor : Editor
     {
         serializedObject.Update();
 
-        DrawHeader("MetaData");
+        DrawHeader("기본");
         EditorGUILayout.PropertyField(keyProp);
         EditorGUILayout.PropertyField(descriptionProp);
 
         EditorGUILayout.Space(5);
 
-        EditorGUILayout.PropertyField(isActivationsClearProp);
-        EditorGUILayout.PropertyField(isSpawnProp);
-        EditorGUILayout.PropertyField(isAttackProp);
-        EditorGUILayout.PropertyField(isBuffProp);
+        EditorGUILayout.PropertyField(isActivationsClearProp, new GUIContent("스텍이 다 차면 리셋?"));
+        EditorGUILayout.PropertyField(isSpawnProp, new GUIContent("소환할 것 인지?"));
+        EditorGUILayout.PropertyField(isAttackProp, new GUIContent("공격할 것 인지?"));
+        EditorGUILayout.PropertyField(isBuffProp, new GUIContent("버프를 줄 것 인지?"));
 
         EditorGUILayout.Space(10);
 
         if (isSpawnProp.boolValue)
         {
-            DrawHeader("Spawn Settings");
+            DrawHeader("소환 세팅");
             DrawColoredSection(() =>
             {
-                EditorGUILayout.PropertyField(isUnitPositionProp, new GUIContent("Spawn at Unit Position"));
-                EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("Is Multiplier"));
-                EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("Spawn Synergy"));
-                EditorGUILayout.PropertyField(spawnPrefabProp, new GUIContent("Spawn Prefab"));
-                EditorGUILayout.PropertyField(spawnObjRefProp, new GUIContent("Spawn Obj Ref"));
-                EditorGUILayout.PropertyField(spawnAddressProp, new GUIContent("Spawn Address"));
+                EditorGUILayout.PropertyField(isUnitPositionProp, new GUIContent("스폰위치 설정", "유닛위치 or 전장중앙"));
+                EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("가중치 적용여부"));
+                if(IsMultiplierProp.boolValue)
+                {
+                    EditorGUILayout.PropertyField(SpawnTypeProp, new GUIContent("스폰할 객체 타입", "유닛 or 공격체"));
+                    EditorGUILayout.PropertyField(SpawnUnitStatsProp, new GUIContent("가중치"));
+                }
+                EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("스폰 시너지"));
+                EditorGUILayout.PropertyField(spawnPrefabProp, new GUIContent("프리팹"));
+                EditorGUILayout.PropertyField(spawnObjRefProp, new GUIContent("참조"));
+                EditorGUILayout.PropertyField(spawnAddressProp, new GUIContent("주소"));
 
             }, new Color(1f, 1f, 0.9f, 0.3f));
 
@@ -108,15 +117,15 @@ public class SynergyEffectEditor : Editor
 
         if (isAttackProp.boolValue)
         {
-            DrawHeader("Attack Settings");
+            DrawHeader("공격 설정");
 
             DrawColoredSection(() =>
             {
-                EditorGUILayout.PropertyField(effectAttackTypeProp);
-                DrawColoredField("Power", powerProp, Color.red);
-                EditorGUILayout.PropertyField(prefabProp);
-                EditorGUILayout.PropertyField(objRefProp);
-                EditorGUILayout.PropertyField(addressProp);
+                EditorGUILayout.PropertyField(effectAttackTypeProp, new GUIContent("공격타입", "각자공격 or 전체공격"));
+                DrawColoredField("계수", powerProp, Color.red);
+                EditorGUILayout.PropertyField(prefabProp, new GUIContent("프리팹"));
+                EditorGUILayout.PropertyField(objRefProp, new GUIContent("참조"));
+                EditorGUILayout.PropertyField(addressProp, new GUIContent("주소"));
             }, new Color(1f, 0.9f, 0.9f, 0.3f));
 
             EditorGUILayout.Space(10);
@@ -124,11 +133,11 @@ public class SynergyEffectEditor : Editor
 
         if (isBuffProp.boolValue)
         {
-            DrawHeader("Effect Settings");
+            DrawHeader("버프 설정");
 
             DrawColoredSection(() =>
             {
-                EditorGUILayout.PropertyField(effectTypeProp);
+                EditorGUILayout.PropertyField(effectTypeProp, new GUIContent("버프 타입", "능력치 상승 or 버프&디버프"));
 
                 EffectType currentEffectType = (EffectType)effectTypeProp.enumValueIndex;
 
@@ -136,12 +145,12 @@ public class SynergyEffectEditor : Editor
 
                 if (currentEffectType == EffectType.Buff_Debuff)
                 {
-                    DrawSubHeader("Buff/Debuff Data:", Color.green);
+                    DrawSubHeader("버프 디버프 설정:", Color.green);
                     EditorGUILayout.PropertyField(synergyBuffDatasProp, true);
                 }
                 else if (currentEffectType == EffectType.Increase)
                 {
-                    DrawSubHeader("Stat Modifiers:", Color.blue);
+                    DrawSubHeader("능력치 상승 설정:", Color.cyan);
                     EditorGUILayout.PropertyField(statModifiersProp, true);
                 }
             }, new Color(0.9f, 1f, 0.9f, 0.3f));
@@ -149,34 +158,34 @@ public class SynergyEffectEditor : Editor
             EditorGUILayout.Space(10);
         }
 
-        DrawHeader("Trigger Settings");
-        EditorGUILayout.PropertyField(triggerTypeProp);
+        DrawHeader("시너지 발동 설정");
+        EditorGUILayout.PropertyField(triggerTypeProp, new GUIContent("발동 설정", "바로 발동, 일정시간마다, 죽었을 때, 공격했을 때, 스킬을 사용했을 때 등"));
 
         TriggerType currentTriggerType = (TriggerType)triggerTypeProp.enumValueIndex;
         if (currentTriggerType == TriggerType.OnInterval)
         {
             EditorGUILayout.Space(5);
-            EditorGUILayout.PropertyField(intervalProp, new GUIContent("Interval (seconds)"));
+            EditorGUILayout.PropertyField(intervalProp, new GUIContent("발동 간격 (초)"));
         }
 
         EditorGUILayout.Space(5);
-        EditorGUILayout.PropertyField(maxActivationsProp, new GUIContent("Max Activations"));
+        EditorGUILayout.PropertyField(maxActivationsProp, new GUIContent("최대 스텍"));
 
         EditorGUILayout.Space(10);
 
-        DrawHeader("Target Settings");
+        DrawHeader("적용 유닛 설정");
         EditorGUILayout.PropertyField(targetTypeProp);
 
         DrawTargetTypeInfo((EffectTargetType)targetTypeProp.enumValueIndex);
 
         EditorGUILayout.Space(10);
 
-        DrawHeader("Chain Effect");
-        EditorGUILayout.PropertyField(nextEffectProp, new GUIContent("Next Effect (Optional)"));
+        DrawHeader("이어지는 효과 설정 (선택)");
+        EditorGUILayout.PropertyField(nextEffectProp, new GUIContent("다음 효과 (선택)"));
 
         if (nextEffectProp.objectReferenceValue == target)
         {
-            DrawWarningBox("Warning: Circular reference detected! This effect points to itself.");
+            DrawWarningBox("경고: 순환 참조가 감지되었습니다! 이 효과가 자기 자신을 가리키고 있습니다.");
         }
 
         serializedObject.ApplyModifiedProperties();
@@ -186,13 +195,13 @@ public class SynergyEffectEditor : Editor
     {
         var (info, color) = targetType switch
         {
-            EffectTargetType.Enemy => ("Targets enemy units", new Color(1f, 0.9f, 0.9f, 1f)),
-            EffectTargetType.Ally => ("Targets all allied units", new Color(0.9f, 1f, 0.9f, 1f)),
-            EffectTargetType.SameSynergy => ("Targets units with same synergy", new Color(0.9f, 0.9f, 1f, 1f)),
-            EffectTargetType.Column => ("Targets entire columns where synergy units exist", new Color(1f, 1f, 0.9f, 1f)),
-            EffectTargetType.Row => ("Targets entire rows where synergy units exist", new Color(1f, 0.9f, 1f, 1f)),
-            EffectTargetType.ColumnAndRow => ("Targets both columns AND rows where synergy units exist", new Color(0.9f, 1f, 1f, 1f)),
-            EffectTargetType.Cross => ("Targets adjacent units (cross pattern) around synergy units", new Color(1f, 1f, 1f, 1f)),
+            EffectTargetType.Enemy => ("적으로 설정", new Color(1f, 0.9f, 0.9f, 1f)),
+            EffectTargetType.Ally => ("아군으로 설정", new Color(0.9f, 1f, 0.9f, 1f)),
+            EffectTargetType.SameSynergy => ("같은 시너지 유닛들로 설정", new Color(0.9f, 0.9f, 1f, 1f)),
+            EffectTargetType.Column => ("시너지 유닛이 존재하는 세로줄 전체를 대상으로 설정", new Color(1f, 1f, 0.9f, 1f)),
+            EffectTargetType.Row => ("시너지 유닛이 존재하는 가로줄 전체를 대상으로 설정", new Color(1f, 0.9f, 1f, 1f)),
+            EffectTargetType.ColumnAndRow => ("시너지 유닛이 존재하는 가로줄과 세로줄 전체를 대상으로 설정", new Color(0.9f, 1f, 1f, 1f)),
+            EffectTargetType.Cross => ("시너지 유닛 주변 십자 형태의 인접 유닛들을 대상으로 설정", new Color(1f, 1f, 1f, 1f)),
             _ => ("", Color.white)
         };
 
@@ -226,13 +235,13 @@ public class SynergyEffectEditor : Editor
     {
         return title switch
         {
-            "MetaData" => new Color(0.2f, 0.4f, 0.8f, 0.8f),        // 파란색
-            "Spawn Settings" => new Color(0.6f, 0.6f, 0.2f, 0.8f),  // 노란색
-            "Attack Settings" => new Color(0.8f, 0.2f, 0.2f, 0.8f), // 빨간색
-            "Effect Settings" => new Color(0.2f, 0.8f, 0.2f, 0.8f),  // 초록색
-            "Trigger Settings" => new Color(0.8f, 0.6f, 0.2f, 0.8f), // 주황색
-            "Target Settings" => new Color(0.6f, 0.2f, 0.8f, 0.8f),  // 보라색
-            "Chain Effect" => new Color(0.4f, 0.7f, 0.7f, 0.8f),     // 청록색
+            "기본" => new Color(0.2f, 0.4f, 0.8f, 0.8f),        // 파란색
+            "소환 설정" => new Color(0.6f, 0.6f, 0.2f, 0.8f),  // 노란색
+            "공격 설정" => new Color(0.8f, 0.2f, 0.2f, 0.8f), // 빨간색
+            "버프 설정" => new Color(0.2f, 0.8f, 0.2f, 0.8f),  // 초록색
+            "시너지 발동 설정" => new Color(0.8f, 0.6f, 0.2f, 0.8f), // 주황색
+            "적용 유닛 설정" => new Color(0.6f, 0.2f, 0.8f, 0.8f),  // 보라색
+            "이어지는 효과 설정 (선택)" => new Color(0.4f, 0.7f, 0.7f, 0.8f),     // 청록색
             _ => new Color(0.3f, 0.3f, 0.3f, 0.8f)                   // 기본 회색
         };
     }

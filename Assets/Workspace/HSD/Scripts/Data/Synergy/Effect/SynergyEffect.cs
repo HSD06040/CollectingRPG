@@ -8,7 +8,7 @@ using UnityEngine.AddressableAssets;
 [CreateAssetMenu(fileName = "SynergyEffect", menuName = "Data/Synergy/Effect")]
 public class SynergyEffect : ScriptableObject
 {
-    [Header("MetaData")]
+    //[Header("MetaData")]
     public string Key = Guid.NewGuid().ToString();
     [TextArea]
     public string Description;
@@ -17,7 +17,7 @@ public class SynergyEffect : ScriptableObject
     public bool IsSpawn;
     public bool IsBuff;
 
-    [Header("SpawnType (유닛 소환)")]
+    //[Header("SpawnType (유닛 소환)")]
     public bool IsUnitPosition;         // 소환 위치 정의 (유닛위치 or 전장 중앙)
     public bool IsMultiplier;           // 시너지 유닛의 Level에 따른 배수 적용 여부
     public SpawnType SpawnType;         // 유닛소환 타입
@@ -27,27 +27,27 @@ public class SynergyEffect : ScriptableObject
     public AssetReference SpawnObjRef;
     public string SpawnAddress;
 
-    [Header("AttackType (공격)")]
+    //[Header("AttackType (공격)")]
     public EffectAttackType EffectAttackType;
     public float Power;
     public GameObject Prefab;
     public AssetReference ObjRef;
     public string Address;
 
-    [Header("EffectType")]
+    //[Header("EffectType")]
     public EffectType EffectType; // Increase
     public SynergyBuffData[] SynergyBuffDatas;
     public SynergyStatModifier[] StatModifiers;
 
-    [Header("TriggerType")]
+    //[Header("TriggerType")]
     public TriggerType TriggerType;
     public float Interval;
     public uint MaxActivations;
 
-    [Header("TargetType")]
+    //[Header("TargetType")]
     public EffectTargetType TargetType;
 
-    [Header("NextEffect")]
+    //[Header("NextEffect")]
     public SynergyEffect NextEffect;
 
     public void ApplyEffect(UnitBase[] units, int synergy)
@@ -62,17 +62,12 @@ public class SynergyEffect : ScriptableObject
         {
             foreach (var unit in GetTarget(units, synergy))
             {
-                if (unit == null)
-                    Debug.Log("UnitNull");
-                if (unit.StatusController.PassiveController == null)
-                    Debug.Log("PassiveControllerNull");
-
                 unit.StatusController.PassiveController.AddPassiveEffect(this);
             }
         }
         else
         {
-            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, units, isChange: true);
+            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, GetTarget(units, synergy), isChange: true);
         }
     }
 
