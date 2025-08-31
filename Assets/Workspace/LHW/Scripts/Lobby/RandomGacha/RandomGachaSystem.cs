@@ -23,14 +23,14 @@ public class RandomGachaSystem : MonoBehaviour
     private void Awake()
     {
         RandomInit(_prob);
-        _dailyButton.onClick.AddListener(() => ItemSelect(1));
-        _oneGachaButton.onClick.AddListener(() => ItemSelect(1));
-        _tenGachaButton.onClick.AddListener(() => ItemSelect(10));
+        _dailyButton.onClick.AddListener(AdButtonClick);
+        _oneGachaButton.onClick.AddListener(OneButtonClick);
+        _tenGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(10));
     }
 
     private void RandomInit(ItemProbabilitySO probability)
-    {        
-        for(int i = 0; i < probability.ItemsProbability.Count; i++)
+    {
+        for (int i = 0; i < probability.ItemsProbability.Count; i++)
         {
             Grade grade = probability.ItemsProbability[i].ItemGrade;
             int value = (int)(probability.ItemsProbability[i].Probability * (int)Math.Pow(10, digits));
@@ -52,15 +52,62 @@ public class RandomGachaSystem : MonoBehaviour
         return _data.GetRandomUnitByGrade(grade);
     }
 
+    private void AdButtonClick()
+    {
+        if(DailyAdGacha()) return;
+
+        if(PopupManager.Instance != null)
+        {
+            PopupManager.instance.ShowPopup("일일 무료 가챠를 전부 사용하였습니다.");
+        }
+    }
+
+    private void OneButtonClick()
+    {
+        if (DailyFreeGacha()) return;
+
+        ItemSelect(1);
+    }
+
+    private bool DailyFreeGacha()
+    {
+        if (TimeManager.Instance.CanObtainedFreeGachaReward())
+        {
+            TimeManager.Instance.SaveDailyFreeGachaResetTimeInfo();
+            ItemSelect(1);
+            return true;
+        }
+        return false;
+    }
+
+    private bool DailyAdGacha()
+    {
+        if(TimeManager.Instance.CanObtainAdGachaReward())
+        {
+            TimeManager.Instance.SaveAdGachaResetTimeInfo();
+            ItemSelect(1);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ConsumeGoodsButtonClick(int number)
+    {
+        // 재화 상태 확인 절차 진행
+
+        ItemSelect(number);
+    }
+
     // 확률 변동이 없는 가중치 확률
     private void ItemSelect(int number)
     {
         if (_gradeRandom.GetList() == null) RandomInit(_prob);
 
-        for(int i = 0; i < number; i++)
+        for (int i = 0; i < number; i++)
         {
             UnitData data = ReturnData();
-            _resultUI.HeroGachaUpdate(data, i);            
+            _resultUI.HeroGachaUpdate(data, i);
         }
 
         _resultUI.gameObject.SetActive(true);
@@ -71,7 +118,7 @@ public class RandomGachaSystem : MonoBehaviour
     {
         if (_gradeRandom.GetList() == null) RandomInit(_prob);
 
-        for(int i = 0; i < number; i++)
+        for (int i = 0; i < number; i++)
         {
             ReturnDataBySub();
         }
