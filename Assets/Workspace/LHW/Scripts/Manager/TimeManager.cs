@@ -7,6 +7,11 @@ public class RewardInfo
     public long dateTicks; // DateTime을 Ticks로 저장
     public int state;      // 획득 여부 또는 스택 수
 
+    /// <summary>
+    /// 리워드 정보를 생성함.
+    /// </summary>
+    /// <param name="dateTicks">시간을 Long으로 변환</param>
+    /// <param name="state">획득여부 혹은 Stack수</param>
     public RewardInfo(long dateTicks, int state)
     {
         this.dateTicks = dateTicks;
@@ -44,7 +49,7 @@ public class TimeManager : MonoBehaviour
 
     [Header("Reference")]
     [SerializeField] private GoogleAdMob _adMob;
-    
+
     private RewardInfo _dailyFreeGachaRewardInfo;
     public RewardInfo DailyFreeGachaRewardInfo => _dailyFreeGachaRewardInfo;
 
@@ -60,6 +65,8 @@ public class TimeManager : MonoBehaviour
     }
 
     #region Data Load & Save
+
+    #region 일일 초기화
 
     private void LoadDailyFreeGachaResetTimeInfo()
     {
@@ -87,10 +94,14 @@ public class TimeManager : MonoBehaviour
         OnDailyGachaInfoChanged?.Invoke();
     }
 
+    #endregion
+
+    #region 12시간 초기화(가챠)
+
     private void LoadAdGachaResetTimeInfo()
     {
         // 테스트용 초기값: 11시간 전, 가챠 횟수 1회
-        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-11).AddMinutes(-3).Ticks, 1);
+        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-11).AddMinutes(-59).Ticks, 1);
 
         if (_dailyAdGachaRewardInfo.state < 2 && IsDailyAdGachaResetTime(out int stack))
         {
@@ -116,10 +127,27 @@ public class TimeManager : MonoBehaviour
 
     #endregion
 
+    #endregion
+
+    #region Obtain 판정
+
+    #region 일일 가챠 가능 여부 판정
+
     public bool CanObtainedFreeGachaReward()
     {
         if (_dailyFreeGachaRewardInfo.state == 1) return true;
         if (IsDailyFreeGachaResetTime(_dailyFreeGachaRewardInfo.GetDateTime())) return true;
+        return false;
+    }
+
+    private bool IsDailyFreeGachaResetTime(DateTime date)
+    {
+        DateTime now = DateTime.Now;
+
+        if (now.Year > date.Year && now.Hour >= date.Hour) return true;
+        if (now.Year == date.Year && now.Month > date.Month && now.Hour >= date.Hour) return true;        
+        if (now.Year == date.Year && now.Month == date.Month && now.Day > date.Day && now.Hour >= date.Hour) return true;
+        
         return false;
     }
 
@@ -133,20 +161,12 @@ public class TimeManager : MonoBehaviour
             if (_dailyAdGachaRewardInfo.state > 2) _dailyAdGachaRewardInfo.state = 2;
             return true;
         }
-
         return true;
     }
 
-    private bool IsDailyFreeGachaResetTime(DateTime date)
-    {
-        DateTime now = DateTime.Now;
+    #endregion
 
-        if (now.Year > date.Year && now.Hour >= date.Hour) return true;
-        if (now.Year == date.Year && now.Month > date.Month && now.Hour >= date.Hour) return true;
-        if (now.Year == date.Year && now.Month == date.Month && now.Day > date.Day && now.Hour >= date.Hour) return true;
-
-        return false;
-    }
+    #region 12시간 광고 가챠 가능 여부 판정
 
     /// <summary>
     /// 12시간 단위 누적 스택 계산
@@ -173,4 +193,8 @@ public class TimeManager : MonoBehaviour
 
         return false;
     }
+
+    #endregion
+
+    #endregion
 }

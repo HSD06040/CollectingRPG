@@ -59,7 +59,7 @@ public class GachaUIController : MonoBehaviour
 
     private void StopAdTimer()
     {
-        if(_adCooltimeTimer != null)
+        if (_adCooltimeTimer != null)
         {
             StopCoroutine(_adCooltimeTimer);
             _adCooltimeTimer = null;
@@ -72,7 +72,7 @@ public class GachaUIController : MonoBehaviour
 
     private void StartDailyTimer()
     {
-        if(_dailyCooltimeTimer != null)
+        if (_dailyCooltimeTimer != null)
         {
             StopCoroutine(_dailyCooltimeTimer);
         }
@@ -81,7 +81,7 @@ public class GachaUIController : MonoBehaviour
 
     private void StopDailyTimer()
     {
-        if(_dailyCooltimeTimer != null)
+        if (_dailyCooltimeTimer != null)
         {
             StopCoroutine(_dailyCooltimeTimer);
             _dailyCooltimeTimer = null;
@@ -100,7 +100,7 @@ public class GachaUIController : MonoBehaviour
 
     private void UpdateAdButton()
     {
-        switch(TimeManager.Instance.DailyAdGachaRewardInfo.state)
+        switch (TimeManager.Instance.DailyAdGachaRewardInfo.state)
         {
             case 2:
                 _adImages[0].color = Color.white;
@@ -108,7 +108,7 @@ public class GachaUIController : MonoBehaviour
                 _adCooltimeImage.gameObject.SetActive(false);
                 break;
 
-           case 1:
+            case 1:
                 _adImages[0].color = Color.grey;
                 _adImages[1].color = Color.white;
                 _adCooltimeImage.gameObject.SetActive(true);
@@ -117,6 +117,8 @@ public class GachaUIController : MonoBehaviour
                 _adImages[0].color = Color.grey;
                 _adImages[1].color = Color.grey;
                 _adCooltimeImage.gameObject.SetActive(true);
+                break;
+            default:
                 break;
         }
     }
@@ -145,21 +147,20 @@ public class GachaUIController : MonoBehaviour
     {
         while (true)
         {
-            if(TimeManager.Instance != null && _adCooltimeImage.activeSelf == true)
+            if (TimeManager.Instance != null && _adCooltimeImage.activeSelf == true)
             {
+                TimeManager.Instance.CanObtainAdGachaReward();
+
                 DateTime lastTime = TimeManager.Instance.DailyAdGachaRewardInfo.GetDateTime();
                 DateTime now = DateTime.Now;
 
-                TimeSpan cooltime = now - lastTime;
+                TimeSpan cooltime = lastTime.AddHours(12) - now;
 
-                // 다음 초기화 시간만 표기하도록
-                while(cooltime.TotalHours > 12)
-                {
-                    lastTime.AddHours(12);
-                }
-
-                _adCooltimeText.text = $"{cooltime.Hours}시간 {cooltime.Minutes}분";
+                _adCooltimeText.text = $"다음 초기화 : {cooltime.Hours}시간 {cooltime.Minutes}분";
             }
+
+            UpdateAdButton();
+
             yield return new WaitForSeconds(1);
         }
     }
@@ -170,13 +171,17 @@ public class GachaUIController : MonoBehaviour
         {
             if (TimeManager.Instance != null && _dailyCooltimeImage.activeSelf == true)
             {
+                TimeManager.Instance.CanObtainedFreeGachaReward();
+
                 DateTime nextdate = TimeManager.Instance.DailyFreeGachaRewardInfo.GetDateTime();
                 DateTime now = DateTime.Now;
 
                 TimeSpan cooltime = nextdate - now;
-                _dailyCooltimeText.text = $"{cooltime.Hours}시간 {cooltime.Minutes}분";
-                Debug.Log($"남은 시간 : {cooltime}");
+                _dailyCooltimeText.text = $"다음 초기화 : {cooltime.Hours}시간 {cooltime.Minutes}분";
             }
+
+            UpdateOneButton();
+
             yield return new WaitForSeconds(1);
         }
     }

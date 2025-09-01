@@ -53,6 +53,10 @@ public class PresetSelectUnit : MonoBehaviour
         if(TempDataManager.Instance.PresetData.Count < _index + 1)
         {
             SetactiveGameobject("LockedPartyButton");
+            if(TempDataManager.Instance.PresetData.Count < _index)
+            {
+                _lockedPartyButton.GetComponent<Button>().interactable = false;
+            }
             return;
         }
 
@@ -139,7 +143,7 @@ public class PresetSelectUnit : MonoBehaviour
         {
             if (PopupManager.Instance != null)
             {
-                PopupManager.instance.ShowConfirmationPopup("Add Preset?\nConsumes 500 Gold.", () => CreatePreset(), null);
+                PopupManager.instance.ShowConfirmationPopup("프리셋을 추가하시겠습니까?\n500 골드 소모", () => CreatePreset(), null);
             }
         }
     }

@@ -58,7 +58,7 @@ public class RandomGachaSystem : MonoBehaviour
 
         if(PopupManager.Instance != null)
         {
-            PopupManager.instance.ShowPopup("일일 무료 가챠를 전부 사용하였습니다.");
+            PopupManager.instance.ShowPopup("일일 광고 가챠를 전부 사용하였습니다.");
         }
     }
 
@@ -66,7 +66,13 @@ public class RandomGachaSystem : MonoBehaviour
     {
         if (DailyFreeGacha()) return;
 
-        ItemSelect(1);
+        // 재화 소모 일시로 막아둠(신원님 요청)
+        //ItemSelect(1);
+
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.instance.ShowPopup("일일 무료 가챠를 이미 진행하였습니다.");
+        }
     }
 
     private bool DailyFreeGacha()
@@ -75,6 +81,7 @@ public class RandomGachaSystem : MonoBehaviour
         {
             TimeManager.Instance.SaveDailyFreeGachaResetTimeInfo();
             ItemSelect(1);
+            TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
             return true;
         }
         return false;
@@ -86,6 +93,7 @@ public class RandomGachaSystem : MonoBehaviour
         {
             TimeManager.Instance.SaveAdGachaResetTimeInfo();
             ItemSelect(1);
+            TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
             return true;
         }
 
