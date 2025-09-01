@@ -32,7 +32,7 @@ public class PartySelectPanelController : MonoBehaviour
 
     private void ActivateGameStartButton()
     { 
-        if(TempDataManager.Instance.SelectedPresetIndex != -1)
+        if(TempDataManager.Instance != null && TempDataManager.Instance.SelectedPresetIndex != -1)
         {
             _gameStartButton.interactable = true;
         }
