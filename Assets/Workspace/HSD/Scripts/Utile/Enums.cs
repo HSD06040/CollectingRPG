@@ -106,6 +106,12 @@ public enum SearchType
 
 #endregion
 
+public enum CsvType
+{
+    UnitStat,
+    Skill,
+}
+
 public enum Priority
 {
     None,

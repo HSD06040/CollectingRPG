@@ -5,22 +5,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class CsvDownloader : MonoBehaviour
+public class CsvDownloader
 {
-    private const string URL = "";
+    private CsvLoadData _csvLoadData;
 
     public event Action OnDataSetupCompleted;
+
+    public CsvDownloader(CsvLoadData csvLoadData)
+    {
+        _csvLoadData = csvLoadData;
+    }
+
     /// <summary>
     /// 데이터 다운로드 및 세팅
     /// </summary>
     public async UniTask DownloadDataAsync()
-    {        
-        UniTask[] task =
-        {
-            LoadCSV(URL, SetupTest, 4),         
-        };
+    {
+        List<UniTask> tasks = new List<UniTask>(10);
 
-        await UniTask.WhenAll(task);
+        foreach (var csvData in _csvLoadData.CsvDatas)
+        {
+            string url = csvData.URL;
+            tasks.Add(LoadCSV(url, GetSetupMethod(csvData.CsvType), csvData.StartLine));         
+        }
+
+        await UniTask.WhenAll(tasks);
 
         Debug.Log("끝!");
         
@@ -55,24 +64,23 @@ public class CsvDownloader : MonoBehaviour
         onParsed?.Invoke(parsed.ToArray());
     }
 
-    // 예시 세팅 함수를 각자 다르게 구현
-    private void SetupTest(string[][] data)
+    private Action<string[][]> GetSetupMethod(CsvType csvType)
     {
-        //foreach (string[] row in data)
-        //{
-        //    int ID = int.Parse(row[0]);
+        switch(csvType)
+        {
+            case CsvType.UnitStat:
+                return UnitStatSetup;
+            default:
+                Debug.LogError($"알 수 없는 CSV 이름: {csvType.ToString()}");
+                return null;
+        }
+    }
 
-        //    MonsterStat stat = Array.Find(Manager.Table.monsterStat, m => m.ID == ID);
-
-        //    if (stat != null)
-        //    {
-        //        stat.ID = ID;
-        //        stat.monsterName = row[1];
-        //        stat.health = float.Parse(row[2]);
-        //        stat.attackPower = int.Parse(row[3]);
-        //        stat.moveSpeed = float.Parse(row[4]);
-        //        stat.GetCoinAmount = int.Parse(row[5]);
-        //    }
-        //}
+    private void UnitStatSetup(string[][] data)
+    {
+        foreach (var row in data)
+        {
+            
+        }
     }
 }

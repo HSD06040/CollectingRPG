@@ -9,6 +9,6 @@ public class UpgradeSynergyTextUI : MonoBehaviour
     private void Start()
     {
         _text = GetComponent<TMP_Text>();
-        if (_character != null && _character.Status != null) _text.text = _character.Status.Data.EnhancementData.ClassSynergy.ToString();
+        if (_character != null && _character.Status != null) _text.text = _character.Status.Data.ClassSynergy.ToString();
     }
 }

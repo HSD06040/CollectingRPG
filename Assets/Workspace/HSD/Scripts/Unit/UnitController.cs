@@ -294,8 +294,8 @@ public class UnitController : MonoBehaviour
             return;
         }
 
-        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
-        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
+        Synergy synergy = unit.Status.Data.Synergy;
+        ClassType classSynergy = unit.Status.Data.ClassSynergy;
 
         SynergyController.AddSynergy(synergy, classSynergy);
 
@@ -310,8 +310,8 @@ public class UnitController : MonoBehaviour
             return;
         }
 
-        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
-        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
+        Synergy synergy = unit.Status.Data.Synergy;
+        ClassType classSynergy = unit.Status.Data.ClassSynergy;
 
         SynergyController.RemoveSynergy(synergy, classSynergy);
 
@@ -346,13 +346,13 @@ public class UnitController : MonoBehaviour
 
     private void CheckSynergy(UnitBase unit)
     {
-        SynergyData synergy = SynergyController.SynergyDB.GetSynergy((int)unit.Status.Data.EnhancementData.Synergy);
-        SynergyData classSynergy = SynergyController.SynergyDB.GetSynergy((int)unit.Status.Data.EnhancementData.ClassSynergy);
+        SynergyData synergy = SynergyController.SynergyDB.GetSynergy((int)unit.Status.Data.Synergy);
+        SynergyData classSynergy = SynergyController.SynergyDB.GetSynergy((int)unit.Status.Data.ClassSynergy);
 
         if (synergy == null) return;
 
-        synergy.Check(SynergyController.GetSynergyUnitCount((int)unit.Status.Data.EnhancementData.Synergy), GetUnits());
-        classSynergy.Check(SynergyController.GetSynergyUnitCount((int)unit.Status.Data.EnhancementData.ClassSynergy), GetUnits());
+        synergy.Check(SynergyController.GetSynergyUnitCount((int)unit.Status.Data.Synergy), GetUnits());
+        classSynergy.Check(SynergyController.GetSynergyUnitCount((int)unit.Status.Data.ClassSynergy), GetUnits());
     }
 
     #endregion

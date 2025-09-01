@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 [Serializable]
 public struct SynergyStatModifier
@@ -22,6 +23,17 @@ public struct BuffEffectData
     public float Duration;
     public bool IsTicking;
     public float TickInterval;
+}
+
+[Serializable]
+public struct CsvData
+{
+    public CsvType CsvType;
+    [TextArea]
+    public string URL;
+    public int StartLine;
+    [Header("예시 : A2:C12")]
+    public string Range;
 }
 
 public readonly struct SourceKey : IEquatable<SourceKey>

@@ -1,27 +1,36 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
-    private static Dictionary<string, Object> resources = new();
+    private static Dictionary<string, Object> resources = new Dictionary<string, Object>();
 
-    public T Load<T>(string path, bool isCached = true) where T : Object
+    public async UniTask LoadLabel<T>(string label) where T : Object
     {
-        string _path = $"{typeof(T).Name}{path}";
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
+        var locations = await locationsHandle.Task;
 
-        if (resources.ContainsKey(_path))
-            return resources[_path] as T;
-
-        T resource = Resources.Load(path) as T;
-
-        if (isCached)
+        foreach (var location in locations)
         {
-            if (resource != null)
-                resources.Add(_path, resource);
+            var handle = Addressables.LoadAssetAsync<T>(location);
+            var asset = await handle.Task;
+
+            if (!resources.ContainsKey(location.PrimaryKey))
+                resources.Add(location.PrimaryKey, asset);
         }
 
-        return resource;
+        Addressables.Release(locationsHandle);
+    }
+
+    public async UniTask<T[]> LoadAll<T>(string label) where T : Object
+    {
+        var handle = Addressables.LoadAssetsAsync<T>(label, null);
+        var result = await handle.Task;
+
+        return result.ToArray();
     }
 
     public void Unload(string path)
@@ -35,9 +44,12 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public void UnloadAll()
     {
-        foreach (var res in resources.Values)
-            Resources.UnloadAsset(res);
-        resources.Clear();
+        
+    }
+
+    public T Load<T> (string path) where T : Object
+    {
+        return resources.ContainsKey(path) ? resources[path] as T : null;
     }
 
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object

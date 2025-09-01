@@ -307,7 +307,7 @@ public static class Utils
 
         foreach (var unit in units)
         {
-            if(unit != null && unit.Status.Data.EnhancementData.Synergy == synergy)
+            if(unit != null && unit.Status.Data.Synergy == synergy)
             {
                 count += unit.Status.Level + 1;
             }

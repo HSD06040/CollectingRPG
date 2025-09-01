@@ -92,8 +92,8 @@ public class SynergyEffect : ScriptableObject
         {
             if (unit == null) continue;
 
-            int unitSynergy = (int)unit.Status.Data.EnhancementData.Synergy;
-            int unitClassSynergy = (int)unit.Status.Data.EnhancementData.ClassSynergy;
+            int unitSynergy = (int)unit.Status.Data.Synergy;
+            int unitClassSynergy = (int)unit.Status.Data.ClassSynergy;
 
             if (!(unitSynergy == synergy) && !(unitClassSynergy == synergy))
                 continue;
@@ -120,8 +120,8 @@ public class SynergyEffect : ScriptableObject
 
                 if (targetUnit != null)
                 {
-                    unitSynergy = (int)targetUnit.Status.Data.EnhancementData.Synergy;
-                    unitClassSynergy = (int)targetUnit.Status.Data.EnhancementData.ClassSynergy;
+                    unitSynergy = (int)targetUnit.Status.Data.Synergy;
+                    unitClassSynergy = (int)targetUnit.Status.Data.ClassSynergy;
 
                     if (unitSynergy == synergy || unitClassSynergy == synergy)
                     {
@@ -158,8 +158,8 @@ public class SynergyEffect : ScriptableObject
                 {
                     if (unit == null) continue;
 
-                    if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
-                        (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
+                    if ((int)unit.Status.Data.Synergy == synergy ||
+                        (int)unit.Status.Data.ClassSynergy == synergy)
                         unitBases.Add(unit);
                 }
                 break;
@@ -170,8 +170,8 @@ public class SynergyEffect : ScriptableObject
                 {
                     if (unit == null) continue;
 
-                    if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
-                        (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
+                    if ((int)unit.Status.Data.Synergy == synergy ||
+                        (int)unit.Status.Data.ClassSynergy == synergy)
                     {
                         int column = unit.CurrentSlot.x;
                         targetColumns.Add(column);
@@ -196,8 +196,8 @@ public class SynergyEffect : ScriptableObject
                 {
                     if (unit == null) continue;
 
-                    if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
-                        (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
+                    if ((int)unit.Status.Data.Synergy == synergy ||
+                        (int)unit.Status.Data.ClassSynergy == synergy)
                     {
                         int Row = unit.CurrentSlot.y;
                         targetRows.Add(Row);
@@ -222,8 +222,8 @@ public class SynergyEffect : ScriptableObject
                 {
                     if (unit == null) continue;
 
-                    if ((int)unit.Status.Data.EnhancementData.Synergy == synergy ||
-                        (int)unit.Status.Data.EnhancementData.ClassSynergy == synergy)
+                    if ((int)unit.Status.Data.Synergy == synergy ||
+                        (int)unit.Status.Data.ClassSynergy == synergy)
                     {
                         int column = unit.CurrentSlot.x;
                         int row = unit.CurrentSlot.y;

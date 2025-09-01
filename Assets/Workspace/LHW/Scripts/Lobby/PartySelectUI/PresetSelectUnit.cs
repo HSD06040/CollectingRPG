@@ -101,8 +101,8 @@ public class PresetSelectUnit : MonoBehaviour
         _leaderName.text = $"리더 : {preset[0].Data.Name}";
         _partyDamageText.text = $"파티 전투력 : {damage}";
         // 시너지 입력 방식은 시너지 활성화 기능 구현 이후 진행
-        //_synergy1Text.text = preset[0].Data.EnhancementData.ClassSynergy.ToString();
-        //_synergy2Text.text = preset[0].Data.EnhancementData.ClassSynergy.ToString();
+        //_synergy1Text.text = preset[0].Data.ClassSynergy.ToString();
+        //_synergy2Text.text = preset[0].Data.ClassSynergy.ToString();
     }
 
     private void SetactiveGameobject(string activeObject)

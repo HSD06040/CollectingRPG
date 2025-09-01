@@ -26,5 +26,4 @@ public class UnitStats
     [Header("Range")]
     public int AttackRange;
     public int AttackCount;
-    public AttackAreaType AttackAreaType;
 }

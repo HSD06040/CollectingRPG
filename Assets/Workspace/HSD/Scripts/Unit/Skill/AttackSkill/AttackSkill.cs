@@ -168,7 +168,7 @@ public abstract class AttackSkill : UnitSkill
                 var statusController = ComponentProvider.Get<UnitStatusController>(target);
                 if (statusController != null && !statusController.IsDead)
                 {
-                    if (statusController.Status.Data.EnhancementData.ClassSynergy == classType)
+                    if (statusController.Status.Data.ClassSynergy == classType)
                     {
                         return target;
                     }
