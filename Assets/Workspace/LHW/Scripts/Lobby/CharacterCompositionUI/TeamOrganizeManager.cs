@@ -1,9 +1,11 @@
+using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class TeamPresetData
@@ -286,6 +288,18 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             _presetAddButton[i].buttonText = $"{(i + 3)}";
             _presetAddButton[i].UpdateUI();
+        }
+
+        for(int i = 0; i < _presetAddButton.Length; i++)
+        {
+            if(i <= TempDataManager.Instance.PresetData.Count- 2)
+            {
+                _presetAddButton[i].GetComponent<Button>().interactable = true;
+            }
+            else
+            {
+                _presetAddButton[i].GetComponent<Button>().interactable = false;
+            }
         }
     }
 
