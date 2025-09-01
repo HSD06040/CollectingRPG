@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [Header("Test")]
+    public bool IsTest;
+
     [Header("BattleManager")]
     [SerializeField] BattleManager _battleManager;
 
@@ -18,13 +21,15 @@ public class UnitManager : MonoBehaviour
     [SerializeField] UnitData[] _unitDatas;
     [SerializeField] int _upgradeNeedCount = 3;
     [SerializeField] int _spawnGold = 20;
-
+    
     private void Awake()
     {
         Utils.Initialize();
-        CsvDownloader.OnDataSetupCompleted += Init;
 
-        //Init();
+        if(IsTest)
+            CsvDownloader.OnDataSetupCompleted += Init;
+        else
+            Init();
     }
 
     private void Init()
