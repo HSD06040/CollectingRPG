@@ -9,10 +9,23 @@ public class RandomGachaSystem : MonoBehaviour
     [SerializeField] private ItemProbabilitySO _prob;
     [SerializeField] private GachaResultUI _resultUI;
 
-    [Header("UI")]
-    [SerializeField] private Button _dailyButton;
-    [SerializeField] private Button _oneGachaButton;
-    [SerializeField] private Button _tenGachaButton;
+    [Header("GachaListUIButton")]
+    [SerializeField] private Button _characterGachaButton;
+    [SerializeField] private Button _stoneGachaButton;
+
+    [Header("GachaListUI")]
+    [SerializeField] private GameObject _characterGacha;
+    [SerializeField] private GameObject _stoneGacha;
+
+    [Header("CharacterGachaUI")]
+    [SerializeField] private Button _dailyCharacterGachaButton;
+    [SerializeField] private Button _oneCharacterGachaButton;
+    [SerializeField] private Button _tenCharacterGachaButton;
+
+    [Header("MagicStoneGachaUI")]
+    [SerializeField] private Button _dailyStoneButton;
+    [SerializeField] private Button _oneStoneGachaButton;
+    [SerializeField] private Button _tenStoneGachaButton;
 
     // 확률 소수점 자릿수
     [Header("ProbOffset")]
@@ -22,10 +35,19 @@ public class RandomGachaSystem : MonoBehaviour
 
     private void Awake()
     {
+        Init();
+    }
+
+    private void Init()
+    {
         RandomInit(_prob);
-        _dailyButton.onClick.AddListener(AdButtonClick);
-        _oneGachaButton.onClick.AddListener(OneButtonClick);
-        _tenGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(10));
+
+        _characterGachaButton.onClick.AddListener(() => SetActivePanel("CharacterGacha"));
+        _stoneGachaButton.onClick.AddListener(() => SetActivePanel("MagicStoneGacha"));
+
+        _dailyCharacterGachaButton.onClick.AddListener(AdButtonClick);
+        _oneCharacterGachaButton.onClick.AddListener(OneButtonClick);
+        _tenCharacterGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(10));
     }
 
     private void RandomInit(ItemProbabilitySO probability)
@@ -38,19 +60,19 @@ public class RandomGachaSystem : MonoBehaviour
         }
     }
 
-    // 확률 변동 없는 캐릭터 뽑기
-    private UnitData ReturnData()
+    #region Button Click Event
+
+    #region GachaListButton
+
+    private void SetActivePanel(string activePanel)
     {
-        Grade grade = _gradeRandom.GetRandomItem();
-        return _data.GetRandomUnitByGrade(grade);
+        _characterGacha.SetActive(activePanel.Equals(_characterGacha.name));
+        _stoneGacha.SetActive(activePanel.Equals(_stoneGacha.name));
     }
 
-    // 확률 변동 있는 캐릭터 뽑기
-    private UnitData ReturnDataBySub()
-    {
-        Grade grade = _gradeRandom.GetRandomItemBySub();
-        return _data.GetRandomUnitByGrade(grade);
-    }
+    #endregion
+
+    #region CharacterGachaButton
 
     private void AdButtonClick()
     {
@@ -60,6 +82,18 @@ public class RandomGachaSystem : MonoBehaviour
         {
             PopupManager.instance.ShowPopup("일일 광고 가챠를 전부 사용하였습니다.");
         }
+    }
+    private bool DailyAdGacha()
+    {
+        if (TimeManager.Instance.CanObtainAdGachaReward())
+        {
+            TimeManager.Instance.SaveAdGachaResetTimeInfo();
+            ItemSelect(1);
+            TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
+            return true;
+        }
+
+        return false;
     }
 
     private void OneButtonClick()
@@ -85,20 +119,7 @@ public class RandomGachaSystem : MonoBehaviour
             return true;
         }
         return false;
-    }
-
-    private bool DailyAdGacha()
-    {
-        if(TimeManager.Instance.CanObtainAdGachaReward())
-        {
-            TimeManager.Instance.SaveAdGachaResetTimeInfo();
-            ItemSelect(1);
-            TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
-            return true;
-        }
-
-        return false;
-    }
+    }    
 
     private void ConsumeGoodsButtonClick(int number)
     {
@@ -106,6 +127,12 @@ public class RandomGachaSystem : MonoBehaviour
 
         ItemSelect(number);
     }
+
+    #endregion
+
+    #endregion
+
+    #region 가중치 확률 선택
 
     // 확률 변동이 없는 가중치 확률
     private void ItemSelect(int number)
@@ -121,6 +148,14 @@ public class RandomGachaSystem : MonoBehaviour
         _resultUI.gameObject.SetActive(true);
     }
 
+    // 확률 변동 없는 캐릭터 뽑기
+    private UnitData ReturnData()
+    {
+        Grade grade = _gradeRandom.GetRandomItem();
+        return _data.GetRandomUnitByGrade(grade);
+    }
+
+
     // 천장이 있는 가중치 확률
     private void ItemSelectBySub(int number)
     {
@@ -131,4 +166,13 @@ public class RandomGachaSystem : MonoBehaviour
             ReturnDataBySub();
         }
     }
+
+    // 확률 변동 있는 캐릭터 뽑기
+    private UnitData ReturnDataBySub()
+    {
+        Grade grade = _gradeRandom.GetRandomItemBySub();
+        return _data.GetRandomUnitByGrade(grade);
+    }
+
+    #endregion
 }
