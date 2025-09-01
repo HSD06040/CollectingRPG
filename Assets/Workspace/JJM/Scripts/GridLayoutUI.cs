@@ -15,7 +15,13 @@ public class GridLayoutUI : MonoBehaviour
     public int columns = 10; // 한 줄에 몇 개
 
     [Min(0)]
-    public float spacing = 10f; // 셀 간격
+    public float spacingX = 10f; // 가로 간격
+    [Min(0)]
+    public float spacingY = 10f; // 세로 간격
+
+    [Header("Cell 비율 설정")]
+    public float baseCellWidth = 250f;  // 기준 셀 가로
+    public float baseCellHeight = 100f; // 기준 셀 세로
 
     private GridLayoutGroup grid;
     void Awake()
@@ -45,7 +51,7 @@ public class GridLayoutUI : MonoBehaviour
     {
         if (grid != null)
         {
-            grid.spacing = new Vector2(spacing, spacing);
+            grid.spacing = new Vector2(spacingX, spacingY);
         }
     }
 
@@ -56,11 +62,15 @@ public class GridLayoutUI : MonoBehaviour
     {
         if (grid == null) grid = GetComponent<GridLayoutGroup>();
         var rect = GetComponent<RectTransform>().rect;
-        float totalSpacing = (columns - 1) * grid.spacing.x;
-        float cellWidth = (rect.width - totalSpacing - grid.padding.left - grid.padding.right) / columns;
-        grid.cellSize = new Vector2(cellWidth, cellWidth); // 정사각형 셀
-    }
+        float totalSpacingX = (columns - 1) * grid.spacing.x;
+        float cellWidth = (rect.width - totalSpacingX - grid.padding.left - grid.padding.right) / columns;
 
+        // 비율 유지: baseCellWidth:baseCellHeight 비율로 세로 크기 계산
+        float ratio = baseCellHeight / baseCellWidth;
+        float cellHeight = cellWidth * ratio;
+
+        grid.cellSize = new Vector2(cellWidth, cellHeight);
+    }
     /// <summary>
     /// RectTransform의 크기가 변경될 때마다 셀 크기 재계산
     /// </summary>
