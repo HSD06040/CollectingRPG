@@ -9,7 +9,7 @@ public class CsvDownloader
 {
     private CsvLoadData _csvLoadData;
 
-    public event Action OnDataSetupCompleted;
+    public static event Action OnDataSetupCompleted;
 
     public CsvDownloader(CsvLoadData csvLoadData)
     {
@@ -86,7 +86,7 @@ public class CsvDownloader
 
             int id = int.Parse(row[0]);
             UnitData unitData = Array.Find(unitDatas, u => u.ID == id);
-
+            Debug.Log($"Setting up UnitData ID: {id}");
             if (unitData == null)
             {
                 Debug.LogWarning($"UnitData with ID {id} not found.");

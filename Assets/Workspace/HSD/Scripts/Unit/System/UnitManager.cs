@@ -15,14 +15,16 @@ public class UnitManager : MonoBehaviour
     public EnemyController _enemyController;
 
     [Header("Data")]
-    [SerializeField] UnitData[] _testDatas;
+    [SerializeField] UnitData[] _unitDatas;
     [SerializeField] int _upgradeNeedCount = 3;
     [SerializeField] int _spawnGold = 20;
 
     private void Awake()
     {
         Utils.Initialize();
-        Init();
+        CsvDownloader.OnDataSetupCompleted += Init;
+
+        //Init();
     }
 
     private void Init()
@@ -30,12 +32,15 @@ public class UnitManager : MonoBehaviour
         _unitController.Init();
         _unitStanbyUIManager.Init();
 
+        _unitDatas = Manager.Data.UnitDatas;
+
         Subscribe();
+
         //_unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
         //_unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
 
-        _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
-        _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
+        _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
+        _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
                        
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
 
@@ -125,7 +130,7 @@ public class UnitManager : MonoBehaviour
             return;
         }
 
-        UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
+        UnitData unit = _unitDatas[Random.Range(0, _unitDatas.Length)];
         UnitStatus unitStatus = new UnitStatus(unit);
 
         AddSlotUnit(unitStatus);

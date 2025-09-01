@@ -34,7 +34,7 @@ public class LobbySynergyController : MonoBehaviour
 
     private void InitializeSynergySlots()
     {
-        foreach (var data in SynergyController.SynergyDB._synergyDataDic.Values)
+        foreach (var data in Manager.Data.SynergyDB._synergyDataDic.Values)
         {
             if (data is ClassSynergyData classSynergy)
             {

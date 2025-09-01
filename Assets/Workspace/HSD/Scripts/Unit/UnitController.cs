@@ -337,7 +337,7 @@ public class UnitController : MonoBehaviour
 
     private void CheckSynergy(int synergyIdx, int synergyCount)
     {
-        SynergyData synergy = SynergyController.SynergyDB.GetSynergy(synergyIdx);
+        SynergyData synergy = Manager.Data.SynergyDB.GetSynergy(synergyIdx);
 
         if (synergy == null) return;
 
@@ -346,8 +346,8 @@ public class UnitController : MonoBehaviour
 
     private void CheckSynergy(UnitBase unit)
     {
-        SynergyData synergy = SynergyController.SynergyDB.GetSynergy((int)unit.Status.Data.Synergy);
-        SynergyData classSynergy = SynergyController.SynergyDB.GetSynergy((int)unit.Status.Data.ClassSynergy);
+        SynergyData synergy = Manager.Data.SynergyDB.GetSynergy((int)unit.Status.Data.Synergy);
+        SynergyData classSynergy = Manager.Data.SynergyDB.GetSynergy((int)unit.Status.Data.ClassSynergy);
 
         if (synergy == null) return;
 
