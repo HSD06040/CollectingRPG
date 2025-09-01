@@ -36,9 +36,6 @@ public class UnitManager : MonoBehaviour
 
         Subscribe();
 
-        //_unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
-        //_unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
-
         _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
         _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
                        
@@ -51,7 +48,7 @@ public class UnitManager : MonoBehaviour
         {
             if(preset.Statuses[i].Data != null)
             {
-                AddSlotUnit(preset.Statuses[i]);
+                AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
             }
         }
     }
@@ -124,6 +121,14 @@ public class UnitManager : MonoBehaviour
 
     public void RandomSpawn()
     {
+        int slotIdx = _unitSlotController.GetEmptySlot();
+
+        if (slotIdx == -1)
+        {
+            Debug.Log("슬롯이 부족합니다.");
+            return;
+        }
+
         if (!InGameManager.Instance.SpendGold(_spawnGold))
         {
             Debug.Log("골드가 부족합니다.");
@@ -133,19 +138,11 @@ public class UnitManager : MonoBehaviour
         UnitData unit = _unitDatas[Random.Range(0, _unitDatas.Length)];
         UnitStatus unitStatus = new UnitStatus(unit);
 
-        AddSlotUnit(unitStatus);
+        AddSlotUnit(unitStatus, slotIdx);
     }
 
-    public void AddSlotUnit(UnitStatus unit)
+    public void AddSlotUnit(UnitStatus unit, int slotIdx)
     {
-        int slotIdx = _unitSlotController.GetEmptySlot();
-
-        if (slotIdx == -1)
-        {
-            Debug.Log("슬롯이 부족합니다.");
-            return;
-        }
-
         SetSlot(unit, slotIdx);
     }
 

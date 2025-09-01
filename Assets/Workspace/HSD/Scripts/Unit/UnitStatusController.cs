@@ -189,7 +189,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void IncreaseHealth(int amount)
     {
-        Debug.Log($"IncreaseHealth: {amount}");
         CurHp.Value = Mathf.Clamp(CurHp.Value + amount, 0, MaxHealth.Value);
     }
 
@@ -254,7 +253,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void AddStat(StatType statType, float value, string source)
     {
-        Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
+        //Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
         switch (statType)
         {
             case StatType.MaxHealth:
