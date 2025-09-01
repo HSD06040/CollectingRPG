@@ -66,14 +66,15 @@ public class TeamOrganizeManager : MonoBehaviour
         _currentPreset = _presetData[0].Statuses;
         */
 
-        _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
+        
     }    
     private void Start()
     {
+        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
         ShowLeaderEffectInfo();
-        ShowCharacterCountInfo();
+        ShowCharacterCountInfo();        
     }    
 
     #region Event
@@ -284,6 +285,8 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowButtonPreset()
     {
+        if (TempDataManager.Instance == null) return;
+
         for(int i = 0; i < TempDataManager.Instance.PresetData.Count - 2; i++)
         {
             _presetAddButton[i].buttonText = $"{(i + 3)}";

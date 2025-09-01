@@ -83,13 +83,18 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void UIUpdate()
     {
+
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost - 1];
-        _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
-        _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
+        if (Manager.Data != null)
+        {
+            _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
+            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
+        }
         _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
+
     }
 
     #endregion

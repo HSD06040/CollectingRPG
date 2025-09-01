@@ -51,7 +51,10 @@ public class SelectedCharacterUnit : MonoBehaviour
 
     private void UIUpdate()
     {
-        _status = _manager.GetCurrentPresetData(_index);
+        if (_manager != null)
+        {
+            _status = _manager.GetCurrentPresetData(_index);
+        }
 
         if (_manager == null || _status == null || _status.Data == null)
         {
