@@ -300,7 +300,7 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             if (PopupManager.Instance != null)
             {
-                PopupManager.instance.ShowPopup("Leader is not added.\nPlease add.");
+                PopupManager.instance.ShowPopup("리더 캐릭터를 추가해주세요.");
             }
 
             return;
@@ -313,7 +313,7 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             if (PopupManager.Instance != null)
             {
-                PopupManager.instance.ShowConfirmationPopup("Add Preset?\nConsumes 500 Gold.", () => CreatePreset(index), null);
+                PopupManager.instance.ShowConfirmationPopup("프리셋을 추가하시겠습니까?\n500 골드 소모", () => CreatePreset(index), null);
             }
         }
         else
