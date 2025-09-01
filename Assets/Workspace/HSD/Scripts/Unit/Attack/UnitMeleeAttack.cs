@@ -23,7 +23,6 @@ public class UnitMeleeAttack : UnitAttackData
             SearchType.Circle, SizeOrRadius, BoxSize, Angle, status.AttackCount.Value, attacker.TargetLayer
             ))
         {
-            Debug.Log($"Melee Attack {obj.name}");
             status.CalculateDamage(AttackPower, DamageType, ComponentProvider.Get<UnitStatusController>(obj));
         }
 

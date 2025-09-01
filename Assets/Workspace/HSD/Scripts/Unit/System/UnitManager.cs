@@ -105,13 +105,14 @@ public class UnitManager : MonoBehaviour
         
         FightUISetup();
         _battleManager.BattleStart();
+        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
 
     public void GameEndedUnitStandby()
     {
         _unitController.UnitsStanby();
         _enemyController.EnemyStanby();
-        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
+        
     }
 
     private void FightUISetup()
