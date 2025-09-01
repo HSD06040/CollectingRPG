@@ -112,6 +112,7 @@ public class CsvDownloader
                 MaxHealth = int.TryParse(row[15], out int hp) ? hp : 0,
                 MaxMana = int.TryParse(row[16], out int mp) ? mp : 0,
                 MoveSpeed = 1.5f,
+                AttackCount = 1
             };
 
             unitData.UnitStats = new UnitStats[4];
