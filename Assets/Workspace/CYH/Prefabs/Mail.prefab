@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5025573243587758588}
   - component: {fileID: 1448733070628660308}
   - component: {fileID: 7478215947280260773}
+  - component: {fileID: 2812773318701704095}
   m_Layer: 5
   m_Name: Mail
   m_TagString: Untagged
@@ -126,6 +127,29 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2812773318701704095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 649065563765078761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79247e1d35794564b8d229440bb71d8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _rewardImage: {fileID: 2875778399704367071}
+  _goldSprite: {fileID: 21300000, guid: 8d3568442d30643e69d9e34c1c2834eb, type: 3}
+  _diamondSprite: {fileID: 21300000, guid: e8d70a7650e2346e5a52d7d2769aca54, type: 3}
+  _rewardText: {fileID: 1858187077638730362}
+  _titleText: {fileID: 4031801305081367875}
+  _bodyText: {fileID: 4273224865692358361}
+  _receiveButton: {fileID: 601985965267314515}
+  _receiveText: {fileID: 7728627526199476833}
+  _expireDateText: {fileID: 3485408960051513587}
+  _timeBoxImage: {fileID: 8183586088333057708}
+  _badgeImage: {fileID: 4370235664071175329}
 --- !u!1 &1918904015413156393
 GameObject:
   m_ObjectHideFlags: 0
@@ -727,7 +751,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 109.19106, y: -30}
-  m_SizeDelta: {x: 71.2, y: 56}
+  m_SizeDelta: {x: 200, y: 56}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &1518571038218959874
 CanvasRenderer:
@@ -995,7 +1019,7 @@ GameObject:
   - component: {fileID: 7024532978786979500}
   - component: {fileID: 5143030736017448290}
   m_Layer: 5
-  m_Name: Image
+  m_Name: BadgeImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,8 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using System;
 
-public class MailData : MonoBehaviour
+[Serializable]
+public class MailData
 {
-  
+    public string MailId;
+    public string Title;
+    public string Body;
+    public int Gold;
+    public int Diamond;
+    public long ReceivedDate;   
+    public long ExpireDate;     
+    public bool IsReceived;
+
+    public bool IsExpired(long currentTime)
+    {
+        return ExpireDate > 0 && ExpireDate <= currentTime;
+    }
 }

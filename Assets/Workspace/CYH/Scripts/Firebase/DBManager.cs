@@ -3,6 +3,7 @@ using Firebase.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 
 public class DBManager : Singleton<DBManager>
@@ -484,15 +485,14 @@ public class DBManager : Singleton<DBManager>
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
 
         // 1) User메일 DB에서 이미 있는 mailId 체크
-        DataSnapshot userMailSnapShot = await FirebaseDatabase.DefaultInstance.GetReference($"UserData/{uid}/MailData").GetValueAsync();
-
-        List<string> existingId = new List<string>();
+        DataSnapshot userMailSnapShot = await FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").GetValueAsync();
+        List<string> existingIdList = new List<string>();
         if (userMailSnapShot.Exists)
         {
             foreach (var child in userMailSnapShot.Children)
             {
-                existingId.Add(child.Key);
-                Debug.Log($"이미 유저가 가지고 있는 메일ID : Mail_{child.Key}");
+                existingIdList.Add(child.Key);
+                Debug.Log($"현재 유저가 가지고 있는 메일ID : Mail_{child.Key}");
             }
         }
 
@@ -501,45 +501,37 @@ public class DBManager : Singleton<DBManager>
 
         DataSnapshot snapShot = await sentMail.GetValueAsync();
 
-        // 3) ExpireDate > currentTime 값이 0보다 큰 메일만 필터링
+        // 3) ExpireDate > currentTime 값이 큰 메일만 필터링
         long currentTime = await Manager.DB.LoadSeverTimeAsync();
-        Debug.Log($"Init : currentTime {currentTime}");
 
         foreach (var mail in snapShot.Children)
         {
             string mailId = mail.Key;
 
             // 이미 유저가 있는 메일 -> 스킵
-            if (existingId.Contains(mailId))
+            if (existingIdList.Contains(mailId))
             {
-                Debug.Log($"유저 DB에 Mail_{mailId} 존재");
+                Debug.Log($"유저 DB에 Mail_{mailId} 존재 / 저장 스킵");
                 continue;
             }
 
             string expireDateStr = mail.Child("ExpireDate").Value?.ToString();
-            Debug.Log($"expireDateStr : {expireDateStr}");
 
-            // 1. 타입 변환: string -> DateTime 
+            // 타입 변환 1.string -> DateTime   2. DateTime -> UnixTimeMillis(long)
             DateTime expireDateDT = DateTime.Parse(expireDateStr);
-            Debug.Log($"ExpireDateDT : {expireDateDT}");
-
-            // 2. 타입 변환: DateTime -> UnixTimeMillis(long)
             long expireDate = new DateTimeOffset(expireDateDT).ToUnixTimeMilliseconds();
-            Debug.Log($"ExpireDate : {expireDate}");
 
             // 3. 서버 현재시간과 비교
             if (expireDate > currentTime)
             {
                 Debug.Log($"우편_ {mail.Key} 사용 가능 (SendDate = {expireDateStr}/{expireDate}, currentTime = {currentTime})");
 
-                //TODO: [CYH] Userdata-Uid-MailData에 해당 메일의 id 저장
-                DatabaseReference userMailRef = FirebaseDatabase.DefaultInstance.GetReference($"UserData/{uid}/MailData/{mail.Key}");
+                DatabaseReference userMailRef = FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mail.Key);
                 await userMailRef.SetValueAsync(true);
 
                 await userMailRef.SetValueAsync(new Dictionary<string, object>
                 {
-                    ["ReceivedDate "] = currentTime,
-                    ["IsRead"] = "false",
+                    ["ReceivedDate"] = currentTime,
                     ["IsReceived"] = "false"
                 });
             }
@@ -550,16 +542,114 @@ public class DBManager : Singleton<DBManager>
         }
     }
 
+    /// <summary>
+    /// 유저 MailData-MailID를 로드하는 메서드 
+    /// 각 메일의 MasterMail과 매칭해 MailData 리스트 생성
+    /// </summary>
+    /// <returns>유저가 가진 메일 정보를 담은 MailData 리스트</returns>
+    public async Task<List<MailData>> LoadUserMailsAsync()
+    {
+        Debug.Log("[DBManager] LoadUserMailsAsync 실행");
 
-    //public async void SetReceivedTimeAsync(int mailId)
-    //{
-    //    string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
 
-    //    var snapShot = await FirebaseManager.DataReference.Child("UserData").Child("uid").Child($"{mailId}").Child("ReceivedDate")
-    //        .GetValueAsync();
-    //    long rewardTime = snapShot.Exists ? long.Parse(snapShot.Value.ToString()) : 0;
-    //    DateTime lastRewardTime = DateTimeOffset.FromUnixTimeMilliseconds(rewardTime).UtcDateTime;
-    //}
+        List<MailData> userMailList = new List<MailData>();
+
+        // 1) 유저 MailData snapshot
+        DataSnapshot userSnapShot = await FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").GetValueAsync();
+        
+        // 유저 메일 존재x -> 빈 리스트 반환
+        if (!userSnapShot.Exists) return userMailList;
+
+        // 유저 메일 DB - MailId 리스트 
+        List<string> userMailIdList = new List<string>();
+        
+        foreach (var child in userSnapShot.Children)
+        {
+            userMailIdList.Add(child.Key);
+        }
+
+        // 2) 각 MailId의 MasterMail 로드
+        List<Task<DataSnapshot>> masterMailList = new List<Task<DataSnapshot>>(userMailIdList.Count);
+
+        foreach (var id in userMailIdList)
+        {
+            masterMailList.Add(FirebaseDatabase.DefaultInstance.RootReference.Child("MailBox").Child("MailData").Child(id).GetValueAsync());
+        }
+        DataSnapshot[] masterSnapShot = await Task.WhenAll(masterMailList);
+
+        // 3) 유저가 가진 MailId - MasterMail snapshot 매칭
+        Dictionary<string, DataSnapshot> userMailDict = new Dictionary<string, DataSnapshot>(userMailIdList.Count);
+        for (int i = 0; i < userMailIdList.Count; i++)
+        {
+            // 같은 id끼리 매칭
+            userMailDict[userMailIdList[i]] = masterSnapShot[i];
+        }
+
+        // 4) 유저 메일 정보 + MasterMail -> MailData List 생성
+        foreach (var child in userSnapShot.Children)
+        {
+            string mailId = child.Key;
+            userMailDict.TryGetValue(mailId, out var masterMail);
+
+            // --- User mail ---
+            long receivedDate = 0;
+            long.TryParse(child.Child("ReceivedDate").Value?.ToString(), out receivedDate);
+
+            bool isReceived = false;
+            bool.TryParse(child.Child("IsReceived").Value?.ToString(), out isReceived);
+
+            // --- Master mail ---
+            string title = masterMail?.Child("Title").Value?.ToString() ?? "LoadFailed";
+            string body = masterMail?.Child("Body").Value?.ToString() ?? "LoadFailed";
+
+            int gold = 0;
+            int.TryParse(masterMail?.Child("Gold").Value?.ToString(), out gold);
+
+            int diamond = 0;
+            int.TryParse(masterMail.Child("Diamond").Value?.ToString(), out diamond); 
+
+            // DateTime ExpireDate -> long
+            long expireDate = 0;
+            string expireDateStr = masterMail?.Child("ExpireDate").Value?.ToString();
+            if (!string.IsNullOrEmpty(expireDateStr))
+            {
+                if (DateTime.TryParse(expireDateStr, out var dateTime))
+                {
+                    expireDate = new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();
+                }
+            }
+
+            userMailList.Add(new MailData
+            {
+                MailId = mailId,
+                Title = title,
+                Body = body,
+                Gold = gold,
+                Diamond = diamond,
+                ReceivedDate = receivedDate,
+                ExpireDate = expireDate,
+                IsReceived = isReceived
+            });
+        }
+
+        Debug.Log("[DBManager] LoadUserMailsAsync 끝");
+        return userMailList;
+    }
+
+    // 보상 수령
+    public Task SetMailIsReceivedAsync(string mailId, bool value)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        return FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).Child("IsReceived").SetValueAsync(value);
+    }
+
+    // 메일 삭제
+    public Task DeleteMailAsync(string mailId)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        return FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).RemoveValueAsync();
+    }
 
     #endregion 
 }
