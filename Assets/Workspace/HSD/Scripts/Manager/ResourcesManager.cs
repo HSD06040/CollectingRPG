@@ -25,6 +25,22 @@ public class ResourcesManager : Singleton<ResourcesManager>
         Addressables.Release(locationsHandle);
     }
 
+    public async UniTask UnLoadLabel<T>(string label) where T : Object
+    {
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
+        var locations = await locationsHandle.Task;
+
+        foreach (var location in locations)
+        {
+            if (resources.ContainsKey(location.PrimaryKey))
+            {
+                Unload(location.PrimaryKey);
+            }            
+        }
+
+        Addressables.Release(locationsHandle);
+    }
+
     public async UniTask<T[]> LoadAll<T>(string label) where T : Object
     {
         var handle = Addressables.LoadAssetsAsync<T>(label, null);
@@ -35,21 +51,33 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public void Unload(string path)
     {
-        if (resources.ContainsKey(path))
+        if (resources.TryGetValue(path, out var asset))
         {
-            Resources.UnloadAsset(resources[path]);
+            Addressables.Release(asset);
             resources.Remove(path);
         }
     }
 
     public void UnloadAll()
     {
-        
+        foreach (var kvp in resources)
+        {
+            Addressables.Release(kvp.Value);
+        }
+        resources.Clear();
     }
 
-    public T Load<T> (string path) where T : Object
+    public async UniTask<T> Load<T> (string path) where T : Object
     {
-        return resources.ContainsKey(path) ? resources[path] as T : null;
+        if(!resources.ContainsKey(path))
+        {
+            var handle = Addressables.LoadAssetAsync<T>(path);
+            var asset = await handle.Task;
+
+            resources.Add(path, asset);
+        }
+
+        return resources[path] as T;
     }
 
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
@@ -72,20 +100,20 @@ public class ResourcesManager : Singleton<ResourcesManager>
         return Instantiate(original, position, Quaternion.identity, null, isPool);
     }
 
-    public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
+    public async UniTask<T> Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
-        T obj = Load<T>(path);
+        T obj = await Load<T>(path);
         return Instantiate(obj, position, rotation, parent, isPool);
     }
 
-    public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
+    public async UniTask<T> Instantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
     {
-        return Instantiate<T>(path, position, rotation, null, isPool);
+        return await Instantiate<T>(path, position, rotation, null, isPool);
     }
 
-    public T Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
+    public async UniTask<T> Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
     {
-        return Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
+        return await Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
     }
 
     public void Destroy(GameObject obj)

@@ -66,7 +66,6 @@ public class BattleUnitManager : MonoBehaviour
     public void SetSlot(UnitSlot slot, UnitBase unit)
     {
         slot.SetUnit(unit);
-
         _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1] = unit;
     }
 

@@ -64,6 +64,10 @@ public class UI_UnitSlotController : MonoBehaviour
         RemoveCahchedArray(idx);
     }
 
+    /// <summary>
+    /// 빈 슬롯의 인덱스를 반환합니다. 없으면 -1 반환
+    /// </summary>
+    /// <returns></returns>
     public int GetEmptySlot()
     {
         for (int i = 0; i < _unitSlots.Length; i++)

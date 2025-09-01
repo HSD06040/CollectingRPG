@@ -95,7 +95,7 @@ public class CsvDownloader
 
             unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.Normal;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
-            unitData.PerferredLine = int.TryParse(row[2], out int line) ? line : 0;
+            unitData.PerferredLine = int.TryParse(row[3], out int line) ? line : 0;
             unitData.ClassSynergy = Enum.TryParse(row[4], out ClassType classSynergy) ? classSynergy : ClassType.Tank;
             unitData.Synergy = Enum.TryParse(row[5], out Synergy synergy) ? synergy : Synergy.KingdomGuard;
 
@@ -110,7 +110,8 @@ public class CsvDownloader
                 MagicDefense = int.TryParse(row[13], out int magicDefense) ? magicDefense : 0,
                 CritChance = int.TryParse(row[14], out int critRate) ? critRate : 0,
                 MaxHealth = int.TryParse(row[15], out int hp) ? hp : 0,
-                MaxMana = int.TryParse(row[16], out int mp) ? mp : 0
+                MaxMana = int.TryParse(row[16], out int mp) ? mp : 0,
+                MoveSpeed = 1.5f,
             };
 
             unitData.UnitStats = new UnitStats[4];

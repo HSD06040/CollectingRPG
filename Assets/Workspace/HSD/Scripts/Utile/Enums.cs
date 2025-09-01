@@ -112,6 +112,12 @@ public enum CsvType
     Skill,
 }
 
+public enum AutoUnitType
+{
+    Unit,
+    Slot
+}
+
 public enum Priority
 {
     None,
