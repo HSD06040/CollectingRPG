@@ -100,44 +100,50 @@ public class GachaUIController : MonoBehaviour
 
     private void UpdateAdButton()
     {
-        switch (TimeManager.Instance.DailyAdGachaRewardInfo.state)
+        if (TimeManager.Instance != null)
         {
-            case 2:
-                _adImages[0].color = Color.white;
-                _adImages[1].color = Color.white;
-                _adCooltimeImage.gameObject.SetActive(false);
-                break;
+            switch (TimeManager.Instance.DailyAdGachaRewardInfo.state)
+            {
+                case 2:
+                    _adImages[0].color = Color.white;
+                    _adImages[1].color = Color.white;
+                    _adCooltimeImage.gameObject.SetActive(false);
+                    break;
 
-            case 1:
-                _adImages[0].color = Color.grey;
-                _adImages[1].color = Color.white;
-                _adCooltimeImage.gameObject.SetActive(true);
-                break;
-            case 0:
-                _adImages[0].color = Color.grey;
-                _adImages[1].color = Color.grey;
-                _adCooltimeImage.gameObject.SetActive(true);
-                break;
-            default:
-                break;
+                case 1:
+                    _adImages[0].color = Color.grey;
+                    _adImages[1].color = Color.white;
+                    _adCooltimeImage.gameObject.SetActive(true);
+                    break;
+                case 0:
+                    _adImages[0].color = Color.grey;
+                    _adImages[1].color = Color.grey;
+                    _adCooltimeImage.gameObject.SetActive(true);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     private void UpdateOneButton()
     {
-        if (TimeManager.Instance.DailyFreeGachaRewardInfo.state == 1)
+        if (TimeManager.Instance != null)
         {
-            _freeGacha.SetActive(true);
-            _consumeGacha.SetActive(false);
-            _dailyCooltimeImage.gameObject.SetActive(false);
-            _oneText.text = "일일 모집";
-        }
-        else
-        {
-            _freeGacha.SetActive(false);
-            _consumeGacha.SetActive(true);
-            _dailyCooltimeImage.gameObject.SetActive(true);
-            _oneText.text = "1회 모집";
+            if (TimeManager.Instance.DailyFreeGachaRewardInfo.state == 1)
+            {
+                _freeGacha.SetActive(true);
+                _consumeGacha.SetActive(false);
+                _dailyCooltimeImage.gameObject.SetActive(false);
+                _oneText.text = "일일 모집";
+            }
+            else
+            {
+                _freeGacha.SetActive(false);
+                _consumeGacha.SetActive(true);
+                _dailyCooltimeImage.gameObject.SetActive(true);
+                _oneText.text = "1회 모집";
+            }
         }
     }
 
