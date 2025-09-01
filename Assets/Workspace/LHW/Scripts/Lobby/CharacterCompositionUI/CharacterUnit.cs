@@ -118,8 +118,8 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost-1];
-        _jobSynergyImg.sprite = SynergyController.SynergyDB.GetSynergy((int)_status.Data.EnhancementData.Synergy).Icon;
-        _roleSynergyImg.sprite = SynergyController.SynergyDB.GetSynergy((int)_status.Data.EnhancementData.ClassSynergy).Icon;
+        _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
+        _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).Icon;
         _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
     }

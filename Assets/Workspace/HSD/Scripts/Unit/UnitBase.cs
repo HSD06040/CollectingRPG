@@ -62,11 +62,11 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
     #endregion
 
-    public void Init()
+    public void Init(UnitStats plusUnitStat = null)
     {  
         Col.enabled = true;
 
-        StatusController.Init(Status);
+        StatusController.Init(Status, plusUnitStat);
     }
 
     public void SetBattleUnit()

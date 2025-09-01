@@ -26,6 +26,11 @@ public class UI_UnitSlotController : MonoBehaviour
         UI_UnitSlot.OnUnitChanged += SetSlot;
     }
 
+    private void OnDestroy()
+    {
+        UI_UnitSlot.OnUnitChanged -= SetSlot;
+    }
+
     private void CreateSlots()
     {
         _unitSlots = new UI_UnitSlot[_slotCount];

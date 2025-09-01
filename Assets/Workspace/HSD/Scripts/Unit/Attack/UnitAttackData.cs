@@ -10,5 +10,8 @@ public abstract class UnitAttackData : ScriptableObject
     [Header("Offset")]
     public Vector2 AttackPointOffset;
 
-    public abstract void Attack(IAttacker attacker);
+    public virtual void Attack(IAttacker attacker)
+    {
+        attacker.GetStatusController().OnAttack?.Invoke();
+    }
 }

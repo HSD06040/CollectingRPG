@@ -384,9 +384,9 @@ public class TeamOrganizeManager : MonoBehaviour
         foreach(var unit in _currentPreset)
         {
             if(unit.Data == null) continue;
-            if(unit.Data.EnhancementData == null) continue;
+            if(unit.Data == null) continue;
 
-            ClassType classSynergy = unit.Data.EnhancementData.ClassSynergy;
+            ClassType classSynergy = unit.Data.ClassSynergy;
 
             if (!classSynergyCount.ContainsKey(classSynergy))
                 classSynergyCount[classSynergy] = 0;
@@ -405,9 +405,9 @@ public class TeamOrganizeManager : MonoBehaviour
         foreach (var unit in _currentPreset)
         {
             if (unit.Data == null) continue;
-            if (unit.Data.EnhancementData == null) continue;
+            if (unit.Data == null) continue;
 
-            Synergy synergy = unit.Data.EnhancementData.Synergy;
+            Synergy synergy = unit.Data.Synergy;
 
             if (!synergyCounts.ContainsKey(synergy))
                 synergyCounts[synergy] = 0;

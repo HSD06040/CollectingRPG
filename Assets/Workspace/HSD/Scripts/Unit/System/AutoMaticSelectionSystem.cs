@@ -16,8 +16,8 @@ public class AutoMaticSelectionSystem : MonoBehaviour
         {
             if (battleUnit != null)
             {
-                if (_unitManager._unitController._uiSlotController.GetEmptySlot() != -1)
-                    break;
+                if (_unitManager._unitController._uiSlotController.GetEmptySlot() == -1)
+                    break;                
 
                 sortedUnits.Add(battleUnit.Status);
                 _unitManager._unitController.RemoveUnit(battleUnit);
@@ -45,7 +45,7 @@ public class AutoMaticSelectionSystem : MonoBehaviour
         .Where(u => u.Data != null)
         .OrderByDescending(u => u.CombatPower)
         .ToList();
-
+        
         for (int i = 0; i < Mathf.Min(UnitController.UnitMaxCount, units.Count); i++)
         {
             int preferredLine = units[i].Data.PerferredLine;

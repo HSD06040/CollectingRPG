@@ -5,15 +5,10 @@ using UnityEngine;
 public class SynergyController : MonoBehaviour
 {
     private int[] _synergyCounts;
-
-    public static SynergyDatabase SynergyDB;    // 추후 싱글톤 적재예정
-
     public event Action<int, int> OnSynergyChanged;
 
     public void Init()
     {
-        SynergyDB = Resources.Load<SynergyDatabase>("Database/SynergyDatabase");
-        SynergyDB.Init();
         _synergyCounts = new int[(int)Synergy.Length];
     }
 

@@ -98,7 +98,7 @@ public class UnitDataEditorWindow : EditorWindow
             currentUnitData.Name = EditorGUILayout.TextField("Name", currentUnitData.Name);
             currentUnitData.Description = EditorGUILayout.TextArea(currentUnitData.Description, GUILayout.Height(60));
             currentUnitData.Cost = EditorGUILayout.IntField("Cost", currentUnitData.Cost);
-            currentUnitData.EnhancementData.UpgradeCount = EditorGUILayout.IntField("Upgrade Count", currentUnitData.EnhancementData.UpgradeCount);
+            currentUnitData.UpgradeCount = EditorGUILayout.IntField("Upgrade Count", currentUnitData.UpgradeCount);
             EditorGUI.indentLevel--;
             EditorGUILayout.Space(5);
         }
@@ -177,16 +177,6 @@ public class UnitDataEditorWindow : EditorWindow
             EditorGUILayout.Space(5);
         }
 
-        // Enhancement 섹션
-        showEnhancementSection = EditorGUILayout.Foldout(showEnhancementSection, "Player Enhancement", true, EditorStyles.foldoutHeader);
-        if (showEnhancementSection)
-        {
-            EditorGUI.indentLevel++;
-            currentUnitData.EnhancementData = (UnitEnhancementData)EditorGUILayout.ObjectField("Enhancement Data", currentUnitData.EnhancementData, typeof(UnitEnhancementData), false);
-            EditorGUI.indentLevel--;
-            EditorGUILayout.Space(5);
-        }
-
         EditorGUILayout.EndVertical();
 
         // 변경사항이 있으면 dirty 표시
@@ -234,7 +224,6 @@ public class UnitDataEditorWindow : EditorWindow
         EditorGUILayout.LabelField("Range", EditorStyles.boldLabel);
         stats.AttackRange = EditorGUILayout.IntField("Attack Range", stats.AttackRange);
         stats.AttackCount = EditorGUILayout.IntField("Attack Count", stats.AttackCount);
-        stats.AttackAreaType = (AttackAreaType)EditorGUILayout.EnumPopup("Attack Area Type", stats.AttackAreaType);
 
         EditorGUI.indentLevel--;
     }
@@ -254,8 +243,7 @@ public class UnitDataEditorWindow : EditorWindow
             PhysicalDefense = 5,
             MagicDefense = 5,
             AttackRange = 1,
-            AttackCount = 1,
-            AttackAreaType = AttackAreaType.Single
+            AttackCount = 1,    
         };
     }
 
@@ -273,7 +261,6 @@ public class UnitDataEditorWindow : EditorWindow
         target.MagicDefense = source.MagicDefense;
         target.AttackRange = source.AttackRange;
         target.AttackCount = source.AttackCount;
-        target.AttackAreaType = source.AttackAreaType;
     }
 
     private void DrawCreateSection()
@@ -502,10 +489,9 @@ public class UnitDataEditorWindow : EditorWindow
         target.Name = source.Name;
         target.Description = source.Description;
         target.Cost = source.Cost;
-        target.EnhancementData.UpgradeCount = source.EnhancementData.UpgradeCount;
+        target.UpgradeCount = source.UpgradeCount;
         target.Skill = source.Skill;
         target.AttackData = source.AttackData;
-        target.EnhancementData = source.EnhancementData;
 
         // UnitStats 배열 복사
         if (source.UnitStats != null)

@@ -59,7 +59,7 @@ public class GachaEffectController : MonoBehaviour
     {
         operIntroText.text = unitData.Description;
         operNameText.text = unitData.Name;
-        SetRole(unitData.EnhancementData != null ? unitData.EnhancementData.ClassSynergy : null);
+        SetRole(unitData != null ? unitData.ClassSynergy : null);
         OperIconSetting(unitData);
     }
 
