@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Diagnostics;
 using UnityEngine.AddressableAssets;
 
 public class DataManager : Singleton<DataManager>
@@ -21,8 +22,6 @@ public class DataManager : Singleton<DataManager>
         await PreLoadData();
 
         csvDownloader.DownloadDataAsync().Forget();
-
-        Manager.Resources.LoadLabel<UnitData>("UnitData").Forget();
     }
 
     private async UniTask PreLoadData()

@@ -25,8 +25,7 @@ public class CsvDownloader
 
         foreach (var csvData in _csvLoadData.CsvDatas)
         {
-            string url = csvData.URL;
-            tasks.Add(LoadCSV(url, GetSetupMethod(csvData.CsvType), csvData.StartLine));         
+            tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));         
         }
 
         await UniTask.WhenAll(tasks);
@@ -78,9 +77,50 @@ public class CsvDownloader
 
     private void UnitStatSetup(string[][] data)
     {
+        UnitData[] unitDatas = Manager.Data.UnitDatas;
+ 
         foreach (var row in data)
         {
-            
+            // No.	Grade	Cost	PreferredLine	Role	Faction	AttackRange	AttackType	AttackSpeed	ManaGain	PhysicalAttack	MagicAttack	PhysicalDefense	MagicDefense 	CritRate	HP	MP
+            // 10001	UNIQUE	4	1	TANK	KINGDOM	1	SINGLE	1	10	48	0(수정중)	76	68	0	1200	0
+
+            int id = int.Parse(row[0]);
+            UnitData unitData = Array.Find(unitDatas, u => u.ID == id);
+
+            if (unitData == null)
+            {
+                Debug.LogWarning($"UnitData with ID {id} not found.");
+                continue;
+            }
+
+            unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.Normal;                        
+            unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
+            unitData.PerferredLine = int.TryParse(row[2], out int line) ? line : 0;
+            unitData.ClassSynergy = Enum.TryParse(row[4], out ClassType classSynergy) ? classSynergy : ClassType.Tank;
+            unitData.Synergy = Enum.TryParse(row[5], out Synergy synergy) ? synergy : Synergy.KingdomGuard;
+
+            UnitStats stat = new UnitStats
+            {
+                AttackRange = int.TryParse(row[6], out int attackRange) ? attackRange : 1,
+                AttackSpeed = float.TryParse(row[8], out float attackSpeed) ? attackSpeed : 1f,
+                ManaGain = int.TryParse(row[9], out int manaGain) ? manaGain : 0,
+                PhysicalDamage = int.TryParse(row[10], out int physicalAttack) ? physicalAttack : 0,
+                MagicDamage = int.TryParse(row[11], out int magicAttack) ? magicAttack : 0,
+                PhysicalDefense = int.TryParse(row[12], out int physicalDefense) ? physicalDefense : 0,
+                MagicDefense = int.TryParse(row[13], out int magicDefense) ? magicDefense : 0,
+                CritChance = int.TryParse(row[14], out int critRate) ? critRate : 0,
+                MaxHealth = int.TryParse(row[15], out int hp) ? hp : 0,
+                MaxMana = int.TryParse(row[16], out int mp) ? mp : 0
+            };
+
+            unitData.UnitStats = new UnitStats[4];
+
+            unitData.UnitStats[0] = stat;
+            unitData.UnitStats[1] = stat;
+            unitData.UnitStats[2] = stat;
+            unitData.UnitStats[3] = stat;
+
+            unitData.Name = id.ToString(); // 임시
         }
-    }
+    }    
 }

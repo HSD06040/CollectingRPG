@@ -29,11 +29,35 @@ public struct BuffEffectData
 public struct CsvData
 {
     public CsvType CsvType;
-    [TextArea]
-    public string URL;
     public int StartLine;
+
+    [TextArea]
+    [SerializeField] string _url;
+
     [Header("예시 : A2:C12")]
-    public string Range;
+    [SerializeField] string range;
+
+    [SerializeField] int gid;
+
+    public string GetURL()
+    {
+        string baseUrl = _url;
+        
+        int editIndex = baseUrl.IndexOf("/edit");
+        if (editIndex > -1)
+        {
+            baseUrl = baseUrl.Substring(0, editIndex);
+        }
+
+        string result = "";
+
+        if(string.IsNullOrEmpty(range))
+            result = $"{baseUrl}/export?format=csv&gid={gid}";
+        else
+            result = $"{baseUrl}/export?format=csv&gid={gid}&range={range}";
+
+        return result;
+    }
 }
 
 public readonly struct SourceKey : IEquatable<SourceKey>
