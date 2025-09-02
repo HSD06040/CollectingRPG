@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -19,15 +20,15 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     [SerializeField] private Image _roleSynergyImg;
     [SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
+    [SerializeField] private Image _outlineImage;
 
     [Header("Reference")]
     [SerializeField] Sprite[] costSprites;
 
+    private UpgradeManager _manager;
 
     private bool _isCollected = true;
     public bool IsCollected => _isCollected;
-
-    private TeamOrganizeManager _manager;
 
     [SerializeField] private float _requiredPointerDownTime = 2f;
     private Coroutine _holdCoroutine;
@@ -35,6 +36,8 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     private void Awake()
     {
         DataInit();
+        GetComponent<Button>().onClick.AddListener(ShowPopUp);
+        _manager = GetComponentInParent<UpgradeManager>();
     }
 
     private void Start()
@@ -47,9 +50,23 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
         _status = new UnitStatus(_unitData, 1);
     }
 
+    private void OnEnable()
+    {
+        _manager.PopUpUI.OnCharacterStatusChanged += UIUpdate;
+    }
+
+    private void OnDisable()
+    {
+        _manager.PopUpUI.OnCharacterStatusChanged -= UIUpdate;
+    }
+
     #region Onclick
 
-    // 업그레이드 UI 띄우기
+    private void ShowPopUp()
+    {
+        _manager.ShowPopUp();
+        _manager.PopUpUI.GetCurrentCharacterUnitData(this);
+    }
 
     #endregion
 
@@ -83,7 +100,6 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void UIUpdate()
     {
-
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost - 1];
@@ -95,9 +111,43 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
         _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
 
+        OutlineUpdate();
+    }
+
+    private void OutlineUpdate()
+    {
+        if (_status.Level >= 3)
+        {
+            _outlineImage.gameObject.SetActive(true);
+            if(_status.Level >= 9)
+            {
+                _outlineImage.color = Color.red;
+                
+                
+            }
+            else if(_status.Level >= 6)
+            {
+                _outlineImage.color = Color.yellow;
+            }
+            else
+            {
+                _outlineImage.color = Color.blue;
+
+            }
+        }
+        else
+        {
+            _outlineImage.gameObject.SetActive(false);
+        }
     }
 
     #endregion
+
+    public void LevelUp()
+    {
+        if (_status.Level >= 12) return;
+        _status.Level++;        
+    }
 
     #region Data Input
 
