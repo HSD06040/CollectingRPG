@@ -64,7 +64,12 @@ public class PlayerMailBoxController : MonoBehaviour
         RefreshUI(loaded);
     }
 
-    public async void ReceiveReward(string mailId)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="mailId"></param>
+    /// <returns></returns>
+    public async Task ReceiveRewardAsync(string mailId)
     {
         MailData mail = _mail?.Find(m => m.MailId == mailId);
 
@@ -72,6 +77,7 @@ public class PlayerMailBoxController : MonoBehaviour
         {
             List<MailData> loadedMail = await LoadAsync();
             mail = loadedMail?.Find(m => m.MailId == mailId);
+
             if (mail == null)
             {
                 Debug.LogWarning($"[ReceiveReward] mail == null : {mailId}");
@@ -94,6 +100,33 @@ public class PlayerMailBoxController : MonoBehaviour
         DeleteMail(mailId);
     }
 
+    public async Task ReceiveAllAsync()
+    {
+        if (_mail == null || _mail.Count == 0) return;
+
+        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+        // 조건: 수령 안 했고, 만료도 안 된 메일만
+        List<MailData> unReceivedMailList = _mail.FindAll(m => !m.IsReceived && !m.IsExpired(currentTime));
+
+        if (unReceivedMailList.Count == 0)
+        {
+            Debug.Log("[ReceiveAllAsync] 받을 메일 없음");
+            return;
+        }
+
+        // 하나씩 순차 처리 (DB 이벤트/리스너 겹침 방지에 안전)
+        foreach (var mail in unReceivedMailList)
+        {
+            await ReceiveRewardAsync(mail.MailId);
+            // 필요시 프레임 양보
+            await Task.Yield();
+        }
+
+        // 마지막에 한 번만 새로고침
+        await RefreshAsync();
+    }
+
     /// <summary>
     /// 유저 메일 DB - mailId의 IsExpired = false로 변경하는 메서드
     /// </summary>
@@ -108,7 +141,7 @@ public class PlayerMailBoxController : MonoBehaviour
     /// 유저 메일 DB에서 해당 mailId를 삭제하는 메서드
     /// </summary>
     /// <param name="mailId">메일 ID</param>
-    public async void DeleteMail(string mailId)
+    public async Task DeleteMail(string mailId)
     {
         await Manager.DB.DeleteMailAsync(mailId);
     }

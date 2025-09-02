@@ -39,7 +39,7 @@ public class MailItem : MonoBehaviour
         }
 
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        
+
         if (!_data.IsExpired(currentTime))
         {
             _countdownRoutine = StartCoroutine(CountdownRoutine(_data.ExpireDate));
@@ -76,9 +76,9 @@ public class MailItem : MonoBehaviour
         {
             if (!_isClicked && !data.IsReceived)
             {
-                StopCountdown();
                 _isClicked = true;
-                _controller.ReceiveReward(_data.MailId);
+                StopCountdown();
+                _controller.ReceiveRewardAsync(_data.MailId);
             }
         });
 

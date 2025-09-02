@@ -14,8 +14,15 @@ public class MailBoxPopup : MonoBehaviour
     [SerializeField] private Button _receiveAllButton;
 
     private bool _isDataBind = false;
+    private bool _isReceivingAll = false;
 
     private void Apply(List<MailData> mails) => Init(mails);
+
+    private void Start()
+    {
+        _receiveAllButton.onClick.RemoveAllListeners();
+        _receiveAllButton.onClick.AddListener(OnClickReceiveAll);
+    }
 
     public void Init(List<MailData> mails)
     {
@@ -71,6 +78,24 @@ public class MailBoxPopup : MonoBehaviour
         {
             _controller.OnMailboxUpdated -= Apply;
             _isDataBind = false;
+        }
+    }
+
+    private async void OnClickReceiveAll()
+    {
+        // 중복 방지
+        if (_isReceivingAll) return; 
+        _isReceivingAll = true;
+        _receiveAllButton.interactable = false;
+
+        try
+        {
+            await _controller.ReceiveAllAsync();
+        }
+        finally
+        {
+            _isReceivingAll = false;
+            _receiveAllButton.interactable = true;
         }
     }
 }
