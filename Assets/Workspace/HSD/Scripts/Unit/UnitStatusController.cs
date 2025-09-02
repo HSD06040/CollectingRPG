@@ -53,7 +53,12 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public bool IsDead => CurHp.Value <= 0;
 
-#region Init&Clear
+    private void OnDestroy()
+    {
+        PassiveController?.DeActiveAllPassive();
+    }
+
+    #region Init&Clear
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
         PassiveController = new UnitPassiveController(this);
@@ -250,6 +255,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
     }
 
+    #region Stat Management
     public void AddStat(StatType statType, float value, string source)
     {
         //Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
@@ -328,4 +334,5 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
                 break;                
         }
     }
+    #endregion
 }
