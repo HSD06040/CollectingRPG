@@ -158,7 +158,7 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
     {
         if (_unit == null) return;
 
-        _dragDropSystem.ToolTipController.UnitToolTip.Show(_unit);
+        _dragDropSystem.ToolTipController.UnitToolTip.Show(_unit, true, true);
     }
 
     public void OnPointerDown(PointerEventData eventData)

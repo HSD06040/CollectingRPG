@@ -5,7 +5,7 @@ public class UnitController : MonoBehaviour
 {
     #region Components
     public SynergyController SynergyController;
-    public UI_UnitSlotController _uiSlotController;
+    public UI_UnitSlotController UISlotController;
 
     [SerializeField] UnitSlotManager _unitSlotManager;
     [SerializeField] UnitDragDropSystem _unitDragDropSystem;
@@ -106,7 +106,7 @@ public class UnitController : MonoBehaviour
         {
             if (unit.CurrentSlot == Vector2Int.zero)
             {
-                _uiSlotController.SetSlot(unit.Status, _unitDragDropSystem.GetCurrentSlotIdx());
+                UISlotController.SetSlot(unit.Status, _unitDragDropSystem.GetCurrentSlotIdx());
                 Destroy(unit.gameObject);
             }
             else
@@ -122,7 +122,7 @@ public class UnitController : MonoBehaviour
             if (slotUnit != null)
             {
                 // 기존 유닛을 UI 슬롯으로 돌려보내기
-                _uiSlotController.SetSlot(slotUnit.Status, _unitDragDropSystem.GetCurrentSlotIdx());
+                UISlotController.SetSlot(slotUnit.Status, _unitDragDropSystem.GetCurrentSlotIdx());
 
                 RemoveUnit(slot, destroyGameObject: false); // 유닛 데이터만 제거 (Destroy 안 함)
                 Destroy(slotUnit.gameObject); // UI로 복제했으니 인게임 오브젝트 제거
@@ -232,7 +232,7 @@ public class UnitController : MonoBehaviour
         OnUnitChanged?.Invoke(GetUnits());
     }
 
-    public Vector2Int RemoveUnit(UnitStatus unit)
+    public Vector2Int RemoveUnitGetPosition(UnitStatus unit)
     {
         UnitBase unitBase = _unitBaseDic[unit.Address][0];
         UnitSlot slot = _unitSlotManager.GetUnitSlot(unitBase);
@@ -241,6 +241,18 @@ public class UnitController : MonoBehaviour
         RemoveUnit(slot);
 
         return unitBase.CurrentSlot;
+    }
+
+    public void RemoveUnit(UnitStatus removeUnit)
+    {
+        foreach (var unit in GetUnits())
+        {
+            if(unit != null && unit.Status == removeUnit)
+            {
+                RemoveUnit(unit);
+                return;
+            }
+        }
     }
     #endregion
 

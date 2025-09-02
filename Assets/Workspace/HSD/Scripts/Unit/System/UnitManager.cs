@@ -14,13 +14,12 @@ public class UnitManager : MonoBehaviour
     [SerializeField] UI_UnitSlotController _unitSlotController;
 
     [Header("Unit_Controller")]
-    public UnitController _unitController;
+    public UnitController UnitController;
     public EnemyController _enemyController;
 
     [Header("Data")]
     [SerializeField] UnitData[] _unitDatas;
     [SerializeField] int _upgradeNeedCount = 3;
-    [SerializeField] int _spawnGold = 20;
     
     private void Awake()
     {
@@ -34,7 +33,7 @@ public class UnitManager : MonoBehaviour
 
     private void Init()
     {
-        _unitController.Init();
+        UnitController.Init();
         _unitStanbyUIManager.Init();
 
         _unitDatas = Manager.Data.UnitDatas;
@@ -67,15 +66,15 @@ public class UnitManager : MonoBehaviour
     private void Subscribe()
     {
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
-        _unitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
-        _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
-        _unitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+        UnitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
+        UnitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
+        UnitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
 
-        _unitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+        UnitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
 
         for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
         {
-            _unitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+            UnitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
         }
     }
 
@@ -86,11 +85,11 @@ public class UnitManager : MonoBehaviour
         UnitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
 
-        _unitController.OnUnitCountChanged -= _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+        UnitController.OnUnitCountChanged -= _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
 
         for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
         {
-            _unitController.OnUnitPowerChanged -= _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+            UnitController.OnUnitPowerChanged -= _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
         }
     }
     #endregion
@@ -98,20 +97,20 @@ public class UnitManager : MonoBehaviour
     #region Fight
     public void Fight()
     {
-        if(_unitController.GetUnitsCount() == 0)
+        if(UnitController.GetUnitsCount() == 0)
             return;
 
-        _unitController.UnitFight();
+        UnitController.UnitFight();
         _enemyController.EnemyFight();
         
         FightUISetup();
         _battleManager.BattleStart();
-        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
+        _battleManager.Init(UnitController.GetUnits(), _enemyController.GetUnits());
     }
 
     public void GameEndedUnitStandby()
     {
-        _unitController.UnitsStanby();
+        UnitController.UnitsStanby();
         _enemyController.EnemyStanby();
         
     }
@@ -120,9 +119,9 @@ public class UnitManager : MonoBehaviour
     {
         _unitUIManager.BattleUIInit();
 
-        _unitUIManager.DamageMeterController.Init(_unitController.GetUnits());
-        _unitUIManager.SkillPopUpController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
-        _unitUIManager.HpMeterController.Init(_unitController.GetUnits(), _enemyController.GetUnits());
+        _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
+        _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), _enemyController.GetUnits());
+        _unitUIManager.HpMeterController.Init(UnitController.GetUnits(), _enemyController.GetUnits());
     }
     #endregion
 
@@ -136,7 +135,7 @@ public class UnitManager : MonoBehaviour
             return;
         }
 
-        if (!InGameManager.Instance.SpendGold(_spawnGold))
+        if (!InGameManager.Instance.SpendGold(InGameManager.Instance.SpawnGold))
         {
             Debug.Log("골드가 부족합니다.");
             return;
@@ -159,7 +158,7 @@ public class UnitManager : MonoBehaviour
         unitBase.Status = unit;
         unitBase.Init();
 
-        _unitController.AddUnit(slot, unitBase);
+        UnitController.AddUnit(slot, unitBase);
     }
 
     private void SetSlot(UnitStatus unit, int idx)
@@ -190,7 +189,7 @@ public class UnitManager : MonoBehaviour
         int upgradeNeedCount = _upgradeNeedCount;
 
         int slotCount = _unitSlotController.GetUnitCount(unit);
-        int unitCount = _unitController.GetUnitCount(unit);
+        int unitCount = UnitController.GetUnitCount(unit);
 
         Vector2Int pos = Vector2Int.zero;
 
@@ -202,16 +201,16 @@ public class UnitManager : MonoBehaviour
 
         for (int i = 0; i < upgradeNeedCount; i++)
         {
-            pos = _unitController.RemoveUnit(unit);
+            pos = UnitController.RemoveUnitGetPosition(unit);
         }
 
-        if (pos != Vector2Int.zero && !_unitController.IsUnitMaxCount())
+        if (pos != Vector2Int.zero && !UnitController.IsUnitMaxCount())
         {
             UnitBase unitBase = Instantiate(newUnit.Data.UnitPrefab).GetComponent<UnitBase>();
             unitBase.Status = newUnit;
             unitBase.Init();
 
-            _unitController.AddUnit(unitBase, pos);
+            UnitController.AddUnit(unitBase, pos);
         }
         else
         {
@@ -223,6 +222,6 @@ public class UnitManager : MonoBehaviour
 
     private int GetUnitCount(UnitStatus unit)
     {
-        return _unitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);
+        return UnitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);
     }
 }

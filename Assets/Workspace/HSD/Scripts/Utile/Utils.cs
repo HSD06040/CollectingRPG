@@ -20,8 +20,13 @@ public static class Utils
     public static bool Contain(this LayerMask layerMask, int layer)
     {
         return ((1 << layer) & layerMask) != 0;
-    }   
+    }
+    public static int GetFacingDir(this Transform transform)
+    {
+        return transform.localScale.x > 0 ? -1 : 1;
+    }
 
+    #region Damage Calculation
     public static void CalculateDamage(this UnitStatusController status, float attackPower, DamageType damageType, UnitStatusController enemy)
     {
         int damage = damageType == DamageType.Physical ? status.PhysicalDamage.Value : status.MagicDamage.Value;
@@ -46,7 +51,9 @@ public static class Utils
         status.TotalDamage.Value += totalDamage;
         enemy.TakeDamage(totalDamage);
     }
+    #endregion
 
+    #region GetClosestTargetNonAlloc
     private static Collider2D[] _hitBuffer = new Collider2D[50];
     private static readonly List<GameObject> _cachedTargets = new List<GameObject>(50);
 
@@ -72,6 +79,7 @@ public static class Utils
 
         return closest;
     }
+    #endregion
 
     #region GetTargetsNonAlloc
     public static GameObject[] GetTargetsNonAlloc(
@@ -176,12 +184,8 @@ public static class Utils
         return result;
     }
     #endregion
-
-    public static int GetFacingDir(this Transform transform)
-    {
-        return transform.localScale.x > 0 ? -1 : 1;
-    }
-
+   
+    #region String
     public static string ToAbbreviation(long value)
     {
         if (value >= 1_000_000_000)
@@ -218,6 +222,9 @@ public static class Utils
         sb.Clear();
     }
 
+    #endregion
+
+    #region Color
     public static Color GetSynergyColor(this SynergyData data)
     {
         return (data.CurrentUpgradeIdx) switch
@@ -253,6 +260,9 @@ public static class Utils
         };
     }
 
+    #endregion
+
+    #region UI
     public static void SetupGridLayoutGroup(
     this GridLayoutGroup gridLayoutGroup,
     Transform content,
@@ -300,6 +310,7 @@ public static class Utils
             gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
         }
     }
+    #endregion
 
     public static int GetSynergyUnitsTotalLevel(this UnitBase[] units, Synergy synergy)
     {

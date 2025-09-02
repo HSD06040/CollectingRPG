@@ -21,10 +21,10 @@ public class AutoMaticSelectionSystem : MonoBehaviour
     }
 
     [SerializeField] UnitManager _unitManager;
-    private UI_UnitSlot[] _uiUnitSlots => _unitManager._unitController._uiSlotController.GetUnitSlots();
-    private UnitBase[] _battleUnits => _unitManager._unitController.GetUnits();
-    [SerializeField] private List<AutoUnitInfo> units = new List<AutoUnitInfo>(20);
-    [SerializeField] private List<UnitStatus> sortedUnits = new List<UnitStatus>(20);
+    private UI_UnitSlot[] _uiUnitSlots => _unitManager.UnitController.UISlotController.GetUnitSlots();
+    private UnitBase[] _battleUnits => _unitManager.UnitController.GetUnits();
+    private List<AutoUnitInfo> units = new List<AutoUnitInfo>(20);
+    private List<UnitStatus> sortedUnits = new List<UnitStatus>(20);
 
     public void AutoSelectCharacters()
     {
@@ -57,12 +57,12 @@ public class AutoMaticSelectionSystem : MonoBehaviour
             if(units[i].AutoUnitType == AutoUnitType.Unit)
             {
                 sortedUnits.Add(units[i].Status);
-                _unitManager._unitController.RemoveUnit(units[i].Status);
+                _unitManager.UnitController.RemoveUnitGetPosition(units[i].Status);
             }
             else
             {
                 sortedUnits.Add(units[i].UI_UnitSlot.GetUnit());
-                _unitManager._unitController._uiSlotController.ClearSlot(units[i].UI_UnitSlot.GetSlotIdx());
+                _unitManager.UnitController.UISlotController.ClearSlot(units[i].UI_UnitSlot.GetSlotIdx());
             }
         }       
 
@@ -73,21 +73,21 @@ public class AutoMaticSelectionSystem : MonoBehaviour
     {  
         for (int i = 0; i < Mathf.Min(UnitController.UnitMaxCount, units.Count); i++)
         {
-            int preferredLine = units[i].Data.PerferredLine;
-            UnitSlot slot = _unitManager._unitController.GetEmptyLineSlot(preferredLine);
+            int perferredLine = units[i].Data.PerferredLine;
+            UnitSlot slot = _unitManager.UnitController.GetEmptyLineSlot(perferredLine);
 
             if (slot == null)
             {
                 // 먼저 오른쪽(증가 방향)으로 끝까지 검사
-                for (int line = preferredLine + 1; line <= 5 && slot == null; line++)
+                for (int line = perferredLine + 1; line <= 5 && slot == null; line++)
                 {
-                    slot = _unitManager._unitController.GetEmptyLineSlot(line);
+                    slot = _unitManager.UnitController.GetEmptyLineSlot(line);
                 }
 
                 // 오른쪽에서도 못 찾으면 왼쪽(감소 방향)으로 검사
-                for (int line = preferredLine - 1; line >= 1 && slot == null; line--)
+                for (int line = perferredLine - 1; line >= 1 && slot == null; line--)
                 {
-                    slot = _unitManager._unitController.GetEmptyLineSlot(line);
+                    slot = _unitManager.UnitController.GetEmptyLineSlot(line);
                 }
             }
 
