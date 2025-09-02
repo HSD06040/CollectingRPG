@@ -64,6 +64,11 @@ public class UI_UnitSlotController : MonoBehaviour
         RemoveCahchedArray(idx);
     }
 
+    public void ClearSlot(UnitStatus unit)
+    {
+        GetUnitSlot(unit)?.ClearSlot();
+    }
+
     /// <summary>
     /// 빈 슬롯의 인덱스를 반환합니다. 없으면 -1 반환
     /// </summary>
@@ -102,7 +107,7 @@ public class UI_UnitSlotController : MonoBehaviour
         if (_unitSlotDic.ContainsKey(unit.Address))
         {
             _unitSlotDic[unit.Address].Remove(idx);
-        }        
+        }     
     }
 
     public void RemoveLastUnit(UnitStatus unit)
@@ -151,6 +156,20 @@ public class UI_UnitSlotController : MonoBehaviour
         _unitController.AddUnit(unit, pos);
     }
 
+    private UI_UnitSlot GetUnitSlot(UnitStatus unit)
+    {
+        if (_unitSlotDic.TryGetValue(unit.Address, out List<int> slotIdxs))
+        {
+            foreach (int idx in slotIdxs)
+            {
+                if (_cachedUnitsArray[idx] == unit)
+                {
+                    return _unitSlots[idx];
+                }
+            }
+        }
+        return null;
+    }
     public int GetUnitCount(string address)
     {
         if (_unitSlotDic.TryGetValue(address, out List<int> slotIdxs))

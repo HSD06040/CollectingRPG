@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -20,7 +19,7 @@ public class UpgradeCollectedCharacterData : MonoBehaviour
     private int _collectedCharacterCount;
     public int CollectedCharacterCount => _collectedCharacterCount;
 
-    private void Start()
+    private void Awake()
     {
         for (int i = 0; i < _charUnits.Length; i++)
         {

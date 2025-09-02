@@ -5,7 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UnitInfoUI : MonoBehaviour
-{
+{  
+    [Header("UI")]
     [SerializeField] Image _unitIcon;
     [SerializeField] TMP_Text _unitNameText;
     [SerializeField] TMP_Text _levelText;
@@ -24,8 +25,9 @@ public class UnitInfoUI : MonoBehaviour
     [Header("Other UI")]
     [SerializeField] UnitSkillUI _unitSkillUI;
     [SerializeField] UnitStatusUI _unitStatusUI;
+    [SerializeField] UnitSellOrAutoSelectionUI _unitSellOrAutoSelectionUI;
 
-    public void Setup(UnitStatus status)
+    public void Setup(UnitStatus status, bool isUI, bool isSell)
     {
         _unitNameText.text = status.Data.Name;
         _unitIcon.sprite = status.Data.Icon;
@@ -48,5 +50,19 @@ public class UnitInfoUI : MonoBehaviour
 
         _unitSkillUI.Setup(status.Data.Skill);
         _unitStatusUI.Setup(stat);
+
+        if(isSell)
+        {
+            _unitSellOrAutoSelectionUI.Setup(status, isUI, Close);
+        }
+        else
+        {
+            _unitSellOrAutoSelectionUI.gameObject.SetActive(false);
+        }
+    }
+
+    private void Close()
+    {
+        gameObject.SetActive(false);
     }
 }

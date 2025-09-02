@@ -68,6 +68,7 @@ public class UnitDragDropSystem : MonoBehaviour
     private void HandleClick()
     {
         ToolTipController.UnitToolTip.Close();   
+
         ToolTipController.SynergyToolTip.Close();
         Vector2 worldMouse = GetWorldMouse();
         RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);
@@ -86,7 +87,10 @@ public class UnitDragDropSystem : MonoBehaviour
             else if (hits[i].collider != null && hits[i].collider.CompareTag("BattleUnit"))
             {
                 isInterfactable = true;
-                ToolTipController.UnitToolTip.Show(ComponentProvider.Get<UnitStatusController>(hits[i].collider.gameObject).Status);
+                ToolTipController.UnitToolTip.Show(
+                    ComponentProvider.Get<UnitStatusController>(hits[i].collider.gameObject).Status
+                    , false, false);
+
                 ToolTipController.SynergyToolTip.Close();
             }
         }
