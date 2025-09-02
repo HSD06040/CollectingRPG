@@ -70,11 +70,7 @@ public class TeamOrganizeManager : MonoBehaviour
     }    
     private void Start()
     {
-        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
-        ShowCostInfo();
-        ShowTotalOverallPowerInfo();
-        ShowLeaderEffectInfo();
-        ShowCharacterCountInfo();        
+        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;       
     }    
 
     #region Event
@@ -87,6 +83,9 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged += ShowLeaderEffectInfo;
         OnCharacterDataChanged += ShowCharacterCountInfo;
         OnCharacterDataChanged += ShowButtonPreset;
+        ShowCostInfo();
+        ShowTotalOverallPowerInfo();
+        ShowCharacterCountInfo();
         ShowButtonPreset();
     }
 
@@ -281,6 +280,7 @@ public class TeamOrganizeManager : MonoBehaviour
     private void ShowCharacterCountInfo()
     {
         _characterCountText.text = $"보유 영웅 {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
+        Debug.Log($"캐릭터 수 : {_collectedCharacterData.CollectedCharacterCount}");
     }
 
     private void ShowButtonPreset()
