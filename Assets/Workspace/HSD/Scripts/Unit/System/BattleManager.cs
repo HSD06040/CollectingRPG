@@ -14,16 +14,6 @@ public class BattleManager : MonoBehaviour
     private int _playerUnitCount;
     private int _enemyUnitCount;
 
-    private void OnEnable()
-    {
-        OnBattleEnded += ClearEvent;
-    }
-
-    private void OnDisable()
-    {
-        OnBattleEnded -= ClearEvent;
-    }
-
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
         UnitBase[] notNullPlayerUnits = GetNotNullUnits(playerUnits);
@@ -69,6 +59,7 @@ public class BattleManager : MonoBehaviour
         }
 
         OnBattleEnded?.Invoke();
+        ClearEvent();
     }
 
     private UnitBase[] GetNotNullUnits(UnitBase[] units)

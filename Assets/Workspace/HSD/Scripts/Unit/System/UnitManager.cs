@@ -81,6 +81,7 @@ public class UnitManager : MonoBehaviour
 
     private void UnSubscrube()
     {
+        BattleManager.OnBattleEnded -= GameEndedUnitStandby;
         _unitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;

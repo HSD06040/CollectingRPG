@@ -14,12 +14,12 @@ public class UnitPassiveController
 
     public void AddPassiveEffect(SynergyEffect effect, int multiplier = 1, bool isChange = false)
     {
-        if(isChange)
+        if (isChange)
         {
             RemovePassiveEffect(effect);
         }
 
-        if(!_passives.ContainsKey(effect.Key))
+        if (!_passives.ContainsKey(effect.Key))
         {
             _passives.Add(effect.Key, new UnitPassive(effect, _owner, multiplier));
             _passives[effect.Key].Active();
@@ -33,5 +33,14 @@ public class UnitPassiveController
             _passives[effect.Key].Deactive();
             _passives.Remove(effect.Key);
         }
+    }
+
+    public void DeActiveAllPassive()
+    {
+        foreach (var passive in _passives.Values)
+        {
+            passive.Deactive();
+        }
+        _passives.Clear();
     }
 }
