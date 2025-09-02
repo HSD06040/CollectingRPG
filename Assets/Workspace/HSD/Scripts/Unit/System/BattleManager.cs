@@ -59,6 +59,7 @@ public class BattleManager : MonoBehaviour
         }
 
         OnBattleEnded?.Invoke();
+        ClearEvent();
     }
 
     private UnitBase[] GetNotNullUnits(UnitBase[] units)
