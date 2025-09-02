@@ -4,10 +4,8 @@ using UnityEngine;
 public class InGameManager : MonoBehaviour
 {
     public Property<int> Gold = new(); 
-    [SerializeField] int _startingGold = 100;
     public bool IsBattle = false;
-
-    public event Action OnBattleStart;
+    [SerializeField] int _startingGold = 100;
 
     #region Singleton Pattern
     private static InGameManager instance;
@@ -34,6 +32,7 @@ public class InGameManager : MonoBehaviour
         }
         
         Instance = this;
+        BattleManager.OnBattleStarted += BattleStart;
     }
     #endregion
 
@@ -57,9 +56,8 @@ public class InGameManager : MonoBehaviour
         return false;
     }
 
-    public void BattleStart()
+    private void BattleStart()
     {
         IsBattle = true;
-        OnBattleStart?.Invoke();
     }
 }

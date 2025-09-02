@@ -5,22 +5,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class CsvDownloader : MonoBehaviour
+public class CsvDownloader
 {
-    private const string URL = "";
+    private CsvLoadData _csvLoadData;
 
-    public event Action OnDataSetupCompleted;
+    public static event Action OnDataSetupCompleted;
+
+    public CsvDownloader(CsvLoadData csvLoadData)
+    {
+        _csvLoadData = csvLoadData;
+    }
+
     /// <summary>
     /// 데이터 다운로드 및 세팅
     /// </summary>
     public async UniTask DownloadDataAsync()
-    {        
-        UniTask[] task =
-        {
-            LoadCSV(URL, SetupTest, 4),         
-        };
+    {
+        List<UniTask> tasks = new List<UniTask>(10);
 
-        await UniTask.WhenAll(task);
+        foreach (var csvData in _csvLoadData.CsvDatas)
+        {
+            tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));         
+        }
+
+        await UniTask.WhenAll(tasks);
 
         Debug.Log("끝!");
         
@@ -55,24 +63,66 @@ public class CsvDownloader : MonoBehaviour
         onParsed?.Invoke(parsed.ToArray());
     }
 
-    // 예시 세팅 함수를 각자 다르게 구현
-    private void SetupTest(string[][] data)
+    private Action<string[][]> GetSetupMethod(CsvType csvType)
     {
-        //foreach (string[] row in data)
-        //{
-        //    int ID = int.Parse(row[0]);
-
-        //    MonsterStat stat = Array.Find(Manager.Table.monsterStat, m => m.ID == ID);
-
-        //    if (stat != null)
-        //    {
-        //        stat.ID = ID;
-        //        stat.monsterName = row[1];
-        //        stat.health = float.Parse(row[2]);
-        //        stat.attackPower = int.Parse(row[3]);
-        //        stat.moveSpeed = float.Parse(row[4]);
-        //        stat.GetCoinAmount = int.Parse(row[5]);
-        //    }
-        //}
+        switch(csvType)
+        {
+            case CsvType.UnitStat:
+                return UnitStatSetup;
+            default:
+                Debug.LogError($"알 수 없는 CSV 이름: {csvType.ToString()}");
+                return null;
+        }
     }
+
+    private void UnitStatSetup(string[][] data)
+    {
+        UnitData[] unitDatas = Manager.Data.UnitDatas;
+ 
+        foreach (var row in data)
+        {
+            // No.	Grade	Cost	PreferredLine	Role	Faction	AttackRange	AttackType	AttackSpeed	ManaGain	PhysicalAttack	MagicAttack	PhysicalDefense	MagicDefense 	CritRate	HP	MP
+            // 10001	UNIQUE	4	1	TANK	KINGDOM	1	SINGLE	1	10	48	0(수정중)	76	68	0	1200	0
+
+            int id = int.Parse(row[0]);
+            UnitData unitData = Array.Find(unitDatas, u => u.ID == id);
+            Debug.Log($"Setting up UnitData ID: {id}");
+            if (unitData == null)
+            {
+                Debug.LogWarning($"UnitData with ID {id} not found.");
+                continue;
+            }
+
+            unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.Normal;                        
+            unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
+            unitData.PerferredLine = int.TryParse(row[3], out int line) ? line : 0;
+            unitData.ClassSynergy = Enum.TryParse(row[4], out ClassType classSynergy) ? classSynergy : ClassType.Tank;
+            unitData.Synergy = Enum.TryParse(row[5], out Synergy synergy) ? synergy : Synergy.KingdomGuard;
+
+            UnitStats stat = new UnitStats
+            {
+                AttackRange = int.TryParse(row[6], out int attackRange) ? attackRange : 1,
+                AttackSpeed = float.TryParse(row[8], out float attackSpeed) ? attackSpeed : 1f,
+                ManaGain = int.TryParse(row[9], out int manaGain) ? manaGain : 0,
+                PhysicalDamage = int.TryParse(row[10], out int physicalAttack) ? physicalAttack : 0,
+                MagicDamage = int.TryParse(row[11], out int magicAttack) ? magicAttack : 0,
+                PhysicalDefense = int.TryParse(row[12], out int physicalDefense) ? physicalDefense : 0,
+                MagicDefense = int.TryParse(row[13], out int magicDefense) ? magicDefense : 0,
+                CritChance = int.TryParse(row[14], out int critRate) ? critRate : 0,
+                MaxHealth = int.TryParse(row[15], out int hp) ? hp : 0,
+                MaxMana = int.TryParse(row[16], out int mp) ? mp : 0,
+                MoveSpeed = 1.5f,
+                AttackCount = 1
+            };
+
+            unitData.UnitStats = new UnitStats[4];
+
+            unitData.UnitStats[0] = stat;
+            unitData.UnitStats[1] = stat;
+            unitData.UnitStats[2] = stat;
+            unitData.UnitStats[3] = stat;
+
+            unitData.Name = id.ToString(); // 임시
+        }
+    }    
 }

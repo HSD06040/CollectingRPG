@@ -129,15 +129,16 @@ public class UnitController : MonoBehaviour
                 _battleUnitManager.RemoveUnit(slot, slotUnit);
             }
 
-            SetSlot(slot, unit);
-            AddSynergyUnit(unit);
-            AddUnitCount(unit);
-            AddList(unit);
+
+            SetSlot(slot, unit);    // 유닛 위치 설정
+            _battleUnitManager.AddUnit(slot, unit); // 배틀유닛추가
+            AddUnitSynergy(unit);   // 유닛 시너지 추가 및 시너지 체크
+            AddUnitCount(unit);     // 유닛 카운트 증가 
+            AddList(unit);          // 유닛 리스트에 추가
 
             CurrentUnitCount++;
 
             OnUnitPowerChanged?.Invoke(unit.Status.CombatPower);
-            _battleUnitManager.AddUnit(slot, unit);
             OnUnitChanged?.Invoke(GetUnits());
         }
         else
@@ -167,6 +168,11 @@ public class UnitController : MonoBehaviour
                 SetSlot(slot, unit);
             }
         }
+
+        if (unit != null)
+            CheckSynergy(unit);
+        if (slotUnit != null)
+            CheckSynergy(slotUnit);
     }
 
     public void AddUnit(UnitBase newUnit, Vector2Int pos)
@@ -281,15 +287,15 @@ public class UnitController : MonoBehaviour
     #endregion
 
     #region Synergy
-    private void AddSynergyUnit(UnitBase unit)
+    private void AddUnitSynergy(UnitBase unit)
     {
         if (_unitCountDic.ContainsKey(unit.Status.Data) && _unitCountDic[unit.Status.Data] >= 1)
         {
             return;
         }
 
-        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
-        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
+        Synergy synergy = unit.Status.Data.Synergy;
+        ClassType classSynergy = unit.Status.Data.ClassSynergy;
 
         SynergyController.AddSynergy(synergy, classSynergy);
 
@@ -304,8 +310,8 @@ public class UnitController : MonoBehaviour
             return;
         }
 
-        Synergy synergy = unit.Status.Data.EnhancementData.Synergy;
-        ClassType classSynergy = unit.Status.Data.EnhancementData.ClassSynergy;
+        Synergy synergy = unit.Status.Data.Synergy;
+        ClassType classSynergy = unit.Status.Data.ClassSynergy;
 
         SynergyController.RemoveSynergy(synergy, classSynergy);
 
@@ -331,12 +337,24 @@ public class UnitController : MonoBehaviour
 
     private void CheckSynergy(int synergyIdx, int synergyCount)
     {
-        SynergyData synergy = SynergyController.SynergyDB.GetSynergy(synergyIdx);
+        SynergyData synergy = Manager.Data.SynergyDB.GetSynergy(synergyIdx);
 
         if (synergy == null) return;
 
         synergy.Check(synergyCount, GetUnits());
     }
+
+    private void CheckSynergy(UnitBase unit)
+    {
+        SynergyData synergy = Manager.Data.SynergyDB.GetSynergy((int)unit.Status.Data.Synergy);
+        SynergyData classSynergy = Manager.Data.SynergyDB.GetSynergy((int)unit.Status.Data.ClassSynergy);
+
+        if (synergy == null) return;
+
+        synergy.Check(SynergyController.GetSynergyUnitCount((int)unit.Status.Data.Synergy), GetUnits());
+        classSynergy.Check(SynergyController.GetSynergyUnitCount((int)unit.Status.Data.ClassSynergy), GetUnits());
+    }
+
     #endregion
 
     #region Gettters

@@ -38,23 +38,45 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<int> CurMana = new Property<int>();
     public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
+    public UnitPassiveController PassiveController { get; set; }
 
     public event Action<UnitStatusController> OnUnitDied;
-    public Action<UnitStatus> UseSkill;
+    public Action<UnitStatus> OnUseSkill;
+    
+    public event Action OnDied;
+    public Action OnSkill;
+    public Action OnAttack;
 
-    private readonly Dictionary<BuffKey, CancellationTokenSource> _activeBuffs = new Dictionary<BuffKey, CancellationTokenSource>(10);
+    private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
 
+    [HideInInspector] public float StatMultiplier = 0;
 
     public bool IsDead => CurHp.Value <= 0;
 
-    #region Init&Clear
-    public void Init(UnitStatus status)
+    private void OnDestroy()
     {
+        PassiveController?.DeActiveAllPassive();
+    }
+
+    #region Init&Clear
+    public void Init(UnitStatus status, UnitStats plusUnitStat = null)
+    {
+        PassiveController = new UnitPassiveController(this);
         Status = status;
-        SetBaseStat(status.GetCurrentStat());
+
+        if(plusUnitStat == null)
+        {
+            SetBaseStat(status.GetCurrentStat());
+        }            
+        else
+        {
+            SetBaseStat(status.GetCurrentStat(), plusUnitStat);
+        }
+
         ClearAllStat();
     }
 
+    #region SetStat
     private void SetBaseStat(UnitStats stat)
     {
         MaxHealth.SetBaseStat(stat.MaxHealth);
@@ -79,6 +101,53 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         CurMana.Value = MaxMana.Value;
         TotalDamage.Value = 0;
     }
+
+    private void SetBaseStat(UnitStats baseStat, UnitStats plusStat)
+    {
+        var stat = new UnitStats
+        {
+            MaxHealth = Mathf.RoundToInt(baseStat.MaxHealth + plusStat.MaxHealth * StatMultiplier),
+            MaxMana = Mathf.RoundToInt(baseStat.MaxMana + plusStat.MaxMana * StatMultiplier),
+            ManaGain = Mathf.RoundToInt(baseStat.ManaGain + plusStat.ManaGain * StatMultiplier),
+
+            AttackSpeed = baseStat.AttackSpeed + plusStat.AttackSpeed * StatMultiplier,
+            MoveSpeed = baseStat.MoveSpeed + plusStat.MoveSpeed * StatMultiplier,
+
+            PhysicalDamage = Mathf.RoundToInt(baseStat.PhysicalDamage + plusStat.PhysicalDamage * StatMultiplier),
+            MagicDamage = Mathf.RoundToInt(baseStat.MagicDamage + plusStat.MagicDamage * StatMultiplier),
+
+            CritChance = Mathf.RoundToInt(baseStat.CritChance + plusStat.CritChance * StatMultiplier),
+
+            PhysicalDefense = Mathf.RoundToInt(baseStat.PhysicalDefense + plusStat.PhysicalDefense * StatMultiplier),
+            MagicDefense = Mathf.RoundToInt(baseStat.MagicDefense + plusStat.MagicDefense * StatMultiplier),
+
+            AttackRange = Mathf.RoundToInt(baseStat.AttackRange + plusStat.AttackRange * StatMultiplier),
+            AttackCount = Mathf.RoundToInt(baseStat.AttackCount + plusStat.AttackCount * StatMultiplier),
+        };
+
+        MaxHealth.SetBaseStat(stat.MaxHealth);
+        MaxMana.SetBaseStat(stat.MaxMana);
+        ManaGain.SetBaseStat(stat.ManaGain);
+
+        AttackSpeed.SetBaseStat(stat.AttackSpeed);
+        MoveSpeed.SetBaseStat(stat.MoveSpeed);
+
+        PhysicalDamage.SetBaseStat(stat.PhysicalDamage);
+        MagicDamage.SetBaseStat(stat.MagicDamage);
+
+        CritChance.SetBaseStat(stat.CritChance);
+
+        PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
+        MagicDefense.SetBaseStat(stat.MagicDefense);
+
+        AttackRange.SetBaseStat(stat.AttackRange);
+        AttackCount.SetBaseStat(stat.AttackCount);
+
+        CurHp.Value = MaxHealth.Value;
+        CurMana.Value = MaxMana.Value;
+        TotalDamage.Value = 0;
+    }
+    #endregion
 
     private void ClearAllStat()
     {
@@ -108,7 +177,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
         _activeBuffs.Clear();
     }
-    #endregion
+#endregion
 
     public void TakeDamage(int amount)
     {
@@ -133,9 +202,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         CurMana.Value = Mathf.Clamp(CurMana.Value + amount, 0, MaxMana.Value);
     }
 
+    public void IncreaseShield(int amount)
+    {
+        Debug.Log($"IncreaseShield: {amount}");
+        Shield.Value += amount;
+    }
+
     private void Die()
     {
         OnUnitDied?.Invoke(this);
+        OnDied?.Invoke();
     }
 
     public void GetMana()
@@ -143,9 +219,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         IncreaseMana(ManaGain.Value);
     }
 
-    public void ApplyEffect(BuffEffectData buffEffectData, int value, string source)
+    public void ApplyEffect(BuffEffectData buffEffectData, float value, string source)
     {
-        var key = new BuffKey(buffEffectData.StatType, source);
+        var key = new SourceKey(buffEffectData.StatType, source);
 
         if (_activeBuffs.TryGetValue(key, out var cts))
         {
@@ -161,17 +237,17 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         var newCts = new CancellationTokenSource();
         _activeBuffs[key] = newCts;
 
-        ClearEffectAsync(buffEffectData, value, source, newCts.Token).Forget();
+        ClearEffectAsync(buffEffectData, source, newCts.Token).Forget();
     }
 
-    private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, int value, string source, CancellationToken token)
+    private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, string source, CancellationToken token)
     {
         try
         {
             await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.Duration), cancellationToken: token);
 
             RemoveStat(buffEffectData.StatType, source);
-            _activeBuffs.Remove(new BuffKey(buffEffectData.StatType, source));
+            _activeBuffs.Remove(new SourceKey(buffEffectData.StatType, source));
         }
         catch (OperationCanceledException)
         {
@@ -179,40 +255,48 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
     }
 
-    public void AddStat(StatType statType, int value, string source)
+    #region Stat Management
+    public void AddStat(StatType statType, float value, string source)
     {
-        switch(statType)
+        //Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
+        switch (statType)
         {
             case StatType.MaxHealth:
-                MaxHealth.AddModifier(value, source);
-                IncreaseHealth(value);
+                MaxHealth.AddModifier((int)value, source);
+                IncreaseHealth((int)value);
                 break;
             case StatType.MaxMana:
-                MaxMana.AddModifier(value, source);
+                MaxMana.AddModifier((int)value, source);
                 break;
             case StatType.ManaGain:
-                ManaGain.AddModifier(value, source);
+                ManaGain.AddModifier((int)value, source);
                 break;
             case StatType.PhysicalDamage:
-                PhysicalDamage.AddModifier(value, source);
+                PhysicalDamage.AddModifier((int)value, source);
                 break;
             case StatType.MagicDamage:
-                MagicDamage.AddModifier(value, source);
+                MagicDamage.AddModifier((int)value, source);
                 break;
             case StatType.CritChance:
-                CritChance.AddModifier(value, source);
+                CritChance.AddModifier((int)value, source);
                 break;
             case StatType.PhysicalDefense:
-                PhysicalDefense.AddModifier(value, source);
+                PhysicalDefense.AddModifier((int)value, source);
                 break;
             case StatType.MagicDefense:
-                MagicDefense.AddModifier(value, source);
+                MagicDefense.AddModifier((int)value, source);
+                break;
+            case StatType.AttackSpeed:
+                AttackSpeed.AddModifier(value, source);
                 break;
             case StatType.CurHp:
-                IncreaseHealth(value);
+                IncreaseHealth((int)value);
                 break;
             case StatType.CurMana:
-                IncreaseMana(value);
+                IncreaseMana((int)value);
+                break;
+            case StatType.Shield:
+                IncreaseShield((int)value);
                 break;
         }
     }
@@ -245,6 +329,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             case StatType.MagicDefense:
                 MagicDefense.RemoveModifier(source);
                 break;
+            case StatType.AttackSpeed:
+                AttackSpeed.RemoveModifier(source);
+                break;                
         }
     }
+    #endregion
 }

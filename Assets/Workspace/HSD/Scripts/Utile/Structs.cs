@@ -1,12 +1,22 @@
 using System;
+using UnityEngine;
 
+[Serializable]
 public struct SynergyStatModifier
 {
-    public TargetType TargetType;
     public StatType StatType;
-    public int Value;
+    public float Value;
 }
 
+[Serializable]
+public struct SynergyBuffData
+{
+    public StatType StatType;
+    public float Duration;
+    public float Value;
+}
+
+[Serializable]
 public struct BuffEffectData
 {  
     public StatType StatType;
@@ -14,23 +24,58 @@ public struct BuffEffectData
     public bool IsTicking;
     public float TickInterval;
 }
-public struct BuffKey : IEquatable<BuffKey>
+
+[Serializable]
+public struct CsvData
+{
+    public CsvType CsvType;
+    public int StartLine;
+
+    [TextArea]
+    [SerializeField] string _url;
+
+    [Header("예시 : A2:C12")]
+    [SerializeField] string range;
+
+    [SerializeField] int gid;
+
+    public string GetURL()
+    {
+        string baseUrl = _url;
+        
+        int editIndex = baseUrl.IndexOf("/edit");
+        if (editIndex > -1)
+        {
+            baseUrl = baseUrl.Substring(0, editIndex);
+        }
+
+        string result = "";
+
+        if(string.IsNullOrEmpty(range))
+            result = $"{baseUrl}/export?format=csv&gid={gid}";
+        else
+            result = $"{baseUrl}/export?format=csv&gid={gid}&range={range}";
+
+        return result;
+    }
+}
+
+public readonly struct SourceKey : IEquatable<SourceKey>
 {
     public StatType StatType { get; }
     public string Source { get; }
 
-    public BuffKey(StatType statType, string source)
+    public SourceKey(StatType statType, string source)
     {
         StatType = statType;
         Source = source;
     }
 
-    // Dictionary에서 키 Equals, GetHashCode 구현
-    public bool Equals(BuffKey other) =>
+    public bool Equals(SourceKey other) =>
         StatType == other.StatType && Source == other.Source;
 
     public override bool Equals(object obj) =>
-        obj is BuffKey other && Equals(other);
+        obj is SourceKey other && Equals(other);
 
     public override int GetHashCode() =>
         HashCode.Combine(StatType, Source);

@@ -1,43 +1,83 @@
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
-    private static Dictionary<string, Object> resources = new();
+    private static Dictionary<string, Object> resources = new Dictionary<string, Object>();
 
-    public T Load<T>(string path, bool isCached = true) where T : Object
+    public async UniTask LoadLabel<T>(string label) where T : Object
     {
-        string _path = $"{typeof(T).Name}{path}";
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
+        var locations = await locationsHandle.Task;
 
-        if (resources.ContainsKey(_path))
-            return resources[_path] as T;
-
-        T resource = Resources.Load(path) as T;
-
-        if (isCached)
+        foreach (var location in locations)
         {
-            if (resource != null)
-                resources.Add(_path, resource);
+            var handle = Addressables.LoadAssetAsync<T>(location);
+            var asset = await handle.Task;
+
+            if (!resources.ContainsKey(location.PrimaryKey))
+                resources.Add(location.PrimaryKey, asset);
         }
 
-        return resource;
+        Addressables.Release(locationsHandle);
+    }
+
+    public async UniTask UnLoadLabel<T>(string label) where T : Object
+    {
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
+        var locations = await locationsHandle.Task;
+
+        foreach (var location in locations)
+        {
+            if (resources.ContainsKey(location.PrimaryKey))
+            {
+                Unload(location.PrimaryKey);
+            }            
+        }
+
+        Addressables.Release(locationsHandle);
+    }
+
+    public async UniTask<T[]> LoadAll<T>(string label) where T : Object
+    {
+        var handle = Addressables.LoadAssetsAsync<T>(label, null);
+        var result = await handle.Task;
+
+        return result.ToArray();
     }
 
     public void Unload(string path)
     {
-        if (resources.ContainsKey(path))
+        if (resources.TryGetValue(path, out var asset))
         {
-            Resources.UnloadAsset(resources[path]);
+            Addressables.Release(asset);
             resources.Remove(path);
         }
     }
 
     public void UnloadAll()
     {
-        foreach (var res in resources.Values)
-            Resources.UnloadAsset(res);
+        foreach (var kvp in resources)
+        {
+            Addressables.Release(kvp.Value);
+        }
         resources.Clear();
+    }
+
+    public async UniTask<T> Load<T> (string path) where T : Object
+    {
+        if(!resources.ContainsKey(path))
+        {
+            var handle = Addressables.LoadAssetAsync<T>(path);
+            var asset = await handle.Task;
+
+            resources.Add(path, asset);
+        }
+
+        return resources[path] as T;
     }
 
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
@@ -60,20 +100,20 @@ public class ResourcesManager : Singleton<ResourcesManager>
         return Instantiate(original, position, Quaternion.identity, null, isPool);
     }
 
-    public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
+    public async UniTask<T> Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
-        T obj = Load<T>(path);
+        T obj = await Load<T>(path);
         return Instantiate(obj, position, rotation, parent, isPool);
     }
 
-    public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
+    public async UniTask<T> Instantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
     {
-        return Instantiate<T>(path, position, rotation, null, isPool);
+        return await Instantiate<T>(path, position, rotation, null, isPool);
     }
 
-    public T Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
+    public async UniTask<T> Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
     {
-        return Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
+        return await Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
     }
 
     public void Destroy(GameObject obj)

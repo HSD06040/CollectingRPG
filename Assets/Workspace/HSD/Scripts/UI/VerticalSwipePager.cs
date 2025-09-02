@@ -31,12 +31,12 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private void OnEnable()
     {
-        InGameManager.Instance.OnBattleStart += MoveToBattlePage;
+        BattleManager.OnBattleStarted += MoveToBattlePage;
     }
 
     private void OnDisable()
     {
-        InGameManager.Instance.OnBattleStart -= MoveToBattlePage;
+        BattleManager.OnBattleStarted -= MoveToBattlePage;
     }
     #endregion
 

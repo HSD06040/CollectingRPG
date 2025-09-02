@@ -68,17 +68,17 @@ public class GuestSignIn : MonoBehaviour
             await Manager.DB.SaveCurrencyAsync(30, 50);
 
             // SignInPanel -> Tutorial패널 로 변경
-            //if (currentUser != null)
-            //{
-            //    // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
-            //    //tutorialPanel.SetActive(true);
-            //    //SigninPanel.SetActive(false);
-            //
-            //    // 튜토리얼 isTutorialComplete = true Data 변경
-            //    SetTutorialCompleteAsync();
-            //    _isClicked = false;
-            //    SceneManager.LoadScene("USW_LoadingScene");
-            //}
+            if (currentUser != null)
+            {
+                // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
+                //tutorialPanel.SetActive(true);
+                //SigninPanel.SetActive(false);
+            
+                // 튜토리얼 isTutorialComplete = true Data 변경
+                SetTutorialCompleteAsync();
+                _isClicked = false;
+                SceneManager.LoadScene("USW_LoadingScene");
+            }
         });
     }
 
