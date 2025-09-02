@@ -139,7 +139,6 @@ public class PlayerMailBoxController : MonoBehaviour
         // ReceivedDate 기준 내림차순 정렬
         //mailList.Sort((a, b) => b.ReceivedDate.CompareTo(a.ReceivedDate));
 
-        OnMailboxUpdated?.Invoke(mailList);
         var loaded = await LoadAsync();
         RefreshUI(loaded);
     }

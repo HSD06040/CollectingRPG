@@ -34,10 +34,16 @@ public class MailBoxPopup : MonoBehaviour
         // 메일 생성 + 바인딩
         foreach (var mail in mails)
         {
-            GameObject mailItem = Instantiate(_mailItemPrefab, _content);
-            MailItem mailItemView = mailItem.GetComponent<MailItem>();
-            if (mailItemView != null)
-                mailItemView.Bind(mail, _controller);
+            GameObject mailObject = Instantiate(_mailItemPrefab, _content);
+
+            // 비활성화로 생성 / 데이터 바인드 이후 OnEnable 실행
+            mailObject.SetActive(false);
+
+            MailItem mailItem = mailObject.GetComponent<MailItem>();
+            if (mailItem != null)
+                mailItem.Bind(mail, _controller);
+
+            mailObject.SetActive(true);
         }
     }
 

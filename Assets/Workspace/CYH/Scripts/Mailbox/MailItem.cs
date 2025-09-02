@@ -29,31 +29,32 @@ public class MailItem : MonoBehaviour
     private MailData _data;
 
 
-    //private void OnEnable()
-    //{
-    //    long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-    //    StopCountdown();
+    private void OnEnable()
+    {
+        StopCountdown();
 
-    //    if(_data == null)
-    //    {
-    //        Debug.Log("_data == null");
-    //    }
+        if (_data == null)
+        {
+            return;
+        }
 
-    //    if (!_data.IsExpired(currentTime))
-    //    {
-    //        _countdownRoutine = StartCoroutine(CountdownToExpire(_data.ExpireDate));
-    //    }
-    //}
+        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        
+        if (!_data.IsExpired(currentTime))
+        {
+            _countdownRoutine = StartCoroutine(CountdownRoutine(_data.ExpireDate));
+        }
+    }
 
-    //private void OnDisable()
-    //{
-    //    StopCountdown();
-    //}
+    private void OnDisable()
+    {
+        StopCountdown();
+    }
 
-    //private void OnDestroy()
-    //{
-    //    StopCountdown();
-    //}
+    private void OnDestroy()
+    {
+        StopCountdown();
+    }
 
     public void Bind(MailData data, PlayerMailBoxController controller)
     {
@@ -81,8 +82,6 @@ public class MailItem : MonoBehaviour
             }
         });
 
-        StopCountdown();
-
         if (!expired)
         {
             _timeBoxImage.SetActive(true);
@@ -100,13 +99,11 @@ public class MailItem : MonoBehaviour
         {
             StopCoroutine(_countdownRoutine);
             _countdownRoutine = null;
-            Debug.Log($"{_data.MailId} 코루틴 멈춤");
         }
     }
 
-    private IEnumerator CountdownToExpire(long expireDate)
+    private IEnumerator CountdownRoutine(long expireDate)
     {
-        Debug.Log($"{_data.MailId} 코루틴 시작");
         while (true)
         {
             long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
