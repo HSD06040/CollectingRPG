@@ -5,17 +5,31 @@ public class LobbySynergySlot : MonoBehaviour
 {
     [SerializeField] private Image _icon;
 
+    private SynergyData _synergyData;
+    private int[] _synergyCountArray;
     public int ActiveCount { get; private set; }
-    public int UpgradeCount => ActiveCount / 2;
-    public void SetSynergy(Synergy synergy)
-    {
-        _icon.sprite = SynergyController.SynergyDB.GetSynergy((int)synergy).Icon;
+    public int UpgradeCount => _synergyData.CurrentUpgradeIdx;
+
+    public void Init(SynergyData data, int activeCount)
+    {        
+        _synergyData = data;
+        _icon.sprite = data.Icon;
+        SetSynergyCount();
+        UpdateUI(activeCount);
     }
 
-    public void SetActiveCount(int count)
+    public void UpdateUI(int activeCount)
     {
-        ActiveCount = count;
+        ActiveCount = activeCount;
+    }
 
-        gameObject.SetActive(count >= 2);
+    public void SetSynergyCount()
+    {
+        _synergyCountArray = new int[_synergyData.SynergyLevelData.Length];
+
+        for (int i = 0; i < _synergyData.SynergyLevelData.Length; i++)
+        {
+            _synergyCountArray[i] = _synergyData.SynergyLevelData[i].SynergyNeedCount;
+        }
     }
 }

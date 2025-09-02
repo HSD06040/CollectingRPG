@@ -11,6 +11,8 @@ public class UnitRangedAttack : UnitAttackData
 
     public override void Attack(IAttacker attacker)
     {
+        base.Attack(attacker);
+
         Vector2 offset = AttackPointOffset;
         offset.x *= attacker.GetTransform().GetFacingDir();
 

@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class UnitManager : MonoBehaviour
 {
+    [Header("Test")]
+    public bool IsTest;
+
     [Header("BattleManager")]
     [SerializeField] BattleManager _battleManager;
 
@@ -15,14 +18,18 @@ public class UnitManager : MonoBehaviour
     public EnemyController _enemyController;
 
     [Header("Data")]
-    [SerializeField] UnitData[] _testDatas;
+    [SerializeField] UnitData[] _unitDatas;
     [SerializeField] int _upgradeNeedCount = 3;
     [SerializeField] int _spawnGold = 20;
-
+    
     private void Awake()
     {
         Utils.Initialize();
-        Init();
+
+        if(IsTest)
+            CsvDownloader.OnDataSetupCompleted += Init;
+        else
+            Init();
     }
 
     private void Init()
@@ -30,12 +37,12 @@ public class UnitManager : MonoBehaviour
         _unitController.Init();
         _unitStanbyUIManager.Init();
 
-        Subscribe();
-        //_unitStanbyUIManager.SynergyPanel.Init(_unitController.SynergyController.SynergyDB);
-        //_unitStanbyUIManager.SynergySlotPanel.Init(_unitController.SynergyController.SynergyDB);
+        _unitDatas = Manager.Data.UnitDatas;
 
-        _unitStanbyUIManager.SynergyPanel.Init(SynergyController.SynergyDB);
-        _unitStanbyUIManager.SynergySlotPanel.Init(SynergyController.SynergyDB);
+        Subscribe();
+
+        _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
+        _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
                        
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
 
@@ -46,7 +53,7 @@ public class UnitManager : MonoBehaviour
         {
             if(preset.Statuses[i].Data != null)
             {
-                AddSlotUnit(preset.Statuses[i]);
+                AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
             }
         }
     }
@@ -74,6 +81,7 @@ public class UnitManager : MonoBehaviour
 
     private void UnSubscrube()
     {
+        BattleManager.OnBattleEnded -= GameEndedUnitStandby;
         _unitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
         _unitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
@@ -93,19 +101,19 @@ public class UnitManager : MonoBehaviour
         if(_unitController.GetUnitsCount() == 0)
             return;
 
-        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
-
         _unitController.UnitFight();
         _enemyController.EnemyFight();
         
         FightUISetup();
-        InGameManager.Instance.BattleStart();
+        _battleManager.BattleStart();
+        _battleManager.Init(_unitController.GetUnits(), _enemyController.GetUnits());
     }
 
     public void GameEndedUnitStandby()
     {
         _unitController.UnitsStanby();
-        _enemyController.EnemyStanby();        
+        _enemyController.EnemyStanby();
+        
     }
 
     private void FightUISetup()
@@ -120,20 +128,6 @@ public class UnitManager : MonoBehaviour
 
     public void RandomSpawn()
     {
-        if (!InGameManager.Instance.SpendGold(_spawnGold))
-        {
-            Debug.Log("골드가 부족합니다.");
-            return;
-        }
-
-        UnitData unit = _testDatas[Random.Range(0, _testDatas.Length)];
-        UnitStatus unitStatus = new UnitStatus(unit);
-
-        AddSlotUnit(unitStatus);
-    }
-
-    public void AddSlotUnit(UnitStatus unit)
-    {
         int slotIdx = _unitSlotController.GetEmptySlot();
 
         if (slotIdx == -1)
@@ -142,6 +136,20 @@ public class UnitManager : MonoBehaviour
             return;
         }
 
+        if (!InGameManager.Instance.SpendGold(_spawnGold))
+        {
+            Debug.Log("골드가 부족합니다.");
+            return;
+        }
+
+        UnitData unit = _unitDatas[Random.Range(0, _unitDatas.Length)];
+        UnitStatus unitStatus = new UnitStatus(unit);
+
+        AddSlotUnit(unitStatus, slotIdx);
+    }
+
+    public void AddSlotUnit(UnitStatus unit, int slotIdx)
+    {
         SetSlot(unit, slotIdx);
     }
 

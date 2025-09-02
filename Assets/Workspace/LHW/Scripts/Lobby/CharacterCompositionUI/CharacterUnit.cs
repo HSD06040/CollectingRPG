@@ -1,6 +1,5 @@
 using System.Collections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,15 +26,15 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [Header("Reference")]
     [SerializeField] Sprite[] costSprites;
 
-    
+
     private bool _isCollected = true;
     public bool IsCollected => _isCollected;
 
     private TeamOrganizeManager _manager;
-    
+
     [SerializeField] private float _requiredPointerDownTime = 2f;
     private Coroutine _holdCoroutine;
-    
+
     private void Awake()
     {
         DataInit();
@@ -71,7 +70,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void OnDisable()
     {
-        if(_manager != null) _manager.OnCharacterDataChanged -= UIUpdate;
+        if (_manager != null) _manager.OnCharacterDataChanged -= UIUpdate;
     }
 
     #endregion
@@ -80,7 +79,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void TryAddCharacter()
     {
-        _manager.AddPresetData(_status);
+        if (_manager != null) _manager.AddPresetData(_status);
     }
 
     #endregion
@@ -94,7 +93,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if(_holdCoroutine != null)
+        if (_holdCoroutine != null)
         {
             StopCoroutine(_holdCoroutine);
             _holdCoroutine = null;
@@ -117,9 +116,12 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     {
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
-        _costImg.sprite = costSprites[_status.Data.Cost-1];
-        _jobSynergyImg.sprite = SynergyController.SynergyDB.GetSynergy((int)_status.Data.EnhancementData.Synergy).Icon;
-        _roleSynergyImg.sprite = SynergyController.SynergyDB.GetSynergy((int)_status.Data.EnhancementData.ClassSynergy).Icon;
+        _costImg.sprite = costSprites[_status.Data.Cost - 1];
+        if (Manager.Data != null)
+        {
+            _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
+            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).Icon;
+        }
         _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
     }

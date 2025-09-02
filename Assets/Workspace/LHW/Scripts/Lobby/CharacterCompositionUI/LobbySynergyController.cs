@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class LobbySynergyController : MonoBehaviour
@@ -16,8 +17,7 @@ public class LobbySynergyController : MonoBehaviour
     private void Start()
     {
         _manager = GetComponentInParent<TeamOrganizeManager>();
-        //InitializeSynergySlots();
-        //InitializeClassSynergySlots();
+        InitializeSynergySlots();
     }
 
     private void OnEnable()
@@ -32,37 +32,24 @@ public class LobbySynergyController : MonoBehaviour
         _manager.OnCharacterDataChanged -= UpdateClassSynergySlots;
     }
 
-    // TODO: 아직 구성중이라 임시 처리 
-    /*
     private void InitializeSynergySlots()
     {
-        foreach (Synergy synergy in SynergyController.SynergyDB._synergyDataDic)
+        foreach (var data in Manager.Data.SynergyDB._synergyDataDic.Values)
         {
-            if (_synergySlots.ContainsKey(synergy.ToString()))
-                continue;
-
-            LobbySynergySlot slot = Instantiate(_synergySlotPrefab, _content).GetComponent<LobbySynergySlot>();
-            slot.SetSynergy(synergy);
-            slot.SetActiveCount(0); // 초기값 0
-            _synergySlots[synergy.ToString()
-                ] = slot;
+            if (data is ClassSynergyData classSynergy)
+            {
+                LobbyClassSynergySlot slot = Instantiate(_classSynergySlotPrefab, _classContent).GetComponent<LobbyClassSynergySlot>();
+                slot.Init(data, 0);
+                _classSynergySlots.Add(classSynergy.Synergy.ToString(), slot);
+            }
+            else if (data is UnitSynergyData unitSynergy)
+            {
+                LobbySynergySlot slot = Instantiate(_synergySlotPrefab, _content).GetComponent<LobbySynergySlot>();
+                slot.Init(data, 0);
+                _synergySlots.Add(unitSynergy.Synergy.ToString(), slot);
+            }
         }
-    }
-
-    private void InitializeClassSynergySlots()
-    {
-        foreach (var classType in System.Enum.GetValues(typeof(ClassType)))
-        {
-            if (_classSynergySlots.ContainsKey(classType.ToString()))
-                continue;
-
-            LobbyClassSynergySlot slot = Instantiate(_classSynergySlotPrefab, _classContent).GetComponent<LobbyClassSynergySlot>();
-            slot.SetClassSynergy((ClassType)classType);
-            slot.SetActiveCount(0);
-            _classSynergySlots[classType.ToString()] = slot;
-        }
-    }
-    */
+    }    
 
     private void UpdateSynergySlots()
     {
@@ -73,14 +60,7 @@ public class LobbySynergyController : MonoBehaviour
             Synergy synergy = data.Key;
             int count = data.Value;
 
-            if(!_synergySlots.ContainsKey(synergy.ToString()))
-            {
-                LobbySynergySlot slot = Instantiate(_synergySlotPrefab, _content).GetComponent<LobbySynergySlot>();
-                _synergySlots[synergy.ToString()] = slot;
-                slot.SetSynergy(synergy);
-            }
-
-            _synergySlots[synergy.ToString()].SetActiveCount(count);
+            _synergySlots[synergy.ToString()].UpdateUI(count);
         }
 
         SetHiararchy();
@@ -95,14 +75,7 @@ public class LobbySynergyController : MonoBehaviour
             ClassType classSynergy = data.Key;
             int count = data.Value;
 
-            if (!_classSynergySlots.ContainsKey(classSynergy.ToString()))
-            {
-                LobbyClassSynergySlot slot = Instantiate(_classSynergySlotPrefab, _classContent).GetComponent<LobbyClassSynergySlot>();
-                _classSynergySlots[classSynergy.ToString()] = slot;
-                slot.SetSynergy(classSynergy);
-            }
-
-            _classSynergySlots[classSynergy.ToString()].SetActiveCount(count);
+            _classSynergySlots[classSynergy.ToString()].UpdateUI(count);
         }
 
         SetClassHiararchy();

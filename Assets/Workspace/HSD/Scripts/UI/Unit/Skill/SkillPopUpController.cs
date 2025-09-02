@@ -20,7 +20,7 @@ public class SkillPopUpController : MonoBehaviour
             foreach (UnitBase unit in _playerUnits)
             {
                 if(unit != null)
-                    unit.StatusController.UseSkill -= AddPlayerSkillPopUp;
+                    unit.StatusController.OnUseSkill -= AddPlayerSkillPopUp;
             }
         }
             
@@ -29,7 +29,7 @@ public class SkillPopUpController : MonoBehaviour
             foreach (UnitBase unit in _enemyUnits)
             {
                 if(unit != null)
-                    unit.StatusController.UseSkill -= AddEnemySkillPopUp;
+                    unit.StatusController.OnUseSkill -= AddEnemySkillPopUp;
             }
         }
             
@@ -41,7 +41,7 @@ public class SkillPopUpController : MonoBehaviour
             foreach (UnitBase unit in _playerUnits)
             {
                 if (unit != null)
-                    unit.StatusController.UseSkill += AddPlayerSkillPopUp;
+                    unit.StatusController.OnUseSkill += AddPlayerSkillPopUp;
             }
         }
 
@@ -50,7 +50,7 @@ public class SkillPopUpController : MonoBehaviour
             foreach (UnitBase unit in _enemyUnits)
             {
                 if (unit != null)
-                    unit.StatusController.UseSkill += AddEnemySkillPopUp;
+                    unit.StatusController.OnUseSkill += AddEnemySkillPopUp;
             }
         }
     }

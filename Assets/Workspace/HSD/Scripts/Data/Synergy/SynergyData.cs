@@ -6,7 +6,7 @@ using UnityEngine;
 public class SynergyLevelData
 {
     public int SynergyNeedCount;
-    public SynergyEffect SynergyEffect;
+    public SynergyEffect[] Effects;
 }
 
 public abstract class SynergyData : ScriptableObject
@@ -17,18 +17,19 @@ public abstract class SynergyData : ScriptableObject
     public string Description;
     public SynergyLevelData[] SynergyLevelData;
 
-    private SynergyEffect _currentEffect;
+    private SynergyEffect[] _currentEffects;
     public int CurrentUpgradeIdx;
+    protected int _synergy;
 
-    public void Init()
+    public virtual void Init()
     {
-        _currentEffect = null;
+        _currentEffects = new SynergyEffect[SynergyLevelData[0].Effects.Length];
         CurrentUpgradeIdx = -1;
     }
 
     public void Check(int newCount, UnitBase[] units)
     {
-        SynergyEffect newEffect = null;
+        SynergyEffect[] newEffects = new SynergyEffect[SynergyLevelData[0].Effects.Length];
 
         CurrentUpgradeIdx = -1;
 
@@ -36,20 +37,26 @@ public abstract class SynergyData : ScriptableObject
         {
             if (newCount >= SynergyLevelData[i].SynergyNeedCount)
             {
-                newEffect = SynergyLevelData[i].SynergyEffect;
+                newEffects = SynergyLevelData[i].Effects;
                 CurrentUpgradeIdx = i;
             }
             else
             {
                 break;
             }
+        }
+
+        
+        foreach (var effect in _currentEffects)
+        {
+            effect?.RemoveEffect(units, _synergy);
+        }
+
+        foreach (var effect in newEffects)
+        {
+            effect?.ApplyEffect(units, _synergy);
         }        
 
-        if (_currentEffect != newEffect)
-        {
-            _currentEffect?.RemoveEffect(units);
-            newEffect?.ApplyEffect(units);
-            _currentEffect = newEffect;
-        }
+        _currentEffects = newEffects;
     }
 }

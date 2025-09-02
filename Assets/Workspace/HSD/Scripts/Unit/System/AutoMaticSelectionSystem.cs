@@ -1,51 +1,76 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class AutoMaticSelectionSystem : MonoBehaviour
 {
+    [Serializable]
+    public class AutoUnitInfo
+    {
+        public UnitStatus Status;
+        public UI_UnitSlot UI_UnitSlot;
+        public AutoUnitType AutoUnitType;
+
+        public AutoUnitInfo(AutoUnitType autoUnitType, UnitStatus status = null, UI_UnitSlot unitSlot = null)
+        {
+            Status = status;
+            UI_UnitSlot = unitSlot;
+            AutoUnitType = autoUnitType;
+        }
+    }
+
     [SerializeField] UnitManager _unitManager;
-    UI_UnitSlot[] _uiUnitSlots => _unitManager._unitController._uiSlotController.GetUnitSlots();
-    UnitBase[] _battleUnits => _unitManager._unitController.GetUnits();
+    private UI_UnitSlot[] _uiUnitSlots => _unitManager._unitController._uiSlotController.GetUnitSlots();
+    private UnitBase[] _battleUnits => _unitManager._unitController.GetUnits();
+    [SerializeField] private List<AutoUnitInfo> units = new List<AutoUnitInfo>(20);
+    [SerializeField] private List<UnitStatus> sortedUnits = new List<UnitStatus>(20);
 
     public void AutoSelectCharacters()
     {
-        List<UnitStatus> sortedUnits = new List<UnitStatus>(20);
+        units.Clear();
+        sortedUnits.Clear();
 
         foreach (var battleUnit in _battleUnits)
         {
-            if (battleUnit != null)
+            if (battleUnit != null && battleUnit.Status != null && battleUnit.Status.Data != null)
             {
-                if (_unitManager._unitController._uiSlotController.GetEmptySlot() != -1)
-                    break;
-
-                sortedUnits.Add(battleUnit.Status);
-                _unitManager._unitController.RemoveUnit(battleUnit);
+                units.Add(new AutoUnitInfo(AutoUnitType.Unit, status: battleUnit.Status));
             }
         }
-
-        Set(sortedUnits);
-        sortedUnits.Clear();
 
         foreach (var uiUnitSlot in _uiUnitSlots)
         {
             if (uiUnitSlot.GetUnit() != null && uiUnitSlot.GetUnit().Data != null)
             {
-                sortedUnits.Add(uiUnitSlot.GetUnit());
-                _unitManager._unitController._uiSlotController.ClearSlot(uiUnitSlot.GetSlotIdx());
+                units.Add(new AutoUnitInfo(AutoUnitType.Slot, uiUnitSlot.GetUnit(), uiUnitSlot));
             }
         }
+
+        units = units
+        .OrderByDescending(u => u.Status.CombatPower)
+        .Take(10)
+        .ToList();
+
+        for (int i = 0; i < units.Count; i++)
+        {
+            if(units[i].AutoUnitType == AutoUnitType.Unit)
+            {
+                sortedUnits.Add(units[i].Status);
+                _unitManager._unitController.RemoveUnit(units[i].Status);
+            }
+            else
+            {
+                sortedUnits.Add(units[i].UI_UnitSlot.GetUnit());
+                _unitManager._unitController._uiSlotController.ClearSlot(units[i].UI_UnitSlot.GetSlotIdx());
+            }
+        }       
 
         Set(sortedUnits);
     }
 
     private void Set(List<UnitStatus> units)
-    {
-        units = units
-        .Where(u => u.Data != null)
-        .OrderByDescending(u => u.CombatPower)
-        .ToList();
-
+    {  
         for (int i = 0; i < Mathf.Min(UnitController.UnitMaxCount, units.Count); i++)
         {
             int preferredLine = units[i].Data.PerferredLine;

@@ -1,9 +1,11 @@
+using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class TeamPresetData
@@ -64,14 +66,15 @@ public class TeamOrganizeManager : MonoBehaviour
         _currentPreset = _presetData[0].Statuses;
         */
 
-        _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
+        
     }    
     private void Start()
     {
+        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
         ShowLeaderEffectInfo();
-        ShowCharacterCountInfo();
+        ShowCharacterCountInfo();        
     }    
 
     #region Event
@@ -282,10 +285,24 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowButtonPreset()
     {
+        if (TempDataManager.Instance == null) return;
+
         for(int i = 0; i < TempDataManager.Instance.PresetData.Count - 2; i++)
         {
             _presetAddButton[i].buttonText = $"{(i + 3)}";
             _presetAddButton[i].UpdateUI();
+        }
+
+        for(int i = 0; i < _presetAddButton.Length; i++)
+        {
+            if(i <= TempDataManager.Instance.PresetData.Count- 2)
+            {
+                _presetAddButton[i].GetComponent<Button>().interactable = true;
+            }
+            else
+            {
+                _presetAddButton[i].GetComponent<Button>().interactable = false;
+            }
         }
     }
 
@@ -300,7 +317,7 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             if (PopupManager.Instance != null)
             {
-                PopupManager.instance.ShowPopup("Leader is not added.\nPlease add.");
+                PopupManager.instance.ShowPopup("리더 캐릭터를 추가해주세요.");
             }
 
             return;
@@ -313,7 +330,7 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             if (PopupManager.Instance != null)
             {
-                PopupManager.instance.ShowConfirmationPopup("Add Preset?\nConsumes 500 Gold.", () => CreatePreset(index), null);
+                PopupManager.instance.ShowConfirmationPopup("프리셋을 추가하시겠습니까?\n500 골드 소모", () => CreatePreset(index), null);
             }
         }
         else
@@ -370,9 +387,9 @@ public class TeamOrganizeManager : MonoBehaviour
         foreach(var unit in _currentPreset)
         {
             if(unit.Data == null) continue;
-            if(unit.Data.EnhancementData == null) continue;
+            if(unit.Data == null) continue;
 
-            ClassType classSynergy = unit.Data.EnhancementData.ClassSynergy;
+            ClassType classSynergy = unit.Data.ClassSynergy;
 
             if (!classSynergyCount.ContainsKey(classSynergy))
                 classSynergyCount[classSynergy] = 0;
@@ -391,9 +408,9 @@ public class TeamOrganizeManager : MonoBehaviour
         foreach (var unit in _currentPreset)
         {
             if (unit.Data == null) continue;
-            if (unit.Data.EnhancementData == null) continue;
+            if (unit.Data == null) continue;
 
-            Synergy synergy = unit.Data.EnhancementData.Synergy;
+            Synergy synergy = unit.Data.Synergy;
 
             if (!synergyCounts.ContainsKey(synergy))
                 synergyCounts[synergy] = 0;
