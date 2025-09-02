@@ -32,10 +32,16 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
         OnCharacterStatusChanged -= UpdateUI;
     }
 
+    #region Read Data
+
     public void GetCurrentCharacterUnitData(CharacterUpgradeUnit charUnit)
     {
         _currentCharUnit = charUnit;
     }
+
+    #endregion
+
+    #region Level Up
 
     private void LevelUp()
     {
@@ -63,6 +69,8 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
         return false;
     }
 
+    #endregion
+
     private void UpdateUI()
     {
         if (_currentCharUnit != null)
@@ -75,6 +83,8 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    #region CloseUI
+
     public void OnPointerClick(PointerEventData eventData)
     {
         GameObject clickedObject = eventData.pointerCurrentRaycast.gameObject;
@@ -83,4 +93,6 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
             gameObject.SetActive(false);
         }
     }
+
+    #endregion
 }
