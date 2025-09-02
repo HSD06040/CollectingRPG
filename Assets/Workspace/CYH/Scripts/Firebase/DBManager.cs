@@ -612,6 +612,7 @@ public class DBManager : Singleton<DBManager>
             // DateTime ExpireDate -> long
             long expireDate = 0;
             string expireDateStr = masterMail?.Child("ExpireDate").Value?.ToString();
+            
             if (!string.IsNullOrEmpty(expireDateStr))
             {
                 if (DateTime.TryParse(expireDateStr, out var dateTime))
@@ -632,8 +633,6 @@ public class DBManager : Singleton<DBManager>
                 IsReceived = isReceived
             });
         }
-
-        Debug.Log("[DBManager] LoadUserMailsAsync 끝");
         return userMailList;
     }
 
@@ -644,12 +643,26 @@ public class DBManager : Singleton<DBManager>
         return FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).Child("IsReceived").SetValueAsync(value);
     }
 
+    // 기간 만료
+    public Task SetMailIsExpireddAsync(string mailId, bool value)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        return FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).Child("IsExpired").SetValueAsync(value);
+    }
+
     // 메일 삭제
     public Task DeleteMailAsync(string mailId)
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
         return FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).RemoveValueAsync();
     }
+
+    // 
+    //public  Task GetAllUnreceivedMailAsync(string mailId)
+    //{
+    //    string uid = FirebaseManager.Auth.CurrentUser.UserId;
+    //    return FirebaseManager.DataReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).Child("IsReceived").GetValueAsync;
+    //}
 
     #endregion 
 }

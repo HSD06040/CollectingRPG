@@ -94,9 +94,22 @@ public class PlayerMailBoxController : MonoBehaviour
         DeleteMail(mailId);
     }
 
+    /// <summary>
+    /// 유저 메일 DB - mailId의 IsExpired = false로 변경하는 메서드
+    /// </summary>
+    /// <param name="mailId">메일 ID</param>
+    public async void SetIsExpired(string mailId)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        await Manager.DB.SetMailIsExpireddAsync(mailId, false);
+    }
+
+    /// <summary>
+    /// 유저 메일 DB에서 해당 mailId를 삭제하는 메서드
+    /// </summary>
+    /// <param name="mailId">메일 ID</param>
     public async void DeleteMail(string mailId)
     {
-        // 해당 mailId 삭제
         await Manager.DB.DeleteMailAsync(mailId);
     }
 

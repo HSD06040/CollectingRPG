@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MailBoxPopup : MonoBehaviour
 {
@@ -7,7 +8,10 @@ public class MailBoxPopup : MonoBehaviour
 
     [Header("List")]
     [SerializeField] private RectTransform _content;       
-    [SerializeField] private GameObject _mailItemPrefab;  
+    [SerializeField] private GameObject _mailItemPrefab;
+
+    [Header("Button")]
+    [SerializeField] private Button _receiveAllButton;
 
     private bool _isDataBind = false;
 
@@ -21,7 +25,6 @@ public class MailBoxPopup : MonoBehaviour
             return;
         }
         
-        Debug.Log("[MailBoxPopup] Init(리스트 UI를 현재 메일 목록으로 갱신)");
         // 기존 메일 제거
         for (int i = _content.childCount - 1; i >= 0; i--)
         {
