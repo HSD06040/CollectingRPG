@@ -83,19 +83,15 @@ public class MailBoxPopup : MonoBehaviour
 
     private async void OnClickReceiveAll()
     {
-        // 중복 방지
-        if (_isReceivingAll) return; 
+        if (_isReceivingAll) 
+            return;
+
         _isReceivingAll = true;
         _receiveAllButton.interactable = false;
 
-        try
-        {
-            await _controller.ReceiveAllAsync();
-        }
-        finally
-        {
-            _isReceivingAll = false;
-            _receiveAllButton.interactable = true;
-        }
+        await _controller.ReceiveAllAsync();
+
+        _isReceivingAll = false;
+        _receiveAllButton.interactable = true;
     }
 }

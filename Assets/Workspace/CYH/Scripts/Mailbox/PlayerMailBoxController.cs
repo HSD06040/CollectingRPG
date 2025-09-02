@@ -106,24 +106,20 @@ public class PlayerMailBoxController : MonoBehaviour
 
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        // 조건: 수령 안 했고, 만료도 안 된 메일만
         List<MailData> unReceivedMailList = _mail.FindAll(m => !m.IsReceived && !m.IsExpired(currentTime));
 
         if (unReceivedMailList.Count == 0)
         {
-            Debug.Log("[ReceiveAllAsync] 받을 메일 없음");
             return;
         }
 
-        // 하나씩 순차 처리 (DB 이벤트/리스너 겹침 방지에 안전)
         foreach (var mail in unReceivedMailList)
         {
             await ReceiveRewardAsync(mail.MailId);
-            // 필요시 프레임 양보
+
             await Task.Yield();
         }
 
-        // 마지막에 한 번만 새로고침
         await RefreshAsync();
     }
 
