@@ -194,7 +194,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void IncreaseMana(int amount)
     {
-        Debug.Log($"IncreaseMana: {amount}");
         CurMana.Value = Mathf.Clamp(CurMana.Value + amount, 0, MaxMana.Value);
     }
 

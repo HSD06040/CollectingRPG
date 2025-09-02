@@ -14,10 +14,18 @@ public class BattleManager : MonoBehaviour
     private int _playerUnitCount;
     private int _enemyUnitCount;
 
+    private void OnEnable()
+    {
+        OnBattleEnded += ClearEvent;
+    }
+
+    private void OnDisable()
+    {
+        OnBattleEnded -= ClearEvent;
+    }
+
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
-        ClearEvent();
-
         UnitBase[] notNullPlayerUnits = GetNotNullUnits(playerUnits);
         UnitBase[] notNullEnemyUnits = GetNotNullUnits(enemyUnits);
 

@@ -19,6 +19,7 @@ public class BattleEndUI : MonoBehaviour
 
     private void ShowPopup()
     {
+        Debug.Log("전투종료 팝업");
         PopupManager.Instance.ShowConfirmationPopup("전투가 종료되었습니다.\n로비로 돌아가시겠습니까?", async () =>
         {
             await WaitForClose();
