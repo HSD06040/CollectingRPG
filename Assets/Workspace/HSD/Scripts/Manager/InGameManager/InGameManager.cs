@@ -5,6 +5,7 @@ public class InGameManager : MonoBehaviour
 {
     public Property<int> Gold = new(); 
     public bool IsBattle = false;
+    public int SpawnGold = 20;
     [SerializeField] int _startingGold = 100;
 
     #region Singleton Pattern
@@ -32,14 +33,25 @@ public class InGameManager : MonoBehaviour
         }
         
         Instance = this;
-        BattleManager.OnBattleStarted += BattleStart;
     }
     #endregion
+
+    #region Life Cycle
+    private void OnEnable()
+    {
+        BattleManager.OnBattleStarted += BattleStart;
+    }
+
+    private void OnDisable()
+    {
+        BattleManager.OnBattleStarted -= BattleStart;
+    }
 
     private void Start()
     {
         Gold.Value = _startingGold;
     }
+    #endregion
 
     public void AddGold(int amount)
     {
