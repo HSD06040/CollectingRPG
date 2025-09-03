@@ -13,7 +13,7 @@ public static class Manager
     public static AuthManager Auth => AuthManager.Instance;
     public static DBManager DB => DBManager.Instance;
     public static PopupManager Popup => PopupManager.Instance;
-    public static MailManager Mail => MailManager.Instance;
+
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Init()
@@ -26,6 +26,6 @@ public static class Manager
         AuthManager.CreateInstance();
         DBManager.CreateInstance();
         PopupManager.CreateInstance();
-        MailManager.CreateInstance();
+       
     }
 }

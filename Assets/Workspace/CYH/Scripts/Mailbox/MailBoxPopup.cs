@@ -14,8 +14,15 @@ public class MailBoxPopup : MonoBehaviour
     [SerializeField] private Button _receiveAllButton;
 
     private bool _isDataBind = false;
+    private bool _isReceivingAll = false;
 
     private void Apply(List<MailData> mails) => Init(mails);
+
+    private void Start()
+    {
+        _receiveAllButton.onClick.RemoveAllListeners();
+        _receiveAllButton.onClick.AddListener(OnClickReceiveAll);
+    }
 
     public void Init(List<MailData> mails)
     {
@@ -34,10 +41,16 @@ public class MailBoxPopup : MonoBehaviour
         // 메일 생성 + 바인딩
         foreach (var mail in mails)
         {
-            GameObject mailItem = Instantiate(_mailItemPrefab, _content);
-            MailItem mailItemView = mailItem.GetComponent<MailItem>();
-            if (mailItemView != null)
-                mailItemView.Bind(mail, _controller);
+            GameObject mailObject = Instantiate(_mailItemPrefab, _content);
+
+            // 비활성화로 생성 / 데이터 바인드 이후 OnEnable 실행
+            mailObject.SetActive(false);
+
+            MailItem mailItem = mailObject.GetComponent<MailItem>();
+            if (mailItem != null)
+                mailItem.Bind(mail, _controller);
+
+            mailObject.SetActive(true);
         }
     }
 
@@ -66,5 +79,19 @@ public class MailBoxPopup : MonoBehaviour
             _controller.OnMailboxUpdated -= Apply;
             _isDataBind = false;
         }
+    }
+
+    private async void OnClickReceiveAll()
+    {
+        if (_isReceivingAll) 
+            return;
+
+        _isReceivingAll = true;
+        _receiveAllButton.interactable = false;
+
+        await _controller.ReceiveAllAsync();
+
+        _isReceivingAll = false;
+        _receiveAllButton.interactable = true;
     }
 }

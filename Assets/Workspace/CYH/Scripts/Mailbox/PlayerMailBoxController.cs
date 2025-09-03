@@ -64,7 +64,12 @@ public class PlayerMailBoxController : MonoBehaviour
         RefreshUI(loaded);
     }
 
-    public async void ReceiveReward(string mailId)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="mailId"></param>
+    /// <returns></returns>
+    public async Task ReceiveRewardAsync(string mailId)
     {
         MailData mail = _mail?.Find(m => m.MailId == mailId);
 
@@ -72,6 +77,7 @@ public class PlayerMailBoxController : MonoBehaviour
         {
             List<MailData> loadedMail = await LoadAsync();
             mail = loadedMail?.Find(m => m.MailId == mailId);
+
             if (mail == null)
             {
                 Debug.LogWarning($"[ReceiveReward] mail == null : {mailId}");
@@ -91,7 +97,30 @@ public class PlayerMailBoxController : MonoBehaviour
        // await Manager.DB.SetMailIsReceivedAsync(mailId, true);
         
         // 메일 삭제
-        DeleteMail(mailId);
+        await DeleteMail(mailId);
+    }
+
+    public async Task ReceiveAllAsync()
+    {
+        if (_mail == null || _mail.Count == 0) return;
+
+        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+        List<MailData> unReceivedMailList = _mail.FindAll(m => !m.IsReceived && !m.IsExpired(currentTime));
+
+        if (unReceivedMailList.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var mail in unReceivedMailList)
+        {
+            await ReceiveRewardAsync(mail.MailId);
+
+            await Task.Yield();
+        }
+
+        await RefreshAsync();
     }
 
     /// <summary>
@@ -108,7 +137,7 @@ public class PlayerMailBoxController : MonoBehaviour
     /// 유저 메일 DB에서 해당 mailId를 삭제하는 메서드
     /// </summary>
     /// <param name="mailId">메일 ID</param>
-    public async void DeleteMail(string mailId)
+    public async Task DeleteMail(string mailId)
     {
         await Manager.DB.DeleteMailAsync(mailId);
     }
@@ -139,7 +168,6 @@ public class PlayerMailBoxController : MonoBehaviour
         // ReceivedDate 기준 내림차순 정렬
         //mailList.Sort((a, b) => b.ReceivedDate.CompareTo(a.ReceivedDate));
 
-        OnMailboxUpdated?.Invoke(mailList);
         var loaded = await LoadAsync();
         RefreshUI(loaded);
     }

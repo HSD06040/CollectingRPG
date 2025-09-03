@@ -187,6 +187,7 @@ public class DeadState : BaseState
     public DeadState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
         _status.OnUnitDied += ChangeDeadState;
+        Debug.Log("DiedEvent등록 완료");
     }
 
     public override void Enter()
@@ -208,6 +209,7 @@ public class DeadState : BaseState
 
     private void ChangeDeadState(UnitStatusController _unitStatusController)
     {
+        Debug.Log("유닛 DeadState 전환");
         _stateMachine.ChangeState(_fsm.DeadState);
     }
 }

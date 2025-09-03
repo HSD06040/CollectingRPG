@@ -25,7 +25,7 @@ public class CsvDownloader
 
         foreach (var csvData in _csvLoadData.CsvDatas)
         {
-            tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));         
+            tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));
         }
 
         await UniTask.WhenAll(tasks);

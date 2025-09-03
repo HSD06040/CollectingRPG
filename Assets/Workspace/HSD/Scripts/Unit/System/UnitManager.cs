@@ -23,8 +23,6 @@ public class UnitManager : MonoBehaviour
     
     private void Awake()
     {
-        Utils.Initialize();
-
         if(IsTest)
             CsvDownloader.OnDataSetupCompleted += Init;
         else
@@ -33,6 +31,7 @@ public class UnitManager : MonoBehaviour
 
     private void Init()
     {
+        Manager.Data.SynergyDB.ResetSynergys();
         UnitController.Init();
         _unitStanbyUIManager.Init();
 
@@ -140,7 +139,6 @@ public class UnitManager : MonoBehaviour
             Debug.Log("골드가 부족합니다.");
             return;
         }
-
         UnitData unit = _unitDatas[Random.Range(0, _unitDatas.Length)];
         UnitStatus unitStatus = new UnitStatus(unit);
 

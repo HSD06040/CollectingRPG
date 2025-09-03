@@ -72,8 +72,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         {
             SetBaseStat(status.GetCurrentStat(), plusUnitStat);
         }
-
-        ClearAllStat();
     }
 
     #region SetStat
@@ -149,7 +147,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     }
     #endregion
 
-    private void ClearAllStat()
+    public void ClearAllStat()
     {
         // 모든 스탯의 모디파이어 제거
         MaxHealth.ClearModifiers();

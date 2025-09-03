@@ -153,15 +153,16 @@ public class TimeManager : MonoBehaviour
 
     public bool CanObtainAdGachaReward()
     {
-        if (_dailyAdGachaRewardInfo.state <= 0) return false;
-
         if (IsDailyAdGachaResetTime(out int stack))
         {
             _dailyAdGachaRewardInfo.state += stack;
             if (_dailyAdGachaRewardInfo.state > 2) _dailyAdGachaRewardInfo.state = 2;
             return true;
         }
-        return true;
+
+        if (_dailyAdGachaRewardInfo.state >= 1) return true;               
+
+        return false;
     }
 
     #endregion

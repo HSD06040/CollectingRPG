@@ -12,7 +12,6 @@ public abstract class UIBase : MonoBehaviour
 
     private void AutoBind()
     {
-        // 필드 전부 가져오기
         var fields = GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 
         foreach (var field in fields)
@@ -40,6 +39,5 @@ public abstract class UIBase : MonoBehaviour
 
             field.SetValue(this, component);
         }
-        Debug.Log("바인딩 완료");
     }
 }

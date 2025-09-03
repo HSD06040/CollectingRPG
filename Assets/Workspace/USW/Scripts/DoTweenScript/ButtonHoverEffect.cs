@@ -14,13 +14,6 @@ public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerEx
     [SerializeField] float animationDuration = 0.3f;
     [SerializeField] Ease ease = Ease.InOutBack;
     
-    [Header("DoTween additional Settings")]
-    [SerializeField] bool enablePunch = false;
-
-    [SerializeField] private float punchStrength = 0.1f;
-
-    [SerializeField] private int punchVibration = 1;
-    
     Vector3 originalScale;
     Sequence hoverSequence;
 
