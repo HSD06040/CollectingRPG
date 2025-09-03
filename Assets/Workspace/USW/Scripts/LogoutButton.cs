@@ -16,7 +16,6 @@ public class LogoutButton : MonoBehaviour
     {
         if (_logoutButton == null)
         {
-            Debug.LogError("[Auth] 로그아웃 버튼 미할당");
             return;
         }
 
@@ -34,13 +33,11 @@ public class LogoutButton : MonoBehaviour
         var auth = FirebaseManager.Auth;
         if (auth == null)
         {
-            Debug.LogError("[Auth] FirebaseAuth 인스턴스가 없습니다.");
             return;
         }
 
         if (auth.CurrentUser == null)
         {
-            Debug.Log("[Auth] 현재 로그인된 사용자가 없습니다.");
             return;
         }
 
@@ -50,6 +47,6 @@ public class LogoutButton : MonoBehaviour
         // 로그아웃
         auth.SignOut();
 
-        Debug.Log($"[Auth] 로그아웃 완료 - 이전 UID={uid}, 닉네임={name}");
+        Debug.Log($"로그아웃 완료 - 이전 UID={uid}, 닉네임={name}");
     }
 }
