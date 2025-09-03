@@ -13,6 +13,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     [SerializeField] UnitData _unitData;
 
     [Header("UI")]
+    [SerializeField] private GameObject _backgroundPanel;
     //[SerializeField] private TMP_Text _charText;
     [SerializeField] private Image _characterImg;
     [SerializeField] private Image _costImg;
@@ -24,6 +25,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     [Header("Reference")]
     [SerializeField] Sprite[] costSprites;
+    [SerializeField] TempUpgradeUnitData _upgradeData;
 
     private UpgradeManager _manager;
 
@@ -100,8 +102,17 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void UIUpdate()
     {
-        //_charText.text = $"{_status.Data.Name}";
-        _characterImg.sprite = _status.Data.Icon;
+        if(_upgradeData.IsCollected)
+        {
+            _backgroundPanel.SetActive(false);
+        }
+        else
+        {
+            _backgroundPanel.SetActive(true);
+        }
+
+            //_charText.text = $"{_status.Data.Name}";
+            _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost - 1];
         if (Manager.Data != null)
         {
