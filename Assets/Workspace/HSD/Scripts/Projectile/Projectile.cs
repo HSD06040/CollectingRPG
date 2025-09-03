@@ -34,7 +34,15 @@ public class Projectile : MonoBehaviour
         _speed = speed;
 
         if(_target == null)
+        {
             _target = Physics2D.OverlapCircle(transform.position, status.AttackRange.Value, targetLayer)?.transform;
+
+            if (_target == null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
 
         MoveAndDestroyAsync(_lifeTime).Forget(); // 발사체 이동 및 파괴 비동기 작업 시작
     }

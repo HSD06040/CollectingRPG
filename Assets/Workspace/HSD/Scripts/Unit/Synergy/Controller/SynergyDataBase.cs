@@ -44,4 +44,12 @@ public class SynergyDatabase : ScriptableObject
     {
         return _synergyDataDic.TryGetValue(synergyIdx, out var effect) ? effect : null;
     }
+
+    public void ResetSynergys()
+    {
+        foreach (var synergyData in _synergyDataDic.Values)
+        {
+            synergyData.Init();
+        }
+    }
 }

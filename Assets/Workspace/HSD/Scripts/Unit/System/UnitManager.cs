@@ -33,6 +33,7 @@ public class UnitManager : MonoBehaviour
 
     private void Init()
     {
+        Manager.Data.SynergyDB.ResetSynergys();
         UnitController.Init();
         _unitStanbyUIManager.Init();
 
