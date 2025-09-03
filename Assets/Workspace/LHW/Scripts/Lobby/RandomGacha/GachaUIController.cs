@@ -153,7 +153,7 @@ public class GachaUIController : MonoBehaviour
     {
         while (true)
         {
-            if (TimeManager.Instance != null && _adCooltimeImage.activeSelf == true)
+            if (TimeManager.Instance != null)
             {
                 TimeManager.Instance.CanObtainAdGachaReward();
 
@@ -175,7 +175,7 @@ public class GachaUIController : MonoBehaviour
     {
         while (true)
         {
-            if (TimeManager.Instance != null && _dailyCooltimeImage.activeSelf == true)
+            if (TimeManager.Instance != null)
             {
                 TimeManager.Instance.CanObtainedFreeGachaReward();
 
