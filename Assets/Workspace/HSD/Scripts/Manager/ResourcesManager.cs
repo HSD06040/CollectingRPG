@@ -7,15 +7,37 @@ using UnityEngine.AddressableAssets;
 public class ResourcesManager : Singleton<ResourcesManager>
 {
     private static Dictionary<string, Object> resources = new Dictionary<string, Object>();
-
-    public async UniTask LoadLabel<T>(string label) where T : Object
+    
+    public UniTask LoadAllLabel(AssetLabelReference[] labels)
     {
-        var locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
+        List<UniTask> tasks = new List<UniTask>();
+        foreach (var label in labels)
+        {
+            tasks.Add(LoadLabel(label));
+        }
+
+        return UniTask.WhenAll(tasks);
+    }
+
+    public UniTask UnloadAllLabel(AssetLabelReference[] labels)
+    {
+        List<UniTask> tasks = new List<UniTask>();
+        foreach (var label in labels)
+        {
+            tasks.Add(UnloadLabel(label));
+        }
+        return UniTask.WhenAll(tasks);
+    }
+
+    #region Load
+    public async UniTask LoadLabel(string label)
+    {
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
         var locations = await locationsHandle.Task;
 
         foreach (var location in locations)
         {
-            var handle = Addressables.LoadAssetAsync<T>(location);
+            var handle = Addressables.LoadAssetAsync<Object>(location);
             var asset = await handle.Task;
 
             if (!resources.ContainsKey(location.PrimaryKey))
@@ -25,9 +47,60 @@ public class ResourcesManager : Singleton<ResourcesManager>
         Addressables.Release(locationsHandle);
     }
 
-    public async UniTask UnLoadLabel<T>(string label) where T : Object
+    public async UniTask LoadLabel(AssetLabelReference label)
     {
-        var locationsHandle = Addressables.LoadResourceLocationsAsync(label, typeof(T));
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
+        var locations = await locationsHandle.Task;
+
+        foreach (var location in locations)
+        {
+            var handle = Addressables.LoadAssetAsync<Object >(location);
+            var asset = await handle.Task;
+
+            if (!resources.ContainsKey(location.PrimaryKey))
+                resources.Add(location.PrimaryKey, asset);
+        }
+
+        Addressables.Release(locationsHandle);
+    }
+    public async UniTask<T[]> LoadAll<T>(string label) where T : Object
+    {
+        var handle = Addressables.LoadAssetsAsync<T>(label, null);
+        var result = await handle.Task;
+
+        return result.ToArray();
+    }
+
+    public async UniTask<T> Load<T>(string path) where T : Object
+    {
+        if (!resources.ContainsKey(path))
+        {
+            var handle = Addressables.LoadAssetAsync<T>(path);
+            var asset = await handle.Task;
+
+            resources.Add(path, asset);
+        }
+
+        return resources[path] as T;
+    }
+
+    public async UniTask<T> Load<T>(AssetReference reference) where T : Object
+    {
+        if (!resources.ContainsKey(reference.RuntimeKey.ToString()))
+        {
+            var handle = reference.LoadAssetAsync<T>();
+            var asset = await handle.Task;
+            resources.Add(reference.RuntimeKey.ToString(), asset);
+        }
+
+        return resources[reference.RuntimeKey.ToString()] as T;
+    }
+#endregion
+
+    #region Unload
+    public async UniTask UnloadLabel(string label)
+    {
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
         var locations = await locationsHandle.Task;
 
         foreach (var location in locations)
@@ -41,14 +114,21 @@ public class ResourcesManager : Singleton<ResourcesManager>
         Addressables.Release(locationsHandle);
     }
 
-    public async UniTask<T[]> LoadAll<T>(string label) where T : Object
+    public async UniTask UnloadLabel(AssetLabelReference label)
     {
-        var handle = Addressables.LoadAssetsAsync<T>(label, null);
-        var result = await handle.Task;
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
+        var locations = await locationsHandle.Task;
 
-        return result.ToArray();
+        foreach (var location in locations)
+        {
+            if (resources.ContainsKey(location.PrimaryKey))
+            {
+                Unload(location.PrimaryKey);
+            }
+        }
+
+        Addressables.Release(locationsHandle);
     }
-
     public void Unload(string path)
     {
         if (resources.TryGetValue(path, out var asset))
@@ -66,19 +146,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
         }
         resources.Clear();
     }
-
-    public async UniTask<T> Load<T> (string path) where T : Object
-    {
-        if(!resources.ContainsKey(path))
-        {
-            var handle = Addressables.LoadAssetAsync<T>(path);
-            var asset = await handle.Task;
-
-            resources.Add(path, asset);
-        }
-
-        return resources[path] as T;
-    }
+    #endregion
 
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {

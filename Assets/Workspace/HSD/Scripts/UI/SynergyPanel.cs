@@ -13,7 +13,7 @@ public class SynergyPanel : MonoBehaviour
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
     [SerializeField] int _offset;
 
-    private Dictionary<int, SynergySlot> _synergySlots = new(50);
+    private Dictionary<int, SynergySlot> _synergySlots = new(10);
     private int _currentPage;
     private int _maxPage;
 

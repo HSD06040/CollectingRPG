@@ -9,7 +9,7 @@ public class SynergySlotPanel : MonoBehaviour
     [SerializeField] GameObject _synergyIconPrefab;
     [SerializeField] Transform _content;
     [SerializeField] SynergyToolTip _synergyTooltip;
-    private Dictionary<int, int> _synergyIconSlotDic = new(50);
+    private Dictionary<int, int> _synergyIconSlotDic = new(10);
     private SynergyIconSlot[] _synergyIconSlots;
 
     public void Init(SynergyDatabase db)

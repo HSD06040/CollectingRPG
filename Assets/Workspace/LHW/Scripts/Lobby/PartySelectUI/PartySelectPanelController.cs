@@ -42,10 +42,13 @@ public class PartySelectPanelController : MonoBehaviour
         }
     }
 
-    private void GameStart()
+    private async void GameStart()
     {
         // 씬 전환
         SceneManager.LoadScene("USW_GameScene");
+
+        await Manager.Resources.LoadLabel("Stage");
+
         Debug.Log("게임 시작");
     }
 }

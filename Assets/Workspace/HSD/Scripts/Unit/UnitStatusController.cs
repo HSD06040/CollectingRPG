@@ -182,9 +182,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         if(IsDead)
             return;
 
-        CurHp.Value = Mathf.Clamp(CurHp.Value - amount,0, int.MaxValue);
+        CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
 
-        if(CurHp.Value == 0)
+        if(CurHp.Value < 0)
         {
             Die();
         }
@@ -192,24 +192,33 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void IncreaseHealth(int amount)
     {
-        CurHp.Value = Mathf.Clamp(CurHp.Value + amount, 0, MaxHealth.Value);
+        CurHp.Value += amount;
+
+        if(CurHp.Value > MaxHealth.Value)
+        {
+            CurHp.Value = MaxHealth.Value;
+        }
     }
 
     public void IncreaseMana(int amount)
     {
-        CurMana.Value = Mathf.Clamp(CurMana.Value + amount, 0, MaxMana.Value);
+        CurMana.Value += amount;
+
+        if (CurMana.Value > MaxMana.Value)
+        {
+            CurMana.Value = MaxMana.Value;
+        }
     }
 
     public void IncreaseShield(int amount)
-    {
-        Debug.Log($"IncreaseShield: {amount}");
+    {        
         Shield.Value += amount;
     }
 
     private void Die()
     {
-        OnUnitDied?.Invoke(this);
         OnDied?.Invoke();
+        OnUnitDied?.Invoke(this);
     }
 
     public void GetMana()

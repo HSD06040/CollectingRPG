@@ -3,7 +3,7 @@ using UnityEngine;
 public class UnitManager : MonoBehaviour
 {
     [Header("Test")]
-    public bool IsTest;
+    public bool IsTest;    
 
     [Header("BattleManager")]
     [SerializeField] BattleManager _battleManager;
@@ -31,7 +31,7 @@ public class UnitManager : MonoBehaviour
             Init();
     }
 
-    private void Init()
+    public void Init()
     {
         Manager.Data.SynergyDB.ResetSynergys();
         UnitController.Init();

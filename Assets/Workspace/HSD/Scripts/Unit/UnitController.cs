@@ -14,9 +14,9 @@ public class UnitController : MonoBehaviour
 
     #region Unit
     private UnitBase[,] _unitGrid;
-    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(256);
-    private Dictionary<UnitData, int> _unitCountDic = new Dictionary<UnitData, int>(64);
-    private Dictionary<int, List<UnitBase>> _synergyUnitDic = new Dictionary<int, List<UnitBase>>(256);
+    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(64);
+    private Dictionary<UnitData, int> _unitCountDic = new Dictionary<UnitData, int>(36);
+    private Dictionary<int, List<UnitBase>> _synergyUnitDic = new Dictionary<int, List<UnitBase>>(64);
     #endregion
 
     #region Data
@@ -275,7 +275,7 @@ public class UnitController : MonoBehaviour
     {
         if (!_unitBaseDic.TryGetValue(unit.Status.Address, out var list))
         {
-            list = new List<UnitBase>(16);
+            list = new List<UnitBase>(4);
             _unitBaseDic.Add(unit.Status.Address, list);
         }
         list.Add(unit);
