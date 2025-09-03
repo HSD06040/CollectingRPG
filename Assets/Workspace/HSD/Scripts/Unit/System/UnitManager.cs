@@ -23,8 +23,6 @@ public class UnitManager : MonoBehaviour
     
     private void Awake()
     {
-        Utils.Initialize();
-
         if(IsTest)
             CsvDownloader.OnDataSetupCompleted += Init;
         else
