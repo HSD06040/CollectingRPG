@@ -1,9 +1,14 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class UnitManager : MonoBehaviour
 {
     [Header("Test")]
-    public bool IsTest;    
+    public bool IsTest;
+
+    [Header("Addressables")]
+    [SerializeField] AssetReference _worldCanvas;
 
     [Header("BattleManager")]
     [SerializeField] BattleManager _battleManager;
@@ -23,17 +28,21 @@ public class UnitManager : MonoBehaviour
     
     private void Awake()
     {
-        Utils.Initialize();
-
-        if(IsTest)
-            CsvDownloader.OnDataSetupCompleted += Init;
+        if (IsTest)
+            CsvDownloader.OnDataSetupCompleted += InitAsync;
         else
-            Init();
+            InitAsync();
     }
 
-    public void Init()
+    private async void InitAsync()
     {
+        await Manager.Resources.LoadLabel("Stage");
+        GameObject obj = await Manager.Resources.Get<GameObject>(_worldCanvas);
+
+        Manager.Pool.PopUpInit(Instantiate(obj).transform);
+
         Manager.Data.SynergyDB.ResetSynergys();
+
         UnitController.Init();
         _unitStanbyUIManager.Init();
 
@@ -43,7 +52,7 @@ public class UnitManager : MonoBehaviour
 
         _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
         _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
-                       
+
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
 
         if (preset == null)
@@ -51,12 +60,42 @@ public class UnitManager : MonoBehaviour
 
         for (int i = 0; i < preset.Statuses.Length; i++)
         {
-            if(preset.Statuses[i].Data != null)
+            if (preset.Statuses[i].Data != null)
             {
                 AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
             }
         }
     }
+
+    //public void Init()
+    //{
+    //    //Manager.Pool.PopUpInit();
+
+    //    Manager.Data.SynergyDB.ResetSynergys();
+
+    //    UnitController.Init();
+    //    _unitStanbyUIManager.Init();
+
+    //    _unitDatas = Manager.Data.UnitDatas;
+
+    //    Subscribe();
+
+    //    _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
+    //    _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
+                       
+    //    TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
+
+    //    if (preset == null)
+    //        return;
+
+    //    for (int i = 0; i < preset.Statuses.Length; i++)
+    //    {
+    //        if(preset.Statuses[i].Data != null)
+    //        {
+    //            AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
+    //        }
+    //    }
+    //}
 
     private void OnDestroy()
     {

@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -9,57 +10,63 @@ using UnityEngine.SceneManagement;
 
 public class PoolManager : Singleton<PoolManager>
 {
-    private Dictionary<string, IObjectPool<GameObject>> poolDic;
-    private Dictionary<string, Transform> parentDic;
-    private Dictionary<string, float> lastUseTimeDic;
+    private Dictionary<string, IObjectPool<GameObject>> _poolDic;
+    private Dictionary<string, Transform> _parentDic;
+    private Dictionary<string, float> _lastUseTimeDic;
 
-    private Transform parent;
+    private ObjectPool<DamagePopUp> _popUpPool;
+    private DamagePopUp _damagePopUp;
 
-    private Coroutine poolCleanupRoutine;   
-    private YieldInstruction cleanUpDelay;
+    private Transform _parent;
+    private Transform _uiParent;
 
-    private const float poolCleanupTime = 60;
-    private const float poolCleanupDelay = 30;
+    private const float _poolCleanupTime = 60;
+    private const float _poolCleanupDelay = 30;
 
     public void Start()
     {
-        cleanUpDelay = new WaitForSeconds(poolCleanupDelay);
-
         ResetPool();
-        poolCleanupRoutine = StartCoroutine(PoolCleanupRoutine());
+        PoolCleanupRoutine().Forget();
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;        
+    }
+
+    public void PopUpInit(Transform uiParent)
+    {
+        _uiParent = uiParent;
+        _damagePopUp = Manager.Resources.Get<GameObject>("DamagePopUp").GetComponent<DamagePopUp>();
+        CreatePopUpPool();
     }
 
     public void ResetPool()
     {
-        poolDic = new();
-        parentDic = new();
-        lastUseTimeDic = new();
+        _poolDic = new();
+        _parentDic = new();
+        _lastUseTimeDic = new();
 
-        parent = new GameObject("Pools").transform;
+        _parent = new GameObject("Pools").transform;
     }
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         ResetPool();
     }
 
-    IEnumerator PoolCleanupRoutine()
+    private async UniTask PoolCleanupRoutine()
     {
         while (true)
         {
-            yield return cleanUpDelay;
+            await UniTask.WaitForSeconds(_poolCleanupDelay); 
 
             float now = Time.time;
             List<string> removePoolKeys = new List<string>();
 
-            foreach (var kvp in poolDic)
+            foreach (var kvp in _poolDic)
             {
                 string key = kvp.Key;
 
-                if (lastUseTimeDic.TryGetValue(key, out float lastTime))
+                if (_lastUseTimeDic.TryGetValue(key, out float lastTime))
                 {
-                    if (now - lastTime > poolCleanupTime)
+                    if (now - lastTime > _poolCleanupTime)
                     {
                         removePoolKeys.Add(key);
                     }
@@ -68,31 +75,25 @@ public class PoolManager : Singleton<PoolManager>
 
             foreach (var value in removePoolKeys)
             {
-                poolDic.Remove(value);
+                _poolDic.Remove(value);
 
-                if (parentDic[value].gameObject != null)
-                    Destroy(parentDic[value].gameObject);
+                if (_parentDic[value].gameObject != null)
+                    Destroy(_parentDic[value].gameObject);
 
-                parentDic.Remove(value);
-                lastUseTimeDic.Remove(value);
+                _parentDic.Remove(value);
+                _lastUseTimeDic.Remove(value);
             }
         }
     }
 
-    public void StopPoolCleanupRoutine()
-    {
-        StopCoroutine(poolCleanupRoutine);
-        poolCleanupRoutine = null;
-    }
-
     private IObjectPool<GameObject> GetOrCreatePool(string name, GameObject prefab)
     {
-        if(poolDic.ContainsKey(name))
-            return poolDic[name];
+        if(_poolDic.ContainsKey(name))
+            return _poolDic[name];
 
         Transform root = new GameObject($"{name} Pool").transform;
-        root.parent = parent;
-        parentDic.Add(name, root);
+        root.parent = _parent;
+        _parentDic.Add(name, root);
 
         ObjectPool<GameObject> pool = new ObjectPool<GameObject>
         (
@@ -101,14 +102,14 @@ public class PoolManager : Singleton<PoolManager>
                 GameObject obj = Instantiate(prefab);
                 obj.name = name;
                 obj.transform.parent = root;
-                lastUseTimeDic[name] = Time.time;
+                _lastUseTimeDic[name] = Time.time;
                 return obj;
             },
             actionOnGet: (GameObject go) =>
             {
                 go.transform.parent = null;
                 go.SetActive(true);
-                lastUseTimeDic[name] = Time.time;
+                _lastUseTimeDic[name] = Time.time;
             },
             actionOnRelease: (GameObject go) =>
             {
@@ -122,10 +123,57 @@ public class PoolManager : Singleton<PoolManager>
             maxSize: 10
         );
 
-        poolDic.Add(name, pool);
+        _poolDic.Add(name, pool);
         return pool;
     }
 
+    #region Popup
+    private void CreatePopUpPool()
+    {
+        _popUpPool = new ObjectPool<DamagePopUp>
+        (
+            createFunc: () =>
+            {
+                DamagePopUp obj = Instantiate(_damagePopUp);
+                obj.name = "DamagePopUp";
+                obj.transform.SetParent(_uiParent);
+                _lastUseTimeDic[obj.name] = Time.time;
+                return obj;
+            },
+            actionOnGet: (DamagePopUp damagePopUp) =>
+            {
+                damagePopUp.gameObject.SetActive(true);
+                _lastUseTimeDic[damagePopUp.gameObject.name] = Time.time;
+            },
+            actionOnRelease: (DamagePopUp damagePopUp) =>
+            {
+                damagePopUp.gameObject.SetActive(false);
+            },
+            actionOnDestroy: (DamagePopUp damagePopUp) =>
+            {
+                Destroy(damagePopUp.gameObject);
+            },
+            maxSize: 10
+        );
+    }
+
+    public DamagePopUp GetPopUp(Vector2 pos)
+    {
+        DamagePopUp popUp = _popUpPool.Get();
+        popUp.transform.position = pos;            
+
+        return popUp;
+    }
+
+    public void ReleasePopUp(DamagePopUp popUp)
+    {
+        if (popUp == null || !popUp.gameObject.activeSelf) return;
+
+        _popUpPool.Release(popUp);
+    }
+    #endregion
+
+    #region Get
     public T Get<T> (T original, Vector3 position, Quaternion rotation, Transform parent) where T : Object
     {
         GameObject go = original as GameObject;
@@ -158,16 +206,18 @@ public class PoolManager : Singleton<PoolManager>
     {
         return Get<T>(original, position, Quaternion.identity, parent);
     }
+    #endregion
 
+    #region Release
     public void Release<T> (T original) where T : Object
     {
         GameObject obj = original as GameObject;
         string name = obj.name;
 
-        if (!poolDic.ContainsKey(name) && !obj.activeSelf)
+        if (!_poolDic.ContainsKey(name) && !obj.activeSelf)
             return;
 
-        poolDic[name].Release(obj);
+        _poolDic[name].Release(obj);
     }
 
     public void Release<T>(T original, float delay) where T : Object
@@ -185,11 +235,12 @@ public class PoolManager : Singleton<PoolManager>
 
         string name = obj.name;
 
-        if (!poolDic.ContainsKey(name) && !obj.activeSelf)
+        if (!_poolDic.ContainsKey(name) && !obj.activeSelf)
             yield break;
 
-        poolDic[name].Release(obj);
+        _poolDic[name].Release(obj);
     }
+    #endregion
 
-    public bool ContainsKey(string name) => poolDic.ContainsKey(name);
+    public bool ContainsKey(string name) => _poolDic.ContainsKey(name);
 }
