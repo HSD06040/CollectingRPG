@@ -19,6 +19,7 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
     private void Awake()
     {
         _levelUpButton.onClick.AddListener(LevelUp);
+        gameObject.SetActive(false);
     }
 
     private void OnEnable()
