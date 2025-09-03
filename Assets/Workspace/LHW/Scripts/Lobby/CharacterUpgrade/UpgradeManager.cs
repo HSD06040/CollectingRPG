@@ -19,12 +19,16 @@ public class UpgradeManager : MonoBehaviour
     [SerializeField] private Button _characterButton;
     [SerializeField] private Button _magicStoneButton;
 
+    private void Awake()
+    {
+        _characterButton.onClick.AddListener(() => SetActivePanel("CharacterUpgrade"));
+        _magicStoneButton.onClick.AddListener(() => SetActivePanel("MagicStoneUpgrade"));
+    }
+
     private void OnEnable()
     {
         ShowCharacterCountInfo();
-        _popUpUI.gameObject.SetActive(false);
-        _characterButton.onClick.AddListener(() => SetActivePanel("CharacterUpgrade"));
-        _magicStoneButton.onClick.AddListener(() => SetActivePanel("MagicStoneUpgrade"));
+        _popUpUI.gameObject.SetActive(false);        
     }
 
     public void ShowPopUp()

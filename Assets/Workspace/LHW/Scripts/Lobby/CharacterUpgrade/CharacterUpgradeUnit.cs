@@ -13,12 +13,12 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     [SerializeField] UnitData _unitData;
 
     [Header("UI")]
-    [SerializeField] private TMP_Text _charText;
+    //[SerializeField] private TMP_Text _charText;
     [SerializeField] private Image _characterImg;
     [SerializeField] private Image _costImg;
     [SerializeField] private Image _jobSynergyImg;
     [SerializeField] private Image _roleSynergyImg;
-    [SerializeField] private TMP_Text _overallPowerText;
+    //[SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
     [SerializeField] private Image _outlineImage;
 
@@ -100,7 +100,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void UIUpdate()
     {
-        _charText.text = $"{_status.Data.Name}";
+        //_charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost - 1];
         if (Manager.Data != null)
@@ -108,7 +108,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
             _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
             _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
         }
-        _overallPowerText.text = $"{_status.CombatPower}";
+        //_overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
 
         OutlineUpdate();
