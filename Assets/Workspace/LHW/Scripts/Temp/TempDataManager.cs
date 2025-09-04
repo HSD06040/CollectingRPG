@@ -30,8 +30,8 @@ public class TempDataManager : MonoBehaviour
     private List<TeamPresetData> _presetData = new List<TeamPresetData>();
     public List<TeamPresetData> PresetData => _presetData;
 
-    private int _charPiece;
-    public int CharPiece => _charPiece;
+    [SerializeField] private TempUpgradeUnitData _upgradeUnitData;
+    public TempUpgradeUnitData UpgradeData => _upgradeUnitData;
 
     #endregion    
 
@@ -72,13 +72,13 @@ public class TempDataManager : MonoBehaviour
 
     #endregion
 
-    public void AddPiece(int amount)
-    {
-        _charPiece += amount;
+    public void AddPiece()
+    {        
+        _upgradeUnitData.AddPiece(100);
     }
 
-    public void RemovePiece(int amount)
+    public void LevelUp()
     {
-        _charPiece -= amount;
+        _upgradeUnitData.LevelUp();
     }
 }

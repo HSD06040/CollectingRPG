@@ -12,8 +12,6 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
 
     private CharacterUpgradeUnit _currentCharUnit;
 
-    private int _usingPiece = 10;
-
     public Action OnCharacterStatusChanged;
 
     private void Awake()
@@ -46,28 +44,15 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
 
     private void LevelUp()
     {
-        if (CanLevelUp(out int piece))
+        if(TempDataManager.Instance.UpgradeData.UpgradeLevel >= 10)
         {
-            _currentCharUnit.LevelUp();
-            TempDataManager.Instance.RemovePiece(piece);
-            OnCharacterStatusChanged?.Invoke();
+            if(PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowPopup("이미 최대 레벨입니다.");
+            }
         }
-    }
-
-    private bool CanLevelUp(out int piece)
-    {
-        int level = _currentCharUnit.Status.Level;
-
-        if(TempDataManager.Instance.CharPiece >= level * 10)
-        {
-            piece = level * 10;
-            // UI 표기용 임시
-            _usingPiece = piece + 10;
-            return true;
-        }
-
-        piece = 0;
-        return false;
+        TempDataManager.Instance.LevelUp();
+        OnCharacterStatusChanged?.Invoke();
     }
 
     #endregion

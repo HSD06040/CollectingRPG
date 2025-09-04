@@ -19,6 +19,8 @@ public class TempUpgradeUnitData : ScriptableObject
     
     public int GetRequiredPiece()
     {
+        if (UpgradeLevel >= 10) return 0;
+
         if (LevelUpData == null)
         {
             Debug.LogError($"[{name}] LevelUpData가 설정되지 않았습니다.");
@@ -45,11 +47,21 @@ public class TempUpgradeUnitData : ScriptableObject
     public void AddPiece(int piece)
     {
         CurrentPieces += piece;
+        Debug.Log("데이터 변동");
     }
 
-    public void ConsumePiece(int piece)
+    public void LevelUp()
     {
-        CurrentPieces -= piece;
+        // 최대레벨 변수 추가?
+        if (UpgradeLevel >= 10) return;
+
+        int requiredPiece = GetRequiredPiece();
+        
+        if(CurrentPieces >= requiredPiece)
+        {
+            CurrentPieces -= requiredPiece;
+            UpgradeLevel += 1;
+        }
     }
 }
 

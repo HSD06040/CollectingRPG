@@ -59,6 +59,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     private void OnEnable()
     {
         _manager.PopUpUI.OnCharacterStatusChanged += UIUpdate;
+        UIUpdate();
     }
 
     private void OnDisable()
@@ -128,13 +129,13 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
         //_charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost - 1];
-        if (Manager.Data != null)
+        if (Manager.Data.SynergyDB != null)
         {
             _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
             _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
         }
         //_overallPowerText.text = $"{_status.CombatPower}";
-        _levelText.text = $"Lv.{_status.Level}";
+        _levelText.text = $"Lv.{_upgradeData.UpgradeLevel}";
 
         PieceGaugeUpdate();
         OutlineUpdate();
@@ -149,30 +150,31 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
         }
         else
         {
-            _pieceGauge.fillAmount = (float)(_upgradeData.CurrentPieces / requirePiece);
+            _pieceGauge.fillAmount = ((float)_upgradeData.CurrentPieces / requirePiece);
         }
         _pieceNum.text = $"{_upgradeData.CurrentPieces}/{requirePiece}";
     }
 
     private void OutlineUpdate()
     {
-        if (_status.Level >= 3)
+        if (_upgradeData.UpgradeLevel >= 4)
         {
             _outlineImage.gameObject.SetActive(true);
-            if (_status.Level >= 9)
+            if (_upgradeData.UpgradeLevel == 10)
             {
                 _outlineImage.color = Color.red;
-
-
             }
-            else if (_status.Level >= 6)
+            else if (_upgradeData.UpgradeLevel >= 8)
             {
                 _outlineImage.color = Color.yellow;
             }
-            else
+            else if(_upgradeData.UpgradeLevel >= 6)
             {
                 _outlineImage.color = Color.blue;
-
+            }
+            else
+            {
+                _outlineImage.color = Color.cyan;
             }
         }
         else
@@ -182,12 +184,6 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     }
 
     #endregion
-
-    public void LevelUp()
-    {
-        if (_status.Level >= 12) return;
-        _status.Level++;
-    }
 
     #region Data Input
 
