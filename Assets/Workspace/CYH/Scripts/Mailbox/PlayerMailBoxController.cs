@@ -100,27 +100,37 @@ public class PlayerMailBoxController : MonoBehaviour
         await DeleteMail(mailId);
     }
 
-    public async Task ReceiveAllAsync()
+    public async Task<(int totalGold, int totalDiamond)> ReceiveAllAsync()
     {
-        if (_mail == null || _mail.Count == 0) return;
+        int totalGold = 0;
+        int totalDiamond = 0;
+        
+        if (_mail == null || _mail.Count == 0) return (0, 0);
 
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
         List<MailData> unReceivedMailList = _mail.FindAll(m => !m.IsReceived && !m.IsExpired(currentTime));
-
-        if (unReceivedMailList.Count == 0)
-        {
-            return;
-        }
-
+        
         foreach (var mail in unReceivedMailList)
         {
+            totalGold += mail.Gold;
+            totalDiamond += mail.Diamond;
+        }
+
+        Debug.Log($"totalGold : {totalGold} / totalDiamond : {totalDiamond}");
+
+        if (unReceivedMailList.Count == 0) return (0, 0);
+
+        // TODO: [CYH] 일괄 수령 리팩토링
+        foreach (MailData mail in unReceivedMailList)
+        {
+            Debug.Log($"ReceiveRewardAsync 실행");
             await ReceiveRewardAsync(mail.MailId);
 
             await Task.Yield();
         }
 
         await RefreshAsync();
+        return (totalGold, totalDiamond);
     }
 
     /// <summary>
