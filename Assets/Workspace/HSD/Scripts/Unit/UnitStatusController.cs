@@ -52,6 +52,12 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     [HideInInspector] public float StatMultiplier = 0;
 
     public bool IsDead => CurHp.Value <= 0;
+    private CancellationToken _destroyToken;
+
+    private void Awake()
+    {
+        _destroyToken = this.GetCancellationTokenOnDestroy();
+    }
 
     private void OnDestroy()
     {
@@ -175,21 +181,53 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
         _activeBuffs.Clear();
     }
-#endregion
+    #endregion
 
-    public void TakeDamage(int amount)
+    #region TakeDamage
+    public void TakeDamage(int amount, bool isCrit = false)
     {
         if(IsDead)
             return;
 
+        Manager.Pool.GetPopUp(transform.position).Init(amount, isCrit);
+
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
+
 
         if(CurHp.Value < 0)
         {
             Die();
         }
     }
+    
+    public void TakeTickDamage(int amount, float totalTickTime, float tickTime = 1)
+    {
+        TickDamage(amount, totalTickTime, tickTime).Forget();
+    }
 
+    private async UniTask TickDamage(int amount, float totalTickTime, float tickTime)
+    {
+        var destroyToken = this.GetCancellationTokenOnDestroy();
+
+        while (totalTickTime > 0)
+        {
+            TakeDamage(amount);
+
+            try
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(tickTime), cancellationToken: destroyToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            totalTickTime -= tickTime;
+        }
+    }
+    #endregion
+
+    #region Increase
     public void IncreaseHealth(int amount)
     {
         CurHp.Value += amount;
@@ -214,6 +252,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {        
         Shield.Value += amount;
     }
+    #endregion
 
     private void Die()
     {
@@ -226,6 +265,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         IncreaseMana(ManaGain.Value);
     }
 
+    #region Effect
     public void ApplyEffect(BuffEffectData buffEffectData, float value, string source)
     {
         var key = new SourceKey(buffEffectData.StatType, source);
@@ -261,6 +301,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             // 갱신으로 취소된 경우 RemoveStat 안 함
         }
     }
+    #endregion
 
     #region Stat Management
     public void AddStat(StatType statType, float value, string source)

@@ -4,5 +4,6 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    public void TakeDamage(int amount);
+    public void TakeDamage(int amount, bool isCrit);
+    public void TakeTickDamage(int amount, float totalTickTime, float tickTime = 1);
 }

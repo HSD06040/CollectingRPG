@@ -13,7 +13,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         {
             if(_target == null)
             {
-                _target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
+                FindTarget();
             }
 
             return _target;

@@ -35,7 +35,7 @@ public class SynergyEffect : ScriptableObject
     //[Header("EffectType")]
     public EffectType EffectType; // Increase
     public SynergyBuffData[] SynergyBuffDatas;
-    public SynergyStatModifier[] StatModifiers;
+    public StatEffectModifier[] StatModifiers;
 
     //[Header("TriggerType")]
     public TriggerType TriggerType;

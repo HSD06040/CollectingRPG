@@ -1,7 +1,6 @@
-
-#region Synergy
 using System;
 
+#region Synergy
 public enum ClassType
 {
     Tank = 0, Melee, Ranged, Support
@@ -19,13 +18,35 @@ public enum Synergy
 }
 #endregion
 
-
 public enum Grade
 {
     Normal, Rare, Unique, Legendary
 }
 
 #region Type
+
+public enum PopupType
+{
+    PhysicalDamage,
+    MagicDamage,
+    Heal,
+    Mana,
+    Buff,
+    Debuff,    
+    Crit
+}
+
+public enum MagicStoneSearchType
+{
+    All,    
+    Circle,    
+}
+
+public enum MagicStonePriority
+{
+    None,
+    LowHp,
+}
 
 /// <summary>
 /// 유닛 또는 공격하는 오브젝트 소환

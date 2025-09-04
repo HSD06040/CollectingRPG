@@ -61,7 +61,6 @@ public class BaseFSM : MonoBehaviour
     {
         while (true)
         {
-            Owner.FindTarget();
             Owner.FlipToTarget();
             StateMachine.Update();
             yield return null;

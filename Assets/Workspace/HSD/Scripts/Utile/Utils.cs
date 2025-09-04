@@ -35,10 +35,8 @@ public static class Utils
 
         int totalDamage = Mathf.RoundToInt(total * (1f - totalDefense));
 
-        Manager.Pool.GetPopUp(enemy.transform.position).Init(totalDamage, isCrit);
-
         status.TotalDamage.Value += totalDamage;
-        enemy.TakeDamage(totalDamage);
+        enemy.TakeDamage(totalDamage, isCrit);
     }
     #endregion
 
