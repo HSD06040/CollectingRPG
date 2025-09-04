@@ -77,10 +77,7 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
         if (_currentCharUnit != null)
         {
             // UI 표기
-        }
-        if (TempDataManager.Instance != null)
-        {
-            _tempText.text = $"캐릭터 정보 표기 예정\n조각 수 : {TempDataManager.Instance.CharPiece}\n 소모 조각 수: {_usingPiece}";
+            _tempText.text = $"캐릭터 정보 표기 예정\n조각 수 : {_currentCharUnit.UpgradeData.CurrentPieces.ToString()}\n 소모 조각 수: {_currentCharUnit.UpgradeData.GetRequiredPiece().ToString()}";
         }
     }
 

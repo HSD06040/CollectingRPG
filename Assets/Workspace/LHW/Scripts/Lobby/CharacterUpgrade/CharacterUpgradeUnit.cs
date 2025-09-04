@@ -1,6 +1,5 @@
 using System.Collections;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,9 +22,14 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     [SerializeField] private TMP_Text _levelText;
     [SerializeField] private Image _outlineImage;
 
+    [Header("GaugeUI")]
+    [SerializeField] private Image _pieceGauge;
+    [SerializeField] private TMP_Text _pieceNum;
+
     [Header("Reference")]
-    [SerializeField] Sprite[] costSprites;
-    [SerializeField] TempUpgradeUnitData _upgradeData;
+    [SerializeField] private Sprite[] costSprites;
+    [SerializeField] private TempUpgradeUnitData _upgradeData;
+    public TempUpgradeUnitData UpgradeData => _upgradeData;
 
     private UpgradeManager _manager;
 
@@ -66,8 +70,18 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void ShowPopUp()
     {
-        _manager.ShowPopUp();
-        _manager.PopUpUI.GetCurrentCharacterUnitData(this);
+        if (_upgradeData.IsCollected)
+        {
+            _manager.PopUpUI.GetCurrentCharacterUnitData(this);
+            _manager.ShowPopUp();
+        }
+        else
+        {
+            if (PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowPopup("획득하지 않은 캐릭터입니다.");
+            }
+        }
     }
 
     #endregion
@@ -102,7 +116,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void UIUpdate()
     {
-        if(_upgradeData.IsCollected)
+        if (_upgradeData.IsCollected)
         {
             _backgroundPanel.SetActive(false);
         }
@@ -111,8 +125,8 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
             _backgroundPanel.SetActive(true);
         }
 
-            //_charText.text = $"{_status.Data.Name}";
-            _characterImg.sprite = _status.Data.Icon;
+        //_charText.text = $"{_status.Data.Name}";
+        _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost - 1];
         if (Manager.Data != null)
         {
@@ -122,7 +136,22 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
         //_overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
 
+        PieceGaugeUpdate();
         OutlineUpdate();
+    }
+
+    private void PieceGaugeUpdate()
+    {
+        int requirePiece = _upgradeData.GetRequiredPiece();
+        if (_upgradeData.CurrentPieces == 0)
+        {
+            _pieceGauge.fillAmount = 0;
+        }
+        else
+        {
+            _pieceGauge.fillAmount = (float)(_upgradeData.CurrentPieces / requirePiece);
+        }
+        _pieceNum.text = $"{_upgradeData.CurrentPieces}/{requirePiece}";
     }
 
     private void OutlineUpdate()
@@ -130,13 +159,13 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
         if (_status.Level >= 3)
         {
             _outlineImage.gameObject.SetActive(true);
-            if(_status.Level >= 9)
+            if (_status.Level >= 9)
             {
                 _outlineImage.color = Color.red;
-                
-                
+
+
             }
-            else if(_status.Level >= 6)
+            else if (_status.Level >= 6)
             {
                 _outlineImage.color = Color.yellow;
             }
@@ -157,7 +186,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     public void LevelUp()
     {
         if (_status.Level >= 12) return;
-        _status.Level++;        
+        _status.Level++;
     }
 
     #region Data Input
