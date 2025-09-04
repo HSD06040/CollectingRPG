@@ -38,6 +38,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<int> CurMana = new Property<int>();
     public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
+    public Property<bool> IsStund = new Property<bool>();
     public UnitPassiveController PassiveController { get; set; }
 
     public event Action<UnitStatusController> OnUnitDied;
@@ -51,13 +52,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     [HideInInspector] public float StatMultiplier = 0;
 
-    public bool IsDead => CurHp.Value <= 0;
-    private CancellationToken _destroyToken;
-
-    private void Awake()
-    {
-        _destroyToken = this.GetCancellationTokenOnDestroy();
-    }
+    public bool IsDead;
 
     private void OnDestroy()
     {
@@ -69,8 +64,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         PassiveController = new UnitPassiveController(this);
         Status = status;
+        IsDead = false;
+        IsStund.Value = false;
 
-        if(plusUnitStat == null)
+        if (plusUnitStat == null)
         {
             SetBaseStat(status.GetCurrentStat());
         }            
@@ -211,6 +208,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
         while (totalTickTime > 0)
         {
+            if(IsDead)
+                return;
+
             TakeDamage(amount);
 
             try
@@ -247,6 +247,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             CurMana.Value = MaxMana.Value;
         }
     }
+    public void GetMana()
+    {
+        IncreaseMana(ManaGain.Value);
+    }
 
     public void IncreaseShield(int amount)
     {        
@@ -254,15 +258,28 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     }
     #endregion
 
-    private void Die()
+    public void Stun(float stunTime)
     {
-        OnDied?.Invoke();
-        OnUnitDied?.Invoke(this);
+        StunDelay(stunTime).Forget();
     }
 
-    public void GetMana()
+    private async UniTask StunDelay(float stunTime)
     {
-        IncreaseMana(ManaGain.Value);
+        IsStund.Value = true;
+
+        await UniTask.Delay(TimeSpan.FromSeconds(stunTime));
+
+        if (IsDead)
+            return;
+
+        IsStund.Value = false;
+    }
+
+    private void Die()
+    {
+        IsDead = true;
+        OnDied?.Invoke();
+        OnUnitDied?.Invoke(this);
     }
 
     #region Effect

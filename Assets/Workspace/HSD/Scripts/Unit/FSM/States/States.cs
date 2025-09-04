@@ -101,12 +101,10 @@ public class MoveState : BaseState
         if(_target == null)
         {
             _owner.transform.Translate(new Vector2(_owner.transform.GetFacingDir() * _status.MoveSpeed.Value * Time.deltaTime, 0), Space.World);
-            //_rb.velocity = Vector2.right * _data.MoveSpeed.Value * Time.deltaTime;
         }
         else
         {
             _owner.transform.Translate(_owner.TargetDir * _status.MoveSpeed.Value * Time.deltaTime, Space.World);
-            //_rb.velocity = _owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime;
         }
     }
 }
@@ -141,6 +139,31 @@ public class AttackState : AnimationFinishedState
 
     public AttackState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+    }
+}
+
+public class StunState : BaseState
+{
+    private float timer;
+
+    public StunState(BaseFSM fsm, int animHash) : base(fsm, animHash)
+    {
+        _status.IsStund.AddEvent(fsm.ChangeStunState);
     }
 
     public override void Enter()
