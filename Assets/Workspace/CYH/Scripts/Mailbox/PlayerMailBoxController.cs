@@ -31,7 +31,7 @@ public class PlayerMailBoxController : MonoBehaviour
     private async void InitAsync()
     {
         // TODO: [CYH] 로그인 씬 호출
-        await Manager.DB.SyncMailsOnLoginAsync();
+       await Manager.DB.SyncMailsOnLoginAsync();
 
         List<MailData> userMailDB = await LoadAsync();
         RefreshUI(userMailDB);
@@ -60,7 +60,7 @@ public class PlayerMailBoxController : MonoBehaviour
     /// </summary>
     public async Task RefreshAsync()
     {
-        var loaded = await LoadAsync();
+        List<MailData> loaded = await LoadAsync();
         RefreshUI(loaded);
     }
 
@@ -130,7 +130,7 @@ public class PlayerMailBoxController : MonoBehaviour
     public async void SetIsExpired(string mailId)
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
-        await Manager.DB.SetMailIsExpireddAsync(mailId, false);
+        await Manager.DB.SetMailIsExpiredAsync(mailId, false);
     }
 
     /// <summary>

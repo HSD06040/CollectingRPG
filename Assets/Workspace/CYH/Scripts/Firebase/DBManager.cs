@@ -3,7 +3,6 @@ using Firebase.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 
 public class DBManager : Singleton<DBManager>
@@ -519,21 +518,25 @@ public class DBManager : Singleton<DBManager>
 
             // 타입 변환 1.string -> DateTime   2. DateTime -> UnixTimeMillis(long)
             DateTime expireDateDT = DateTime.Parse(expireDateStr);
-            long expireDate = new DateTimeOffset(expireDateDT).ToUnixTimeMilliseconds();
+
+            long offset = (long)DateTimeOffset.Now.Offset.TotalMilliseconds;
+            long expireDate = new DateTimeOffset(expireDateDT).ToUnixTimeMilliseconds() - offset;
+
+            // 디버깅용
+            DateTime expireDateUTC = DateTimeOffset.FromUnixTimeMilliseconds(expireDate).UtcDateTime;
 
             // 3. 서버 현재시간과 비교
             if (expireDate > currentTime)
             {
-                Debug.Log($"우편_ {mail.Key} 사용 가능 (SendDate = {expireDateStr}/{expireDate}, currentTime = {currentTime})");
+                Debug.Log($"우편_ {mail.Key} 사용 가능 (SendDate / ExpireDateUTC = {expireDateStr}/{expireDateUTC}, currentTimeServer/currentTimeLocal = {currentTime}/{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()} )");
 
-                DatabaseReference userMailRef = FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mail.Key);
-                await userMailRef.SetValueAsync(true);
-
-                await userMailRef.SetValueAsync(new Dictionary<string, object>
+                Dictionary<string, object> updates = new Dictionary<string, object>                       
                 {
-                    ["ReceivedDate"] = currentTime,
-                    ["IsReceived"] = "false"
-                });
+                    [$"UserData/{uid}/MailData/{mailId}/ReceivedDate"] = currentTime, 
+                    [$"UserData/{uid}/MailData/{mailId}/IsReceived"] = false      
+                };
+
+                await FirebaseDatabase.DefaultInstance.RootReference.UpdateChildrenAsync(updates); 
             }
             else
             {
@@ -610,16 +613,10 @@ public class DBManager : Singleton<DBManager>
             int.TryParse(masterMail.Child("Diamond").Value?.ToString(), out diamond); 
 
             // DateTime ExpireDate -> long
-            long expireDate = 0;
             string expireDateStr = masterMail?.Child("ExpireDate").Value?.ToString();
-            
-            if (!string.IsNullOrEmpty(expireDateStr))
-            {
-                if (DateTime.TryParse(expireDateStr, out var dateTime))
-                {
-                    expireDate = new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();
-                }
-            }
+            DateTime expireDateDT = DateTime.Parse(expireDateStr);
+            long offset = (long)DateTimeOffset.Now.Offset.TotalMilliseconds;
+            long expireDate = new DateTimeOffset(expireDateDT).ToUnixTimeMilliseconds() - offset;
 
             userMailList.Add(new MailData
             {
@@ -644,7 +641,7 @@ public class DBManager : Singleton<DBManager>
     }
 
     // 기간 만료
-    public Task SetMailIsExpireddAsync(string mailId, bool value)
+    public Task SetMailIsExpiredAsync(string mailId, bool value)
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
         return FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).Child("IsExpired").SetValueAsync(value);
@@ -656,13 +653,6 @@ public class DBManager : Singleton<DBManager>
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
         return FirebaseDatabase.DefaultInstance.RootReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).RemoveValueAsync();
     }
-
-    // 
-    //public  Task GetAllUnreceivedMailAsync(string mailId)
-    //{
-    //    string uid = FirebaseManager.Auth.CurrentUser.UserId;
-    //    return FirebaseManager.DataReference.Child("UserData").Child(uid).Child("MailData").Child(mailId).Child("IsReceived").GetValueAsync;
-    //}
 
     #endregion 
 }

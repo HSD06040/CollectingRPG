@@ -90,6 +90,7 @@ public class MailItem : MonoBehaviour
         else
         {
             SetExpiredUI();
+            _controller.DeleteMail(_data.MailId);
         }
     }
 
