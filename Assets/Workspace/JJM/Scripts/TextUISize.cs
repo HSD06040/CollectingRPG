@@ -44,6 +44,7 @@ public class TextUISize : MonoBehaviour
     /// </summary>
     void UpdateFontSize()
     {
+        if (tmp == null) tmp = GetComponent<TextMeshProUGUI>();
         if (targetRect == null) return;
         float ratio = targetRect.rect.width / baseWidth;
         float newFontSize = baseFontSize * ratio;
@@ -55,6 +56,7 @@ public class TextUISize : MonoBehaviour
     /// </summary>
     void OnRectTransformDimensionsChange()
     {
+        if (tmp == null) tmp = GetComponent<TextMeshProUGUI>();
         UpdateFontSize();
     }
 }
