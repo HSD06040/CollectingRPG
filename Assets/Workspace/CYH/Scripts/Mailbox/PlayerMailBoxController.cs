@@ -97,7 +97,7 @@ public class PlayerMailBoxController : MonoBehaviour
        // await Manager.DB.SetMailIsReceivedAsync(mailId, true);
         
         // 메일 삭제
-        DeleteMail(mailId);
+        await DeleteMail(mailId);
     }
 
     public async Task ReceiveAllAsync()
