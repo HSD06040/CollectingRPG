@@ -9,6 +9,8 @@ public class RandomGachaSystem : MonoBehaviour
     [SerializeField] private ItemProbabilitySO _prob;
     [SerializeField] private GachaResultUI _resultUI;
 
+
+
     [Header("GachaListUIButton")]
     [SerializeField] private Button _characterGachaButton;
     [SerializeField] private Button _stoneGachaButton;
@@ -31,6 +33,11 @@ public class RandomGachaSystem : MonoBehaviour
     [Header("ProbOffset")]
     [SerializeField] private int digits = 0;
 
+    [Header("DB Test")]
+    [SerializeField] private UnitData _testData;
+    [SerializeField] private TempUpgradeUnitData _testUpgradeData;
+    [SerializeField] private Button _testCharacterGachaButton;
+
     private WeightedRandom<Grade> _gradeRandom = new WeightedRandom<Grade>();
 
     private void Awake()
@@ -48,6 +55,8 @@ public class RandomGachaSystem : MonoBehaviour
         _dailyCharacterGachaButton.onClick.AddListener(AdButtonClick);
         _oneCharacterGachaButton.onClick.AddListener(OneButtonClick);
         _tenCharacterGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(10));
+
+        _testCharacterGachaButton.onClick.AddListener(TestItemSelect);
     }
 
     private void RandomInit(ItemProbabilitySO probability)
@@ -76,9 +85,9 @@ public class RandomGachaSystem : MonoBehaviour
 
     private void AdButtonClick()
     {
-        if(DailyAdGacha()) return;
+        if (DailyAdGacha()) return;
 
-        if(PopupManager.Instance != null)
+        if (PopupManager.Instance != null)
         {
             PopupManager.instance.ShowPopup("일일 광고 가챠를 전부 사용하였습니다.");
         }
@@ -119,13 +128,39 @@ public class RandomGachaSystem : MonoBehaviour
             return true;
         }
         return false;
-    }    
+    }
 
     private void ConsumeGoodsButtonClick(int number)
     {
         // 재화 상태 확인 절차 진행
 
         ItemSelect(number);
+    }
+
+    #endregion
+
+    #region DB Test
+
+
+    private void TestItemSelect()
+    {
+        UnitData data = _testData;
+
+        if (!_testUpgradeData.IsCollected)
+        {
+            // 캐릭터 획득 판정 데이터 저장
+            _resultUI.HeroGachaUpdate(data, 0, "New");
+            _testUpgradeData.IsCollected = true;
+        }
+        else
+        {
+            // 조각 등장 확률도 나중에 가중치로 전환되면 가중치로 적용 필요
+            int pieceNum = UnityEngine.Random.Range(1, 11);
+            // 캐릭터 조각 개수 데이터베이스 저장
+            _resultUI.HeroGachaUpdate(data, 0, pieceNum.ToString());
+        }
+
+        _resultUI.gameObject.SetActive(true);
     }
 
     #endregion
@@ -142,7 +177,18 @@ public class RandomGachaSystem : MonoBehaviour
         for (int i = 0; i < number; i++)
         {
             UnitData data = ReturnData();
-            _resultUI.HeroGachaUpdate(data, i);
+
+            // 캐릭터 획득여부 판정
+            //if (!_testUpgradeData.IsCollected)
+            //{
+            //    _resultUI.HeroGachaUpdate(data, 0, "New");
+            //}
+            //else
+            //{
+            // 조각 등장 확률도 나중에 가중치로 전환되면 가중치로 적용 필요
+            int pieceNum = UnityEngine.Random.Range(1, 11);
+            _resultUI.HeroGachaUpdate(data, i, pieceNum.ToString());
+            //}
         }
 
         _resultUI.gameObject.SetActive(true);
