@@ -3,26 +3,15 @@ using UnityEngine.UI;
 
 public class FightUnitSlotController : MonoBehaviour
 {
-    [SerializeField] GameObject _fightSlotPrefab;
     [SerializeField] Transform _content;
     [SerializeField] GridLayoutGroup _grid;
-    private UI_FightUnitSlot[] _slots;
+    [SerializeField] UI_FightUnitSlot[] _slots;
 
     private void Awake()
     {
         CreateSlots();
 
         _grid.SetupGridLayoutGroup(_content, 10, 1, 0, true);
-
-        //int count = _grid.transform.childCount;
-        //float width = ((RectTransform)_grid.transform).rect.width;
-        //float height = ((RectTransform)_grid.transform).rect.height;
-
-        //if (count > 0)
-        //{
-        //    float cellWidth = width / count;
-        //    _grid.cellSize = new Vector2(cellWidth, height);
-        //}
     }
 
     private void CreateSlots()
@@ -33,8 +22,7 @@ public class FightUnitSlotController : MonoBehaviour
 
         for (int i = 0; i < _slotCount; i++)
         {
-            GameObject slot = Instantiate(_fightSlotPrefab, _content);
-            _slots[i] = slot.GetComponent<UI_FightUnitSlot>();
+            UI_FightUnitSlot slot = _slots[i];
             _slots[i].Init(null);
         }
     }

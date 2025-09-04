@@ -205,14 +205,14 @@ public class UnitPassive
         if (!_effect.IsAttack)
             return;
 
-        GameObject.Instantiate(_effect.Prefab, _owner.transform.position, Quaternion.identity);
+        GameObject.Instantiate(_effect.AttackPrefab, _owner.transform.position, Quaternion.identity);
     }
     private void NextAttackActive()
     {
         if (!_effect.NextEffect.IsAttack)
             return;
 
-        GameObject.Instantiate(_effect.NextEffect.Prefab, _owner.transform.position, Quaternion.identity);
+        GameObject.Instantiate(_effect.NextEffect.AttackPrefab, _owner.transform.position, Quaternion.identity);
     }
     #endregion
 

@@ -7,35 +7,29 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
-    private static Dictionary<string, Object> resources = new Dictionary<string, Object>();
+    private static Dictionary<string, Object> _resources = new Dictionary<string, Object>();
 
-    private async UniTask<string> GetPrimaryKey(AssetReference reference)
-    {
-        var locationsHandle = Addressables.LoadResourceLocationsAsync(reference);
-        var locations = await locationsHandle.Task;
-        string primaryKey = locations.FirstOrDefault()?.PrimaryKey ?? reference.RuntimeKey.ToString();
-        Addressables.Release(locationsHandle);
-        return primaryKey;
-    }
-
+    #region Get
     public async UniTask<T> Get<T>(AssetReference reference) where T : Object
     {
         string primaryKey = await GetPrimaryKey(reference);
 
-        if (!resources.ContainsKey(primaryKey))
+        if (!_resources.ContainsKey(primaryKey))
             return null;
 
-        return resources[primaryKey] as T;
+        return _resources[primaryKey] as T;
     }
 
     public T Get<T>(string address) where T : Object
     {
-        Debug.Log($"Get : {address}");
-        if (!resources.ContainsKey(address))
+        if (!_resources.ContainsKey(address))
             return null;
 
-        return resources[address] as T;
+        return _resources[address] as T;
     }
+    #endregion
+
+    #region Load&Unload Label
     public UniTask LoadAllLabel(AssetLabelReference[] labels)
     {
         List<UniTask> tasks = new List<UniTask>();
@@ -46,7 +40,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         return UniTask.WhenAll(tasks);
     }
-
     public UniTask UnloadAllLabel(AssetLabelReference[] labels)
     {
         List<UniTask> tasks = new List<UniTask>();
@@ -55,6 +48,16 @@ public class ResourcesManager : Singleton<ResourcesManager>
             tasks.Add(UnloadLabel(label));
         }
         return UniTask.WhenAll(tasks);
+    }
+    #endregion
+
+    private async UniTask<string> GetPrimaryKey(AssetReference reference)
+    {
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(reference);
+        var locations = await locationsHandle.Task;
+        string primaryKey = locations.FirstOrDefault()?.PrimaryKey ?? reference.RuntimeKey.ToString();
+        Addressables.Release(locationsHandle);
+        return primaryKey;
     }
 
     #region Load
@@ -67,15 +70,13 @@ public class ResourcesManager : Singleton<ResourcesManager>
         {
             var handle = Addressables.LoadAssetAsync<Object>(location);
             var asset = await handle.Task;
-            Debug.Log($"{label} 로딩중 : {location.PrimaryKey}");
 
-            if (!resources.ContainsKey(location.PrimaryKey))
+            if (!_resources.ContainsKey(location.PrimaryKey))
             {
-                resources.Add(location.PrimaryKey, asset);
+                _resources.Add(location.PrimaryKey, asset);
             }
         }
         Addressables.Release(locationsHandle);
-        Debug.Log($"{label} 로딩 끝");
     }
 
     public async UniTask LoadLabel(AssetLabelReference label)
@@ -88,9 +89,9 @@ public class ResourcesManager : Singleton<ResourcesManager>
             var handle = Addressables.LoadAssetAsync<Object>(location);
             var asset = await handle.Task;
 
-            if (!resources.ContainsKey(location.PrimaryKey))
+            if (!_resources.ContainsKey(location.PrimaryKey))
             {
-                resources.Add(location.PrimaryKey, asset);
+                _resources.Add(location.PrimaryKey, asset);
             }
         }
 
@@ -107,29 +108,29 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public async UniTask<T> Load<T>(string path) where T : Object
     {
-        if (!resources.ContainsKey(path))
+        if (!_resources.ContainsKey(path))
         {
             var handle = Addressables.LoadAssetAsync<T>(path);
             var asset = await handle.Task;
 
-            resources.Add(path, asset);
+            _resources.Add(path, asset);
         }
 
-        return resources[path] as T;
+        return _resources[path] as T;
     }
 
     public async UniTask<T> Load<T>(AssetReference reference) where T : Object
     {
         string primaryKey = await GetPrimaryKey(reference);
 
-        if (!resources.ContainsKey(primaryKey))
+        if (!_resources.ContainsKey(primaryKey))
         {
             var handle = reference.LoadAssetAsync<T>();
             var asset = await handle.Task;
-            resources.Add(primaryKey, asset);
+            _resources.Add(primaryKey, asset);
         }
 
-        return resources[primaryKey] as T;
+        return _resources[primaryKey] as T;
     }
     #endregion
 
@@ -141,7 +142,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         foreach (var location in locations)
         {
-            if (resources.ContainsKey(location.PrimaryKey))
+            if (_resources.ContainsKey(location.PrimaryKey))
             {
                 Unload(location.PrimaryKey);
             }
@@ -157,7 +158,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         foreach (var location in locations)
         {
-            if (resources.ContainsKey(location.PrimaryKey))
+            if (_resources.ContainsKey(location.PrimaryKey))
             {
                 Unload(location.PrimaryKey);
             }
@@ -168,24 +169,24 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public void Unload(string path)
     {
-        if (resources.TryGetValue(path, out var asset))
+        if (_resources.TryGetValue(path, out var asset))
         {
             Addressables.Release(asset);
-            resources.Remove(path);
+            _resources.Remove(path);
         }
     }
 
     public void UnloadAll()
     {
-        foreach (var kvp in resources)
+        foreach (var kvp in _resources)
         {
             Addressables.Release(kvp.Value);
         }
-        resources.Clear();
+        _resources.Clear();
     }
     #endregion
 
-
+    #region Instantiate&Destroy
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
         GameObject obj = original as GameObject;
@@ -239,4 +240,5 @@ public class ResourcesManager : Singleton<ResourcesManager>
         else
             Object.Destroy(obj, delay);
     }
+    #endregion
 }

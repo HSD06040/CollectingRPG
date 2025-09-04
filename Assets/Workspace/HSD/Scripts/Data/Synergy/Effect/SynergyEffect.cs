@@ -23,16 +23,14 @@ public class SynergyEffect : ScriptableObject
     public SpawnType SpawnType;         // 유닛소환 타입
     public UnitStats SpawnUnitStats;    // 가중치
     public Synergy SpawnSynergy;        // 유닛을 소환하는 시너지
-    public GameObject SpawnPrefab;      
-    public AssetReference SpawnObjRef;
+    public GameObject SpawnPrefab => Manager.Resources.Get<GameObject>(SpawnAddress);
     public string SpawnAddress;
 
     //[Header("AttackType (공격)")]
     public EffectAttackType EffectAttackType;
     public float Power;
-    public GameObject Prefab;
-    public AssetReference ObjRef;
-    public string Address;
+    public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);    
+    public string AttackAddress;
 
     //[Header("EffectType")]
     public EffectType EffectType; // Increase

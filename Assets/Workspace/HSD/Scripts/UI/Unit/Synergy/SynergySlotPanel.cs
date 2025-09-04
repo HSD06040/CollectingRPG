@@ -5,12 +5,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 public class SynergySlotPanel : MonoBehaviour
-{
-    [SerializeField] GameObject _synergyIconPrefab;
-    [SerializeField] Transform _content;
+{    
     [SerializeField] SynergyToolTip _synergyTooltip;
+    [SerializeField] SynergyIconSlot[] _synergyIconSlots;
     private Dictionary<int, int> _synergyIconSlotDic = new(10);
-    private SynergyIconSlot[] _synergyIconSlots;
 
     public void Init(SynergyDatabase db)
     {
@@ -20,11 +18,11 @@ public class SynergySlotPanel : MonoBehaviour
     private void CreateSynergtSlots(SynergyDatabase db)
     {
         SynergyData[] datas = db._synergyDataDic.Values.ToArray();
-        _synergyIconSlots = new SynergyIconSlot[datas.Length];
 
         for (int i = 0; i < datas.Length; i++)
         {
-            SynergyIconSlot slot = Instantiate(_synergyIconPrefab, _content).GetComponent<SynergyIconSlot>();
+            SynergyIconSlot slot = _synergyIconSlots[i];
+
             slot.Init(datas[i], _synergyTooltip);
             
             _synergyIconSlots[i] = slot;

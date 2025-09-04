@@ -6,9 +6,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Unit_Data", menuName = "Data/Unit/Unit_Data")]
 public class UnitData : ScriptableObject
 {
-    [Header("MetaData")]    
+    [Header("MetaData")]  
     public Grade Grade;
-    public GameObject UnitPrefab; // Test
+    public string AddressableAddress;
+    public GameObject UnitPrefab => Manager.Resources.Get<GameObject>(AddressableAddress);
     public Sprite Icon;
     public int ID;
     public int PerferredLine;

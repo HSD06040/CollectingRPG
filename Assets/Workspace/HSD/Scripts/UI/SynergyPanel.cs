@@ -7,7 +7,9 @@ using UnityEngine.UI;
 
 public class SynergyPanel : MonoBehaviour
 {
-    [SerializeField] GameObject _synergySlotPrefab;
+    private GameObject _synergySlotPrefab;
+
+    [SerializeField] string _synergySlotAddress;
     [SerializeField] Transform _content;
     [SerializeField] SynergyToolTip _synergyTooltip;
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
@@ -19,6 +21,8 @@ public class SynergyPanel : MonoBehaviour
 
     public void Init(SynergyDatabase db)
     {
+        _synergySlotPrefab = Manager.Resources.Get<GameObject>(_synergySlotAddress);
+
         _gridLayoutGroup.SetupGridLayoutGroup(_content, 3, 2, _offset);
 
         CreateSynergtSlots(db); 

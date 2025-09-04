@@ -53,15 +53,11 @@ public class SynergyEffectEditor : Editor
         SpawnTypeProp = serializedObject.FindProperty("SpawnType");
         SpawnUnitStatsProp = serializedObject.FindProperty("SpawnUnitStats");
         spawnSynergyProp = serializedObject.FindProperty("SpawnSynergy");
-        spawnPrefabProp = serializedObject.FindProperty("SpawnPrefab");
-        spawnObjRefProp = serializedObject.FindProperty("SpawnObjRef");
         spawnAddressProp = serializedObject.FindProperty("SpawnAddress");
 
         effectAttackTypeProp = serializedObject.FindProperty("EffectAttackType");
         powerProp = serializedObject.FindProperty("Power");
-        prefabProp = serializedObject.FindProperty("Prefab");
-        objRefProp = serializedObject.FindProperty("ObjRef");
-        addressProp = serializedObject.FindProperty("Address");
+        addressProp = serializedObject.FindProperty("AttackAddress");
 
         effectTypeProp = serializedObject.FindProperty("EffectType");
         synergyBuffDatasProp = serializedObject.FindProperty("SynergyBuffDatas");
@@ -106,8 +102,6 @@ public class SynergyEffectEditor : Editor
                     EditorGUILayout.PropertyField(SpawnUnitStatsProp, new GUIContent("가중치"));
                 }
                 EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("스폰 시너지"));
-                EditorGUILayout.PropertyField(spawnPrefabProp, new GUIContent("프리팹"));
-                EditorGUILayout.PropertyField(spawnObjRefProp, new GUIContent("참조"));
                 EditorGUILayout.PropertyField(spawnAddressProp, new GUIContent("주소"));
 
             }, new Color(1f, 1f, 0.9f, 0.3f));
@@ -123,8 +117,6 @@ public class SynergyEffectEditor : Editor
             {
                 EditorGUILayout.PropertyField(effectAttackTypeProp, new GUIContent("공격타입", "각자공격 or 전체공격"));
                 DrawColoredField("계수", powerProp, Color.red);
-                EditorGUILayout.PropertyField(prefabProp, new GUIContent("프리팹"));
-                EditorGUILayout.PropertyField(objRefProp, new GUIContent("참조"));
                 EditorGUILayout.PropertyField(addressProp, new GUIContent("주소"));
             }, new Color(1f, 0.9f, 0.9f, 0.3f));
 

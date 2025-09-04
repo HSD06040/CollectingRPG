@@ -274,7 +274,7 @@ public class GlobalPassive
 
         // 글로벌 공격은 전장 중앙이나 특정 지점에 소환하는 식으로 처리
         Vector3 pos = _center.position;
-        GameObject.Instantiate(_effect.Prefab, pos, Quaternion.identity);
+        GameObject.Instantiate(_effect.AttackPrefab, pos, Quaternion.identity);
     }
 
     private void NextAttackActive()
@@ -283,7 +283,7 @@ public class GlobalPassive
             return;
 
         Vector3 pos = _center.position;
-        GameObject.Instantiate(_effect.NextEffect.Prefab, pos, Quaternion.identity);
+        GameObject.Instantiate(_effect.NextEffect.AttackPrefab, pos, Quaternion.identity);
     }
     #endregion
 
