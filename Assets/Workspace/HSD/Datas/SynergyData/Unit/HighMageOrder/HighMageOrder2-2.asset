@@ -16,23 +16,39 @@ MonoBehaviour:
   Description: 
   IsActivationsClear: 0
   IsAttack: 0
+  IsSpawn: 0
   IsBuff: 1
+  IsDelay: 0
+  IsFirstOnly: 0
+  DelayTime: 0
+  IsUnitPosition: 0
+  IsMultiplier: 0
+  SpawnType: 0
+  SpawnUnitStats:
+    MaxHealth: 0
+    MaxMana: 0
+    ManaGain: 0
+    AttackSpeed: 0
+    MoveSpeed: 0
+    PhysicalDamage: 0
+    MagicDamage: 0
+    CritChance: 0
+    PhysicalDefense: 0
+    MagicDefense: 0
+    AttackRange: 0
+    AttackCount: 0
+  SpawnSynergy: 0
+  SpawnAddress: 
   EffectAttackType: 0
   Power: 0
-  Prefab: {fileID: 0}
-  ObjRef:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  Address: 
+  AttackAddress: 
   EffectType: 1
   SynergyBuffDatas: []
   StatModifiers:
   - StatType: 6
     Value: 15
-  TriggerType: 3
-  Interval: 0
+  TriggerType: 5
+  Interval: 3
   MaxActivations: 5
   TargetType: 1
   NextEffect: {fileID: 0}

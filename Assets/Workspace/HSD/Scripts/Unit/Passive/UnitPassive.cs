@@ -9,6 +9,7 @@ public class UnitPassive
     private UnitStatusController _owner;
     private int _currentActivations;
     private int _mulriplier;
+    private bool _isActive;
 
     private CancellationTokenSource _cts; // Interval 루프 중단용
 
@@ -30,14 +31,14 @@ public class UnitPassive
         switch (_effect.TriggerType)
         {
             case TriggerType.Base:
-                EffectActive();
+                EffectActives();
                 break;
 
             case TriggerType.OnAttack:
-                _owner.OnAttack += EffectActive;
+                _owner.OnAttack += EffectActives;
                 break;
             case TriggerType.OnUseSkill:
-                _owner.OnSkill += EffectActive;
+                _owner.OnSkill += EffectActives;
                 break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted += OnInterval;
@@ -45,11 +46,11 @@ public class UnitPassive
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted += EffectActive;
+                BattleManager.OnBattleStarted += EffectActives;
                 break;  
                 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded += EffectActive;
+                BattleManager.OnBattleEnded += EffectActives;
                 break;
         }
     }
@@ -60,14 +61,15 @@ public class UnitPassive
     public void Deactive()
     {
         TokenClear();
+        _isActive = false;
 
         switch (_effect.TriggerType)
         {
             case TriggerType.OnAttack:
-                _owner.OnAttack -= EffectActive;
+                _owner.OnAttack -= EffectActives;
                 break;
             case TriggerType.OnUseSkill:
-                _owner.OnSkill -= EffectActive;
+                _owner.OnSkill -= EffectActives;
                 break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted -= OnInterval;
@@ -75,11 +77,11 @@ public class UnitPassive
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted -= EffectActive;
+                BattleManager.OnBattleStarted -= EffectActives;
                 break;
 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded -= EffectActive;
+                BattleManager.OnBattleEnded -= EffectActives;
                 break;
         }
     }
@@ -95,47 +97,113 @@ public class UnitPassive
     #region Interval
     private void OnInterval()
     {
-        OnIntervalEffectAsync(_cts.Token).Forget();
+        if (_effect.IsDelay)
+            OnDelayEffectAsync(_cts.Token).Forget();
+        else
+            OnIntervalEffectAsync(_cts.Token).Forget();
     }
 
+    /// <summary>
+    /// 일반적인 Interval 효과 (MaxActivations 만큼 실행)
+    /// </summary>
     private async UniTask OnIntervalEffectAsync(CancellationToken token)
     {
         while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
         {
             EffectActives();
+            _currentActivations++;
+
             try
             {
                 await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
             }
             catch (OperationCanceledException)
             {
-                break;
+                return;
             }
         }
 
-        if(_effect.NextEffect != null)
+        if (_effect.NextEffect != null)
         {
-            while (true)
+            await RunNextEffectAsync(token);
+        }
+    }
+
+    /// <summary>
+    /// Delay 효과 (첫 효과 후 Delay → NextEffect)
+    /// </summary>
+    private async UniTask OnDelayEffectAsync(CancellationToken token)
+    {
+        while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
+        {
+            EffectActives();
+            _currentActivations++;
+
+            try
+            {
+                await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+
+        // Delay 대기
+        try
+        {
+            await UniTask.WaitForSeconds(_effect.DelayTime, cancellationToken: token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        // NextEffect 실행
+        if (_effect.NextEffect != null)
+        {
+            await RunNextEffectAsync(token);
+        }
+    }
+
+    /// <summary>
+    /// NextEffect 실행 로직 (Interval 여부에 따라 단발/주기)
+    /// </summary>
+    private async UniTask RunNextEffectAsync(CancellationToken token)
+    {
+        if (_effect.NextEffect.Interval > 0)
+        {
+            while (!token.IsCancellationRequested)
             {
                 NextEffectActives();
+
                 try
                 {
                     await UniTask.WaitForSeconds(_effect.NextEffect.Interval, cancellationToken: token);
                 }
                 catch (OperationCanceledException)
                 {
-                    break;
+                    return;
                 }
             }
+        }
+        else
+        {
+            NextEffectActives();
         }
     }
     #endregion
 
-#region EffectActives
+    #region EffectActives
 
     private void EffectActives()
     {
-        if(_currentActivations < _effect.MaxActivations)
+        if (_effect.IsFirstOnly && _isActive)
+            return;
+
+        _isActive = true;
+
+        if (_currentActivations < _effect.MaxActivations)
         {
             EffectActive();
             AttackActive();

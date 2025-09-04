@@ -38,14 +38,9 @@ public enum PopupType
 
 public enum MagicStoneSearchType
 {
-    All,    
-    Circle,    
-}
-
-public enum MagicStonePriority
-{
-    None,
+    All,
     LowHp,
+    Random
 }
 
 /// <summary>
@@ -108,6 +103,7 @@ public enum TargetType
     Enemy,
     Ally,
     Self,
+    Boss
 }
 
 public enum AttackAreaType

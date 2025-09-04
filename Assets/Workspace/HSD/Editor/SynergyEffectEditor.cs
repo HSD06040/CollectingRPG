@@ -11,20 +11,20 @@ public class SynergyEffectEditor : Editor
     private SerializedProperty isAttackProp;
     private SerializedProperty isBuffProp;
     private SerializedProperty isSpawnProp;
+    private SerializedProperty isDelayProp;
+    private SerializedProperty isFirstOnlyProp;
+
+    private SerializedProperty DelayTimeProp;
 
     private SerializedProperty isUnitPositionProp;
     private SerializedProperty IsMultiplierProp;
     private SerializedProperty SpawnTypeProp;
     private SerializedProperty SpawnUnitStatsProp;
     private SerializedProperty spawnSynergyProp;
-    private SerializedProperty spawnPrefabProp;
-    private SerializedProperty spawnObjRefProp;
     private SerializedProperty spawnAddressProp;
 
     private SerializedProperty effectAttackTypeProp;
     private SerializedProperty powerProp;
-    private SerializedProperty prefabProp;
-    private SerializedProperty objRefProp;
     private SerializedProperty addressProp;
 
     private SerializedProperty effectTypeProp;
@@ -47,6 +47,10 @@ public class SynergyEffectEditor : Editor
         isAttackProp = serializedObject.FindProperty("IsAttack");
         isBuffProp = serializedObject.FindProperty("IsBuff");
         isSpawnProp = serializedObject.FindProperty("IsSpawn");
+        isDelayProp = serializedObject.FindProperty("IsDelay");
+        isFirstOnlyProp = serializedObject.FindProperty("IsFirstOnly");
+
+        DelayTimeProp = serializedObject.FindProperty("DelayTime");
 
         isUnitPositionProp = serializedObject.FindProperty("IsUnitPosition");
         IsMultiplierProp = serializedObject.FindProperty("IsMultiplier");
@@ -86,8 +90,20 @@ public class SynergyEffectEditor : Editor
         EditorGUILayout.PropertyField(isSpawnProp, new GUIContent("소환할 것 인지?"));
         EditorGUILayout.PropertyField(isAttackProp, new GUIContent("공격할 것 인지?"));
         EditorGUILayout.PropertyField(isBuffProp, new GUIContent("버프를 줄 것 인지?"));
+        EditorGUILayout.PropertyField(isDelayProp, new GUIContent("딜레이 설정을 할껀지?"));
+        EditorGUILayout.PropertyField(isFirstOnlyProp, new GUIContent("최초 1회만 발동?"));
 
         EditorGUILayout.Space(10);
+
+        if (isDelayProp.boolValue)
+        {
+            DrawHeader("딜레이 설정");
+            DrawColoredSection(() =>
+            {
+                EditorGUILayout.PropertyField(DelayTimeProp, new GUIContent("딜레이 시간 (초)", "다음 효과까지의 딜레이(초)"));
+            }, new Color(0.9f, 0.9f, 1f, 0.3f));
+            EditorGUILayout.Space(10);
+        }
 
         if (isSpawnProp.boolValue)
         {
@@ -96,7 +112,7 @@ public class SynergyEffectEditor : Editor
             {
                 EditorGUILayout.PropertyField(isUnitPositionProp, new GUIContent("스폰위치 설정", "유닛위치 or 전장중앙"));
                 EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("가중치 적용여부"));
-                if(IsMultiplierProp.boolValue)
+                if (IsMultiplierProp.boolValue)
                 {
                     EditorGUILayout.PropertyField(SpawnTypeProp, new GUIContent("스폰할 객체 타입", "유닛 or 공격체"));
                     EditorGUILayout.PropertyField(SpawnUnitStatsProp, new GUIContent("가중치"));
@@ -234,6 +250,7 @@ public class SynergyEffectEditor : Editor
             "시너지 발동 설정" => new Color(0.8f, 0.6f, 0.2f, 0.8f), // 주황색
             "적용 유닛 설정" => new Color(0.6f, 0.2f, 0.8f, 0.8f),  // 보라색
             "이어지는 효과 설정 (선택)" => new Color(0.4f, 0.7f, 0.7f, 0.8f),     // 청록색
+            "딜레이 설정" => new Color(0.9f, 0.4f, 0.7f, 0.8f),  // 분홍색
             _ => new Color(0.3f, 0.3f, 0.3f, 0.8f)                   // 기본 회색
         };
     }

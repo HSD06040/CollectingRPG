@@ -16,6 +16,11 @@ public class SynergyEffect : ScriptableObject
     public bool IsAttack;
     public bool IsSpawn;
     public bool IsBuff;
+    public bool IsDelay;
+    public bool IsFirstOnly;
+
+    //[Header("Delay")]
+    public float DelayTime;
 
     //[Header("SpawnType (유닛 소환)")]
     public bool IsUnitPosition;         // 소환 위치 정의 (유닛위치 or 전장 중앙)
@@ -29,7 +34,7 @@ public class SynergyEffect : ScriptableObject
     //[Header("AttackType (공격)")]
     public EffectAttackType EffectAttackType;
     public float Power;
-    public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);    
+    public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);
     public string AttackAddress;
 
     //[Header("EffectType")]

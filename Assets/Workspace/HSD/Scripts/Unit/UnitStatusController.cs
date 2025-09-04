@@ -197,32 +197,32 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
     }
     
-    public void TakeTickDamage(int amount, float totalTickTime, float tickTime = 1)
+    public void TakeTickDamage(int amount, float tickCount, float tickInterval)
     {
-        TickDamage(amount, totalTickTime, tickTime).Forget();
+        TickDamage(amount, tickCount, tickInterval).Forget();
     }
 
-    private async UniTask TickDamage(int amount, float totalTickTime, float tickTime)
+    private async UniTask TickDamage(int amount, float tickCount, float tickInterval)
     {
         var destroyToken = this.GetCancellationTokenOnDestroy();
+        int count = 0;
 
-        while (totalTickTime > 0)
+        while (tickCount > count)
         {
-            if(IsDead)
+            count++;
+            if (IsDead)
                 return;
 
             TakeDamage(amount);
 
             try
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(tickTime), cancellationToken: destroyToken);
+                await UniTask.Delay(TimeSpan.FromSeconds(tickInterval), cancellationToken: destroyToken);
             }
             catch (OperationCanceledException)
             {
                 return;
-            }
-
-            totalTickTime -= tickTime;
+            }            
         }
     }
     #endregion
@@ -258,9 +258,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     }
     #endregion
 
-    public void Stun(float stunTime)
+    public void Stun(float stunDuration)
     {
-        StunDelay(stunTime).Forget();
+        StunDelay(stunDuration).Forget();
     }
 
     private async UniTask StunDelay(float stunTime)
