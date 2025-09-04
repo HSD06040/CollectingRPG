@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -74,11 +75,16 @@ public class MailItem : MonoBehaviour
         _receiveButton.onClick.RemoveAllListeners();
         _receiveButton.onClick.AddListener(() =>
         {
-            if (!_isClicked && !data.IsReceived)
+            if (!_isClicked && !expired && !data.IsReceived)
             {
                 _isClicked = true;
                 StopCountdown();
                 _controller.ReceiveRewardAsync(_data.MailId);
+            }
+
+            if (expired)
+            {
+                ExpiredMailAsync();
             }
         });
 
@@ -89,9 +95,15 @@ public class MailItem : MonoBehaviour
         }
         else
         {
-            SetExpiredUI();
-            _controller.DeleteMail(_data.MailId);
+            ExpiredMailAsync();
         }
+    }
+
+    private async void ExpiredMailAsync()
+    {
+        SetExpiredUI();
+        await Task.Delay(3000);
+        await _controller.DeleteMail(_data.MailId);
     }
 
     private void StopCountdown()
