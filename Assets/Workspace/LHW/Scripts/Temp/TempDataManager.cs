@@ -93,18 +93,4 @@ public class TempDataManager : MonoBehaviour
     }
 
     #endregion
-
-    #region CharacterUpgrade
-
-    public void AddPiece(int amount)
-    {        
-        _upgradeUnitData.AddPiece(amount);
-    }
-
-    public void LevelUp()
-    {
-        _upgradeUnitData.LevelUp();
-    }
-
-    #endregion
 }
