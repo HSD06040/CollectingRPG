@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,31 +8,60 @@ public class MailBoxPopup : MonoBehaviour
     [SerializeField] private PlayerMailBoxController _controller;
 
     [Header("List")]
-    [SerializeField] private RectTransform _content;       
+    [SerializeField] private RectTransform _content;
     [SerializeField] private GameObject _mailItemPrefab;
 
     [Header("Button")]
     [SerializeField] private Button _receiveAllButton;
+    [SerializeField] private Button _closePanelButton;
+
+    [Header("Panel")]
+    [SerializeField] private GameObject _emptyMailViewPanel;
+    [SerializeField] private GameObject _receiveAllInfoPanel;
+    [SerializeField] private GameObject _gold;
+    [SerializeField] private GameObject _diamond;
 
     private bool _isDataBind = false;
     private bool _isReceivingAll = false;
 
+    private List<MailData> _currentMails;
     private void Apply(List<MailData> mails) => Init(mails);
+
 
     private void Start()
     {
         _receiveAllButton.onClick.RemoveAllListeners();
         _receiveAllButton.onClick.AddListener(OnClickReceiveAll);
+        _closePanelButton.onClick.AddListener(() => _receiveAllInfoPanel.SetActive(false));
     }
 
+    private void OnEnable()
+    {
+        if (_currentMails == null || _currentMails.Count == 0)
+        {
+            CheckEmptyMailBox(_currentMails);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_isDataBind)
+        {
+            _controller.OnMailboxUpdated -= Apply;
+            _isDataBind = false;
+        }
+    }
+
+    /// <summary>
+    /// 유저 DB 메일 데이터 리스트 -> 우편함 UI 재빌드하는 메서드
+    /// </summary>
+    /// <param name="mails">유저 DB 메일 데이터 리스트</param>
     public void Init(List<MailData> mails)
     {
-        if (mails == null)
-        {
-            Debug.Log("MailBoxPopup: mails == null");
-            return;
-        }
-        
+        _currentMails = mails;
+
+        CheckEmptyMailBox(mails);
+
         // 기존 메일 제거
         for (int i = _content.childCount - 1; i >= 0; i--)
         {
@@ -47,8 +77,11 @@ public class MailBoxPopup : MonoBehaviour
             mailObject.SetActive(false);
 
             MailItem mailItem = mailObject.GetComponent<MailItem>();
+            
             if (mailItem != null)
+            {
                 mailItem.Bind(mail, _controller);
+            }
 
             mailObject.SetActive(true);
         }
@@ -72,26 +105,52 @@ public class MailBoxPopup : MonoBehaviour
             _controller.OnMailboxUpdated -= Apply;
     }
 
-    private void OnDisable()
+    private void CheckEmptyMailBox(List<MailData> mails)
     {
-        if (_isDataBind)
+        if (mails == null || mails.Count == 0)
         {
-            _controller.OnMailboxUpdated -= Apply;
-            _isDataBind = false;
+            _emptyMailViewPanel.SetActive(true);
+            _receiveAllButton.interactable = false;
+            return;
+        }
+        else
+        {
+            _emptyMailViewPanel.SetActive(false);
+            _receiveAllButton.interactable = true;
         }
     }
 
+    /// <summary>
+    /// 모두 받기 버튼 클릭 -> 보상 UI 활성화하는 메서드
+    /// </summary>
     private async void OnClickReceiveAll()
     {
-        if (_isReceivingAll) 
-            return;
+        if (_isReceivingAll) return;
 
         _isReceivingAll = true;
         _receiveAllButton.interactable = false;
 
-        await _controller.ReceiveAllAsync();
+        var (totalGold, totalDiamond) = await _controller.ReceiveAllAsync();
+
+        if (totalGold > 0 || totalDiamond > 0)
+        {
+            _receiveAllInfoPanel.SetActive(true);
+
+            if (totalGold > 0)
+            {
+                _gold.SetActive(true);
+                _receiveAllInfoPanel.GetComponent<ReceiveAllPanel>().SetGoldInfo(totalGold);
+            }
+
+            if (totalDiamond > 0)
+            {
+                _diamond.SetActive(true);
+                _receiveAllInfoPanel.GetComponent<ReceiveAllPanel>().SetDiamondInfo(totalDiamond);
+            }
+        }
 
         _isReceivingAll = false;
-        _receiveAllButton.interactable = true;
+        _currentMails.Clear();
+        CheckEmptyMailBox(_currentMails);
     }
 }
