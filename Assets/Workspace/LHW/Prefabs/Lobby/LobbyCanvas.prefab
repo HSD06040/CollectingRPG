@@ -229,7 +229,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5681731438091636135
 RectTransform:
   m_ObjectHideFlags: 0
@@ -356,7 +356,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aa63a983d5f27943b2aed792b445182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _unit: {fileID: 4555218119365538259}
 --- !u!1 &5053310561045600736
 GameObject:
   m_ObjectHideFlags: 0
@@ -2569,6 +2568,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: StageUIPanel
+      objectReference: {fileID: 0}
+    - target: {fileID: 2060893058122048216, guid: a8e35904211a0f14096c907c9c7a1ef7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2702162541671158151, guid: a8e35904211a0f14096c907c9c7a1ef7,
         type: 3}
@@ -4850,6 +4854,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: UpgradeUIPanel
       objectReference: {fileID: 0}
+    - target: {fileID: 8516899879002897233, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4871,18 +4880,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4555218119365538259 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4615929914211976781, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
-    type: 3}
-  m_PrefabInstance: {fileID: 9167201777219598238}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa5dc34614deeaf42a758556177cad57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &8045120276012300499 stripped
