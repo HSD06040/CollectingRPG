@@ -45,12 +45,15 @@ public class TempUpgradeUnitData : ScriptableObject
     public void ObtainCharacter()
     {
         if (UpgradeLevel == 0) UpgradeLevel += 1;
+
+        // TODO : DB에 [레벨] 업데이트
     }
 
     public void AddPiece(int piece)
     {
         CurrentPieces += piece;
-        Debug.Log("데이터 변동");
+
+        // TODO : DB에 [조각] 업데이트
     }
 
     public void LevelUp()
@@ -64,6 +67,8 @@ public class TempUpgradeUnitData : ScriptableObject
         {
             CurrentPieces -= requiredPiece;
             UpgradeLevel += 1;
+
+            // TODO : DB에 [레벨]과 [조각] 업데이트
         }
     }
 }
