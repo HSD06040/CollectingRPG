@@ -24,12 +24,13 @@ public class TempDataManager : MonoBehaviour
 
     #region Data
 
+    // 프리셋 관련
     private int _selectedPresetIndex = 0;
     public int SelectedPresetIndex => _selectedPresetIndex;
-
     private List<TeamPresetData> _presetData = new List<TeamPresetData>();
     public List<TeamPresetData> PresetData => _presetData;
 
+    // 업그레이드 관련
     [SerializeField] private TempUpgradeUnitData _upgradeUnitData;
     public TempUpgradeUnitData UpgradeData => _upgradeUnitData;
 
@@ -72,6 +73,8 @@ public class TempDataManager : MonoBehaviour
 
     #endregion
 
+    #region CharacterUpgrade
+
     public void AddPiece(int amount)
     {        
         _upgradeUnitData.AddPiece(amount);
@@ -81,4 +84,6 @@ public class TempDataManager : MonoBehaviour
     {
         _upgradeUnitData.LevelUp();
     }
+
+    #endregion
 }
