@@ -7,9 +7,7 @@ public class TempUpgradeUnitData : ScriptableObject
 {
     // 해당 캐릭터 등급 -> 이후 UnitData에서 직접 참조하는 방식으로 변경
     public Grade Grade;
-    // 캐릭터의 획득 여부
-    public bool IsCollected;
-    // 캐릭터의 업그레이드 레벨
+    // 캐릭터의 업그레이드 레벨 - 레벨이 0일 때는 획득하지 않은 상태
     public int UpgradeLevel;
     // 현재 보유 캐릭터 조각 수
     public int CurrentPieces;
@@ -19,7 +17,7 @@ public class TempUpgradeUnitData : ScriptableObject
     
     public int GetRequiredPiece()
     {
-        if (UpgradeLevel >= 10) return 0;
+        if (UpgradeLevel >= 10 || UpgradeLevel <= 0) return 0;
 
         if (LevelUpData == null)
         {
@@ -44,6 +42,11 @@ public class TempUpgradeUnitData : ScriptableObject
         return pieceLevelRatio.RequirePiece;
     }
 
+    public void ObtainCharacter()
+    {
+        if (UpgradeLevel == 0) UpgradeLevel += 1;
+    }
+
     public void AddPiece(int piece)
     {
         CurrentPieces += piece;
@@ -53,7 +56,7 @@ public class TempUpgradeUnitData : ScriptableObject
     public void LevelUp()
     {
         // 최대레벨 변수 추가?
-        if (UpgradeLevel >= 10) return;
+        if (UpgradeLevel >= 10 || UpgradeLevel <= 0) return;
 
         int requiredPiece = GetRequiredPiece();
         

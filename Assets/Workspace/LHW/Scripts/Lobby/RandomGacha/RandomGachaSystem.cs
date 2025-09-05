@@ -146,11 +146,11 @@ public class RandomGachaSystem : MonoBehaviour
     {
         UnitData data = _testData;
 
-        if (!_testUpgradeData.IsCollected)
+        if (_testUpgradeData.UpgradeLevel == 0)
         {
             // 캐릭터 획득 판정 데이터 저장
             _resultUI.HeroGachaUpdate(data, 0, "New");
-            _testUpgradeData.IsCollected = true;
+            _testUpgradeData.ObtainCharacter();
         }
         else
         {
@@ -180,9 +180,9 @@ public class RandomGachaSystem : MonoBehaviour
             UnitData data = ReturnData();
 
             // 캐릭터 획득여부 판정
-            //if (!_testUpgradeData.IsCollected)
+            //if (_testUpgradeData.UpgradeLevel == 0)
             //{
-            //    _resultUI.HeroGachaUpdate(data, 0, "New");
+            //    _resultUI.HeroGachaUpdate(data, i, "New");
             //}
             //else
             //{

@@ -71,17 +71,17 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void ShowPopUp()
     {
-        if (_upgradeData.IsCollected)
-        {
-            _manager.PopUpUI.GetCurrentCharacterUnitData(this);
-            _manager.ShowPopUp();
-        }
-        else
+        if (_upgradeData.UpgradeLevel == 0)
         {
             if (PopupManager.Instance != null)
             {
                 PopupManager.instance.ShowPopup("획득하지 않은 캐릭터입니다.");
             }
+        }
+        else
+        {
+            _manager.PopUpUI.GetCurrentCharacterUnitData(this);
+            _manager.ShowPopUp();
         }
     }
 
@@ -117,13 +117,13 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void UIUpdate()
     {
-        if (_upgradeData.IsCollected)
+        if (_upgradeData.UpgradeLevel == 0)
         {
-            _backgroundPanel.SetActive(false);
+            _backgroundPanel.SetActive(true);
         }
         else
         {
-            _backgroundPanel.SetActive(true);
+            _backgroundPanel.SetActive(false);
         }
 
         //_charText.text = $"{_status.Data.Name}";

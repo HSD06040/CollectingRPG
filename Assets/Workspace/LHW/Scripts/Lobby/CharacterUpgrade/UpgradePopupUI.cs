@@ -49,9 +49,11 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
             if(PopupManager.Instance != null)
             {
                 PopupManager.instance.ShowPopup("이미 최대 레벨입니다.");
+                return;
             }
         }
         TempDataManager.Instance.LevelUp();
+
         OnCharacterStatusChanged?.Invoke();
     }
 
