@@ -78,7 +78,6 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Standby()
     {
-        StatusController.ClearAllStat();
         _fsm.Standby();
     }
 

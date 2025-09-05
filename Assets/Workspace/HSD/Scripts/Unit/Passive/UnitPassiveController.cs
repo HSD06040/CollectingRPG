@@ -43,4 +43,14 @@ public class UnitPassiveController
         }
         _passives.Clear();
     }
+
+    public void RefreshBaseStats()
+    {
+        foreach (var passive in _passives.Values)
+        {
+            if(passive.Effect.TriggerType != TriggerType.Base)
+            
+            passive.Active();
+        }
+    }
 }

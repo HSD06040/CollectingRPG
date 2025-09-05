@@ -31,12 +31,12 @@ public class PoolManager : Singleton<PoolManager>
         SceneManager.sceneLoaded += OnSceneLoaded;        
     }
 
-    public void PopUpInit(Transform uiParent)
-    {
-        _uiParent = uiParent;
-        _damagePopUp = Manager.Resources.Get<GameObject>("DamagePopUp").GetComponent<DamagePopUp>();
-        CreatePopUpPool();
-    }
+    //public void PopUpInit(Transform uiParent)
+    //{
+    //    _uiParent = uiParent;
+    //    _damagePopUp = Manager.Resources.Get<GameObject>("DamagePopUp").GetComponent<DamagePopUp>();
+    //    CreatePopUpPool();
+    //}
 
     public void ResetPool()
     {
@@ -127,51 +127,51 @@ public class PoolManager : Singleton<PoolManager>
         return pool;
     }
 
-    #region Popup
-    private void CreatePopUpPool()
-    {
-        _popUpPool = new ObjectPool<DamagePopUp>
-        (
-            createFunc: () =>
-            {
-                DamagePopUp obj = Instantiate(_damagePopUp);
-                obj.name = "DamagePopUp";
-                obj.transform.SetParent(_uiParent);
-                _lastUseTimeDic[obj.name] = Time.time;
-                return obj;
-            },
-            actionOnGet: (DamagePopUp damagePopUp) =>
-            {
-                damagePopUp.gameObject.SetActive(true);
-                _lastUseTimeDic[damagePopUp.gameObject.name] = Time.time;
-            },
-            actionOnRelease: (DamagePopUp damagePopUp) =>
-            {
-                damagePopUp.gameObject.SetActive(false);
-            },
-            actionOnDestroy: (DamagePopUp damagePopUp) =>
-            {
-                Destroy(damagePopUp.gameObject);
-            },
-            maxSize: 10
-        );
-    }
+    //#region Popup
+    //private void CreatePopUpPool()
+    //{
+    //    _popUpPool = new ObjectPool<DamagePopUp>
+    //    (
+    //        createFunc: () =>
+    //        {
+    //            DamagePopUp obj = Instantiate(_damagePopUp);
+    //            obj.name = "DamagePopUp";
+    //            obj.transform.SetParent(_uiParent);
+    //            _lastUseTimeDic[obj.name] = Time.time;
+    //            return obj;
+    //        },
+    //        actionOnGet: (DamagePopUp damagePopUp) =>
+    //        {
+    //            damagePopUp.gameObject.SetActive(true);
+    //            _lastUseTimeDic[damagePopUp.gameObject.name] = Time.time;
+    //        },
+    //        actionOnRelease: (DamagePopUp damagePopUp) =>
+    //        {
+    //            damagePopUp.gameObject.SetActive(false);
+    //        },
+    //        actionOnDestroy: (DamagePopUp damagePopUp) =>
+    //        {
+    //            Destroy(damagePopUp.gameObject);
+    //        },
+    //        maxSize: 10
+    //    );
+    //}
 
-    public DamagePopUp GetPopUp(Vector2 pos)
-    {
-        DamagePopUp popUp = _popUpPool.Get();
-        popUp.transform.position = pos;            
+    //public DamagePopUp GetPopUp(Vector2 pos)
+    //{
+    //    DamagePopUp popUp = _popUpPool.Get();
+    //    popUp.transform.position = pos;            
 
-        return popUp;
-    }
+    //    return popUp;
+    //}
 
-    public void ReleasePopUp(DamagePopUp popUp)
-    {
-        if (popUp == null || !popUp.gameObject.activeSelf) return;
+    //public void ReleasePopUp(DamagePopUp popUp)
+    //{
+    //    if (popUp == null || !popUp.gameObject.activeSelf) return;
 
-        _popUpPool.Release(popUp);
-    }
-    #endregion
+    //    _popUpPool.Release(popUp);
+    //}
+    //#endregion
 
     #region Get
     public T Get<T> (T original, Vector3 position, Quaternion rotation, Transform parent) where T : Object

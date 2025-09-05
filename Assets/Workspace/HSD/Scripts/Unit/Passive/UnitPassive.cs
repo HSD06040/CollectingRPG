@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class UnitPassive
 {
-    private SynergyEffect _effect;
+    public SynergyEffect Effect;
     private UnitBase _owner;
     private int _currentActivations;
     private int _mulriplier;
@@ -16,7 +16,7 @@ public class UnitPassive
     public UnitPassive(SynergyEffect effect, UnitBase owner, int statMulriplier = 1)
     {
         _currentActivations = 0;
-        _effect = effect;
+        Effect = effect;
         _owner = owner;
         _mulriplier = statMulriplier;
 
@@ -28,7 +28,7 @@ public class UnitPassive
     /// </summary>
     public void Active()
     {
-        switch (_effect.TriggerType)
+        switch (Effect.TriggerType)
         {
             case TriggerType.Base:
                 EffectActives();
@@ -65,7 +65,7 @@ public class UnitPassive
         TokenClear();
         _isActive = false;
 
-        switch (_effect.TriggerType)
+        switch (Effect.TriggerType)
         {
             case TriggerType.Base:
                 RemoveStat();
@@ -105,7 +105,7 @@ public class UnitPassive
     #region Interval
     private void OnInterval()
     {
-        if (_effect.IsDelay)
+        if (Effect.IsDelay)
             OnDelayEffectAsync(_cts.Token).Forget();
         else
             OnIntervalEffectAsync(_cts.Token).Forget();
@@ -116,14 +116,14 @@ public class UnitPassive
     /// </summary>
     private async UniTask OnIntervalEffectAsync(CancellationToken token)
     {
-        while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
+        while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
         {
             EffectActives();
             _currentActivations++;
 
             try
             {
-                await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
+                await UniTask.WaitForSeconds(Effect.Interval, cancellationToken: token);
             }
             catch (OperationCanceledException)
             {
@@ -131,7 +131,7 @@ public class UnitPassive
             }
         }
 
-        if (_effect.NextEffect != null)
+        if (Effect.NextEffect != null)
         {
             await RunNextEffectAsync(token);
         }
@@ -142,14 +142,14 @@ public class UnitPassive
     /// </summary>
     private async UniTask OnDelayEffectAsync(CancellationToken token)
     {
-        while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
+        while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
         {
             EffectActives();
             _currentActivations++;
 
             try
             {
-                await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
+                await UniTask.WaitForSeconds(Effect.Interval, cancellationToken: token);
             }
             catch (OperationCanceledException)
             {
@@ -160,7 +160,7 @@ public class UnitPassive
         // Delay 대기
         try
         {
-            await UniTask.WaitForSeconds(_effect.DelayTime, cancellationToken: token);
+            await UniTask.WaitForSeconds(Effect.DelayTime, cancellationToken: token);
         }
         catch (OperationCanceledException)
         {
@@ -168,7 +168,7 @@ public class UnitPassive
         }
 
         // NextEffect 실행
-        if (_effect.NextEffect != null)
+        if (Effect.NextEffect != null)
         {
             await RunNextEffectAsync(token);
         }
@@ -179,7 +179,7 @@ public class UnitPassive
     /// </summary>
     private async UniTask RunNextEffectAsync(CancellationToken token)
     {
-        if (_effect.NextEffect.Interval > 0)
+        if (Effect.NextEffect.Interval > 0)
         {
             while (!token.IsCancellationRequested)
             {
@@ -187,7 +187,7 @@ public class UnitPassive
 
                 try
                 {
-                    await UniTask.WaitForSeconds(_effect.NextEffect.Interval, cancellationToken: token);
+                    await UniTask.WaitForSeconds(Effect.NextEffect.Interval, cancellationToken: token);
                 }
                 catch (OperationCanceledException)
                 {
@@ -206,12 +206,12 @@ public class UnitPassive
 
     private void EffectActives()
     {
-        if (_effect.IsFirstOnly && _isActive)
+        if (Effect.IsFirstOnly && _isActive)
             return;
 
         _isActive = true;
 
-        if (_currentActivations < _effect.MaxActivations)
+        if (_currentActivations < Effect.MaxActivations)
         {
             SpawnActive();
             BuffEffectActive();
@@ -222,25 +222,25 @@ public class UnitPassive
         {
             NextEffectActives();
 
-            if(_effect.IsActivationsClear)
+            if(Effect.IsActivationsClear)
                 _currentActivations = 0;
         }
     }
 
     private void RemoveStat()
     {
-        if (!_effect.IsBuff)
+        if (!Effect.IsBuff)
             return;
 
-        foreach (var stat in _effect.StatModifiers)
+        foreach (var stat in Effect.StatModifiers)
         {
-            _owner.StatusController.RemoveStat(stat.StatType, _effect.Key);
+            _owner.StatusController.RemoveStat(stat.StatType, Effect.Key);
         }
     }
 
     private void NextEffectActives()
     {
-        if (_effect.NextEffect == null) return;
+        if (Effect.NextEffect == null) return;
 
         NextBuffEffectActive();
         NextAttackActive();
@@ -249,17 +249,17 @@ public class UnitPassive
     #region BuffEffect
     private void BuffEffectActive()
     {
-        if (!_effect.IsBuff)
+        if (!Effect.IsBuff)
             return;
 
-        BuffEffectActive(_effect);
+        BuffEffectActive(Effect);
     }
     private void NextBuffEffectActive()
     {
-        if (!_effect.NextEffect.IsBuff)
+        if (!Effect.NextEffect.IsBuff)
             return;
 
-        BuffEffectActive(_effect.NextEffect);
+        BuffEffectActive(Effect.NextEffect);
     }
     private void BuffEffectActive(SynergyEffect _effect)
     {
@@ -295,17 +295,17 @@ public class UnitPassive
     #region AttackEffect
     private void AttackActive()
     {
-        if (!_effect.IsAttack)
+        if (!Effect.IsAttack)
             return;
-        AttackSpawn(_effect);
+        AttackSpawn(Effect);
     }
 
     private void NextAttackActive()
     {
-        if (!_effect.NextEffect.IsAttack)
+        if (!Effect.NextEffect.IsAttack)
             return;
 
-        AttackSpawn(_effect.NextEffect);
+        AttackSpawn(Effect.NextEffect);
     }
 
     private void AttackSpawn(SynergyEffect effect)
@@ -320,7 +320,7 @@ public class UnitPassive
     #region SpawnEffect
     private void SpawnActive()
     {
-        if (!_effect.IsSpawn)
+        if (!Effect.IsSpawn)
             return;
 
         Vector3 pos = _owner.transform.position;
@@ -329,28 +329,28 @@ public class UnitPassive
 
     private void Spawn(Vector3 pos)
     {
-        GameObject obj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
+        GameObject obj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
 
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
 
-        if (_effect.IsMultiplier)
+        if (Effect.IsMultiplier)
         {
             if (spawnUnit == null)
                 return;
 
-            if (_effect.SpawnType == SpawnStatType.Level)
+            if (Effect.SpawnType == SpawnStatType.Level)
             {
-                if (_effect.IsMultiplier)
+                if (Effect.IsMultiplier)
                 {
-                    spawnUnit.StatusController.StatMultiplier = _effect.UnitStatMultiplier;
-                    spawnUnit.Init(_effect.SpawnUnitStats);
+                    spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;
+                    spawnUnit.Init(Effect.SpawnUnitStats);
                 }
                 else
                 {
                     spawnUnit.Init();
                 }
             }
-            else if (_effect.SpawnType == SpawnStatType.LowUpgrade)
+            else if (Effect.SpawnType == SpawnStatType.LowUpgrade)
             {
                 spawnUnit.Status.Level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
                 spawnUnit.Init();

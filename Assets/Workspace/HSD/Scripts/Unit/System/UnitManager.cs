@@ -7,9 +7,6 @@ public class UnitManager : MonoBehaviour
     [Header("Test")]
     public bool IsTest;
 
-    [Header("Addressables")]
-    [SerializeField] AssetReference _worldCanvas;
-
     [Header("BattleManager")]
     [SerializeField] BattleManager _battleManager;
 
@@ -37,9 +34,6 @@ public class UnitManager : MonoBehaviour
     private async void InitAsync()
     {
         await Manager.Resources.LoadLabel("Stage");
-        GameObject obj = await Manager.Resources.Get<GameObject>(_worldCanvas);
-
-        Manager.Pool.PopUpInit(Instantiate(obj).transform);
 
         Manager.Data.SynergyDB.ResetSynergys();
 

@@ -63,6 +63,8 @@ public class UnitController : MonoBehaviour
 
             unit.transform.position = _unitSlotManager.GetUnitSlot(unit.CurrentSlot).transform.position;
             unit.Standby();
+            unit.StatusController.ClearAllStat();
+            unit.StatusController.PassiveController.RefreshBaseStats();
         }
 
         _unitDragDropSystem.enabled = true;

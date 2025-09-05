@@ -189,4 +189,7 @@ public enum StatType
     // Default
     CurHp,
     CurMana,
+
+    // Currency
+    GoldBonus
 }
