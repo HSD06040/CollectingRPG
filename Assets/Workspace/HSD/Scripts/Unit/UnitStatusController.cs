@@ -66,7 +66,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     [HideInInspector] public float StatMultiplier = 0;
 
-    public bool IsDead;
+    public bool IsDead { get; set; }
 
     private void OnDestroy()
     {
@@ -190,6 +190,13 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     }
     #endregion
 
+    public void Refresh()
+    {
+        ClearAllStat();
+        PassiveController.RefreshBaseStats();
+        IsDead = false;
+    }
+
     public void ClearAllStat()
     {
         Debug.Log("ClearAllStat called");
@@ -296,6 +303,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     }
     #endregion
 
+    #region Stun
     public void Stun(float stunDuration)
     {
         StunDelay(stunDuration).Forget();
@@ -312,6 +320,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
         IsStund.Value = false;
     }
+    #endregion
 
     private void Die()
     {
