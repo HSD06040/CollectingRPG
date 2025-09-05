@@ -50,11 +50,15 @@ public class TimeManager : MonoBehaviour
     [Header("Reference")]
     [SerializeField] private GoogleAdMob _adMob;
 
+    // 가챠
     private RewardInfo _dailyFreeGachaRewardInfo;
     public RewardInfo DailyFreeGachaRewardInfo => _dailyFreeGachaRewardInfo;
 
     private RewardInfo _dailyAdGachaRewardInfo;
     public RewardInfo DailyAdGachaRewardInfo => _dailyAdGachaRewardInfo;
+
+    // 상점
+    private DateTime _dailyShopResetTime;
 
     public Action OnDailyGachaInfoChanged;
 
@@ -66,7 +70,7 @@ public class TimeManager : MonoBehaviour
 
     #region Data Load & Save
 
-    #region 일일 초기화
+    #region 일일 초기화(가챠 - 오전 6시 초기화)
 
     private void LoadDailyFreeGachaResetTimeInfo()
     {
@@ -74,7 +78,7 @@ public class TimeManager : MonoBehaviour
         DateTime todayReset = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 6, 0, 0);
         _dailyFreeGachaRewardInfo = new RewardInfo(todayReset.Ticks, 1);
 
-        if (_dailyFreeGachaRewardInfo.state == 0 && IsDailyFreeGachaResetTime(_dailyFreeGachaRewardInfo.GetDateTime()))
+        if (_dailyFreeGachaRewardInfo.state == 0 && IsDailyResetTime(_dailyFreeGachaRewardInfo.GetDateTime()))
         {
             _dailyFreeGachaRewardInfo.state = 1;
         }
@@ -127,6 +131,39 @@ public class TimeManager : MonoBehaviour
 
     #endregion
 
+    #region 일일 초기화(상점)
+
+    public bool LoadDailyShopResetTime(out DateTime resetTime)
+    {
+        bool isResetTime = SaveDailyShopResetTIme();
+        resetTime = _dailyShopResetTime;
+
+        return isResetTime;
+    }
+
+    private bool SaveDailyShopResetTIme()
+    {
+        if(IsDailyResetTime(_dailyShopResetTime))
+        {
+            DateTime now = DateTime.Now;
+            DateTime todayReset = new DateTime(now.Year, now.Month, now.Day, 6, 0, 0);
+
+            if(now.Hour < 6)
+            {
+                _dailyShopResetTime = todayReset;
+                return false;
+            }
+            else
+            {
+                _dailyShopResetTime = todayReset.AddDays(1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    #endregion
+
     #endregion
 
     #region Obtain 판정
@@ -136,11 +173,11 @@ public class TimeManager : MonoBehaviour
     public bool CanObtainedFreeGachaReward()
     {
         if (_dailyFreeGachaRewardInfo.state == 1) return true;
-        if (IsDailyFreeGachaResetTime(_dailyFreeGachaRewardInfo.GetDateTime())) return true;
+        if (IsDailyResetTime(_dailyFreeGachaRewardInfo.GetDateTime())) return true;
         return false;
     }
 
-    private bool IsDailyFreeGachaResetTime(DateTime date)
+    private bool IsDailyResetTime(DateTime date)
     {
         DateTime now = DateTime.Now;
 
@@ -151,6 +188,10 @@ public class TimeManager : MonoBehaviour
         return false;
     }
 
+    #endregion
+
+    #region 12시간 광고 가챠 가능 여부 판정
+
     public bool CanObtainAdGachaReward()
     {
         if (IsDailyAdGachaResetTime(out int stack))
@@ -160,14 +201,10 @@ public class TimeManager : MonoBehaviour
             return true;
         }
 
-        if (_dailyAdGachaRewardInfo.state >= 1) return true;               
+        if (_dailyAdGachaRewardInfo.state >= 1) return true;
 
         return false;
     }
-
-    #endregion
-
-    #region 12시간 광고 가챠 가능 여부 판정
 
     /// <summary>
     /// 12시간 단위 누적 스택 계산

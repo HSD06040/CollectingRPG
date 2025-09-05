@@ -117,7 +117,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         _costImg.sprite = costSprites[_status.Data.Cost - 1];
-        if (Manager.Data != null)
+        if (Manager.Data.SynergyDB != null)
         {
             _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
             _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).Icon;
