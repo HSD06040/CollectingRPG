@@ -10,14 +10,14 @@ public class GachaResultUI : MonoBehaviour,IPointerClickHandler
 
     private GameObject[] _slots = new GameObject[10];
     
-    public void HeroGachaUpdate(UnitData data, int index)
+    public void HeroGachaUpdate(UnitData data, int index, string amount)
     {
         if (_slots[index] == null)
         {
             _slots[index] = Instantiate(_gachaResultSlotUI, _content);
         }
         GachaResultUISlot slot = _slots[index].GetComponent<GachaResultUISlot>();
-        slot.UpdateUI(data.Icon);
+        slot.UpdateUI(data.Icon, amount);
     }
 
     // 비활성화와 동시에 슬롯을 한개만 남겨두고 전부 파괴(Grid UI를 위해서 임시 처리)

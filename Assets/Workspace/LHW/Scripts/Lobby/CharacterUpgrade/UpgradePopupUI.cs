@@ -12,13 +12,12 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
 
     private CharacterUpgradeUnit _currentCharUnit;
 
-    private int _usingPiece = 10;
-
     public Action OnCharacterStatusChanged;
 
     private void Awake()
     {
         _levelUpButton.onClick.AddListener(LevelUp);
+        gameObject.SetActive(false);
     }
 
     private void OnEnable()
@@ -45,28 +44,17 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
 
     private void LevelUp()
     {
-        if (CanLevelUp(out int piece))
+        if(TempDataManager.Instance.UpgradeData.UpgradeLevel >= 10)
         {
-            _currentCharUnit.LevelUp();
-            TempDataManager.Instance.RemovePiece(piece);
-            OnCharacterStatusChanged?.Invoke();
+            if(PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowPopup("이미 최대 레벨입니다.");
+                return;
+            }
         }
-    }
+        TempDataManager.Instance.LevelUp();
 
-    private bool CanLevelUp(out int piece)
-    {
-        int level = _currentCharUnit.Status.Level;
-
-        if(TempDataManager.Instance.CharPiece >= level * 10)
-        {
-            piece = level * 10;
-            // UI 표기용 임시
-            _usingPiece = piece + 10;
-            return true;
-        }
-
-        piece = 0;
-        return false;
+        OnCharacterStatusChanged?.Invoke();
     }
 
     #endregion
@@ -76,10 +64,7 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
         if (_currentCharUnit != null)
         {
             // UI 표기
-        }
-        if (TempDataManager.Instance != null)
-        {
-            _tempText.text = $"캐릭터 정보 표기 예정\n조각 수 : {TempDataManager.Instance.CharPiece}\n 소모 조각 수: {_usingPiece}";
+            _tempText.text = $"캐릭터 정보 표기 예정\n조각 수 : {_currentCharUnit.UpgradeData.CurrentPieces.ToString()}\n 소모 조각 수: {_currentCharUnit.UpgradeData.GetRequiredPiece().ToString()}";
         }
     }
 
