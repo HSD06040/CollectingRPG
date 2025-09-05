@@ -24,6 +24,7 @@ public class SynergyEffectEditor : Editor
     private SerializedProperty spawnAddressProp;
 
     private SerializedProperty effectAttackTypeProp;
+    private SerializedProperty spawnPositionTypeProp;
     private SerializedProperty powerProp;
     private SerializedProperty addressProp;
 
@@ -60,6 +61,7 @@ public class SynergyEffectEditor : Editor
         spawnAddressProp = serializedObject.FindProperty("SpawnAddress");
 
         effectAttackTypeProp = serializedObject.FindProperty("EffectAttackType");
+        spawnPositionTypeProp = serializedObject.FindProperty("SpawnPositionType");
         powerProp = serializedObject.FindProperty("Power");
         addressProp = serializedObject.FindProperty("AttackAddress");
 
@@ -93,6 +95,8 @@ public class SynergyEffectEditor : Editor
         EditorGUILayout.PropertyField(isDelayProp, new GUIContent("딜레이 설정을 할껀지?"));
         EditorGUILayout.PropertyField(isFirstOnlyProp, new GUIContent("최초 1회만 발동?"));
 
+        EditorGUILayout.Space(10);
+        EditorGUILayout.PropertyField(effectAttackTypeProp, new GUIContent("적용타입", "각자패시브 or 전체공용 패시브"));
         EditorGUILayout.Space(10);
 
         if (isDelayProp.boolValue)
@@ -130,8 +134,8 @@ public class SynergyEffectEditor : Editor
             DrawHeader("공격 설정");
 
             DrawColoredSection(() =>
-            {
-                EditorGUILayout.PropertyField(effectAttackTypeProp, new GUIContent("공격타입", "각자공격 or 전체공격"));
+            {           
+                EditorGUILayout.PropertyField(spawnPositionTypeProp, new GUIContent("공격 위치", "자신기준 or 타겟기준"));
                 DrawColoredField("계수", powerProp, Color.red);
                 EditorGUILayout.PropertyField(addressProp, new GUIContent("주소"));
             }, new Color(1f, 0.9f, 0.9f, 0.3f));

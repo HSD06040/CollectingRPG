@@ -34,7 +34,8 @@ public class SynergyEffect : ScriptableObject
     public string SpawnAddress;
 
     //[Header("AttackType (공격)")]
-    public EffectAttackType EffectAttackType;
+    public EffectApplyType EffectAttackType;
+    public SpawnPositionType SpawnPositionType; // 유닛 위치 or 전장 중앙
     public float Power;
     public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);
     public string AttackAddress;
@@ -66,7 +67,7 @@ public class SynergyEffect : ScriptableObject
             return;
         }
 
-        if (EffectAttackType == EffectAttackType.Self)
+        if (EffectAttackType == EffectApplyType.Self)
         {
             foreach (var unit in GetTarget(units, synergy))
             {
@@ -81,7 +82,7 @@ public class SynergyEffect : ScriptableObject
 
     public void RemoveEffect(UnitBase[] units, int synergy)
     {
-        if (EffectAttackType == EffectAttackType.Self)
+        if (EffectAttackType == EffectApplyType.Self)
         {
             foreach (var unit in GetTarget(units, synergy))
             {

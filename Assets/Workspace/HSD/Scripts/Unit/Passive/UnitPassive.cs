@@ -67,6 +67,9 @@ public class UnitPassive
 
         switch (_effect.TriggerType)
         {
+            case TriggerType.Base:
+                RemoveStat();
+                break;
             case TriggerType.OnAttack:
                 _owner.OnAttack -= EffectActives;
                 break;
@@ -220,6 +223,17 @@ public class UnitPassive
         }
 
         _currentActivations++;
+    }
+
+    private void RemoveStat()
+    {
+        if (!_effect.IsBuff)
+            return;
+
+        foreach (var stat in _effect.StatModifiers)
+        {
+            _owner.RemoveStat(stat.StatType, _effect.Key);
+        }
     }
 
     private void NextEffectActives()

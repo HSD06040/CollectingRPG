@@ -25,6 +25,12 @@ public enum Grade
 
 #region Type
 
+public enum SpawnPositionType
+{
+    Self,
+    Target
+}
+
 public enum UnitMultiplierType
 {
     None,
@@ -98,7 +104,7 @@ public enum EffectType
 /// <summary>
 /// 효과 공격 타입, 각자공격 or 전체공격
 /// </summary>
-public enum EffectAttackType
+public enum EffectApplyType
 {
     Self,
     All,    

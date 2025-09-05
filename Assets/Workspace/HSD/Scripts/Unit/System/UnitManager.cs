@@ -54,6 +54,9 @@ public class UnitManager : MonoBehaviour
         _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
         _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
+        if (TempDataManager.Instance == null)
+            return;
+
         TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
 
         if (preset == null)

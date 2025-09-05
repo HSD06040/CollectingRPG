@@ -70,7 +70,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         if (plusUnitStat == null)
         {
             SetBaseStat(status.GetCurrentStat());
-        }            
+        }        
         else
         {
             SetBaseStat(status.GetCurrentStat(), plusUnitStat);
@@ -152,6 +152,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void ClearAllStat()
     {
+        Debug.Log("ClearAllStat called");
         // 모든 스탯의 모디파이어 제거
         MaxHealth.ClearModifiers();
         MaxMana.ClearModifiers();
@@ -191,7 +192,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
 
 
-        if(CurHp.Value < 0)
+        if(CurHp.Value <= 0)
         {
             Die();
         }
@@ -279,7 +280,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsDead = true;
         OnDied?.Invoke();
+        Debug.Log($"{gameObject.name} is Dead.");
+
         OnUnitDied?.Invoke(this);
+        Debug.Log($"{gameObject.name} Died event invoked.");
     }
 
     #region Effect
@@ -323,7 +327,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Stat Management
     public void AddStat(StatType statType, float value, string source)
     {
-        //Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
+        Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
         switch (statType)
         {
             case StatType.MaxHealth:

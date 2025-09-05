@@ -5,12 +5,10 @@ using UnityEngine;
 public class UnitSpawner : MonoBehaviour
 {
     private GameObject _unitPrefab;
-    private float _damage;
 
-    public void Init(GameObject unitPrefab, bool isAttack = false, float damage = 10)
+    public void Init(GameObject unitPrefab)
     {
         _unitPrefab = unitPrefab;
-        _damage = damage;
     }
 
     private void SpawnUnit()
