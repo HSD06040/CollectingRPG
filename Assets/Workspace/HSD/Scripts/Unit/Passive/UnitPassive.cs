@@ -6,14 +6,14 @@ using UnityEngine;
 public class UnitPassive
 {
     private SynergyEffect _effect;
-    private UnitStatusController _owner;
+    private UnitBase _owner;
     private int _currentActivations;
     private int _mulriplier;
     private bool _isActive;
 
     private CancellationTokenSource _cts; // Interval 루프 중단용
 
-    public UnitPassive(SynergyEffect effect, UnitStatusController owner, int statMulriplier = 1)
+    public UnitPassive(SynergyEffect effect, UnitBase owner, int statMulriplier = 1)
     {
         _currentActivations = 0;
         _effect = effect;
@@ -34,13 +34,13 @@ public class UnitPassive
                 EffectActives();
                 break;
             case TriggerType.OnDied:
-                _owner.OnDied += EffectActives;
+                _owner.StatusController.OnDied += EffectActives;
                 break;
             case TriggerType.OnAttack:
-                _owner.OnAttack += EffectActives;
+                _owner.StatusController.OnAttack += EffectActives;
                 break;
             case TriggerType.OnUseSkill:
-                _owner.OnSkill += EffectActives;
+                _owner.StatusController.OnSkill += EffectActives;
                 break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted += OnInterval;
@@ -71,13 +71,13 @@ public class UnitPassive
                 RemoveStat();
                 break;
             case TriggerType.OnAttack:
-                _owner.OnAttack -= EffectActives;
+                _owner.StatusController.OnAttack -= EffectActives;
                 break;
             case TriggerType.OnDied:
-                _owner.OnDied -= EffectActives;
+                _owner.StatusController.OnDied -= EffectActives;
                 break;
             case TriggerType.OnUseSkill:
-                _owner.OnSkill -= EffectActives;
+                _owner.StatusController.OnSkill -= EffectActives;
                 break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted -= OnInterval;
@@ -216,13 +216,15 @@ public class UnitPassive
             SpawnActive();
             BuffEffectActive();
             AttackActive();
+            _currentActivations++;
         }
         else
         {
             NextEffectActives();
-        }
 
-        _currentActivations++;
+            if(_effect.IsActivationsClear)
+                _currentActivations = 0;
+        }
     }
 
     private void RemoveStat()
@@ -232,7 +234,7 @@ public class UnitPassive
 
         foreach (var stat in _effect.StatModifiers)
         {
-            _owner.RemoveStat(stat.StatType, _effect.Key);
+            _owner.StatusController.RemoveStat(stat.StatType, _effect.Key);
         }
     }
 
@@ -267,7 +269,7 @@ public class UnitPassive
                 for (int i = 0; i < _effect.SynergyBuffDatas.Length; i++)
                 {
                     SynergyBuffData data = _effect.SynergyBuffDatas[i];
-                    _owner.ApplyEffect(
+                    _owner.StatusController.ApplyEffect(
                         new BuffEffectData { StatType = data.StatType, Duration = data.Duration },
                         data.Value * _mulriplier, _effect.Key);
                 }
@@ -277,13 +279,13 @@ public class UnitPassive
                 foreach (var stat in _effect.StatModifiers)
                 {
                     if (stat.StatType == StatType.CurHp)
-                        _owner.IncreaseHealth(Mathf.RoundToInt(stat.Value * _mulriplier));
+                        _owner.StatusController.IncreaseHealth(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else if (stat.StatType == StatType.CurMana)
-                        _owner.IncreaseMana(Mathf.RoundToInt(stat.Value * _mulriplier));
+                        _owner.StatusController.IncreaseMana(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else if (stat.StatType == StatType.Shield)
-                        _owner.IncreaseShield(Mathf.RoundToInt(stat.Value * _mulriplier));
+                        _owner.StatusController.IncreaseShield(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else
-                        _owner.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.Key);
+                        _owner.StatusController.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.Key);
                 }
                 break;
         }
@@ -295,15 +297,23 @@ public class UnitPassive
     {
         if (!_effect.IsAttack)
             return;
-
-        GameObject.Instantiate(_effect.AttackPrefab, _owner.transform.position, Quaternion.identity);
+        AttackSpawn(_effect);
     }
+
     private void NextAttackActive()
     {
         if (!_effect.NextEffect.IsAttack)
             return;
 
-        GameObject.Instantiate(_effect.NextEffect.AttackPrefab, _owner.transform.position, Quaternion.identity);
+        AttackSpawn(_effect.NextEffect);
+    }
+
+    private void AttackSpawn(SynergyEffect effect)
+    {
+        if (effect.SpawnPositionType == SpawnPositionType.Self)
+            GameObject.Instantiate(effect.NextEffect.AttackPrefab, _owner.transform.position, Quaternion.identity);
+        else if (effect.SpawnPositionType == SpawnPositionType.Target)
+            GameObject.Instantiate(effect.NextEffect.AttackPrefab, _owner.Target.position, Quaternion.identity);
     }
     #endregion
 

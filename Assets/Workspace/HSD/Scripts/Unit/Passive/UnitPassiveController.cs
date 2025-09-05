@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class UnitPassiveController
 {
-    private UnitStatusController _owner;
+    private UnitBase _owner;
     private Dictionary<string, UnitPassive> _passives = new Dictionary<string, UnitPassive>(128);
 
-    public UnitPassiveController(UnitStatusController owner)
+    public UnitPassiveController(GameObject owner)
     {
-        _owner = owner;
+        _owner = ComponentProvider.Get<UnitBase>(owner);
     }
 
     public void AddPassiveEffect(SynergyEffect effect, int statMultiplier = 1, bool isChange = false)

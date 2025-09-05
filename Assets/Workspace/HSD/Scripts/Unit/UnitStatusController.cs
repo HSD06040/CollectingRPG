@@ -62,7 +62,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Init&Clear
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
-        PassiveController = new UnitPassiveController(this);
+        PassiveController = new UnitPassiveController(gameObject);
         Status = status;
         IsDead = false;
         IsStund.Value = false;

@@ -35,13 +35,13 @@ public class SynergyEffect : ScriptableObject
 
     //[Header("AttackType (공격)")]
     public EffectApplyType EffectAttackType;
-    public SpawnPositionType SpawnPositionType; // 유닛 위치 or 전장 중앙
+    public SpawnPositionType SpawnPositionType;
     public float Power;
     public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);
     public string AttackAddress;
 
     //[Header("EffectType")]
-    public EffectType EffectType; // Increase
+    public EffectType EffectType;
     public SynergyBuffData[] SynergyBuffDatas;
     public StatEffectModifier[] StatModifiers;
 
