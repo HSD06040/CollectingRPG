@@ -126,7 +126,7 @@ public class RandomGachaSystem : MonoBehaviour
         if (TimeManager.Instance.CanObtainAdGachaReward())
         {
             // 광고 가챠 쿨타임 업데이트
-            TimeManager.Instance.SaveAdGachaResetTimeInfo();
+            TimeManager.Instance.UpdateAdGachaResetTimeInfo();
             // 1회 뽑기 진행
             ItemSelect(1);
             TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
@@ -168,11 +168,10 @@ public class RandomGachaSystem : MonoBehaviour
         // 일일 무료 뽑기가 가능할 때
         if (TimeManager.Instance.CanObtainedFreeGachaReward())
         {
-            // 일일 무료 뽑기 쿨타임 업데이트
-            TimeManager.Instance.UpdateDailyFreeGachaResetTimeInfo();
             // 1회 뽑기 진행
             ItemSelect(1);
-            TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
+            // 일일 무료 뽑기 쿨타임 업데이트
+            TimeManager.Instance.UpdateDailyFreeGachaResetTimeInfo();
             return true;
         }
         return false;
