@@ -16,6 +16,7 @@ public class MailBoxPopup : MonoBehaviour
     [SerializeField] private Button _closePanelButton;
 
     [Header("Panel")]
+    [SerializeField] private GameObject _emptyMailViewPanel;
     [SerializeField] private GameObject _receiveAllInfoPanel;
     [SerializeField] private GameObject _gold;
     [SerializeField] private GameObject _diamond;
@@ -23,9 +24,9 @@ public class MailBoxPopup : MonoBehaviour
     private bool _isDataBind = false;
     private bool _isReceivingAll = false;
 
-    private Action onPanelActive;
-
+    private List<MailData> _currentMails;
     private void Apply(List<MailData> mails) => Init(mails);
+
 
     private void Start()
     {
@@ -34,17 +35,15 @@ public class MailBoxPopup : MonoBehaviour
         _closePanelButton.onClick.AddListener(() => _receiveAllInfoPanel.SetActive(false));
     }
 
+    /// <summary>
+    /// 유저 DB 메일 데이터 리스트 -> 우편함 UI 재빌드하는 메서드
+    /// </summary>
+    /// <param name="mails">유저 DB 메일 데이터 리스트</param>
     public void Init(List<MailData> mails)
     {
-        if (mails == null)
-        {
-            Debug.Log("MailBoxPopup: mails == null");
-            // 빈 우편함 아이콘 추가
-            // 모두받기 버튼 interactable false
-            return;
-        }
+        _currentMails = mails;
 
-        _receiveAllButton.interactable = true;
+        CheckEmptyMailBox(mails);
 
         // 기존 메일 제거
         for (int i = _content.childCount - 1; i >= 0; i--)
@@ -61,8 +60,11 @@ public class MailBoxPopup : MonoBehaviour
             mailObject.SetActive(false);
 
             MailItem mailItem = mailObject.GetComponent<MailItem>();
+            
             if (mailItem != null)
+            {
                 mailItem.Bind(mail, _controller);
+            }
 
             mailObject.SetActive(true);
         }
@@ -86,12 +88,35 @@ public class MailBoxPopup : MonoBehaviour
             _controller.OnMailboxUpdated -= Apply;
     }
 
+    private void OnEnable()
+    {
+        if(_currentMails == null || _currentMails.Count == 0)
+        {
+            CheckEmptyMailBox(_currentMails);
+        }
+    }
+
     private void OnDisable()
     {
         if (_isDataBind)
         {
             _controller.OnMailboxUpdated -= Apply;
             _isDataBind = false;
+        }
+    }
+
+    private void CheckEmptyMailBox(List<MailData> mails)
+    {
+        if (mails == null || mails.Count == 0)
+        {
+            _emptyMailViewPanel.SetActive(true);
+            _receiveAllButton.interactable = false;
+            return;
+        }
+        else
+        {
+            _emptyMailViewPanel.SetActive(false);
+            _receiveAllButton.interactable = true;
         }
     }
 
@@ -105,33 +130,25 @@ public class MailBoxPopup : MonoBehaviour
 
         var (totalGold, totalDiamond) = await _controller.ReceiveAllAsync();
 
-        if (totalGold > 0)
+        if (totalGold > 0 || totalDiamond > 0)
         {
-            if (!_receiveAllInfoPanel.activeSelf)
-            {
-                _receiveAllInfoPanel.SetActive(true);
+            _receiveAllInfoPanel.SetActive(true);
 
+            if (totalGold > 0)
+            {
+                _gold.SetActive(true);
+                _receiveAllInfoPanel.GetComponent<ReceiveAllPanel>().SetGoldInfo(totalGold);
             }
 
-            _gold.SetActive(true);
-            _receiveAllInfoPanel.GetComponent<ReceiveAllPanel>().SetGoldInfo(totalGold);
-
-        }
-
-        if (totalDiamond > 0)
-        {
-            if (!_receiveAllInfoPanel.activeSelf)
+            if (totalDiamond > 0)
             {
-                _receiveAllInfoPanel.SetActive(true);
-
+                _diamond.SetActive(true);
+                _receiveAllInfoPanel.GetComponent<ReceiveAllPanel>().SetDiamondInfo(totalDiamond);
             }
-
-            _diamond.SetActive(true);
-            _receiveAllInfoPanel.GetComponent<ReceiveAllPanel>().SetDiamondInfo(totalDiamond);
         }
-
 
         _isReceivingAll = false;
-        //_receiveAllButton.interactable = true;
+        _currentMails.Clear();
+        CheckEmptyMailBox(_currentMails);
     }
 }

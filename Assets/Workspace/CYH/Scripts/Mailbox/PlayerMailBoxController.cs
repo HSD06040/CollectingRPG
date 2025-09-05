@@ -65,10 +65,9 @@ public class PlayerMailBoxController : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    ///  미수령 보상 지급 후 DB에 연동 및 삭제하는 메서드 
     /// </summary>
-    /// <param name="mailId"></param>
-    /// <returns></returns>
+    /// <param name="mailId">보상 받을 메일 ID</param>
     public async Task ReceiveRewardAsync(string mailId)
     {
         MailData mail = _mail?.Find(m => m.MailId == mailId);
@@ -93,13 +92,17 @@ public class PlayerMailBoxController : MonoBehaviour
             await Task.WhenAll(goldTask, diaTask);
         }
 
-        // 해당 메일 IsReceived == true 업데이트
+       // TODO: [CYH] 해당 메일 IsReceived == true 업데이트 (DeleteMail 삭제)
        // await Manager.DB.SetMailIsReceivedAsync(mailId, true);
         
         // 메일 삭제
         await DeleteMail(mailId);
     }
 
+    /// <summary>
+    /// 미수령 우편을 모두 수령하는 메서드
+    /// </summary>
+    /// <returns>수령할 총 골드/다이아</returns>
     public async Task<(int totalGold, int totalDiamond)> ReceiveAllAsync()
     {
         int totalGold = 0;
@@ -115,8 +118,6 @@ public class PlayerMailBoxController : MonoBehaviour
             totalGold += mail.Gold;
             totalDiamond += mail.Diamond;
         }
-
-        Debug.Log($"totalGold : {totalGold} / totalDiamond : {totalDiamond}");
 
         if (unReceivedMailList.Count == 0) return (0, 0);
 
@@ -175,8 +176,6 @@ public class PlayerMailBoxController : MonoBehaviour
 
         List<MailData> mailList = await Manager.DB.LoadUserMailsAsync();
         Debug.Log("[PlayerMailBoxController] OnMailChanged 실행");
-        // ReceivedDate 기준 내림차순 정렬
-        //mailList.Sort((a, b) => b.ReceivedDate.CompareTo(a.ReceivedDate));
 
         var loaded = await LoadAsync();
         RefreshUI(loaded);

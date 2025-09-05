@@ -57,6 +57,10 @@ public class MailItem : MonoBehaviour
         StopCountdown();
     }
 
+    /// <summary>
+    /// 메일 정보를 UI와 바인딩하는 메서드
+    /// </summary>
+    /// <param name="data">메일 데이터</param>
     public void Bind(MailData data, PlayerMailBoxController controller)
     {
         _data = data;
@@ -136,6 +140,10 @@ public class MailItem : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 기한 만료 시간 표시
+    /// </summary>
+    /// <param name="remains"></param>
     private void UpdateRemainText(long remains)
     {
         TimeSpan remain = TimeSpan.FromMilliseconds(remains);
