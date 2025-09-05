@@ -476,7 +476,7 @@ public class DBManager : Singleton<DBManager>
     }
 
     /// <summary>
-    /// 
+    /// 로그인 시 유저 메일함을 최신화하는 메서드
     /// </summary>
     /// <returns></returns>
     public async Task SyncMailsOnLoginAsync()
@@ -552,8 +552,6 @@ public class DBManager : Singleton<DBManager>
     /// <returns>유저가 가진 메일 정보를 담은 MailData 리스트</returns>
     public async Task<List<MailData>> LoadUserMailsAsync()
     {
-        Debug.Log("[DBManager] LoadUserMailsAsync 실행");
-
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
 
         List<MailData> userMailList = new List<MailData>();

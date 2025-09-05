@@ -103,6 +103,9 @@ public class MailItem : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 기한 만료 메일 상태 변경 및 삭제하는 메서드
+    /// </summary>
     private async void ExpiredMailAsync()
     {
         SetExpiredUI();
@@ -110,15 +113,11 @@ public class MailItem : MonoBehaviour
         await _controller.DeleteMail(_data.MailId);
     }
 
-    private void StopCountdown()
-    {
-        if (_countdownRoutine != null)
-        {
-            StopCoroutine(_countdownRoutine);
-            _countdownRoutine = null;
-        }
-    }
-
+    /// <summary>
+    /// 메일 만료 시간 확인 및 남은 시간을 UI에 갱신하는 메서드
+    /// 만료 시 기한 만료 상태로 업데이트
+    /// </summary>
+    /// <param name="expireDate">메일 만료 시간</param>
     private IEnumerator CountdownRoutine(long expireDate)
     {
         while (true)
@@ -130,7 +129,6 @@ public class MailItem : MonoBehaviour
             {
                 SetExpiredUI();
                 _countdownRoutine = null;
-                //TODO: [CYH] IsExpired로 변경
                 _controller.SetIsExpired(_data.MailId);
                 yield break;
             }
@@ -140,8 +138,17 @@ public class MailItem : MonoBehaviour
         }
     }
 
+    private void StopCountdown()
+    {
+        if (_countdownRoutine != null)
+        {
+            StopCoroutine(_countdownRoutine);
+            _countdownRoutine = null;
+        }
+    }
+
     /// <summary>
-    /// 기한 만료 시간 표시
+    /// 잔여 만료 시간 표시
     /// </summary>
     /// <param name="remains"></param>
     private void UpdateRemainText(long remains)
@@ -156,7 +163,7 @@ public class MailItem : MonoBehaviour
     }
 
     /// <summary>
-    /// 기한 만료 UI 변경
+    /// 기한 만료 UI 설정
     /// </summary>
     private void SetExpiredUI()
     {

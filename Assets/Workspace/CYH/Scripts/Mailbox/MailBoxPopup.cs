@@ -35,6 +35,23 @@ public class MailBoxPopup : MonoBehaviour
         _closePanelButton.onClick.AddListener(() => _receiveAllInfoPanel.SetActive(false));
     }
 
+    private void OnEnable()
+    {
+        if (_currentMails == null || _currentMails.Count == 0)
+        {
+            CheckEmptyMailBox(_currentMails);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_isDataBind)
+        {
+            _controller.OnMailboxUpdated -= Apply;
+            _isDataBind = false;
+        }
+    }
+
     /// <summary>
     /// 유저 DB 메일 데이터 리스트 -> 우편함 UI 재빌드하는 메서드
     /// </summary>
@@ -88,23 +105,6 @@ public class MailBoxPopup : MonoBehaviour
             _controller.OnMailboxUpdated -= Apply;
     }
 
-    private void OnEnable()
-    {
-        if(_currentMails == null || _currentMails.Count == 0)
-        {
-            CheckEmptyMailBox(_currentMails);
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (_isDataBind)
-        {
-            _controller.OnMailboxUpdated -= Apply;
-            _isDataBind = false;
-        }
-    }
-
     private void CheckEmptyMailBox(List<MailData> mails)
     {
         if (mails == null || mails.Count == 0)
@@ -120,10 +120,12 @@ public class MailBoxPopup : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 모두 받기 버튼 클릭 -> 보상 UI 활성화하는 메서드
+    /// </summary>
     private async void OnClickReceiveAll()
     {
-        if (_isReceivingAll)
-            return;
+        if (_isReceivingAll) return;
 
         _isReceivingAll = true;
         _receiveAllButton.interactable = false;
