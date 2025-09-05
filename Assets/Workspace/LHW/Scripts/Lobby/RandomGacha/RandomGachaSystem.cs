@@ -157,6 +157,7 @@ public class RandomGachaSystem : MonoBehaviour
             // 조각 등장 확률도 나중에 가중치로 전환되면 가중치로 적용 필요
             int pieceNum = UnityEngine.Random.Range(1, 11);
             // 캐릭터 조각 개수 데이터베이스 저장
+            TempDataManager.Instance.AddPiece(pieceNum);
             _resultUI.HeroGachaUpdate(data, 0, pieceNum.ToString());
         }
 

@@ -72,9 +72,9 @@ public class TempDataManager : MonoBehaviour
 
     #endregion
 
-    public void AddPiece()
+    public void AddPiece(int amount)
     {        
-        _upgradeUnitData.AddPiece(100);
+        _upgradeUnitData.AddPiece(amount);
     }
 
     public void LevelUp()
