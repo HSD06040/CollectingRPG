@@ -7,6 +7,20 @@ using UnityEngine;
 
 public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 {
+    private struct StatStruct
+    {
+        public int MaxHealth;        
+        public float AttackSpeed;
+        
+        public int PhysicalDamage;
+        public int MagicDamage;        
+
+        public int PhysicalDefense;
+        public int MagicDefense;
+        
+        public int CritChance;
+    }
+
     public UnitStatus Status { get; set; }
 
     #region Stat
@@ -38,6 +52,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<int> CurMana = new Property<int>();
     public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
+    public Property<bool> IsStund = new Property<bool>();
     public UnitPassiveController PassiveController { get; set; }
 
     public event Action<UnitStatusController> OnUnitDied;
@@ -51,7 +66,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     [HideInInspector] public float StatMultiplier = 0;
 
-    public bool IsDead => CurHp.Value <= 0;
+    public bool IsDead { get; set; }
 
     private void OnDestroy()
     {
@@ -61,13 +76,15 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Init&Clear
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
-        PassiveController = new UnitPassiveController(this);
+        PassiveController = new UnitPassiveController(gameObject);
         Status = status;
+        IsDead = false;
+        IsStund.Value = false;
 
-        if(plusUnitStat == null)
+        if (plusUnitStat == null)
         {
             SetBaseStat(status.GetCurrentStat());
-        }            
+        }        
         else
         {
             SetBaseStat(status.GetCurrentStat(), plusUnitStat);
@@ -77,20 +94,22 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region SetStat
     private void SetBaseStat(UnitStats stat)
     {
-        MaxHealth.SetBaseStat(stat.MaxHealth);
+        StatStruct addStat = GetStatStruct();
+
+        MaxHealth.SetBaseStat(stat.MaxHealth + addStat.MaxHealth);
         MaxMana.SetBaseStat(stat.MaxMana);
         ManaGain.SetBaseStat(stat.ManaGain);
 
-        AttackSpeed.SetBaseStat(stat.AttackSpeed);
+        AttackSpeed.SetBaseStat(stat.AttackSpeed + addStat.AttackSpeed);
         MoveSpeed.SetBaseStat(stat.MoveSpeed);
 
-        PhysicalDamage.SetBaseStat(stat.PhysicalDamage);
-        MagicDamage.SetBaseStat(stat.MagicDamage);
+        PhysicalDamage.SetBaseStat(stat.PhysicalDamage + addStat.PhysicalDamage);
+        MagicDamage.SetBaseStat(stat.MagicDamage + addStat.MagicDamage);
 
-        CritChance.SetBaseStat(stat.CritChance);
+        CritChance.SetBaseStat(stat.CritChance + addStat.CritChance);
 
-        PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
-        MagicDefense.SetBaseStat(stat.MagicDefense);
+        PhysicalDefense.SetBaseStat(stat.PhysicalDefense + addStat.PhysicalDefense);
+        MagicDefense.SetBaseStat(stat.MagicDefense + addStat.MagicDefense);
 
         AttackRange.SetBaseStat(stat.AttackRange);
         AttackCount.SetBaseStat(stat.AttackCount);
@@ -123,20 +142,22 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             AttackCount = Mathf.RoundToInt(baseStat.AttackCount + plusStat.AttackCount * StatMultiplier),
         };
 
-        MaxHealth.SetBaseStat(stat.MaxHealth);
+        StatStruct addStat = GetStatStruct();
+
+        MaxHealth.SetBaseStat(stat.MaxHealth + addStat.MaxHealth);
         MaxMana.SetBaseStat(stat.MaxMana);
         ManaGain.SetBaseStat(stat.ManaGain);
 
-        AttackSpeed.SetBaseStat(stat.AttackSpeed);
+        AttackSpeed.SetBaseStat(stat.AttackSpeed + addStat.AttackSpeed);
         MoveSpeed.SetBaseStat(stat.MoveSpeed);
 
-        PhysicalDamage.SetBaseStat(stat.PhysicalDamage);
-        MagicDamage.SetBaseStat(stat.MagicDamage);
+        PhysicalDamage.SetBaseStat(stat.PhysicalDamage + addStat.PhysicalDamage);
+        MagicDamage.SetBaseStat(stat.MagicDamage + addStat.MagicDamage);
 
-        CritChance.SetBaseStat(stat.CritChance);
+        CritChance.SetBaseStat(stat.CritChance + addStat.CritChance);
 
-        PhysicalDefense.SetBaseStat(stat.PhysicalDefense);
-        MagicDefense.SetBaseStat(stat.MagicDefense);
+        PhysicalDefense.SetBaseStat(stat.PhysicalDefense + addStat.PhysicalDefense);
+        MagicDefense.SetBaseStat(stat.MagicDefense + addStat.MagicDefense);
 
         AttackRange.SetBaseStat(stat.AttackRange);
         AttackCount.SetBaseStat(stat.AttackCount);
@@ -145,10 +166,40 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         CurMana.Value = MaxMana.Value;
         TotalDamage.Value = 0;
     }
+
+    private StatStruct GetStatStruct()
+    {
+        AugmentManager augment = AugmentManager.Instance;
+
+        bool isPlayer = gameObject.layer == LayerMask.NameToLayer("Player");
+
+        return new StatStruct
+        {
+            MaxHealth = isPlayer ? augment.MaxHealth.Value : 0,
+
+            AttackSpeed = isPlayer ? augment.AttackSpeed.Value : 0f,
+
+            PhysicalDamage = isPlayer ? augment.PhysicalDamage.Value : 0,
+            MagicDamage = isPlayer ? augment.MagicDamage.Value : 0,
+
+            PhysicalDefense = isPlayer ? augment.PhysicalDefense.Value : 0,
+            MagicDefense = isPlayer ? augment.MagicDefense.Value : 0,
+
+            CritChance = isPlayer ? augment.CritChance.Value : 0,
+        };
+    }
     #endregion
+
+    public void Refresh()
+    {
+        ClearAllStat();
+        PassiveController.RefreshBaseStats();
+        IsDead = false;
+    }
 
     public void ClearAllStat()
     {
+        Debug.Log("ClearAllStat called");
         // 모든 스탯의 모디파이어 제거
         MaxHealth.ClearModifiers();
         MaxMana.ClearModifiers();
@@ -175,48 +226,113 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
         _activeBuffs.Clear();
     }
-#endregion
+    #endregion
 
-    public void TakeDamage(int amount)
+    #region TakeDamage
+    public void TakeDamage(int amount, bool isCrit = false)
     {
         if(IsDead)
             return;
 
-        CurHp.Value = Mathf.Clamp(CurHp.Value - amount,0, int.MaxValue);
+        CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
 
-        if(CurHp.Value == 0)
+        if(CurHp.Value <= 0)
         {
             Die();
         }
     }
+        
+    public void TakeTickDamage(int amount, float tickCount, float tickInterval)
+    {
+        TickDamage(amount, tickCount, tickInterval).Forget();
+    }
 
+    private async UniTask TickDamage(int amount, float tickCount, float tickInterval)
+    {
+        var destroyToken = this.GetCancellationTokenOnDestroy();
+        int count = 0;
+
+        while (tickCount > count)
+        {
+            count++;
+            if (IsDead)
+                return;
+
+            TakeDamage(amount);
+
+            try
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(tickInterval), cancellationToken: destroyToken);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }            
+        }
+    }
+    #endregion
+
+    #region Increase
     public void IncreaseHealth(int amount)
     {
-        CurHp.Value = Mathf.Clamp(CurHp.Value + amount, 0, MaxHealth.Value);
+        CurHp.Value += amount;
+
+        if(CurHp.Value > MaxHealth.Value)
+        {
+            CurHp.Value = MaxHealth.Value;
+        }
     }
 
     public void IncreaseMana(int amount)
     {
-        CurMana.Value = Mathf.Clamp(CurMana.Value + amount, 0, MaxMana.Value);
-    }
+        CurMana.Value += amount;
 
-    public void IncreaseShield(int amount)
-    {
-        Debug.Log($"IncreaseShield: {amount}");
-        Shield.Value += amount;
+        if (CurMana.Value > MaxMana.Value)
+        {
+            CurMana.Value = MaxMana.Value;
+        }
     }
-
-    private void Die()
-    {
-        OnUnitDied?.Invoke(this);
-        OnDied?.Invoke();
-    }
-
     public void GetMana()
     {
         IncreaseMana(ManaGain.Value);
     }
 
+    public void IncreaseShield(int amount)
+    {        
+        Shield.Value += amount;
+    }
+    #endregion
+
+    #region Stun
+    public void Stun(float stunDuration)
+    {
+        StunDelay(stunDuration).Forget();
+    }
+
+    private async UniTask StunDelay(float stunTime)
+    {
+        IsStund.Value = true;
+
+        await UniTask.Delay(TimeSpan.FromSeconds(stunTime));
+
+        if (IsDead)
+            return;
+
+        IsStund.Value = false;
+    }
+    #endregion
+
+    private void Die()
+    {
+        IsDead = true;
+        OnDied?.Invoke();
+        Debug.Log($"{gameObject.name} is Dead.");
+
+        OnUnitDied?.Invoke(this);
+        Debug.Log($"{gameObject.name} Died event invoked.");
+    }
+
+    #region Effect
     public void ApplyEffect(BuffEffectData buffEffectData, float value, string source)
     {
         var key = new SourceKey(buffEffectData.StatType, source);
@@ -252,11 +368,12 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             // 갱신으로 취소된 경우 RemoveStat 안 함
         }
     }
+    #endregion
 
     #region Stat Management
     public void AddStat(StatType statType, float value, string source)
     {
-        //Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
+        Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
         switch (statType)
         {
             case StatType.MaxHealth:

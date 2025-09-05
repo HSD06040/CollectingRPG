@@ -11,6 +11,7 @@ public class BaseFSM : MonoBehaviour
     private static readonly int _attackHash = Animator.StringToHash("Attack");
     private static readonly int _skillHash = Animator.StringToHash("Skill");
     private static readonly int _deadHash = Animator.StringToHash("Dead");
+    private static readonly int _stunHash = Animator.StringToHash("Stun");
     #endregion
 
     #region State
@@ -20,6 +21,7 @@ public class BaseFSM : MonoBehaviour
     public MoveState MoveState { get; private set; }
     public DeadState DeadState { get; private set; }
     public AttackState AttackState { get; private set; }
+    public StunState StunState { get; private set; }
     public SkillState SkillState { get; private set; }
     #endregion
 
@@ -37,6 +39,7 @@ public class BaseFSM : MonoBehaviour
         AttackState ??= new AttackState(this, _attackHash);
         SkillState ??= new SkillState(this, _skillHash);
         DeadState ??= new DeadState(this, _deadHash);
+        StunState ??= new StunState(this, _stunHash);
     }
 
     public void Standby()
@@ -61,10 +64,22 @@ public class BaseFSM : MonoBehaviour
     {
         while (true)
         {
-            Owner.FindTarget();
             Owner.FlipToTarget();
+            Owner.FindTarget();
             StateMachine.Update();
             yield return null;
+        }
+    }
+
+    public void ChangeStunState(bool isStun)
+    {
+        if (isStun)
+        {
+            StateMachine.ChangeState(StunState);
+        }
+        else
+        {
+            StateMachine.ChangeState(IdleState);
         }
     }
 

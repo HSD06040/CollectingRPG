@@ -7,18 +7,22 @@ using UnityEngine.UI;
 
 public class SynergyPanel : MonoBehaviour
 {
-    [SerializeField] GameObject _synergySlotPrefab;
+    private GameObject _synergySlotPrefab;
+
+    [SerializeField] string _synergySlotAddress;
     [SerializeField] Transform _content;
     [SerializeField] SynergyToolTip _synergyTooltip;
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
     [SerializeField] int _offset;
 
-    private Dictionary<int, SynergySlot> _synergySlots = new(50);
+    private Dictionary<int, SynergySlot> _synergySlots = new(10);
     private int _currentPage;
     private int _maxPage;
 
     public void Init(SynergyDatabase db)
     {
+        _synergySlotPrefab = Manager.Resources.Get<GameObject>(_synergySlotAddress);
+
         _gridLayoutGroup.SetupGridLayoutGroup(_content, 3, 2, _offset);
 
         CreateSynergtSlots(db); 

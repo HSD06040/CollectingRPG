@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class UnitPassiveController
 {
-    private UnitStatusController _owner;
+    private UnitBase _owner;
     private Dictionary<string, UnitPassive> _passives = new Dictionary<string, UnitPassive>(128);
 
-    public UnitPassiveController(UnitStatusController owner)
+    public UnitPassiveController(GameObject owner)
     {
-        _owner = owner;
+        _owner = ComponentProvider.Get<UnitBase>(owner);
     }
 
-    public void AddPassiveEffect(SynergyEffect effect, int multiplier = 1, bool isChange = false)
+    public void AddPassiveEffect(SynergyEffect effect, int statMultiplier = 1, bool isChange = false)
     {
         if (isChange)
         {
@@ -21,7 +21,7 @@ public class UnitPassiveController
 
         if (!_passives.ContainsKey(effect.Key))
         {
-            _passives.Add(effect.Key, new UnitPassive(effect, _owner, multiplier));
+            _passives.Add(effect.Key, new UnitPassive(effect, _owner, statMultiplier));
             _passives[effect.Key].Active();
         }
     }
@@ -42,5 +42,15 @@ public class UnitPassiveController
             passive.Deactive();
         }
         _passives.Clear();
+    }
+
+    public void RefreshBaseStats()
+    {
+        foreach (var passive in _passives.Values)
+        {
+            if(passive.Effect.TriggerType != TriggerType.Base)
+            
+            passive.Active();
+        }
     }
 }

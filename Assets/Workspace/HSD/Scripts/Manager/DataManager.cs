@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 
 public class DataManager : Singleton<DataManager>
@@ -14,13 +15,14 @@ public class DataManager : Singleton<DataManager>
 
     public async UniTask InitData()
     {
-        CsvLoadData data;
+        await PreLoadData();
+        await CsvDownload();
+    }
 
-        data = await Addressables.LoadAssetAsync<CsvLoadData>("Data/CsvLoadData");
-
+    private async UniTask CsvDownload()
+    {
+        CsvLoadData data = await Addressables.LoadAssetAsync<CsvLoadData>("Data/CsvLoadData");
         CsvDownloader csvDownloader = new CsvDownloader(data);
-
-        await PreLoadData();    
 
         csvDownloader.DownloadDataAsync().Forget();
     }

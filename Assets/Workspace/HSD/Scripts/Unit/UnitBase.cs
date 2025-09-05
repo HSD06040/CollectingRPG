@@ -7,25 +7,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     [field: SerializeField] public UnitStatus Status { get; set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
     [field: SerializeField] public BoxCollider2D TriggerCol { get; private set; }
-    [SerializeField] public Transform Target 
-    { 
-        get
-        {
-            if(_target == null)
-            {
-                _target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
-            }
-
-            return _target;
-        }
-
-        set
-        {
-            _target = value;            
-        }
-    }
-
-    private Transform _target;
+    [field: SerializeField] public Transform Target { get; set; }
 
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
@@ -78,12 +60,12 @@ public class UnitBase : MonoBehaviour, IAttacker
     #region Provider
     private void AddProviderComponents()
     {
-        ComponentProvider.Add<UnitStatusController>(gameObject, StatusController);
+        ComponentProvider.Add<UnitBase>(gameObject, this);
     }
 
     private void RemoveProviderComponents()
     {
-        ComponentProvider.Remove<UnitStatusController>(gameObject);
+        ComponentProvider.Remove<UnitBase>(gameObject);
     }
     #endregion
 
@@ -96,7 +78,6 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Standby()
     {
-        StatusController.ClearAllStat();
         _fsm.Standby();
     }
 
@@ -122,7 +103,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target == null || ComponentProvider.Get<UnitStatusController>(Target.gameObject).IsDead)
+        if (Target == null || ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead)
             Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 

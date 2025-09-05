@@ -51,7 +51,7 @@ public class Projectile : MonoBehaviour
     {
         if (_targetLayer.Contain(collision.gameObject.layer))
         {
-            _status.CalculateDamage(_attackPower, _damageType, ComponentProvider.Get<UnitStatusController>(collision.gameObject));
+            _status.CalculateDamage(_attackPower, _damageType, ComponentProvider.Get<UnitBase>(collision.gameObject).StatusController);
 
             _pireceCount--;
 
