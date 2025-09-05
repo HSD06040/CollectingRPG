@@ -31,7 +31,7 @@ public class PlayerMailBoxController : MonoBehaviour
     private async void InitAsync()
     {
         // TODO: [CYH] 로그인 씬 호출
-        await Manager.DB.SyncMailsOnLoginAsync();
+       await Manager.DB.SyncMailsOnLoginAsync();
 
         List<MailData> userMailDB = await LoadAsync();
         RefreshUI(userMailDB);
@@ -60,15 +60,14 @@ public class PlayerMailBoxController : MonoBehaviour
     /// </summary>
     public async Task RefreshAsync()
     {
-        var loaded = await LoadAsync();
+        List<MailData> loaded = await LoadAsync();
         RefreshUI(loaded);
     }
 
     /// <summary>
-    /// 
+    ///  미수령 보상 지급 후 DB에 연동 및 삭제하는 메서드 
     /// </summary>
-    /// <param name="mailId"></param>
-    /// <returns></returns>
+    /// <param name="mailId">보상 받을 메일 ID</param>
     public async Task ReceiveRewardAsync(string mailId)
     {
         MailData mail = _mail?.Find(m => m.MailId == mailId);
@@ -93,34 +92,46 @@ public class PlayerMailBoxController : MonoBehaviour
             await Task.WhenAll(goldTask, diaTask);
         }
 
-        // 해당 메일 IsReceived == true 업데이트
+       // TODO: [CYH] 해당 메일 IsReceived == true 업데이트 (DeleteMail 삭제)
        // await Manager.DB.SetMailIsReceivedAsync(mailId, true);
         
         // 메일 삭제
         await DeleteMail(mailId);
     }
 
-    public async Task ReceiveAllAsync()
+    /// <summary>
+    /// 미수령 우편을 모두 수령하는 메서드
+    /// </summary>
+    /// <returns>수령할 총 골드/다이아</returns>
+    public async Task<(int totalGold, int totalDiamond)> ReceiveAllAsync()
     {
-        if (_mail == null || _mail.Count == 0) return;
+        int totalGold = 0;
+        int totalDiamond = 0;
+        
+        if (_mail == null || _mail.Count == 0) return (0, 0);
 
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
         List<MailData> unReceivedMailList = _mail.FindAll(m => !m.IsReceived && !m.IsExpired(currentTime));
-
-        if (unReceivedMailList.Count == 0)
-        {
-            return;
-        }
-
+        
         foreach (var mail in unReceivedMailList)
         {
+            totalGold += mail.Gold;
+            totalDiamond += mail.Diamond;
+        }
+
+        if (unReceivedMailList.Count == 0) return (0, 0);
+
+        // TODO: [CYH] 일괄 수령 리팩토링
+        foreach (MailData mail in unReceivedMailList)
+        {
+            Debug.Log($"ReceiveRewardAsync 실행");
             await ReceiveRewardAsync(mail.MailId);
 
             await Task.Yield();
         }
 
         await RefreshAsync();
+        return (totalGold, totalDiamond);
     }
 
     /// <summary>
@@ -130,7 +141,7 @@ public class PlayerMailBoxController : MonoBehaviour
     public async void SetIsExpired(string mailId)
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
-        await Manager.DB.SetMailIsExpireddAsync(mailId, false);
+        await Manager.DB.SetMailIsExpiredAsync(mailId, false);
     }
 
     /// <summary>
@@ -165,8 +176,6 @@ public class PlayerMailBoxController : MonoBehaviour
 
         List<MailData> mailList = await Manager.DB.LoadUserMailsAsync();
         Debug.Log("[PlayerMailBoxController] OnMailChanged 실행");
-        // ReceivedDate 기준 내림차순 정렬
-        //mailList.Sort((a, b) => b.ReceivedDate.CompareTo(a.ReceivedDate));
 
         var loaded = await LoadAsync();
         RefreshUI(loaded);

@@ -40,6 +40,6 @@ public class LoadingSceneTextAnimation : MonoBehaviour
 
     void LoadNextScene()
     {
-        SceneManager.LoadScene("USW_Tutorial");
+        //SceneManager.LoadScene("USW_Tutorial");
     }
 }

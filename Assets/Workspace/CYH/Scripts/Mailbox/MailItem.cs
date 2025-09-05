@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -56,6 +57,10 @@ public class MailItem : MonoBehaviour
         StopCountdown();
     }
 
+    /// <summary>
+    /// 메일 정보를 UI와 바인딩하는 메서드
+    /// </summary>
+    /// <param name="data">메일 데이터</param>
     public void Bind(MailData data, PlayerMailBoxController controller)
     {
         _data = data;
@@ -74,11 +79,16 @@ public class MailItem : MonoBehaviour
         _receiveButton.onClick.RemoveAllListeners();
         _receiveButton.onClick.AddListener(() =>
         {
-            if (!_isClicked && !data.IsReceived)
+            if (!_isClicked && !expired && !data.IsReceived)
             {
                 _isClicked = true;
                 StopCountdown();
                 _controller.ReceiveRewardAsync(_data.MailId);
+            }
+
+            if (expired)
+            {
+                ExpiredMailAsync();
             }
         });
 
@@ -89,7 +99,42 @@ public class MailItem : MonoBehaviour
         }
         else
         {
-            SetExpiredUI();
+            ExpiredMailAsync();
+        }
+    }
+
+    /// <summary>
+    /// 기한 만료 메일 상태 변경 및 삭제하는 메서드
+    /// </summary>
+    private async void ExpiredMailAsync()
+    {
+        SetExpiredUI();
+        await Task.Delay(3000);
+        await _controller.DeleteMail(_data.MailId);
+    }
+
+    /// <summary>
+    /// 메일 만료 시간 확인 및 남은 시간을 UI에 갱신하는 메서드
+    /// 만료 시 기한 만료 상태로 업데이트
+    /// </summary>
+    /// <param name="expireDate">메일 만료 시간</param>
+    private IEnumerator CountdownRoutine(long expireDate)
+    {
+        while (true)
+        {
+            long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long remain = expireDate - currentTime;
+
+            if (remain <= 0)
+            {
+                SetExpiredUI();
+                _countdownRoutine = null;
+                _controller.SetIsExpired(_data.MailId);
+                yield break;
+            }
+
+            UpdateRemainText(remain);
+            yield return new WaitForSeconds(1f);
         }
     }
 
@@ -102,27 +147,10 @@ public class MailItem : MonoBehaviour
         }
     }
 
-    private IEnumerator CountdownRoutine(long expireDate)
-    {
-        while (true)
-        {
-            long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            long remain = expireDate - currentTime;
-
-            if (remain <= 0)
-            {
-                SetExpiredUI();
-                _countdownRoutine = null;
-                //TODO: [CYH] IsExpired로 변경
-                _controller.SetIsExpired(_data.MailId);
-                yield break;
-            }
-
-            UpdateRemainText(remain);
-            yield return new WaitForSeconds(1f);
-        }
-    }
-
+    /// <summary>
+    /// 잔여 만료 시간 표시
+    /// </summary>
+    /// <param name="remains"></param>
     private void UpdateRemainText(long remains)
     {
         TimeSpan remain = TimeSpan.FromMilliseconds(remains);
@@ -135,7 +163,7 @@ public class MailItem : MonoBehaviour
     }
 
     /// <summary>
-    /// 기한 만료 UI 변경
+    /// 기한 만료 UI 설정
     /// </summary>
     private void SetExpiredUI()
     {
