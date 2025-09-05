@@ -20,7 +20,7 @@ public class UnitManager : MonoBehaviour
 
     [Header("Unit_Controller")]
     public UnitController UnitController;
-    public EnemyController _enemyController;
+    public EnemyController EnemyController;
 
     [Header("Data")]
     [SerializeField] UnitData[] _unitDatas;
@@ -45,6 +45,7 @@ public class UnitManager : MonoBehaviour
 
         UnitController.Init();
         _unitStanbyUIManager.Init();
+        EnemyController.Init();
 
         _unitDatas = Manager.Data.UnitDatas;
 
@@ -141,17 +142,17 @@ public class UnitManager : MonoBehaviour
             return;
 
         UnitController.UnitFight();
-        _enemyController.EnemyFight();
+        EnemyController.EnemyFight();
         
         FightUISetup();
         _battleManager.BattleStart();
-        _battleManager.Init(UnitController.GetUnits(), _enemyController.GetUnits());
+        _battleManager.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
 
     public void GameEndedUnitStandby()
     {
         UnitController.UnitsStanby();
-        _enemyController.EnemyStanby();
+        EnemyController.EnemyStanby();
         
     }
 
@@ -160,8 +161,8 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.BattleUIInit();
 
         _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
-        _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), _enemyController.GetUnits());
-        _unitUIManager.HpMeterController.Init(UnitController.GetUnits(), _enemyController.GetUnits());
+        _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
+        _unitUIManager.HpMeterController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
     #endregion
 
@@ -193,7 +194,8 @@ public class UnitManager : MonoBehaviour
 
     public void AddBattleUnit(UnitStatus unit, UnitSlot slot)
     {
-        UnitBase unitBase = Instantiate(unit.Data.UnitPrefab).GetComponent<UnitBase>();
+        GameObject obj = Instantiate(unit.Data.UnitPrefab);
+        UnitBase unitBase = ComponentProvider.Get<UnitBase>(obj);
         unitBase.Status = unit;
         unitBase.Init();
 
@@ -245,7 +247,8 @@ public class UnitManager : MonoBehaviour
 
         if (pos != Vector2Int.zero && !UnitController.IsUnitMaxCount())
         {
-            UnitBase unitBase = Instantiate(newUnit.Data.UnitPrefab).GetComponent<UnitBase>();
+            GameObject obj = Instantiate(newUnit.Data.UnitPrefab);
+            UnitBase unitBase = ComponentProvider.Get<UnitBase>(obj);
             unitBase.Status = newUnit;
             unitBase.Init();
 

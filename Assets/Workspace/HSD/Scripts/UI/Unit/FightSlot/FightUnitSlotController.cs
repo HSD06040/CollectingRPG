@@ -18,11 +18,8 @@ public class FightUnitSlotController : MonoBehaviour
     {
         int _slotCount = UnitController.UnitMaxCount;
 
-        _slots = new UI_FightUnitSlot[_slotCount];
-
         for (int i = 0; i < _slotCount; i++)
         {
-            UI_FightUnitSlot slot = _slots[i];
             _slots[i].Init(null);
         }
     }

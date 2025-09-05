@@ -24,9 +24,11 @@ public class SynergyEffect : ScriptableObject
 
     //[Header("SpawnType (유닛 소환)")]
     public bool IsUnitPosition;         // 소환 위치 정의 (유닛위치 or 전장 중앙)
-    public bool IsMultiplier;           // 시너지 유닛의 Level에 따른 배수 적용 여부
-    public SpawnType SpawnType;         // 유닛소환 타입
+    public int UnitStatMultiplier { get; private set; }
     public UnitStats SpawnUnitStats;    // 가중치
+    public bool IsMultiplier;           // 시너지 유닛의 Level에 따른 배수 적용 여부
+
+    public SpawnStatType SpawnType;     // 유닛소환 시 스텟 타입 설정
     public Synergy SpawnSynergy;        // 유닛을 소환하는 시너지
     public GameObject SpawnPrefab => Manager.Resources.Get<GameObject>(SpawnAddress);
     public string SpawnAddress;
@@ -51,10 +53,13 @@ public class SynergyEffect : ScriptableObject
     public EffectTargetType TargetType;
 
     //[Header("NextEffect")]
-    public SynergyEffect NextEffect;
+    public SynergyEffect NextEffect;    
 
     public void ApplyEffect(UnitBase[] units, int synergy)
     {
+        if(IsMultiplier)
+            UnitStatMultiplier = units.GetSynergyUnitsTotalLevel(SpawnSynergy);
+
         if (TargetType == EffectTargetType.Cross)
         {
             ActiveCross(units, synergy);

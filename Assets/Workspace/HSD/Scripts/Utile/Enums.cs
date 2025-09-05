@@ -25,6 +25,12 @@ public enum Grade
 
 #region Type
 
+public enum UnitMultiplierType
+{
+    None,
+    UnitLevel,
+}
+
 public enum PopupType
 {
     PhysicalDamage,
@@ -44,12 +50,12 @@ public enum MagicStoneSearchType
 }
 
 /// <summary>
-/// 유닛 또는 공격하는 오브젝트 소환
+/// 유닛 레벨에 따른 가중치 곱하기 or 1단계 아래 레벨
 /// </summary>
-public enum SpawnType
+public enum SpawnStatType
 {
-    Unit,
-    AttackObject
+    Level,
+    LowUpgrade
 }
 
 /// <summary>

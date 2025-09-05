@@ -187,8 +187,9 @@ public class UnitController : MonoBehaviour
 
     public void AddUnit(UnitStatus newUnitData, Vector2Int pos)
     {
-        UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);
-        UnitBase newUnit = Instantiate(newUnitData.Data.UnitPrefab).GetComponent<UnitBase>();
+        GameObject obj = Instantiate(newUnitData.Data.UnitPrefab);
+        UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);        
+        UnitBase newUnit = ComponentProvider.Get<UnitBase>(obj);
         newUnit.Status = newUnitData;
 
         newUnit.transform.SetParent(slot.transform);

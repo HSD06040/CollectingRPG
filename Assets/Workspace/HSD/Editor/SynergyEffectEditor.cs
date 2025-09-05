@@ -114,7 +114,7 @@ public class SynergyEffectEditor : Editor
                 EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("가중치 적용여부"));
                 if (IsMultiplierProp.boolValue)
                 {
-                    EditorGUILayout.PropertyField(SpawnTypeProp, new GUIContent("스폰할 객체 타입", "유닛 or 공격체"));
+                    EditorGUILayout.PropertyField(SpawnTypeProp, new GUIContent("스폰할 유닛 스텟 타입", "시너지 유닛의 Level에 따른 or 한단계 낮은 레벨로 소환"));
                     EditorGUILayout.PropertyField(SpawnUnitStatsProp, new GUIContent("가중치"));
                 }
                 EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("스폰 시너지"));

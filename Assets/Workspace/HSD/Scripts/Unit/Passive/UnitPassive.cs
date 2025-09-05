@@ -13,12 +13,12 @@ public class UnitPassive
 
     private CancellationTokenSource _cts; // Interval 루프 중단용
 
-    public UnitPassive(SynergyEffect effect, UnitStatusController owner, int mulriplier = 1)
+    public UnitPassive(SynergyEffect effect, UnitStatusController owner, int statMulriplier = 1)
     {
         _currentActivations = 0;
         _effect = effect;
         _owner = owner;
-        _mulriplier = mulriplier;
+        _mulriplier = statMulriplier;
 
         _cts = new CancellationTokenSource();
     }
@@ -33,7 +33,9 @@ public class UnitPassive
             case TriggerType.Base:
                 EffectActives();
                 break;
-
+            case TriggerType.OnDied:
+                _owner.OnDied += EffectActives;
+                break;
             case TriggerType.OnAttack:
                 _owner.OnAttack += EffectActives;
                 break;
@@ -67,6 +69,9 @@ public class UnitPassive
         {
             case TriggerType.OnAttack:
                 _owner.OnAttack -= EffectActives;
+                break;
+            case TriggerType.OnDied:
+                _owner.OnDied -= EffectActives;
                 break;
             case TriggerType.OnUseSkill:
                 _owner.OnSkill -= EffectActives;
@@ -205,7 +210,8 @@ public class UnitPassive
 
         if (_currentActivations < _effect.MaxActivations)
         {
-            EffectActive();
+            SpawnActive();
+            BuffEffectActive();
             AttackActive();
         }
         else
@@ -215,21 +221,24 @@ public class UnitPassive
 
         _currentActivations++;
     }
+
     private void NextEffectActives()
     {
-        NextEffectActive();
+        if (_effect.NextEffect == null) return;
+
+        NextBuffEffectActive();
         NextAttackActive();
     }
 
     #region BuffEffect
-    private void EffectActive()
+    private void BuffEffectActive()
     {
         if (!_effect.IsBuff)
             return;
 
         BuffEffectActive(_effect);
     }
-    private void NextEffectActive()
+    private void NextBuffEffectActive()
     {
         if (!_effect.NextEffect.IsBuff)
             return;
@@ -284,5 +293,46 @@ public class UnitPassive
     }
     #endregion
 
+    #region SpawnEffect
+    private void SpawnActive()
+    {
+        if (!_effect.IsSpawn)
+            return;
+
+        Vector3 pos = _owner.transform.position;
+        Spawn(pos);
+    }
+
+    private void Spawn(Vector3 pos)
+    {
+        GameObject obj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
+
+        UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
+
+        if (_effect.IsMultiplier)
+        {
+            if (spawnUnit == null)
+                return;
+
+            if (_effect.SpawnType == SpawnStatType.Level)
+            {
+                if (_effect.IsMultiplier)
+                {
+                    spawnUnit.StatusController.StatMultiplier = _effect.UnitStatMultiplier;
+                    spawnUnit.Init(_effect.SpawnUnitStats);
+                }
+                else
+                {
+                    spawnUnit.Init();
+                }
+            }
+            else if (_effect.SpawnType == SpawnStatType.LowUpgrade)
+            {
+                spawnUnit.Status.Level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
+                spawnUnit.Init();
+            }
+        }
+    }
+    #endregion
 #endregion
 }

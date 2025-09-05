@@ -12,7 +12,7 @@ public class UnitPassiveController
         _owner = owner;
     }
 
-    public void AddPassiveEffect(SynergyEffect effect, int multiplier = 1, bool isChange = false)
+    public void AddPassiveEffect(SynergyEffect effect, int statMultiplier = 1, bool isChange = false)
     {
         if (isChange)
         {
@@ -21,7 +21,7 @@ public class UnitPassiveController
 
         if (!_passives.ContainsKey(effect.Key))
         {
-            _passives.Add(effect.Key, new UnitPassive(effect, _owner, multiplier));
+            _passives.Add(effect.Key, new UnitPassive(effect, _owner, statMultiplier));
             _passives[effect.Key].Active();
         }
     }
