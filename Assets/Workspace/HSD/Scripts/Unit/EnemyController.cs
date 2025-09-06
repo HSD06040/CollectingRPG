@@ -62,6 +62,7 @@ public class EnemyController : MonoBehaviour
         {
             if (unit == null || unit.StatusController.IsDead)
                 continue;
+
             unit.Standby();
         }
     }

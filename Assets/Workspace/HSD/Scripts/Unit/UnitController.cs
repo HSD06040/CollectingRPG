@@ -78,9 +78,8 @@ public class UnitController : MonoBehaviour
 
             unit.Standby();
         }
-
-        _unitDragDropSystem.enabled = true;
     }
+
     public void UnitFight()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())

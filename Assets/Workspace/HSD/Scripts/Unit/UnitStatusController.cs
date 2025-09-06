@@ -56,11 +56,11 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     #region Controller
     public UnitPassiveController PassiveController { get; set; }
-    public FXController FXController { get; set; }
+    public UnitFXController UnitFXController { get; set; }
     #endregion
 
     #region Events
-    public event Action<UnitStatusController> OnUnitDied;
+    public Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> OnUseSkill;
     
     public event Action OnDied;
@@ -83,7 +83,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
         PassiveController = new UnitPassiveController(gameObject);
-        FXController = new FXController(GetComponentsInChildren<SpriteRenderer>());
+        UnitFXController = new UnitFXController(GetComponentsInChildren<SpriteRenderer>());
 
         Status = status;
         IsDead = false;
@@ -243,7 +243,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             return;
 
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
-        FXController.Flash();
+        UnitFXController.Flash();
 
         if (CurHp.Value <= 0)
         {
@@ -335,10 +335,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsDead = true;
         OnDied?.Invoke();
-        Debug.Log($"{gameObject.name} is Dead.");
-
-        OnUnitDied?.Invoke(this);
-        Debug.Log($"{gameObject.name} Died event invoked.");
     }
 
     #region Effect

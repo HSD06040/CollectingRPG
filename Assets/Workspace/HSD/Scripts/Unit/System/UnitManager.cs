@@ -148,9 +148,9 @@ public class UnitManager : MonoBehaviour
 
     public void GameEndedUnitStandby()
     {
+        Debug.Log("게임 끝");
         UnitController.UnitsStanby();
-        EnemyController.EnemyStanby();
-        
+        EnemyController.EnemyStanby();     
     }
 
     private void FightUISetup()

@@ -215,8 +215,9 @@ public class DeadState : BaseState
     public override void Enter()
     {
         base.Enter();
-
+        
         _owner.Col.enabled = false;
+        _status.OnUnitDied?.Invoke(_status);
     }
 
     public override void Exit()
