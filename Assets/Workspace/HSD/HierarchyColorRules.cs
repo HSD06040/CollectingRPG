@@ -18,15 +18,6 @@ public class HierarchyColorRules : ScriptableObject
         [Tooltip("Match by first character (#R, #G, etc.)")]
         public string firstCharPattern = "";
 
-        [Tooltip("Match by prefix word (Player_, Enemy_, UI_, etc.)")]
-        public string prefixPattern = "";
-
-        [Tooltip("Match by suffix word (_Manager, _Controller, etc.)")]
-        public string suffixPattern = "";
-
-        [Tooltip("Match by containing word (contains 'Camera', 'Light', etc.)")]
-        public string containsPattern = "";
-
         [Header("Color Settings")]
         public Color backgroundColor = Color.blue;
 

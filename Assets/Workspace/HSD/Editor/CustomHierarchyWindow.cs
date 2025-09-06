@@ -108,35 +108,11 @@ public class CompleteHierarchyOverride
 
         string nameToCheck = rule.caseSensitive ? name : name.ToUpper();
 
-        // 첫 글자 패턴 체크
+        // 첫 글자 패턴 체크만 사용
         if (!string.IsNullOrEmpty(rule.firstCharPattern))
         {
             string pattern = rule.caseSensitive ? rule.firstCharPattern : rule.firstCharPattern.ToUpper();
             if (nameToCheck.StartsWith(pattern))
-                return true;
-        }
-
-        // 접두사 패턴 체크
-        if (!string.IsNullOrEmpty(rule.prefixPattern))
-        {
-            string pattern = rule.caseSensitive ? rule.prefixPattern : rule.prefixPattern.ToUpper();
-            if (nameToCheck.StartsWith(pattern))
-                return true;
-        }
-
-        // 접미사 패턴 체크
-        if (!string.IsNullOrEmpty(rule.suffixPattern))
-        {
-            string pattern = rule.caseSensitive ? rule.suffixPattern : rule.suffixPattern.ToUpper();
-            if (nameToCheck.EndsWith(pattern))
-                return true;
-        }
-
-        // 포함 패턴 체크
-        if (!string.IsNullOrEmpty(rule.containsPattern))
-        {
-            string pattern = rule.caseSensitive ? rule.containsPattern : rule.containsPattern.ToUpper();
-            if (nameToCheck.Contains(pattern))
                 return true;
         }
 
@@ -189,13 +165,16 @@ public class CompleteHierarchyOverride
         {
             float t = i / 255f;
 
+            // 더 부드러운 반투명 그라데이션 효과
             Color leftColor = Color.Lerp(baseColor * 0.8f, baseColor * 0.3f, 0.5f);
             Color rightColor = Color.Lerp(baseColor, Color.white, 0.1f);
 
+            // 부드러운 곡선
             float curve = Mathf.Pow(t, 1.2f);
             Color pixelColor = Color.Lerp(leftColor, rightColor, curve);
 
-            pixelColor.a = baseColor.a * Mathf.Lerp(1f, 0f, t);
+            // 전체적으로 반투명하게 조정 (원래 baseColor.a 값 사용)
+            pixelColor.a = baseColor.a * Mathf.Lerp(0.9f, 0.3f, t);
 
             gradientTexture.SetPixel(i, 0, pixelColor);
         }
