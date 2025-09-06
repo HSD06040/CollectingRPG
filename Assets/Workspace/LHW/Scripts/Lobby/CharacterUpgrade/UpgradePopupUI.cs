@@ -44,7 +44,8 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
 
     private void LevelUp()
     {
-        if(TempDataManager.Instance.UpgradeData.UpgradeLevel >= 10)
+        //if(TempDataManager.Instance.UpgradeData.UpgradeLevel >= 10)
+        if(_currentCharUnit.UpgradeData.UpgradeLevel >= 10)
         {
             if(PopupManager.Instance != null)
             {
@@ -52,7 +53,8 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
                 return;
             }
         }
-        TempDataManager.Instance.LevelUp();
+        _currentCharUnit.UpgradeData.LevelUp();
+        //TempDataManager.Instance.LevelUp();
 
         OnCharacterStatusChanged?.Invoke();
     }
