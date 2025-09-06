@@ -53,14 +53,20 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
     public Property<bool> IsStund = new Property<bool>();
-    public UnitPassiveController PassiveController { get; set; }
 
+    #region Controller
+    public UnitPassiveController PassiveController { get; set; }
+    public FXController FXController { get; set; }
+    #endregion
+
+    #region Events
     public event Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> OnUseSkill;
     
     public event Action OnDied;
     public Action OnSkill;
     public Action OnAttack;
+    #endregion
 
     private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
 
@@ -77,6 +83,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
         PassiveController = new UnitPassiveController(gameObject);
+        FXController = new FXController(GetComponentsInChildren<SpriteRenderer>());
+
         Status = status;
         IsDead = false;
         IsStund.Value = false;
@@ -235,8 +243,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             return;
 
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
+        FXController.Flash();
 
-        if(CurHp.Value <= 0)
+        if (CurHp.Value <= 0)
         {
             Die();
         }

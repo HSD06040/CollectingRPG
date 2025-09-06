@@ -103,7 +103,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target == null || ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead)
+        if (Target == null || (Target != null && ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead))
             Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 
