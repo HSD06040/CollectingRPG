@@ -180,7 +180,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return Target;
     }
-    public UnitStatus GetUnitData()
+    public UnitStatus GetUnitStatus()
     {
         return Status;
     }

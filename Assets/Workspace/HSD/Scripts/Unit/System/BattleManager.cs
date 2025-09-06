@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
+    public static event Action OnPlayerVictory;
+    public static event Action OnPlayerDefeat;
+
     public static event Action OnBattleStarted;
     public static event Action OnBattleEnded;
     public static Action<UnitBase> OnSpawnUnit;
@@ -67,10 +70,12 @@ public class BattleManager : MonoBehaviour
 
         if (_playerUnitCount <= 0)
         {
+            OnPlayerDefeat?.Invoke();
             Debug.Log("플레이어 패배");
         }
         else if (_enemyUnitCount <= 0)
         {
+            OnPlayerVictory?.Invoke();
             Debug.Log("플레이어 승리");
         }
 
