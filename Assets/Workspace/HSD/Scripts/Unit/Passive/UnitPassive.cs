@@ -310,6 +310,12 @@ public class UnitPassive
 
     private void AttackSpawn(SynergyEffect effect)
     {
+        if (effect.AttackPrefab == null)
+        {
+            Debug.LogWarning($"[시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {effect.AttackAddress}");
+            return;
+        }
+
         if (effect.SpawnPositionType == SpawnPositionType.Self)
             GameObject.Instantiate(effect.NextEffect.AttackPrefab, _owner.transform.position, Quaternion.identity);
         else if (effect.SpawnPositionType == SpawnPositionType.Target)
@@ -329,10 +335,16 @@ public class UnitPassive
 
     private void Spawn(Vector3 pos)
     {
+        if (Effect.SpawnPrefab == null)
+        {
+            Debug.LogWarning($"[시너지 스폰 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {Effect.SpawnAddress}");
+            return;
+        }
+
         GameObject obj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
 
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
-
+        
         if (Effect.IsMultiplier)
         {
             if (spawnUnit == null)
@@ -356,6 +368,8 @@ public class UnitPassive
                 spawnUnit.Init();
             }
         }
+
+        BattleManager.OnSpawnUnit?.Invoke(spawnUnit);
     }
     #endregion
 #endregion
