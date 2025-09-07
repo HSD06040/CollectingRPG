@@ -16,7 +16,7 @@ public class BaseFSM : MonoBehaviour
 
     #region State
     public StateMachine StateMachine { get; private set; }
-    public StanbyState StanbyState { get; private set; }
+    public StandbyState StandbyState { get; private set; }
     public IdleState IdleState {  get; private set; }
     public MoveState MoveState { get; private set; }
     public DeadState DeadState { get; private set; }
@@ -33,7 +33,7 @@ public class BaseFSM : MonoBehaviour
 
         StateMachine ??= new StateMachine();
 
-        StanbyState ??= new StanbyState(this, _idleHash);
+        StandbyState ??= new StandbyState(this, _idleHash);
         IdleState ??= new IdleState(this, _idleHash);
         MoveState ??= new MoveState(this, _moveHash);
         AttackState ??= new AttackState(this, _attackHash);
@@ -50,7 +50,7 @@ public class BaseFSM : MonoBehaviour
             _fightRoutine = null;
         }
 
-        StateMachine.ChangeState(StanbyState);
+        StateMachine.ChangeState(StandbyState);
         StateMachine.Update();
     }
 

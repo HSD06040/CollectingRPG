@@ -20,7 +20,6 @@ public class CompleteHierarchyOverride
 
     private static void LoadColorRules()
     {
-        // ScriptableObject 찾기
         string[] guids = AssetDatabase.FindAssets("t:HierarchyColorRules");
         if (guids.Length > 0)
         {
@@ -28,7 +27,6 @@ public class CompleteHierarchyOverride
             colorRules = AssetDatabase.LoadAssetAtPath<HierarchyColorRules>(path);
         }
 
-        // 없으면 기본 생성
         if (colorRules == null)
         {
             colorRules = ScriptableObject.CreateInstance<HierarchyColorRules>();
@@ -53,29 +51,22 @@ public class CompleteHierarchyOverride
         GameObject gameObject = EditorUtility.InstanceIDToObject(instanceID) as GameObject;
         if (gameObject == null) return;
 
-        // 선택된 오브젝트는 Unity 기본 스타일 유지하지만 컴포넌트 아이콘은 그리기
         if (Selection.Contains(instanceID))
         {
             DrawComponentIcons(gameObject, selectionRect);
             return;
         }
 
-        // 규칙에 따른 색상 감지
         Color detectedColor = GetColorByRules(gameObject.name);
 
-        // 매칭되는 규칙이 있을 때만 커스텀 그리기
         if (detectedColor != Color.clear)
         {
-            // 완전히 새로운 배경으로 덮어쓰기
             DrawCompleteBackground(selectionRect, detectedColor);
 
-            // 완전히 새로운 내용으로 그리기
             DrawCompleteContent(gameObject, selectionRect, detectedColor);
         }
 
-        // 모든 오브젝트에 컴포넌트 아이콘 그리기
         DrawComponentIcons(gameObject, selectionRect);
-        // detectedColor가 Color.clear면 Unity 기본 렌더링 그대로 사용
     }
 
     private static Color GetColorByRules(string gameObjectName)
@@ -92,7 +83,6 @@ public class CompleteHierarchyOverride
             }
         }
 
-        // 우선순위가 가장 높은 규칙 선택
         if (matchedRules.Count > 0)
         {
             var bestRule = matchedRules.OrderByDescending(r => r.priority).First();
@@ -108,7 +98,6 @@ public class CompleteHierarchyOverride
 
         string nameToCheck = rule.caseSensitive ? name : name.ToUpper();
 
-        // 첫 글자 패턴 체크만 사용
         if (!string.IsNullOrEmpty(rule.firstCharPattern))
         {
             string pattern = rule.caseSensitive ? rule.firstCharPattern : rule.firstCharPattern.ToUpper();
@@ -121,13 +110,11 @@ public class CompleteHierarchyOverride
 
     private static void DrawCompleteBackground(Rect rect, Color backgroundColor)
     {
-        // 기본 배경으로 덮기
         Color defaultBg = EditorGUIUtility.isProSkin ?
             new Color(0.22f, 0.22f, 0.22f, 1f) :
             new Color(0.76f, 0.76f, 0.76f, 1f);
         EditorGUI.DrawRect(rect, defaultBg);
 
-        // 그라데이션 배경 그리기
         DrawGradientRect(rect, backgroundColor);
     }
 
@@ -142,9 +129,8 @@ public class CompleteHierarchyOverride
 
         if (gradientTextures.ContainsKey(textureKey) && gradientTextures[textureKey] != null)
         {
-            // 그라데이션 텍스처가 제대로 적용되도록 GUI 상태 설정
             var oldColor = GUI.color;
-            GUI.color = Color.white; // 텍스처 색상이 제대로 나오도록
+            GUI.color = Color.white;
 
             GUI.DrawTexture(rect, gradientTextures[textureKey], ScaleMode.StretchToFill, true);
 
@@ -152,7 +138,6 @@ public class CompleteHierarchyOverride
         }
         else
         {
-            // 텍스처가 없으면 단색 배경으로 fallback
             EditorGUI.DrawRect(rect, baseColor);
         }
     }
@@ -165,16 +150,13 @@ public class CompleteHierarchyOverride
         {
             float t = i / 255f;
 
-            // 더 부드러운 반투명 그라데이션 효과
             Color leftColor = Color.Lerp(baseColor * 0.8f, baseColor * 0.3f, 0.5f);
             Color rightColor = Color.Lerp(baseColor, Color.white, 0.1f);
 
-            // 부드러운 곡선
             float curve = Mathf.Pow(t, 1.2f);
             Color pixelColor = Color.Lerp(leftColor, rightColor, curve);
 
-            // 전체적으로 반투명하게 조정 (원래 baseColor.a 값 사용)
-            pixelColor.a = baseColor.a * Mathf.Lerp(0.9f, 0.3f, t);
+            pixelColor.a = baseColor.a * Mathf.Lerp(0.9f, 0f, t);
 
             gradientTexture.SetPixel(i, 0, pixelColor);
         }
@@ -188,13 +170,12 @@ public class CompleteHierarchyOverride
         var content = EditorGUIUtility.ObjectContent(gameObject, typeof(GameObject));
         Color textColor = GetOptimalTextColor(backgroundColor);
 
-        // 색상 코드 제거한 이름 가져오기
         string displayName = GetDisplayName(gameObject.name);
 
         GUIStyle customStyle = new GUIStyle(EditorStyles.label);
         customStyle.normal.textColor = textColor;
-        customStyle.fontStyle = FontStyle.Bold;  // Bold로 변경
-        customStyle.alignment = TextAnchor.MiddleCenter;  // 중앙정렬로 변경
+        customStyle.fontStyle = FontStyle.Bold;
+        customStyle.alignment = TextAnchor.MiddleCenter;
         customStyle.richText = true;
 
         Rect contentRect = new Rect(rect.x, rect.y, rect.width - 80, rect.height);
@@ -210,7 +191,6 @@ public class CompleteHierarchyOverride
             customStyle.normal.textColor = Color.Lerp(textColor, Color.cyan, 0.3f);
         }
 
-        // 색상 코드가 제거된 이름과 아이콘으로 새로운 GUIContent 생성
         var customContent = new GUIContent(displayName, content.image);
         EditorGUI.LabelField(contentRect, customContent, customStyle);
 
@@ -229,7 +209,6 @@ public class CompleteHierarchyOverride
 
     private static string GetDisplayName(string originalName)
     {
-        // 색상 코드 패턴들 제거
         string[] colorCodes = { "#R", "#G", "#B", "#Y", "#O", "#P", "#C" };
 
         foreach (string code in colorCodes)

@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StanbyState : BaseState
+public class StandbyState : BaseState
 {
-    public StanbyState(BaseFSM fsm, int animHash) : base(fsm, animHash)
+    public StandbyState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
     }
 

@@ -56,7 +56,7 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    public void EnemyStanby()
+    public void EnemyStandby()
     {
         foreach (var unit in _unitGrid)
         {

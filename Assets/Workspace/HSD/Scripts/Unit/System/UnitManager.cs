@@ -12,7 +12,6 @@ public class UnitManager : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] UnitUIManager _unitUIManager;
-    [SerializeField] UnitStanbyUIManager _unitStanbyUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
 
     [Header("Unit_Controller")]
@@ -30,6 +29,10 @@ public class UnitManager : MonoBehaviour
         else
             InitAsync();
     }
+    private void OnDestroy()
+    {
+        UnSubscrube();
+    }
 
     private async void InitAsync()
     {
@@ -38,15 +41,14 @@ public class UnitManager : MonoBehaviour
         Manager.Data.SynergyDB.ResetSynergys();
 
         UnitController.Init();
-        _unitStanbyUIManager.Init();
         EnemyController.Init();
 
         _unitDatas = Manager.Data.UnitDatas;
 
         Subscribe();
 
-        _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
-        _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
+        _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
+        _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
         if (TempDataManager.Instance == null)
             return;
@@ -72,14 +74,14 @@ public class UnitManager : MonoBehaviour
     //    Manager.Data.SynergyDB.ResetSynergys();
 
     //    UnitController.Init();
-    //    _unitStanbyUIManager.Init();
+    //    _unitUIManager.Init();
 
     //    _unitDatas = Manager.Data.UnitDatas;
 
     //    Subscribe();
 
-    //    _unitStanbyUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
-    //    _unitStanbyUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
+    //    _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
+    //    _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
                        
     //    TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
 
@@ -95,24 +97,19 @@ public class UnitManager : MonoBehaviour
     //    }
     //}
 
-    private void OnDestroy()
-    {
-        UnSubscrube();
-    }
-
     #region EventHandler
     private void Subscribe()
     {
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
         UnitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
-        UnitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
-        UnitController.SynergyController.OnSynergyChanged += _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+        UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
+        UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergyPanel.UpdateSynergySlot;
 
-        UnitController.OnUnitCountChanged += _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+        UnitController.OnUnitCountChanged += _unitUIManager.UnitCountPanel.UpdateUnitCount;
 
-        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        for (int i = 0; i < _unitUIManager.UnitTotalPowerPanel.Length; i++)
         {
-            UnitController.OnUnitPowerChanged += _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+            UnitController.OnUnitPowerChanged += _unitUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
         }
     }
 
@@ -120,14 +117,14 @@ public class UnitManager : MonoBehaviour
     {
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
         UnitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
-        UnitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergySlotPanel.UpdateSynergySlot;
-        UnitController.SynergyController.OnSynergyChanged -= _unitStanbyUIManager.SynergyPanel.UpdateSynergySlot;
+        UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
+        UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergyPanel.UpdateSynergySlot;
 
-        UnitController.OnUnitCountChanged -= _unitStanbyUIManager.UnitCountPanel.UpdateUnitCount;
+        UnitController.OnUnitCountChanged -= _unitUIManager.UnitCountPanel.UpdateUnitCount;
 
-        for (int i = 0; i < _unitStanbyUIManager.UnitTotalPowerPanel.Length; i++)
+        for (int i = 0; i < _unitUIManager.UnitTotalPowerPanel.Length; i++)
         {
-            UnitController.OnUnitPowerChanged -= _unitStanbyUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
+            UnitController.OnUnitPowerChanged -= _unitUIManager.UnitTotalPowerPanel[i].UpdateTotalPower;
         }
     }
     #endregion
@@ -149,19 +146,25 @@ public class UnitManager : MonoBehaviour
     public void GameEndedUnitStandby()
     {
         Debug.Log("게임 끝");
-        UnitController.UnitsStanby();
-        EnemyController.EnemyStanby();     
+        UnitController.UnitsStandby();
+        EnemyController.EnemyStandby();     
     }
 
     private void FightUISetup()
     {
-        _unitUIManager.BattleUIInit();
+        _unitUIManager.BattleUISetting();
 
         _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
         _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
         _unitUIManager.HpMeterController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
     #endregion
+
+    public void StandbyGame()
+    {
+        UnitController.UnitStandbyAndSetSlotPosition();
+        _unitUIManager.StandbyUISetting();
+    }
 
     public void RandomSpawn()
     {
@@ -184,6 +187,7 @@ public class UnitManager : MonoBehaviour
         AddSlotUnit(unitStatus, slotIdx);
     }
 
+    #region Unit
     public void AddSlotUnit(UnitStatus unit, int slotIdx)
     {
         SetSlot(unit, slotIdx);
@@ -263,4 +267,5 @@ public class UnitManager : MonoBehaviour
     {
         return UnitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);
     }
+    #endregion
 }
