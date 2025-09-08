@@ -8,7 +8,9 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private GameObject _backgroundPanel;
     [SerializeField] private Button _levelUpButton;
-    [SerializeField] private TMP_Text _tempText;
+    [SerializeField] private TMP_Text _pieceText;
+    [SerializeField] private Image _pieceGauge;
+
 
     private CharacterUpgradeUnit _currentCharUnit;
 
@@ -45,7 +47,7 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
     private void LevelUp()
     {
         //if(TempDataManager.Instance.UpgradeData.UpgradeLevel >= 10)
-        if(_currentCharUnit.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 10)
+        if(_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 10)
         {
             if(PopupManager.Instance != null)
             {
@@ -53,7 +55,7 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
                 return;
             }
         }
-        _currentCharUnit.UpgradeData.LevelUp();
+        _currentCharUnit.Status.Data.UpgradeData.LevelUp();
         //TempDataManager.Instance.LevelUp();
 
         OnCharacterStatusChanged?.Invoke();
@@ -63,11 +65,25 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
 
     private void UpdateUI()
     {
-        if (_currentCharUnit != null)
+        if (_currentCharUnit != null && _currentCharUnit.Status.Data.UpgradeData != null && _currentCharUnit.Status.Data.LevelUpData != null)
         {
             // UI 표기
-            _tempText.text = $"캐릭터 정보 표기 예정\n조각 수 : {_currentCharUnit.UpgradeData.CurrentUpgradeData.CurrentPieces.ToString()}\n 소모 조각 수: {_currentCharUnit.UpgradeData.GetRequiredPiece().ToString()}";
+            PieceGaugeUpdate();
         }
+    }
+
+    private void PieceGaugeUpdate()
+    {
+        int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
+        if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
+        {
+            _pieceGauge.fillAmount = 0;
+        }
+        else
+        {
+            _pieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
+        }
+        _pieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
     }
 
     #region CloseUI

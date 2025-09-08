@@ -7,29 +7,28 @@ public class UpgradeUnitData : ScriptableObject
 {
     // 캐릭터의 업그레이드 레벨 - 레벨이 0일 때는 획득하지 않은 상태
     private Grade _grade;
+    private LevelUpData _levelUpData;
 
     public CurrentUpgradeData CurrentUpgradeData;
 
-    public void Init(Grade grade)
+    public void Init(Grade grade, LevelUpData data)
     {
         _grade = grade;
+        _levelUpData = data;
     }
-
-    // 캐릭터 강화 요구 조각 수 데이터 -> 이후 UnitData로 옮기는 방법 고민중
-    [field:SerializeField] public static LevelUpData LevelUpData { get; private set; }
     
     public int GetRequiredPiece()
     {
         if (CurrentUpgradeData.UpgradeLevel >= 10 || 
             CurrentUpgradeData.UpgradeLevel <= 0) return 0;
 
-        if (LevelUpData == null)
+        if (_levelUpData == null)
         {
             Debug.LogError($"[{name}] LevelUpData가 설정되지 않았습니다.");
             return 0;
         }
 
-        RequirePiece requirePiece = LevelUpData.RequirePieceData[_grade];
+        RequirePiece requirePiece = _levelUpData.RequirePieceData.Find(r=>r.Grade == _grade);
         if (requirePiece == null)
         {
             Debug.LogError($"[{name}] {_grade} 등급에 맞는 RequirePiece 데이터가 없습니다.");
@@ -80,7 +79,7 @@ public class UpgradeUnitData : ScriptableObject
 [CreateAssetMenu(fileName = "Unit_LevelUpData", menuName = "Data/Temp/Unit_LevelUpData")]
 public class LevelUpData : ScriptableObject
 {
-    public Dictionary<Grade, RequirePiece> RequirePieceData = new ();
+    public List<RequirePiece> RequirePieceData = new();
 }
 
 [Serializable]
