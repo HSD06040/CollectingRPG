@@ -5,14 +5,25 @@ using UnityEngine;
 
 public class BattleManager : MonoBehaviour
 {
+    public static event Action OnPlayerVictory;
+    public static event Action OnPlayerDefeat;
+
     public static event Action OnBattleStarted;
     public static event Action OnBattleEnded;
+    public static Action<UnitBase> OnSpawnUnit;
 
     [SerializeField] LayerMask _playerLayer;
 
     [Header("UnitCount")]
     private int _playerUnitCount;
     private int _enemyUnitCount;
+
+    private void OnDestroy()
+    {
+        OnBattleStarted = null;
+        OnBattleEnded = null;
+        OnSpawnUnit = null;
+    }
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
@@ -24,6 +35,14 @@ public class BattleManager : MonoBehaviour
 
         _playerUnitCount = notNullPlayerUnits.Length;
         _enemyUnitCount = notNullEnemyUnits.Length;
+
+        OnSpawnUnit += SpawnUnit;
+    }
+
+    private void SpawnUnit(UnitBase unit)
+    {
+        _playerUnitCount++;
+        unit.StatusController.OnUnitDied += CheckBattleEnded;
     }
 
     public void BattleStart()
@@ -51,10 +70,12 @@ public class BattleManager : MonoBehaviour
 
         if (_playerUnitCount <= 0)
         {
+            OnPlayerDefeat?.Invoke();
             Debug.Log("플레이어 패배");
         }
         else if (_enemyUnitCount <= 0)
         {
+            OnPlayerVictory?.Invoke();
             Debug.Log("플레이어 승리");
         }
 

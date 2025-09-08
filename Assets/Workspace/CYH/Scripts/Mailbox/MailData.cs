@@ -11,6 +11,7 @@ public class MailData
     public long ReceivedDate;   
     public long ExpireDate;     
     public bool IsReceived;
+    public bool IsCoupon;
 
     public bool IsExpired(long currentTime)
     {

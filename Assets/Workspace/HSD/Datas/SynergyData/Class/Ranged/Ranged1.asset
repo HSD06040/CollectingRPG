@@ -16,16 +16,33 @@ MonoBehaviour:
   Description: "\uACF5\uACA9 \uC18D\uB3C4 0.5"
   IsActivationsClear: 0
   IsAttack: 0
+  IsSpawn: 0
   IsBuff: 1
+  IsDelay: 0
+  IsFirstOnly: 0
+  DelayTime: 0
+  IsUnitPosition: 0
+  SpawnUnitStats:
+    MaxHealth: 0
+    MaxMana: 0
+    ManaGain: 0
+    AttackSpeed: 0
+    MoveSpeed: 0
+    PhysicalDamage: 0
+    MagicDamage: 0
+    CritChance: 0
+    PhysicalDefense: 0
+    MagicDefense: 0
+    AttackRange: 0
+    AttackCount: 0
+  IsMultiplier: 0
+  SpawnType: 0
+  SpawnSynergy: 0
+  SpawnAddress: 
   EffectAttackType: 0
+  SpawnPositionType: 0
   Power: 0
-  Prefab: {fileID: 0}
-  ObjRef:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  Address: 
+  AttackAddress: 
   EffectType: 1
   SynergyBuffDatas: []
   StatModifiers:
@@ -33,6 +50,6 @@ MonoBehaviour:
     Value: 0.5
   TriggerType: 0
   Interval: 0
-  MaxActivations: 0
+  MaxActivations: 1
   TargetType: 1
   NextEffect: {fileID: 0}

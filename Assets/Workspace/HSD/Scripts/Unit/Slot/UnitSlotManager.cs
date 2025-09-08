@@ -5,7 +5,7 @@ using UnityEngine;
 public class UnitSlotManager : MonoBehaviour
 {
     public SlotCreater SlotCreater;
-    public Dictionary<Vector2Int, UnitSlot> UnitSlotDic = new Dictionary<Vector2Int, UnitSlot>(128);
+    public Dictionary<Vector2Int, UnitSlot> UnitSlotDic = new Dictionary<Vector2Int, UnitSlot>(20);
 
     public void Init()
     {
@@ -20,5 +20,10 @@ public class UnitSlotManager : MonoBehaviour
     public UnitSlot GetUnitSlot(Vector2Int pos)
     {
         return UnitSlotDic.TryGetValue(pos, out UnitSlot slot) ? slot : null;
+    }
+
+    public void SetUnitSlot(UnitBase unit)
+    {
+        UnitSlotDic[unit.CurrentSlot].SetUnit(unit);
     }
 }

@@ -6,10 +6,9 @@ using UnityEngine.UI;
 
 public class DamageMeterController : MonoBehaviour
 {
-    [SerializeField] GameObject _damageMeterPrefab;
     [SerializeField] Transform _content;
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
-    private DamageMeterSlot[] _damageMeterSlots;
+    [SerializeField] DamageMeterSlot[] _damageMeterSlots;
     private List<DamageMeterSlot> _activeSlots = new List<DamageMeterSlot>();
     private CancellationTokenSource _cts;
     private int _unitCount;
@@ -17,8 +16,7 @@ public class DamageMeterController : MonoBehaviour
     private void Awake()
     {
         _gridLayoutGroup.SetupGridLayoutGroup(_content, 1, 5, 10);
-
-        CreateDamageMeterSlots();        
+    
         DamageMeterSlot.OnDamaged += SortingDamageMeter;
     }
 
@@ -53,18 +51,6 @@ public class DamageMeterController : MonoBehaviour
         }
 
         SortingDamageMeter();
-    }
-
-    private void CreateDamageMeterSlots()
-    {
-        int slotCount = UnitController.UnitMaxCount;
-        _damageMeterSlots = new DamageMeterSlot[slotCount];
-
-        for (int i = 0; i < slotCount; i++)
-        {
-            DamageMeterSlot slot = Instantiate(_damageMeterPrefab, _content).GetComponent<DamageMeterSlot>();
-            _damageMeterSlots[i] = slot;
-        }
     }
 
     private void SortingDamageMeter()

@@ -11,20 +11,21 @@ public class SynergyEffectEditor : Editor
     private SerializedProperty isAttackProp;
     private SerializedProperty isBuffProp;
     private SerializedProperty isSpawnProp;
+    private SerializedProperty isDelayProp;
+    private SerializedProperty isFirstOnlyProp;
+
+    private SerializedProperty DelayTimeProp;
 
     private SerializedProperty isUnitPositionProp;
     private SerializedProperty IsMultiplierProp;
     private SerializedProperty SpawnTypeProp;
     private SerializedProperty SpawnUnitStatsProp;
     private SerializedProperty spawnSynergyProp;
-    private SerializedProperty spawnPrefabProp;
-    private SerializedProperty spawnObjRefProp;
     private SerializedProperty spawnAddressProp;
 
     private SerializedProperty effectAttackTypeProp;
+    private SerializedProperty spawnPositionTypeProp;
     private SerializedProperty powerProp;
-    private SerializedProperty prefabProp;
-    private SerializedProperty objRefProp;
     private SerializedProperty addressProp;
 
     private SerializedProperty effectTypeProp;
@@ -47,21 +48,22 @@ public class SynergyEffectEditor : Editor
         isAttackProp = serializedObject.FindProperty("IsAttack");
         isBuffProp = serializedObject.FindProperty("IsBuff");
         isSpawnProp = serializedObject.FindProperty("IsSpawn");
+        isDelayProp = serializedObject.FindProperty("IsDelay");
+        isFirstOnlyProp = serializedObject.FindProperty("IsFirstOnly");
+
+        DelayTimeProp = serializedObject.FindProperty("DelayTime");
 
         isUnitPositionProp = serializedObject.FindProperty("IsUnitPosition");
         IsMultiplierProp = serializedObject.FindProperty("IsMultiplier");
         SpawnTypeProp = serializedObject.FindProperty("SpawnType");
         SpawnUnitStatsProp = serializedObject.FindProperty("SpawnUnitStats");
         spawnSynergyProp = serializedObject.FindProperty("SpawnSynergy");
-        spawnPrefabProp = serializedObject.FindProperty("SpawnPrefab");
-        spawnObjRefProp = serializedObject.FindProperty("SpawnObjRef");
         spawnAddressProp = serializedObject.FindProperty("SpawnAddress");
 
         effectAttackTypeProp = serializedObject.FindProperty("EffectAttackType");
+        spawnPositionTypeProp = serializedObject.FindProperty("SpawnPositionType");
         powerProp = serializedObject.FindProperty("Power");
-        prefabProp = serializedObject.FindProperty("Prefab");
-        objRefProp = serializedObject.FindProperty("ObjRef");
-        addressProp = serializedObject.FindProperty("Address");
+        addressProp = serializedObject.FindProperty("AttackAddress");
 
         effectTypeProp = serializedObject.FindProperty("EffectType");
         synergyBuffDatasProp = serializedObject.FindProperty("SynergyBuffDatas");
@@ -90,8 +92,22 @@ public class SynergyEffectEditor : Editor
         EditorGUILayout.PropertyField(isSpawnProp, new GUIContent("소환할 것 인지?"));
         EditorGUILayout.PropertyField(isAttackProp, new GUIContent("공격할 것 인지?"));
         EditorGUILayout.PropertyField(isBuffProp, new GUIContent("버프를 줄 것 인지?"));
+        EditorGUILayout.PropertyField(isDelayProp, new GUIContent("딜레이 설정을 할껀지?"));
+        EditorGUILayout.PropertyField(isFirstOnlyProp, new GUIContent("최초 1회만 발동?"));
 
         EditorGUILayout.Space(10);
+        EditorGUILayout.PropertyField(effectAttackTypeProp, new GUIContent("적용타입", "각자패시브 or 전체공용 패시브"));
+        EditorGUILayout.Space(10);
+
+        if (isDelayProp.boolValue)
+        {
+            DrawHeader("딜레이 설정");
+            DrawColoredSection(() =>
+            {
+                EditorGUILayout.PropertyField(DelayTimeProp, new GUIContent("딜레이 시간 (초)", "다음 효과까지의 딜레이(초)"));
+            }, new Color(0.9f, 0.9f, 1f, 0.3f));
+            EditorGUILayout.Space(10);
+        }
 
         if (isSpawnProp.boolValue)
         {
@@ -100,14 +116,12 @@ public class SynergyEffectEditor : Editor
             {
                 EditorGUILayout.PropertyField(isUnitPositionProp, new GUIContent("스폰위치 설정", "유닛위치 or 전장중앙"));
                 EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("가중치 적용여부"));
-                if(IsMultiplierProp.boolValue)
+                if (IsMultiplierProp.boolValue)
                 {
-                    EditorGUILayout.PropertyField(SpawnTypeProp, new GUIContent("스폰할 객체 타입", "유닛 or 공격체"));
+                    EditorGUILayout.PropertyField(SpawnTypeProp, new GUIContent("스폰할 유닛 스텟 타입", "시너지 유닛의 Level에 따른 or 한단계 낮은 레벨로 소환"));
                     EditorGUILayout.PropertyField(SpawnUnitStatsProp, new GUIContent("가중치"));
                 }
                 EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("스폰 시너지"));
-                EditorGUILayout.PropertyField(spawnPrefabProp, new GUIContent("프리팹"));
-                EditorGUILayout.PropertyField(spawnObjRefProp, new GUIContent("참조"));
                 EditorGUILayout.PropertyField(spawnAddressProp, new GUIContent("주소"));
 
             }, new Color(1f, 1f, 0.9f, 0.3f));
@@ -120,11 +134,9 @@ public class SynergyEffectEditor : Editor
             DrawHeader("공격 설정");
 
             DrawColoredSection(() =>
-            {
-                EditorGUILayout.PropertyField(effectAttackTypeProp, new GUIContent("공격타입", "각자공격 or 전체공격"));
+            {           
+                EditorGUILayout.PropertyField(spawnPositionTypeProp, new GUIContent("공격 위치", "자신기준 or 타겟기준"));
                 DrawColoredField("계수", powerProp, Color.red);
-                EditorGUILayout.PropertyField(prefabProp, new GUIContent("프리팹"));
-                EditorGUILayout.PropertyField(objRefProp, new GUIContent("참조"));
                 EditorGUILayout.PropertyField(addressProp, new GUIContent("주소"));
             }, new Color(1f, 0.9f, 0.9f, 0.3f));
 
@@ -242,6 +254,7 @@ public class SynergyEffectEditor : Editor
             "시너지 발동 설정" => new Color(0.8f, 0.6f, 0.2f, 0.8f), // 주황색
             "적용 유닛 설정" => new Color(0.6f, 0.2f, 0.8f, 0.8f),  // 보라색
             "이어지는 효과 설정 (선택)" => new Color(0.4f, 0.7f, 0.7f, 0.8f),     // 청록색
+            "딜레이 설정" => new Color(0.9f, 0.4f, 0.7f, 0.8f),  // 분홍색
             _ => new Color(0.3f, 0.3f, 0.3f, 0.8f)                   // 기본 회색
         };
     }

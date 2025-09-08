@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public struct SynergyStatModifier
+public struct StatEffectModifier
 {
     public StatType StatType;
     public float Value;

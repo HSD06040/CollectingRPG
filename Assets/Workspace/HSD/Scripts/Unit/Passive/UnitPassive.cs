@@ -5,19 +5,20 @@ using UnityEngine;
 
 public class UnitPassive
 {
-    private SynergyEffect _effect;
-    private UnitStatusController _owner;
+    public SynergyEffect Effect;
+    private UnitBase _owner;
     private int _currentActivations;
     private int _mulriplier;
+    private bool _isActive;
 
     private CancellationTokenSource _cts; // Interval 루프 중단용
 
-    public UnitPassive(SynergyEffect effect, UnitStatusController owner, int mulriplier = 1)
+    public UnitPassive(SynergyEffect effect, UnitBase owner, int statMulriplier = 1)
     {
         _currentActivations = 0;
-        _effect = effect;
+        Effect = effect;
         _owner = owner;
-        _mulriplier = mulriplier;
+        _mulriplier = statMulriplier;
 
         _cts = new CancellationTokenSource();
     }
@@ -27,17 +28,19 @@ public class UnitPassive
     /// </summary>
     public void Active()
     {
-        switch (_effect.TriggerType)
+        switch (Effect.TriggerType)
         {
             case TriggerType.Base:
-                EffectActive();
+                EffectActives();
                 break;
-
+            case TriggerType.OnDied:
+                _owner.StatusController.OnDied += EffectActives;
+                break;
             case TriggerType.OnAttack:
-                _owner.OnAttack += EffectActive;
+                _owner.StatusController.OnAttack += EffectActives;
                 break;
             case TriggerType.OnUseSkill:
-                _owner.OnSkill += EffectActive;
+                _owner.StatusController.OnSkill += EffectActives;
                 break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted += OnInterval;
@@ -45,11 +48,11 @@ public class UnitPassive
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted += EffectActive;
+                BattleManager.OnBattleStarted += EffectActives;
                 break;  
                 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded += EffectActive;
+                BattleManager.OnBattleEnded += EffectActives;
                 break;
         }
     }
@@ -60,14 +63,21 @@ public class UnitPassive
     public void Deactive()
     {
         TokenClear();
+        _isActive = false;
 
-        switch (_effect.TriggerType)
+        switch (Effect.TriggerType)
         {
+            case TriggerType.Base:
+                RemoveStat();
+                break;
             case TriggerType.OnAttack:
-                _owner.OnAttack -= EffectActive;
+                _owner.StatusController.OnAttack -= EffectActives;
+                break;
+            case TriggerType.OnDied:
+                _owner.StatusController.OnDied -= EffectActives;
                 break;
             case TriggerType.OnUseSkill:
-                _owner.OnSkill -= EffectActive;
+                _owner.StatusController.OnSkill -= EffectActives;
                 break;
             case TriggerType.OnInterval:
                 BattleManager.OnBattleStarted -= OnInterval;
@@ -75,11 +85,11 @@ public class UnitPassive
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted -= EffectActive;
+                BattleManager.OnBattleStarted -= EffectActives;
                 break;
 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded -= EffectActive;
+                BattleManager.OnBattleEnded -= EffectActives;
                 break;
         }
     }
@@ -95,78 +105,161 @@ public class UnitPassive
     #region Interval
     private void OnInterval()
     {
-        OnIntervalEffectAsync(_cts.Token).Forget();
+        if (Effect.IsDelay)
+            OnDelayEffectAsync(_cts.Token).Forget();
+        else
+            OnIntervalEffectAsync(_cts.Token).Forget();
     }
 
+    /// <summary>
+    /// 일반적인 Interval 효과 (MaxActivations 만큼 실행)
+    /// </summary>
     private async UniTask OnIntervalEffectAsync(CancellationToken token)
     {
-        while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
+        while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
         {
             EffectActives();
+            _currentActivations++;
+
             try
             {
-                await UniTask.WaitForSeconds(_effect.Interval, cancellationToken: token);
+                await UniTask.WaitForSeconds(Effect.Interval, cancellationToken: token);
             }
             catch (OperationCanceledException)
             {
-                break;
+                return;
             }
         }
 
-        if(_effect.NextEffect != null)
+        if (Effect.NextEffect != null)
         {
-            while (true)
+            await RunNextEffectAsync(token);
+        }
+    }
+
+    /// <summary>
+    /// Delay 효과 (첫 효과 후 Delay → NextEffect)
+    /// </summary>
+    private async UniTask OnDelayEffectAsync(CancellationToken token)
+    {
+        while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
+        {
+            EffectActives();
+            _currentActivations++;
+
+            try
+            {
+                await UniTask.WaitForSeconds(Effect.Interval, cancellationToken: token);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+
+        // Delay 대기
+        try
+        {
+            await UniTask.WaitForSeconds(Effect.DelayTime, cancellationToken: token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        // NextEffect 실행
+        if (Effect.NextEffect != null)
+        {
+            await RunNextEffectAsync(token);
+        }
+    }
+
+    /// <summary>
+    /// NextEffect 실행 로직 (Interval 여부에 따라 단발/주기)
+    /// </summary>
+    private async UniTask RunNextEffectAsync(CancellationToken token)
+    {
+        if (Effect.NextEffect.Interval > 0)
+        {
+            while (!token.IsCancellationRequested)
             {
                 NextEffectActives();
+
                 try
                 {
-                    await UniTask.WaitForSeconds(_effect.NextEffect.Interval, cancellationToken: token);
+                    await UniTask.WaitForSeconds(Effect.NextEffect.Interval, cancellationToken: token);
                 }
                 catch (OperationCanceledException)
                 {
-                    break;
+                    return;
                 }
             }
-        }
-    }
-    #endregion
-
-#region EffectActives
-
-    private void EffectActives()
-    {
-        if(_currentActivations < _effect.MaxActivations)
-        {
-            EffectActive();
-            AttackActive();
         }
         else
         {
             NextEffectActives();
         }
-
-        _currentActivations++;
     }
+    #endregion
+
+    #region EffectActives
+
+    private void EffectActives()
+    {
+        if (Effect.IsFirstOnly && _isActive)
+            return;
+
+        _isActive = true;
+
+        if (_currentActivations < Effect.MaxActivations)
+        {
+            SpawnActive();
+            BuffEffectActive();
+            AttackActive();
+            _currentActivations++;
+        }
+        else
+        {
+            NextEffectActives();
+
+            if(Effect.IsActivationsClear)
+                _currentActivations = 0;
+        }
+    }
+
+    private void RemoveStat()
+    {
+        if (!Effect.IsBuff)
+            return;
+
+        foreach (var stat in Effect.StatModifiers)
+        {
+            _owner.StatusController.RemoveStat(stat.StatType, Effect.Key);
+        }
+    }
+
     private void NextEffectActives()
     {
-        NextEffectActive();
+        if (Effect.NextEffect == null) return;
+
+        NextBuffEffectActive();
         NextAttackActive();
     }
 
     #region BuffEffect
-    private void EffectActive()
+    private void BuffEffectActive()
     {
-        if (!_effect.IsBuff)
+        if (!Effect.IsBuff)
             return;
 
-        BuffEffectActive(_effect);
+        BuffEffectActive(Effect);
     }
-    private void NextEffectActive()
+    private void NextBuffEffectActive()
     {
-        if (!_effect.NextEffect.IsBuff)
+        if (!Effect.NextEffect.IsBuff)
             return;
 
-        BuffEffectActive(_effect.NextEffect);
+        BuffEffectActive(Effect.NextEffect);
     }
     private void BuffEffectActive(SynergyEffect _effect)
     {
@@ -176,7 +269,7 @@ public class UnitPassive
                 for (int i = 0; i < _effect.SynergyBuffDatas.Length; i++)
                 {
                     SynergyBuffData data = _effect.SynergyBuffDatas[i];
-                    _owner.ApplyEffect(
+                    _owner.StatusController.ApplyEffect(
                         new BuffEffectData { StatType = data.StatType, Duration = data.Duration },
                         data.Value * _mulriplier, _effect.Key);
                 }
@@ -186,13 +279,13 @@ public class UnitPassive
                 foreach (var stat in _effect.StatModifiers)
                 {
                     if (stat.StatType == StatType.CurHp)
-                        _owner.IncreaseHealth(Mathf.RoundToInt(stat.Value * _mulriplier));
+                        _owner.StatusController.IncreaseHealth(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else if (stat.StatType == StatType.CurMana)
-                        _owner.IncreaseMana(Mathf.RoundToInt(stat.Value * _mulriplier));
+                        _owner.StatusController.IncreaseMana(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else if (stat.StatType == StatType.Shield)
-                        _owner.IncreaseShield(Mathf.RoundToInt(stat.Value * _mulriplier));
+                        _owner.StatusController.IncreaseShield(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else
-                        _owner.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.Key);
+                        _owner.StatusController.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.Key);
                 }
                 break;
         }
@@ -202,19 +295,85 @@ public class UnitPassive
     #region AttackEffect
     private void AttackActive()
     {
-        if (!_effect.IsAttack)
+        if (!Effect.IsAttack)
             return;
 
-        GameObject.Instantiate(_effect.Prefab, _owner.transform.position, Quaternion.identity);
+        AttackSpawn(Effect);
     }
+
     private void NextAttackActive()
     {
-        if (!_effect.NextEffect.IsAttack)
+        if (!Effect.NextEffect.IsAttack)
             return;
+        
+        AttackSpawn(Effect.NextEffect);
+    }
 
-        GameObject.Instantiate(_effect.NextEffect.Prefab, _owner.transform.position, Quaternion.identity);
+    private void AttackSpawn(SynergyEffect effect)
+    {
+        if (effect.AttackPrefab == null)
+        {
+            Debug.LogWarning($"[시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {effect.AttackAddress}");
+            return;
+        }
+
+        if (effect.SpawnPositionType == SpawnPositionType.Self)
+            GameObject.Instantiate(effect.NextEffect.AttackPrefab, _owner.transform.position, Quaternion.identity);
+        else if (effect.SpawnPositionType == SpawnPositionType.Target)
+            GameObject.Instantiate(effect.NextEffect.AttackPrefab, _owner.Target.position, Quaternion.identity);
     }
     #endregion
 
+    #region SpawnEffect
+    private void SpawnActive()
+    {
+        if (!Effect.IsSpawn)
+            return;
+
+        Vector3 pos = _owner.transform.position;
+        Spawn(pos);
+    }
+
+    private void Spawn(Vector3 pos)
+    {
+        if (Effect.SpawnPrefab == null)
+        {
+            Debug.LogWarning($"[시너지 스폰 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {Effect.SpawnAddress}");
+            return;
+        }
+
+        Debug.Log($"[시너지 스폰 시스템] {Effect.SpawnPrefab.name} 소환");
+
+        GameObject obj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
+        obj.name = "SpawnUnit";
+        UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
+        
+        if (Effect.IsMultiplier)
+        {
+            if (spawnUnit == null)
+                return;
+
+            if (Effect.SpawnType == SpawnStatType.Level)
+            {
+                if (Effect.IsMultiplier)
+                {
+                    spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;
+                    spawnUnit.Init(Effect.SpawnUnitStats);
+                }
+                else
+                {
+                    spawnUnit.Init();
+                }
+            }
+            else if (Effect.SpawnType == SpawnStatType.LowUpgrade)
+            {
+                spawnUnit.Status.Level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
+                spawnUnit.Init();
+            }
+        }
+
+        BattleManager.OnSpawnUnit?.Invoke(spawnUnit);
+    }
+    #endregion
 #endregion
 }

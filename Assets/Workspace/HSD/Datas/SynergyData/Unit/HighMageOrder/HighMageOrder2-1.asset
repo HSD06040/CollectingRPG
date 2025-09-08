@@ -16,23 +16,39 @@ MonoBehaviour:
   Description: "\uCD94\uAC00 \uB9C8\uB098 2, \uB9C8\uBC95 \uACF5\uACA9\uB825 15"
   IsActivationsClear: 0
   IsAttack: 0
+  IsSpawn: 0
   IsBuff: 1
+  IsDelay: 1
+  IsFirstOnly: 1
+  DelayTime: 10
+  IsUnitPosition: 0
+  IsMultiplier: 0
+  SpawnType: 0
+  SpawnUnitStats:
+    MaxHealth: 0
+    MaxMana: 0
+    ManaGain: 0
+    AttackSpeed: 0
+    MoveSpeed: 0
+    PhysicalDamage: 0
+    MagicDamage: 0
+    CritChance: 0
+    PhysicalDefense: 0
+    MagicDefense: 0
+    AttackRange: 0
+    AttackCount: 0
+  SpawnSynergy: 0
+  SpawnAddress: 
   EffectAttackType: 0
   Power: 0
-  Prefab: {fileID: 0}
-  ObjRef:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  Address: 
+  AttackAddress: 
   EffectType: 1
   SynergyBuffDatas: []
   StatModifiers:
   - StatType: 2
-    Value: 2
-  TriggerType: 0
+    Value: 20
+  TriggerType: 4
   Interval: 0
   MaxActivations: 0
   TargetType: 1
-  NextEffect: {fileID: 0}
+  NextEffect: {fileID: 11400000, guid: 2cdd33b894be13b4fa0d8f5af0e75770, type: 2}

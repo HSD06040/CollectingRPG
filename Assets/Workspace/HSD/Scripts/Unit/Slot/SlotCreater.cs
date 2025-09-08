@@ -44,4 +44,14 @@ public class SlotCreater : MonoBehaviour
 
         return parentPos + new Vector2(x * _offset.x + xOffset, y * _offset.y + yOffset);
     }
+
+    public void DeActiveSlots()
+    {
+        _slotParent.gameObject.SetActive(false);
+    }
+
+    public void ActiveSlots()
+    {
+        _slotParent.gameObject.SetActive(true);
+    }
 }

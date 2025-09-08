@@ -14,9 +14,9 @@ public class UnitController : MonoBehaviour
 
     #region Unit
     private UnitBase[,] _unitGrid;
-    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(256);
-    private Dictionary<UnitData, int> _unitCountDic = new Dictionary<UnitData, int>(64);
-    private Dictionary<int, List<UnitBase>> _synergyUnitDic = new Dictionary<int, List<UnitBase>>(256);
+    private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(64);
+    private Dictionary<UnitData, int> _unitCountDic = new Dictionary<UnitData, int>(36);
+    private Dictionary<int, List<UnitBase>> _synergyUnitDic = new Dictionary<int, List<UnitBase>>(64);
     #endregion
 
     #region Data
@@ -54,8 +54,11 @@ public class UnitController : MonoBehaviour
     }
 
     #region UnitSetting
-    public void UnitStanbyAndSetSlotPosition()
+    public void UnitStandbyAndSetSlotPosition()
     {
+        _unitSlotManager.SlotCreater.ActiveSlots();
+        _battleUnitManager._unitSlotManager.SlotCreater.ActiveSlots();
+
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
             if (unit == null)
@@ -63,12 +66,14 @@ public class UnitController : MonoBehaviour
 
             unit.transform.position = _unitSlotManager.GetUnitSlot(unit.CurrentSlot).transform.position;
             unit.Standby();
-        }
+            unit.StatusController.Refresh();
+            _battleUnitManager._unitSlotManager.SetUnitSlot(unit);
+        }        
 
         _unitDragDropSystem.enabled = true;
     }
 
-    public void UnitsStanby()
+    public void UnitsStandby()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
@@ -77,9 +82,8 @@ public class UnitController : MonoBehaviour
 
             unit.Standby();
         }
-
-        _unitDragDropSystem.enabled = true;
     }
+
     public void UnitFight()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
@@ -87,8 +91,12 @@ public class UnitController : MonoBehaviour
             if (unit == null)
                 continue;
 
+            unit.transform.SetParent(null);
             unit.Fight();
         }
+
+        _unitSlotManager.SlotCreater.DeActiveSlots();
+        _battleUnitManager._unitSlotManager.SlotCreater.DeActiveSlots();
 
         _unitDragDropSystem.enabled = false;
     }
@@ -187,8 +195,9 @@ public class UnitController : MonoBehaviour
 
     public void AddUnit(UnitStatus newUnitData, Vector2Int pos)
     {
-        UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);
-        UnitBase newUnit = Instantiate(newUnitData.Data.UnitPrefab).GetComponent<UnitBase>();
+        GameObject obj = Instantiate(newUnitData.Data.UnitPrefab);
+        UnitSlot slot = _unitSlotManager.GetUnitSlot(pos);        
+        UnitBase newUnit = ComponentProvider.Get<UnitBase>(obj);
         newUnit.Status = newUnitData;
 
         newUnit.transform.SetParent(slot.transform);
@@ -275,7 +284,7 @@ public class UnitController : MonoBehaviour
     {
         if (!_unitBaseDic.TryGetValue(unit.Status.Address, out var list))
         {
-            list = new List<UnitBase>(16);
+            list = new List<UnitBase>(4);
             _unitBaseDic.Add(unit.Status.Address, list);
         }
         list.Add(unit);
