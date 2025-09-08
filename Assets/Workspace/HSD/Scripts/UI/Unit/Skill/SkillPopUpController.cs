@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SkillPopUpController : MonoBehaviour
 {
-    [SerializeField] GameObject _playerUnitSkillPopUpPrefab;
-    [SerializeField] GameObject _enemyUnitSkillPopUpPrefab;
+    [SerializeField] string _playerUnitSkillPopUpAddress;
+    [SerializeField] string _enemyUnitSkillPopUpAddress;
 
     [SerializeField] Transform _playerContent;
     [SerializeField] Transform _enemyContent;
@@ -13,9 +13,15 @@ public class SkillPopUpController : MonoBehaviour
     [SerializeField] UnitBase[] _playerUnits;
     [SerializeField] UnitBase[] _enemyUnits;
 
+    private GameObject _playerUnitSkillPopUpPrefab;
+    private GameObject _enemyUnitSkillPopUpPrefab;
+
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
-        if(_playerUnits != null && _playerUnits.Length != 0)
+        _playerUnitSkillPopUpPrefab = Manager.Resources.Get<GameObject>(_playerUnitSkillPopUpAddress);
+        _enemyUnitSkillPopUpPrefab = Manager.Resources.Get<GameObject>(_enemyUnitSkillPopUpAddress);
+
+        if (_playerUnits != null && _playerUnits.Length != 0)
         {
             foreach (UnitBase unit in _playerUnits)
             {

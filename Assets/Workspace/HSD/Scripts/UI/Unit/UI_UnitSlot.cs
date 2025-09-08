@@ -89,7 +89,7 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
         _unitSlotController.RemoveUnit(_unit, _slotIdx);
         GameObject unit = Instantiate(_unit.Data.UnitPrefab);
 
-        UnitBase unitBase = unit.GetComponent<UnitBase>();
+        UnitBase unitBase = ComponentProvider.Get<UnitBase>(unit);
         unitBase.Status = _unit;
         unitBase.Init();
 

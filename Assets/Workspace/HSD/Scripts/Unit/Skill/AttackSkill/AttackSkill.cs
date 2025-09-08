@@ -100,7 +100,7 @@ public abstract class AttackSkill : UnitSkill
 
         foreach (var target in targets)
         {
-            var statusController = ComponentProvider.Get<UnitStatusController>(target);
+            var statusController = ComponentProvider.Get<UnitBase>(target).StatusController;
             if (statusController != null && !statusController.IsDead)
             {
                 validTargets.Add(target);
@@ -112,8 +112,8 @@ public abstract class AttackSkill : UnitSkill
 
         validTargets.Sort((a, b) =>
         {
-            var statusA = ComponentProvider.Get<UnitStatusController>(a);
-            var statusB = ComponentProvider.Get<UnitStatusController>(b);
+            var statusA = ComponentProvider.Get<UnitBase>(a).StatusController;
+            var statusB = ComponentProvider.Get<UnitBase>(b).StatusController;
 
             float hpPercentA = (float)statusA.CurHp.Value / statusA.MaxHealth.Value;
             float hpPercentB = (float)statusB.CurHp.Value / statusB.MaxHealth.Value;
@@ -134,7 +134,7 @@ public abstract class AttackSkill : UnitSkill
 
         foreach (var target in targets)
         {
-            var statusController = ComponentProvider.Get<UnitStatusController>(target);
+            var statusController = ComponentProvider.Get<UnitBase>(target).StatusController;
             if (statusController != null && !statusController.IsDead)
             {
                 validTargets.Add(target);
@@ -147,8 +147,8 @@ public abstract class AttackSkill : UnitSkill
         // HP 높은 순으로 정렬
         validTargets.Sort((a, b) =>
         {
-            var statusA = ComponentProvider.Get<UnitStatusController>(a);
-            var statusB = ComponentProvider.Get<UnitStatusController>(b);
+            var statusA = ComponentProvider.Get<UnitBase>(a).StatusController;
+            var statusB = ComponentProvider.Get<UnitBase>(b).StatusController;
 
             float hpPercentA = (float)statusA.CurHp.Value / statusA.MaxHealth.Value;
             float hpPercentB = (float)statusB.CurHp.Value / statusB.MaxHealth.Value;
@@ -165,7 +165,7 @@ public abstract class AttackSkill : UnitSkill
         {
             foreach (var target in targets)
             {
-                var statusController = ComponentProvider.Get<UnitStatusController>(target);
+                var statusController = ComponentProvider.Get<UnitBase>(target).StatusController;
                 if (statusController != null && !statusController.IsDead)
                 {
                     if (statusController.Status.Data.ClassSynergy == classType)

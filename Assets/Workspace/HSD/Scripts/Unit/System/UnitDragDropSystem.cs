@@ -88,7 +88,7 @@ public class UnitDragDropSystem : MonoBehaviour
             {
                 isInterfactable = true;
                 ToolTipController.UnitToolTip.Show(
-                    ComponentProvider.Get<UnitStatusController>(hits[i].collider.gameObject).Status
+                    ComponentProvider.Get<UnitBase>(hits[i].collider.gameObject).Status
                     , false, false);
 
                 ToolTipController.SynergyToolTip.Close();

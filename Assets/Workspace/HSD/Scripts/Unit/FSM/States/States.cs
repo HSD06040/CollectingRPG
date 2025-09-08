@@ -101,12 +101,10 @@ public class MoveState : BaseState
         if(_target == null)
         {
             _owner.transform.Translate(new Vector2(_owner.transform.GetFacingDir() * _status.MoveSpeed.Value * Time.deltaTime, 0), Space.World);
-            //_rb.velocity = Vector2.right * _data.MoveSpeed.Value * Time.deltaTime;
         }
         else
         {
             _owner.transform.Translate(_owner.TargetDir * _status.MoveSpeed.Value * Time.deltaTime, Space.World);
-            //_rb.velocity = _owner.TargetDir * _data.MoveSpeed.Value * Time.deltaTime;
         }
     }
 }
@@ -159,6 +157,31 @@ public class AttackState : AnimationFinishedState
     }
 }
 
+public class StunState : BaseState
+{
+    private float timer;
+
+    public StunState(BaseFSM fsm, int animHash) : base(fsm, animHash)
+    {
+        _status.IsStund.AddEvent(fsm.ChangeStunState);
+    }
+
+    public override void Enter()
+    {
+        base.Enter();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+    }
+}
+
 public class SkillState : AnimationFinishedState
 {
     public SkillState(BaseFSM fsm, int animHash) : base(fsm, animHash)
@@ -186,8 +209,7 @@ public class DeadState : BaseState
 {
     public DeadState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
-        _status.OnUnitDied += ChangeDeadState;
-        Debug.Log("DiedEvent등록 완료");
+        _status.OnDied += ChangeDeadState;
     }
 
     public override void Enter()
@@ -207,9 +229,8 @@ public class DeadState : BaseState
         base.Update();
     }
 
-    private void ChangeDeadState(UnitStatusController _unitStatusController)
+    private void ChangeDeadState()
     {
-        Debug.Log("유닛 DeadState 전환");
         _stateMachine.ChangeState(_fsm.DeadState);
     }
 }
