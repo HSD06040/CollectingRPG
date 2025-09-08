@@ -53,14 +53,20 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
     public Property<bool> IsStund = new Property<bool>();
-    public UnitPassiveController PassiveController { get; set; }
 
-    public event Action<UnitStatusController> OnUnitDied;
+    #region Controller
+    public UnitPassiveController PassiveController { get; set; }
+    public UnitFXController UnitFXController { get; set; }
+    #endregion
+
+    #region Events
+    public Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> OnUseSkill;
     
     public event Action OnDied;
     public Action OnSkill;
     public Action OnAttack;
+    #endregion
 
     private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
 
@@ -77,6 +83,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
         PassiveController = new UnitPassiveController(gameObject);
+        UnitFXController = new UnitFXController(GetComponentsInChildren<SpriteRenderer>());
+
         Status = status;
         IsDead = false;
         IsStund.Value = false;
@@ -235,8 +243,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             return;
 
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
+        UnitFXController.Flash();
 
-        if(CurHp.Value <= 0)
+        if (CurHp.Value <= 0)
         {
             Die();
         }
@@ -326,10 +335,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsDead = true;
         OnDied?.Invoke();
-        Debug.Log($"{gameObject.name} is Dead.");
-
-        OnUnitDied?.Invoke(this);
-        Debug.Log($"{gameObject.name} Died event invoked.");
     }
 
     #region Effect
@@ -373,7 +378,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Stat Management
     public void AddStat(StatType statType, float value, string source)
     {
-        Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
         switch (statType)
         {
             case StatType.MaxHealth:

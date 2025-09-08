@@ -26,8 +26,8 @@ public class BaseState
     }
 
     public virtual void Enter()
-    {
-        _isAnimFinished = false; // 애니메이션이 끝나지 않았음을 초기화
+    {        
+        _isAnimFinished = false;
         _anim.SetTrigger(_animHash);
     }
 

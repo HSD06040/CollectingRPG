@@ -28,8 +28,8 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     [Header("Reference")]
     [SerializeField] private Sprite[] costSprites;
-    [SerializeField] private TempUpgradeUnitData _upgradeData;
-    public TempUpgradeUnitData UpgradeData => _upgradeData;
+    [SerializeField] private UpgradeUnitData _upgradeData;
+    public UpgradeUnitData UpgradeData => _upgradeData;
 
     private UpgradeManager _manager;
 
@@ -71,7 +71,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void ShowPopUp()
     {
-        if (_upgradeData.UpgradeLevel == 0)
+        if (_upgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
             if (PopupManager.Instance != null)
             {
@@ -117,7 +117,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void UIUpdate()
     {
-        if (_upgradeData.UpgradeLevel == 0)
+        if (_upgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
             _backgroundPanel.SetActive(true);
         }
@@ -135,7 +135,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
             _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
         }
         //_overallPowerText.text = $"{_status.CombatPower}";
-        _levelText.text = $"Lv.{_upgradeData.UpgradeLevel}";
+        _levelText.text = $"Lv.{_upgradeData.CurrentUpgradeData.UpgradeLevel}";
 
         PieceGaugeUpdate();
         OutlineUpdate();
@@ -144,31 +144,31 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
     private void PieceGaugeUpdate()
     {
         int requirePiece = _upgradeData.GetRequiredPiece();
-        if (_upgradeData.CurrentPieces == 0)
+        if (_upgradeData.CurrentUpgradeData.CurrentPieces == 0)
         {
             _pieceGauge.fillAmount = 0;
         }
         else
         {
-            _pieceGauge.fillAmount = ((float)_upgradeData.CurrentPieces / requirePiece);
+            _pieceGauge.fillAmount = ((float)_upgradeData.CurrentUpgradeData.CurrentPieces / requirePiece);
         }
-        _pieceNum.text = $"{_upgradeData.CurrentPieces}/{requirePiece}";
+        _pieceNum.text = $"{_upgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
     }
 
     private void OutlineUpdate()
     {
-        if (_upgradeData.UpgradeLevel >= 4)
+        if (_upgradeData.CurrentUpgradeData.UpgradeLevel >= 4)
         {
             _outlineImage.gameObject.SetActive(true);
-            if (_upgradeData.UpgradeLevel == 10)
+            if (_upgradeData.CurrentUpgradeData.UpgradeLevel == 10)
             {
                 _outlineImage.color = Color.red;
             }
-            else if (_upgradeData.UpgradeLevel >= 8)
+            else if (_upgradeData.CurrentUpgradeData.UpgradeLevel >= 8)
             {
                 _outlineImage.color = Color.yellow;
             }
-            else if(_upgradeData.UpgradeLevel >= 6)
+            else if(_upgradeData.CurrentUpgradeData.UpgradeLevel >= 6)
             {
                 _outlineImage.color = Color.blue;
             }

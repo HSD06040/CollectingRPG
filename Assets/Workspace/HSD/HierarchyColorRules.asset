@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 561f6245292944643a6350053a599fa0, type: 3}
+  m_Name: HierarchyColorRules
+  m_EditorClassIdentifier: 
+  rules:
+  - ruleName: Red Objects (#R)
+    firstCharPattern: '#R'
+    prefixPattern: 
+    suffixPattern: 
+    containsPattern: 
+    backgroundColor: {r: 0.6509804, g: 0.101960786, b: 0.101960786, a: 0.7294118}
+    priority: 100
+    caseSensitive: 0
+  - ruleName: Green Objects (#G)
+    firstCharPattern: '#G'
+    prefixPattern: 
+    suffixPattern: 
+    containsPattern: 
+    backgroundColor: {r: 0.08627451, g: 0.6784314, b: 0.08627451, a: 0.7294118}
+    priority: 10
+    caseSensitive: 0
+  - ruleName: Blue Objects (#B)
+    firstCharPattern: '#B'
+    prefixPattern: 
+    suffixPattern: 
+    containsPattern: 
+    backgroundColor: {r: 0.2509804, g: 0.18039216, b: 0.98039216, a: 0.7647059}
+    priority: 10
+    caseSensitive: 0
+  - ruleName: Yellow Objects (#Y)
+    firstCharPattern: '#Y'
+    prefixPattern: 
+    suffixPattern: 
+    containsPattern: 
+    backgroundColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 0.74509805}
+    priority: 10
+    caseSensitive: 0
+  - ruleName: Cyan Objects (#C)
+    firstCharPattern: '#C'
+    prefixPattern: 
+    suffixPattern: 
+    containsPattern: 
+    backgroundColor: {r: 0.12156863, g: 0.8392157, b: 0.81960785, a: 0.6156863}
+    priority: 1
+    caseSensitive: 0

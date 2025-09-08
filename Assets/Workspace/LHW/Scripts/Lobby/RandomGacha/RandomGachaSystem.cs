@@ -33,7 +33,7 @@ public class RandomGachaSystem : MonoBehaviour
 
     [Header("DB Test")]
     [SerializeField] private UnitData _testData;
-    [SerializeField] private TempUpgradeUnitData _testUpgradeData;
+    [SerializeField] private UpgradeUnitData _testUpgradeData;
     [SerializeField] private Button _testCharacterGachaButton;
 
     private WeightedRandom<Grade> _gradeRandom = new WeightedRandom<Grade>();
@@ -201,7 +201,7 @@ public class RandomGachaSystem : MonoBehaviour
     {
         UnitData data = _testData;
 
-        if (_testUpgradeData.UpgradeLevel == 0)
+        if (_testUpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
             _testUpgradeData.ObtainCharacter();
 

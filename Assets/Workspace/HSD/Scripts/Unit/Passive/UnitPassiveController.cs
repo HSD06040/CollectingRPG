@@ -14,6 +14,7 @@ public class UnitPassiveController
 
     public void AddPassiveEffect(SynergyEffect effect, int statMultiplier = 1, bool isChange = false)
     {
+        Debug.Log($"AddPassiveEffect");
         if (isChange)
         {
             RemovePassiveEffect(effect);
