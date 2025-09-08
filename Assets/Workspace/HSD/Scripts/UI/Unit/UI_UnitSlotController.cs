@@ -11,14 +11,13 @@ public class UI_UnitSlotController : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] Transform _content;
-    [SerializeField] GameObject _unitSlotPrefab;
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
     [SerializeField] int _slotCount;
     [SerializeField] int _offset;
 
-    private UI_UnitSlot[] _unitSlots;
+    [SerializeField] UI_UnitSlot[] _unitSlots;
     private UnitStatus[] _cachedUnitsArray = new UnitStatus[UnitController.UnitMaxCount];
-    private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(128);
+    private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(10);
 
     private void Awake()
     {
@@ -32,17 +31,13 @@ public class UI_UnitSlotController : MonoBehaviour
     }
 
     private void CreateSlots()
-    {
-        _unitSlots = new UI_UnitSlot[_slotCount];
-
+    {        
         _gridLayoutGroup.SetupGridLayoutGroup(_content, 5, 2, _offset, true);
 
         for (int i = 0; i < _slotCount; i++)
         {
-            UI_UnitSlot slot = Instantiate(_unitSlotPrefab, _content).GetComponent<UI_UnitSlot>();
-            slot.ClearSlot();
-            slot.Init(_dragDropSystem, i, this);
-            _unitSlots[i] = slot;
+            _unitSlots[i].ClearSlot();
+            _unitSlots[i].Init(_dragDropSystem, i, this);
         }
     }
 

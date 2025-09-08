@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class BattleUnitManager : MonoBehaviour
 {
-    [SerializeField] UnitSlotManager _unitSlotManager;
+    public UnitSlotManager _unitSlotManager;
     private UnitBase[,] _unitGrid;
     private int UnitMaxCount => UnitController.UnitMaxCount;
     private UnitBase[] _cachedUnitsArray = new UnitBase[UnitController.UnitMaxCount];

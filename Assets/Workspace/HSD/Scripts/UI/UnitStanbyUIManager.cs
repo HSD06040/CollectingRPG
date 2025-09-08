@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class UnitStanbyUIManager : MonoBehaviour
+public class UnitStandbyUIManager : MonoBehaviour
 {
     public SynergyPanel SynergyPanel;
     public SynergySlotPanel SynergySlotPanel;

@@ -14,7 +14,7 @@ public class BuffSkill : UnitSkill
 
         foreach (GameObject target in GetTargetFromTargetType(attacker))
         {
-            ComponentProvider.Get<UnitStatusController>(target).ApplyEffect(BuffEffectData, (int)Power, name);
+            ComponentProvider.Get<UnitBase>(target).StatusController.ApplyEffect(BuffEffectData, (int)Power, name);
         }
     }
 

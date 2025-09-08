@@ -16,28 +16,34 @@ public class SynergyEffect : ScriptableObject
     public bool IsAttack;
     public bool IsSpawn;
     public bool IsBuff;
+    public bool IsDelay;
+    public bool IsFirstOnly;
+
+    //[Header("Delay")]
+    public float DelayTime;
 
     //[Header("SpawnType (유닛 소환)")]
     public bool IsUnitPosition;         // 소환 위치 정의 (유닛위치 or 전장 중앙)
-    public bool IsMultiplier;           // 시너지 유닛의 Level에 따른 배수 적용 여부
-    public SpawnType SpawnType;         // 유닛소환 타입
+    public int UnitStatMultiplier { get; private set; }
     public UnitStats SpawnUnitStats;    // 가중치
+    public bool IsMultiplier;           // 시너지 유닛의 Level에 따른 배수 적용 여부
+
+    public SpawnStatType SpawnType;     // 유닛소환 시 스텟 타입 설정
     public Synergy SpawnSynergy;        // 유닛을 소환하는 시너지
-    public GameObject SpawnPrefab;      
-    public AssetReference SpawnObjRef;
+    public GameObject SpawnPrefab => Manager.Resources.Get<GameObject>(SpawnAddress);
     public string SpawnAddress;
 
     //[Header("AttackType (공격)")]
-    public EffectAttackType EffectAttackType;
+    public EffectApplyType EffectAttackType;
+    public SpawnPositionType SpawnPositionType;
     public float Power;
-    public GameObject Prefab;
-    public AssetReference ObjRef;
-    public string Address;
+    public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);
+    public string AttackAddress;
 
     //[Header("EffectType")]
-    public EffectType EffectType; // Increase
+    public EffectType EffectType;
     public SynergyBuffData[] SynergyBuffDatas;
-    public SynergyStatModifier[] StatModifiers;
+    public StatEffectModifier[] StatModifiers;
 
     //[Header("TriggerType")]
     public TriggerType TriggerType;
@@ -48,17 +54,20 @@ public class SynergyEffect : ScriptableObject
     public EffectTargetType TargetType;
 
     //[Header("NextEffect")]
-    public SynergyEffect NextEffect;
+    public SynergyEffect NextEffect;    
 
     public void ApplyEffect(UnitBase[] units, int synergy)
     {
+        if(IsMultiplier)
+            UnitStatMultiplier = units.GetSynergyUnitsTotalLevel(SpawnSynergy);
+
         if (TargetType == EffectTargetType.Cross)
         {
             ActiveCross(units, synergy);
             return;
         }
 
-        if (EffectAttackType == EffectAttackType.Self)
+        if (EffectAttackType == EffectApplyType.Self)
         {
             foreach (var unit in GetTarget(units, synergy))
             {
@@ -67,13 +76,14 @@ public class SynergyEffect : ScriptableObject
         }
         else
         {
+            Debug.Log($"글로벌 패시브 이펙트 적용");
             SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, GetTarget(units, synergy), isChange: true);
         }
     }
 
     public void RemoveEffect(UnitBase[] units, int synergy)
     {
-        if (EffectAttackType == EffectAttackType.Self)
+        if (EffectAttackType == EffectApplyType.Self)
         {
             foreach (var unit in GetTarget(units, synergy))
             {

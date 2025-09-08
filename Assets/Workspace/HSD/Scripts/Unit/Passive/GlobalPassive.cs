@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using Firebase.Auth;
 using System;
 using System.Threading;
 using UnityEngine;
@@ -16,6 +15,7 @@ public class GlobalPassive
     private CancellationTokenSource _cts;
     private Transform _center;
     private UnitBase[] _units;
+    private bool _isActive;
 
     public GlobalPassive(SynergyEffect effect, UnitBase[] units, Transform center, int mulriplier = 1)
     {
@@ -36,7 +36,7 @@ public class GlobalPassive
         switch (_effect.TriggerType)
         {
             case TriggerType.Base:
-                EffectActive();
+                EffectBuffActive();
                 break;
             case TriggerType.OnDied:
                 UnitsDiedEventSubscribe();
@@ -47,11 +47,11 @@ public class GlobalPassive
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted += EffectActive;
+                BattleManager.OnBattleStarted += EffectBuffActive;
                 break;
 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded += EffectActive;
+                BattleManager.OnBattleEnded += EffectBuffActive;
                 break;
         }
     }
@@ -62,9 +62,10 @@ public class GlobalPassive
     public void Deactive()
     {
         TokenClear();
+        _isActive = false;
 
         switch (_effect.TriggerType)
-        {            
+        {
             case TriggerType.OnDied:
                 OnUnitDieEventUnSubscribe();
                 break;
@@ -74,11 +75,11 @@ public class GlobalPassive
                 break;
 
             case TriggerType.OnBattleStart:
-                BattleManager.OnBattleStarted -= EffectActive;
+                BattleManager.OnBattleStarted -= EffectBuffActive;
                 break;
 
             case TriggerType.OnBattleEnded:
-                BattleManager.OnBattleEnded -= EffectActive;
+                BattleManager.OnBattleEnded -= EffectBuffActive;
                 break;
         }
     }
@@ -133,13 +134,14 @@ public class GlobalPassive
     #region DiedEventSubscribe
     private void UnitsDiedEventSubscribe()
     {
-        if(_effect.IsUnitPosition)
+        Debug.Log("UnitsDiedEventSubscribe");
+        if (_effect.IsUnitPosition)
         {
             foreach (var unit in _units)
             {
                 unit.StatusController.OnUnitDied += EffectActives;
             }
-        }    
+        }
         else
         {
             foreach (var unit in _units)
@@ -164,38 +166,53 @@ public class GlobalPassive
             {
                 unit.StatusController.OnDied -= EffectActives;
             }
-        }        
+        }
     }
     #endregion
 
-#region EffectActives
+    #region EffectActives
     private void EffectActives()
     {
+        if (_effect.IsFirstOnly && _isActive)
+            return;
+
+        _isActive = true;
+
         if (_currentActivations < _effect.MaxActivations)
         {
-            SpawnActive();
-            EffectActive();
+            EffectBuffActive();
             AttackActive();
+            _currentActivations++;
         }
         else
-        {            
+        {
             NextEffectActives();
-        }
 
-        _currentActivations++;
+            if (_effect.IsActivationsClear)
+                _currentActivations = 0;
+        }      
     }
 
     private void EffectActives(UnitStatusController unit)
     {
+        if (_effect.IsFirstOnly && _isActive)
+            return;
+
+        _isActive = true;
+
         if (_currentActivations < _effect.MaxActivations)
         {
             SpawnActive(unit);
-            EffectActive();
+            EffectBuffActive();
             AttackActive();
+            _currentActivations++;
         }
         else
         {
             NextEffectActives();
+
+            if (_effect.IsActivationsClear)
+                _currentActivations = 0;
         }
 
         _currentActivations++;
@@ -203,14 +220,15 @@ public class GlobalPassive
 
     private void NextEffectActives()
     {
-        if (_effect.NextEffect == null) return;
+        if (_effect.NextEffect == null || _effect.NextEffect == null)
+            return;
 
-        NextEffectActive();
+        NextBuffEffectActive();
         NextAttackActive();
     }
 
     #region BuffEffect
-    private void EffectActive()
+    private void EffectBuffActive()
     {
         if (!_effect.IsBuff)
             return;
@@ -218,9 +236,9 @@ public class GlobalPassive
         BuffEffectActive(_effect);
     }
 
-    private void NextEffectActive()
+    private void NextBuffEffectActive()
     {
-        if (!_effect.NextEffect.IsBuff)
+        if (_effect.NextEffect == null || !_effect.NextEffect.IsBuff)
             return;
 
         BuffEffectActive(_effect.NextEffect);
@@ -273,66 +291,79 @@ public class GlobalPassive
             return;
 
         // 글로벌 공격은 전장 중앙이나 특정 지점에 소환하는 식으로 처리
-        Vector3 pos = _center.position;
-        GameObject.Instantiate(_effect.Prefab, pos, Quaternion.identity);
+        AttackSpawn();
     }
 
     private void NextAttackActive()
     {
-        if (!_effect.NextEffect.IsAttack)
+        if (_effect.NextEffect == null || !_effect.NextEffect.IsAttack)
             return;
 
-        Vector3 pos = _center.position;
-        GameObject.Instantiate(_effect.NextEffect.Prefab, pos, Quaternion.identity);
+        AttackSpawn();
+    }
+
+    private void AttackSpawn()
+    {
+        if (_effect.AttackPrefab == null)
+        {
+            Debug.LogWarning($"[글로벌 시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {_effect.AttackAddress}");
+            return;
+        }
+
+        Vector3 pos = _center != null ? _center.position : Vector3.zero;
+        GameObject.Instantiate(_effect.NextEffect.AttackPrefab, pos, Quaternion.identity);
     }
     #endregion
 
-    private void SpawnActive()
-    {
-        if (!_effect.IsSpawn)
-            return;
-
-        Vector3 pos = _center.position;
-        Spawn(pos);
-    }
+    #region SpawnEffect
 
     private void SpawnActive(UnitStatusController unit)
     {
         if (!_effect.IsSpawn)
             return;
 
-        Spawn(unit.transform.position);
+        Spawn(unit, unit.transform.position);
     }
 
-    private void Spawn(Vector3 pos)
+    private void Spawn(UnitStatusController unit, Vector3 pos)
     {
+        if (_effect.SpawnPrefab == null)
+        {
+            Debug.LogWarning($"[시너지 스폰 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {_effect.SpawnAddress}");
+            return;
+        }
+        Debug.Log($"[시너지 스폰 시스템] {_effect.SpawnPrefab.name} 소환");
+
         GameObject obj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
+        obj.name = "SpawnUnit";
+        UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
 
         if (_effect.IsMultiplier)
         {
-            if (_effect.SpawnType == SpawnType.Unit)
-            {
-                // 나중에 아마 소환진을 스폰할 예정 (이펙트 리소스가 기획측에서 들어오면 수정 예정)
-                UnitBase unit = obj.GetComponent<UnitBase>();
+            if (spawnUnit == null)
+                return;
 
-                if (unit != null)
+            if (_effect.SpawnType == SpawnStatType.Level)
+            {
+                if (_effect.IsMultiplier)
                 {
-                    if (_effect.IsMultiplier)
-                    {
-                        unit.StatusController.StatMultiplier = _units.GetSynergyUnitsTotalLevel(_effect.SpawnSynergy);
-                        unit.Init(_effect.SpawnUnitStats);
-                    }
-                    else
-                    {
-                        unit.Init();
-                    }
+                    spawnUnit.StatusController.StatMultiplier = _effect.UnitStatMultiplier;
+                    spawnUnit.Status.Data = Manager.Data.UnitDataDic["10001"];
+                    spawnUnit.Init(_effect.SpawnUnitStats);
+                    spawnUnit.Fight();
+                }
+                else
+                {
+                    spawnUnit.Init();
                 }
             }
-            else if (_effect.SpawnType == SpawnType.AttackObject)
+            else if (_effect.SpawnType == SpawnStatType.LowUpgrade)
             {
-
+                spawnUnit.Status.Level = unit.Status.Level - 1 >= 0 ? unit.Status.Level - 1 : 0;
+                spawnUnit.Init();
             }
-        }
+        }   
     }
     #endregion
+#endregion
 }

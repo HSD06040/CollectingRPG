@@ -91,8 +91,7 @@ public class UnitDataEditorWindow : EditorWindow
         if (showMetaDataSection)
         {
             EditorGUI.indentLevel++;
-            currentUnitData.Grade = (Grade)EditorGUILayout.EnumPopup("Grade", currentUnitData.Grade);
-            currentUnitData.UnitPrefab = (GameObject)EditorGUILayout.ObjectField("Unit Prefab", currentUnitData.UnitPrefab, typeof(GameObject), false);
+            currentUnitData.Grade = (Grade)EditorGUILayout.EnumPopup("Grade", currentUnitData.Grade);            
             currentUnitData.Icon = (Sprite)EditorGUILayout.ObjectField("Icon", currentUnitData.Icon, typeof(Sprite), false);
             currentUnitData.ID = EditorGUILayout.IntField("ID", currentUnitData.ID);
             currentUnitData.Name = EditorGUILayout.TextField("Name", currentUnitData.Name);
@@ -483,7 +482,6 @@ public class UnitDataEditorWindow : EditorWindow
     private void CopyUnitData(UnitData source, UnitData target)
     {
         target.Grade = source.Grade;
-        target.UnitPrefab = source.UnitPrefab;
         target.Icon = source.Icon;
         target.ID = source.ID;
         target.Name = source.Name;

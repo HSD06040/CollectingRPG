@@ -9,7 +9,7 @@ public class EnemyController : MonoBehaviour
     [SerializeField] LayerMask _targetLayer;
     private UnitBase[,] _unitGrid;
 
-    private void Awake()
+    public void Init()
     {
         _slotManager.Init();
         _unitGrid = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];
@@ -26,7 +26,8 @@ public class EnemyController : MonoBehaviour
             int x = unitDatas.position.x;
             int y = unitDatas.position.y;
 
-            UnitBase unit = Instantiate(unitDatas.unitStatus.Data.UnitPrefab).GetComponent<UnitBase>();
+            GameObject obj = Instantiate(unitDatas.unitStatus.Data.UnitPrefab);
+            UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
             unit.Status = unitDatas.unitStatus;
 
             unit.transform.position = slot.transform.position;
@@ -51,17 +52,39 @@ public class EnemyController : MonoBehaviour
             if (unit == null)
                 continue;
 
+            unit.transform.SetParent(null);
             unit.Fight();
         }
+
+        _slotManager.SlotCreater.DeActiveSlots();
     }
 
-    public void EnemyStanby()
+    public void EnemyStandby()
     {
         foreach (var unit in _unitGrid)
         {
             if (unit == null || unit.StatusController.IsDead)
                 continue;
+
             unit.Standby();
+        }
+    }
+
+    public void ResetEnemy()
+    {
+        ClearAllEnemyUnits();
+        _slotManager.SlotCreater.ActiveSlots();
+    }
+
+    private void ClearAllEnemyUnits()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit != null)
+            {
+                _slotManager.GetUnitSlot(unit).ClearSlot();
+                Destroy(unit.gameObject);
+            }
         }
     }
 
