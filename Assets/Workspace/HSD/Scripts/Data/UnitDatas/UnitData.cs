@@ -26,10 +26,15 @@ public class UnitData : MetaData
 
     [Header("Upgrade")]
     public int UpgradeCount;
-    public UnitUpgradeData UpgradeData;
+    public UpgradeUnitData UpgradeData;
 
     public UnitStats GetUnitStat(int level)
     {
         return UnitStats[level];
+    }
+
+    public void Init()
+    {
+        UpgradeData?.Init(Grade);
     }
 }

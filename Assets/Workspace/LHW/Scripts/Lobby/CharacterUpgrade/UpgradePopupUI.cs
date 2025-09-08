@@ -45,7 +45,7 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
     private void LevelUp()
     {
         //if(TempDataManager.Instance.UpgradeData.UpgradeLevel >= 10)
-        if(_currentCharUnit.UpgradeData.UpgradeLevel >= 10)
+        if(_currentCharUnit.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 10)
         {
             if(PopupManager.Instance != null)
             {
@@ -66,7 +66,7 @@ public class UpgradePopupUI : MonoBehaviour, IPointerClickHandler
         if (_currentCharUnit != null)
         {
             // UI 표기
-            _tempText.text = $"캐릭터 정보 표기 예정\n조각 수 : {_currentCharUnit.UpgradeData.CurrentPieces.ToString()}\n 소모 조각 수: {_currentCharUnit.UpgradeData.GetRequiredPiece().ToString()}";
+            _tempText.text = $"캐릭터 정보 표기 예정\n조각 수 : {_currentCharUnit.UpgradeData.CurrentUpgradeData.CurrentPieces.ToString()}\n 소모 조각 수: {_currentCharUnit.UpgradeData.GetRequiredPiece().ToString()}";
         }
     }
 

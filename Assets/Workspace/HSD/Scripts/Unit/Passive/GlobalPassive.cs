@@ -348,7 +348,7 @@ public class GlobalPassive
                 if (_effect.IsMultiplier)
                 {
                     spawnUnit.StatusController.StatMultiplier = _effect.UnitStatMultiplier;
-                    spawnUnit.Status.Data = Manager.Data.UnitDatas[UnityEngine.Random.Range(0, Manager.Data.UnitDatas.Length)];
+                    spawnUnit.Status.Data = Manager.Data.UnitDataDic["10001"];
                     spawnUnit.Init(_effect.SpawnUnitStats);
                     spawnUnit.Fight();
                 }

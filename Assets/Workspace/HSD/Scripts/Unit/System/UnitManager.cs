@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -43,7 +44,7 @@ public class UnitManager : MonoBehaviour
         UnitController.Init();
         EnemyController.Init();
 
-        _unitDatas = Manager.Data.UnitDatas;
+        _unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
 
         Subscribe();
 
