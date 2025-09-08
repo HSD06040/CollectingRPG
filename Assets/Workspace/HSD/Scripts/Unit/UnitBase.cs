@@ -47,7 +47,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     public void Init(UnitStats plusUnitStat = null)
     {  
         Col.enabled = true;
-
+        _fsm.Init(this);
         StatusController.Init(Status, plusUnitStat);
     }
 

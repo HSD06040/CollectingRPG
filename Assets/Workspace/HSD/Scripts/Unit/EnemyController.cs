@@ -52,8 +52,11 @@ public class EnemyController : MonoBehaviour
             if (unit == null)
                 continue;
 
+            unit.transform.SetParent(null);
             unit.Fight();
         }
+
+        _slotManager.SlotCreater.DeActiveSlots();
     }
 
     public void EnemyStandby()
@@ -64,6 +67,24 @@ public class EnemyController : MonoBehaviour
                 continue;
 
             unit.Standby();
+        }
+    }
+
+    public void ResetEnemy()
+    {
+        ClearAllEnemyUnits();
+        _slotManager.SlotCreater.ActiveSlots();
+    }
+
+    private void ClearAllEnemyUnits()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit != null)
+            {
+                _slotManager.GetUnitSlot(unit).ClearSlot();
+                Destroy(unit.gameObject);
+            }
         }
     }
 

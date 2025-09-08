@@ -297,6 +297,7 @@ public class UnitPassive
     {
         if (!Effect.IsAttack)
             return;
+
         AttackSpawn(Effect);
     }
 
@@ -304,7 +305,7 @@ public class UnitPassive
     {
         if (!Effect.NextEffect.IsAttack)
             return;
-
+        
         AttackSpawn(Effect.NextEffect);
     }
 
@@ -341,8 +342,10 @@ public class UnitPassive
             return;
         }
 
-        GameObject obj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
+        Debug.Log($"[시너지 스폰 시스템] {Effect.SpawnPrefab.name} 소환");
 
+        GameObject obj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
+        obj.name = "SpawnUnit";
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
         
         if (Effect.IsMultiplier)

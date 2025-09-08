@@ -874,7 +874,6 @@ MonoBehaviour:
   IsTest: 1
   _battleManager: {fileID: 1736584827}
   _unitUIManager: {fileID: 1434084937}
-  _unitStanbyUIManager: {fileID: 398631489}
   _unitSlotController: {fileID: 185726854}
   UnitController: {fileID: 1059808075}
   EnemyController: {fileID: 859023221}
@@ -2197,13 +2196,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d5b92699bd83904f92aa08fa6a87625, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _battleUI: {fileID: 107256328}
   _fightButton: {fileID: 369737087}
+  _battleUI: {fileID: 107256328}
   _notBattleUI: {fileID: 2082157803}
   FightSlotController: {fileID: 32510361}
   DamageMeterController: {fileID: 1883515661}
   HpMeterController: {fileID: 729093098}
   SkillPopUpController: {fileID: 2015092864}
+  SynergyPanel: {fileID: 1923150497}
+  SynergySlotPanel: {fileID: 1861482936}
+  UnitCountPanel: {fileID: 499981959}
+  UnitTotalPowerPanel:
+  - {fileID: 197642111}
 --- !u!1 &1545470059
 GameObject:
   m_ObjectHideFlags: 0

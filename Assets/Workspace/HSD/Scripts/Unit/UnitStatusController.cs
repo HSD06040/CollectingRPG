@@ -378,7 +378,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Stat Management
     public void AddStat(StatType statType, float value, string source)
     {
-        Debug.Log($"AddStat: {statType}, Value: {value}, Source: {source}");
         switch (statType)
         {
             case StatType.MaxHealth:

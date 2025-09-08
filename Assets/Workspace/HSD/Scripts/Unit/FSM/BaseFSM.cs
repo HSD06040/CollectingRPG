@@ -26,9 +26,11 @@ public class BaseFSM : MonoBehaviour
     #endregion
 
     private Coroutine _fightRoutine;
-
+    private bool _isInit = false;
     public virtual void Init(UnitBase owner)
     {
+        if (_isInit) return;
+
         Owner = owner;
 
         StateMachine ??= new StateMachine();
@@ -40,6 +42,8 @@ public class BaseFSM : MonoBehaviour
         SkillState ??= new SkillState(this, _skillHash);
         DeadState ??= new DeadState(this, _deadHash);
         StunState ??= new StunState(this, _stunHash);
+
+        _isInit = true;
     }
 
     public void Standby()
@@ -56,7 +60,7 @@ public class BaseFSM : MonoBehaviour
 
     public void Fight()
     {
-        _fightRoutine = StartCoroutine(FightRoutine());        
+        _fightRoutine = StartCoroutine(FightRoutine());
         StateMachine.ChangeState(MoveState);
     }
 

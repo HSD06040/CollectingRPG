@@ -27,6 +27,11 @@ public class StateMachine
         _nextState = newState;
     }
 
+    public void SetStateImmediate(BaseState newState)
+    {
+        _currentState = newState;
+    }
+
     private void Transition(BaseState newState)
     {
         _currentState?.Exit();

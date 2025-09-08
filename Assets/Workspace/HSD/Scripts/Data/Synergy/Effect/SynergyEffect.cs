@@ -76,6 +76,7 @@ public class SynergyEffect : ScriptableObject
         }
         else
         {
+            Debug.Log($"글로벌 패시브 이펙트 적용");
             SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, GetTarget(units, synergy), isChange: true);
         }
     }

@@ -15,6 +15,7 @@ public class GlobalPassive
     private CancellationTokenSource _cts;
     private Transform _center;
     private UnitBase[] _units;
+    private bool _isActive;
 
     public GlobalPassive(SynergyEffect effect, UnitBase[] units, Transform center, int mulriplier = 1)
     {
@@ -61,6 +62,7 @@ public class GlobalPassive
     public void Deactive()
     {
         TokenClear();
+        _isActive = false;
 
         switch (_effect.TriggerType)
         {
@@ -132,6 +134,7 @@ public class GlobalPassive
     #region DiedEventSubscribe
     private void UnitsDiedEventSubscribe()
     {
+        Debug.Log("UnitsDiedEventSubscribe");
         if (_effect.IsUnitPosition)
         {
             foreach (var unit in _units)
@@ -170,30 +173,46 @@ public class GlobalPassive
     #region EffectActives
     private void EffectActives()
     {
+        if (_effect.IsFirstOnly && _isActive)
+            return;
+
+        _isActive = true;
+
         if (_currentActivations < _effect.MaxActivations)
         {
             EffectBuffActive();
             AttackActive();
+            _currentActivations++;
         }
         else
         {
             NextEffectActives();
-        }
 
-        _currentActivations++;
+            if (_effect.IsActivationsClear)
+                _currentActivations = 0;
+        }      
     }
 
     private void EffectActives(UnitStatusController unit)
     {
+        if (_effect.IsFirstOnly && _isActive)
+            return;
+
+        _isActive = true;
+
         if (_currentActivations < _effect.MaxActivations)
         {
             SpawnActive(unit);
             EffectBuffActive();
             AttackActive();
+            _currentActivations++;
         }
         else
         {
             NextEffectActives();
+
+            if (_effect.IsActivationsClear)
+                _currentActivations = 0;
         }
 
         _currentActivations++;
@@ -272,8 +291,7 @@ public class GlobalPassive
             return;
 
         // 글로벌 공격은 전장 중앙이나 특정 지점에 소환하는 식으로 처리
-        Vector3 pos = _center.position;
-        GameObject.Instantiate(_effect.AttackPrefab, pos, Quaternion.identity);
+        AttackSpawn();
     }
 
     private void NextAttackActive()
@@ -281,7 +299,18 @@ public class GlobalPassive
         if (_effect.NextEffect == null || !_effect.NextEffect.IsAttack)
             return;
 
-        Vector3 pos = _center.position;
+        AttackSpawn();
+    }
+
+    private void AttackSpawn()
+    {
+        if (_effect.AttackPrefab == null)
+        {
+            Debug.LogWarning($"[글로벌 시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {_effect.AttackAddress}");
+            return;
+        }
+
+        Vector3 pos = _center != null ? _center.position : Vector3.zero;
         GameObject.Instantiate(_effect.NextEffect.AttackPrefab, pos, Quaternion.identity);
     }
     #endregion
@@ -298,8 +327,15 @@ public class GlobalPassive
 
     private void Spawn(UnitStatusController unit, Vector3 pos)
     {
-        GameObject obj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
+        if (_effect.SpawnPrefab == null)
+        {
+            Debug.LogWarning($"[시너지 스폰 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {_effect.SpawnAddress}");
+            return;
+        }
+        Debug.Log($"[시너지 스폰 시스템] {_effect.SpawnPrefab.name} 소환");
 
+        GameObject obj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
+        obj.name = "SpawnUnit";
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
 
         if (_effect.IsMultiplier)
@@ -312,7 +348,9 @@ public class GlobalPassive
                 if (_effect.IsMultiplier)
                 {
                     spawnUnit.StatusController.StatMultiplier = _effect.UnitStatMultiplier;
+                    spawnUnit.Status.Data = Manager.Data.UnitDatas[UnityEngine.Random.Range(0, Manager.Data.UnitDatas.Length)];
                     spawnUnit.Init(_effect.SpawnUnitStats);
+                    spawnUnit.Fight();
                 }
                 else
                 {

@@ -145,7 +145,6 @@ public class UnitManager : MonoBehaviour
 
     public void GameEndedUnitStandby()
     {
-        Debug.Log("게임 끝");
         UnitController.UnitsStandby();
         EnemyController.EnemyStandby();     
     }
@@ -162,6 +161,7 @@ public class UnitManager : MonoBehaviour
 
     public void StandbyGame()
     {
+        EnemyController.ResetEnemy();
         UnitController.UnitStandbyAndSetSlotPosition();
         _unitUIManager.StandbyUISetting();
     }
