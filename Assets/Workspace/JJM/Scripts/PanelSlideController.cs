@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
 
+
 public enum SlideDirection
 {
     Up,
@@ -10,7 +11,6 @@ public enum SlideDirection
     Left,
     Right
 }
-
 [System.Serializable]
 public class SlideButtonInfo
 {
