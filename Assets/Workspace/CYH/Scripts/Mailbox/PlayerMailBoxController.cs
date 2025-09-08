@@ -7,10 +7,13 @@ using Firebase.Database;
 public class PlayerMailBoxController : MonoBehaviour
 {
     private List<MailData> _mail;
+    private List<CouponData> _coupon;
     private DatabaseReference _mailRef;
 
     public event Action<List<MailData>> OnMailboxUpdated;
+    public event Action<List<CouponData>> OnCouponUpdated;
     public List<MailData> Mail { get { return _mail; } }
+    public List<CouponData> Coupon { get { return _coupon; } }
 
 
     private void Start()
@@ -62,6 +65,15 @@ public class PlayerMailBoxController : MonoBehaviour
     {
         List<MailData> loaded = await LoadAsync();
         RefreshUI(loaded);
+    }
+
+    /// <summary>
+    /// 입력된 쿠폰코드 검증 및 우편 전송하는 메서드
+    /// </summary>
+    /// <param name="couponCode"></param>
+    public async void CheckCouponCode(string couponCode)
+    {
+        await Manager.DB.CheckCouponDataAsync(couponCode);
     }
 
     /// <summary>
