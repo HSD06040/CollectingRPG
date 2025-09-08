@@ -20,15 +20,17 @@ public class UnitBase : MonoBehaviour, IAttacker
     [SerializeField] BaseFSM _fsm;
 
     #region LifeCycle
-    protected virtual void Awake()
+    public virtual void Awake()
     {
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
         _enemyLayer = LayerMask.NameToLayer("Enemy");
 
-        Anim ??= GetComponentInChildren<Animator>();
-        Rb ??= GetComponent<Rigidbody2D>();
-        Col ??= GetComponent<CapsuleCollider2D>();
-        TriggerCol ??= GetComponentInChildren<BoxCollider2D>();
+        Anim = GetComponentInChildren<Animator>();
+        Rb = GetComponent<Rigidbody2D>();
+        Col = GetComponent<CapsuleCollider2D>();
+        StatusController = GetComponent<UnitStatusController>();
+        TriggerCol = GetComponentInChildren<BoxCollider2D>();
+        _fsm = GetComponentInChildren<BaseFSM>();
 
         AddProviderComponents();
     }
@@ -53,7 +55,9 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void SetBattleUnit()
     {
-        TriggerCol.enabled = false;
+        if(TriggerCol != null)
+            TriggerCol.enabled = false;
+
         tag = "BattleUnit";
     }
 
@@ -202,7 +206,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {        
-        if (Status == null) return;
+        if (Status == null || StatusController == null) return;
 
         // 찾는 거리
         Gizmos.color = Color.cyan;
