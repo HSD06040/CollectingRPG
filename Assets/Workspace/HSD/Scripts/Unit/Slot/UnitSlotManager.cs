@@ -21,4 +21,9 @@ public class UnitSlotManager : MonoBehaviour
     {
         return UnitSlotDic.TryGetValue(pos, out UnitSlot slot) ? slot : null;
     }
+
+    public void SetUnitSlot(UnitBase unit)
+    {
+        UnitSlotDic[unit.CurrentSlot].SetUnit(unit);
+    }
 }

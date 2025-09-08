@@ -4,35 +4,14 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-public class SynergyEffectManager : MonoBehaviour
+public class SynergyEffectManager : InGameSingleton<SynergyEffectManager>
 {
-    #region Singleton
-    private static SynergyEffectManager instance;
-    public static SynergyEffectManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<SynergyEffectManager>();
-            }
-            return instance;
-        }
-    }
-
-    private void Awake()
-    {
-        if (instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
-
-        Init();
-    }
-    #endregion
     [SerializeField] Transform _center;
+
+    protected override void Awake()
+    {
+        Init();
+    }   
     
     public GlobalPassiveController GlobalPassiveController { get; private set; }
 

@@ -54,8 +54,11 @@ public class UnitController : MonoBehaviour
     }
 
     #region UnitSetting
-    public void UnitStanbyAndSetSlotPosition()
+    public void UnitStandbyAndSetSlotPosition()
     {
+        _unitSlotManager.SlotCreater.ActiveSlots();
+        _battleUnitManager._unitSlotManager.SlotCreater.ActiveSlots();
+
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
             if (unit == null)
@@ -64,12 +67,13 @@ public class UnitController : MonoBehaviour
             unit.transform.position = _unitSlotManager.GetUnitSlot(unit.CurrentSlot).transform.position;
             unit.Standby();
             unit.StatusController.Refresh();
-        }
+            _battleUnitManager._unitSlotManager.SetUnitSlot(unit);
+        }        
 
         _unitDragDropSystem.enabled = true;
     }
 
-    public void UnitsStanby()
+    public void UnitsStandby()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
@@ -78,9 +82,8 @@ public class UnitController : MonoBehaviour
 
             unit.Standby();
         }
-
-        _unitDragDropSystem.enabled = true;
     }
+
     public void UnitFight()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
@@ -88,8 +91,12 @@ public class UnitController : MonoBehaviour
             if (unit == null)
                 continue;
 
+            unit.transform.SetParent(null);
             unit.Fight();
         }
+
+        _unitSlotManager.SlotCreater.DeActiveSlots();
+        _battleUnitManager._unitSlotManager.SlotCreater.DeActiveSlots();
 
         _unitDragDropSystem.enabled = false;
     }

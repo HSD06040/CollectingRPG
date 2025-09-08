@@ -3,21 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Unit_TempUpgradeUnitData", menuName = "Data/Temp/Unit_TempUpgradeUnitData")]
-public class TempUpgradeUnitData : ScriptableObject
+public class UpgradeUnitData : ScriptableObject
 {
-    // 해당 캐릭터 등급 -> 이후 UnitData에서 직접 참조하는 방식으로 변경
-    public Grade Grade;
     // 캐릭터의 업그레이드 레벨 - 레벨이 0일 때는 획득하지 않은 상태
-    public int UpgradeLevel;
-    // 현재 보유 캐릭터 조각 수
-    public int CurrentPieces;
+    private Grade _grade;
+
+    public CurrentUpgradeData CurrentUpgradeData;
+
+    public void Init(Grade grade)
+    {
+        _grade = grade;
+    }
 
     // 캐릭터 강화 요구 조각 수 데이터 -> 이후 UnitData로 옮기는 방법 고민중
-    [field:SerializeField] public LevelUpData LevelUpData { get; private set; }
+    [field:SerializeField] public static LevelUpData LevelUpData { get; private set; }
     
     public int GetRequiredPiece()
     {
-        if (UpgradeLevel >= 10 || UpgradeLevel <= 0) return 0;
+        if (CurrentUpgradeData.UpgradeLevel >= 10 || 
+            CurrentUpgradeData.UpgradeLevel <= 0) return 0;
 
         if (LevelUpData == null)
         {
@@ -25,17 +29,17 @@ public class TempUpgradeUnitData : ScriptableObject
             return 0;
         }
 
-        RequirePiece requirePiece = LevelUpData.RequirePieceData.Find(r => r.Grade == Grade);
+        RequirePiece requirePiece = LevelUpData.RequirePieceData[_grade];
         if (requirePiece == null)
         {
-            Debug.LogError($"[{name}] {Grade} 등급에 맞는 RequirePiece 데이터가 없습니다.");
+            Debug.LogError($"[{name}] {_grade} 등급에 맞는 RequirePiece 데이터가 없습니다.");
             return 0;
         }
 
-        PieceLevelRatio pieceLevelRatio = requirePiece.LevelRatio.Find(l => l.Level == UpgradeLevel + 1);
+        PieceLevelRatio pieceLevelRatio = requirePiece.LevelRatio.Find(l => l.Level == CurrentUpgradeData.UpgradeLevel + 1);
         if (pieceLevelRatio == null)
         {
-            Debug.LogError($"[{name}] {Grade} / {UpgradeLevel}에 맞는 PieceLevelRatio 데이터가 없습니다.");
+            Debug.LogError($"[{name}] {_grade} / {CurrentUpgradeData.UpgradeLevel}에 맞는 PieceLevelRatio 데이터가 없습니다.");
             return 0;
         }
 
@@ -44,14 +48,14 @@ public class TempUpgradeUnitData : ScriptableObject
 
     public void ObtainCharacter()
     {
-        if (UpgradeLevel == 0) UpgradeLevel += 1;
+        if (CurrentUpgradeData.UpgradeLevel == 0) CurrentUpgradeData.UpgradeLevel += 1;
 
         // TODO : DB에 [레벨] 업데이트
     }
 
     public void AddPiece(int piece)
     {
-        CurrentPieces += piece;
+        CurrentUpgradeData.CurrentPieces += piece;
 
         // TODO : DB에 [조각] 업데이트
     }
@@ -59,24 +63,24 @@ public class TempUpgradeUnitData : ScriptableObject
     public void LevelUp()
     {
         // 최대레벨 변수 추가?
-        if (UpgradeLevel >= 10 || UpgradeLevel <= 0) return;
+        if (CurrentUpgradeData.UpgradeLevel >= 10 || CurrentUpgradeData.UpgradeLevel <= 0) return;
 
         int requiredPiece = GetRequiredPiece();
         
-        if(CurrentPieces >= requiredPiece)
+        if(CurrentUpgradeData.CurrentPieces >= requiredPiece)
         {
-            CurrentPieces -= requiredPiece;
-            UpgradeLevel += 1;
+            CurrentUpgradeData.CurrentPieces -= requiredPiece;
+            CurrentUpgradeData.UpgradeLevel += 1;
 
             // TODO : DB에 [레벨]과 [조각] 업데이트
         }
-    }
+    }    
 }
 
 [CreateAssetMenu(fileName = "Unit_LevelUpData", menuName = "Data/Temp/Unit_LevelUpData")]
 public class LevelUpData : ScriptableObject
 {
-    public List<RequirePiece> RequirePieceData = new List<RequirePiece>();
+    public Dictionary<Grade, RequirePiece> RequirePieceData = new ();
 }
 
 [Serializable]
@@ -94,4 +98,18 @@ public class PieceLevelRatio
 {
     public int Level;
     public int RequirePiece;
+}
+
+[Serializable]
+public class CurrentUpgradeData
+{
+    public int UpgradeLevel;
+    // 현재 보유 캐릭터 조각 수
+    public int CurrentPieces;
+
+    public void SetData(int upgradeLevel, int currentPieces)
+    {
+        UpgradeLevel = upgradeLevel;
+        CurrentPieces = currentPieces;
+    }
 }

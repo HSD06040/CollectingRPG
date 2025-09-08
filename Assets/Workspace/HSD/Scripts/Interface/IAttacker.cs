@@ -8,6 +8,6 @@ public interface IAttacker
     public UnitStatusController GetStatusController();
     public Transform GetTransform();
     public Transform GetTarget();
-    public UnitStatus GetUnitData();
+    public UnitStatus GetUnitStatus();
     public Vector2 GetTargetDir();
 }

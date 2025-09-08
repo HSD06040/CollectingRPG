@@ -47,7 +47,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     public void Init(UnitStats plusUnitStat = null)
     {  
         Col.enabled = true;
-
+        _fsm.Init(this);
         StatusController.Init(Status, plusUnitStat);
     }
 
@@ -103,7 +103,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target == null || ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead)
+        if (Target == null || (Target != null && ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead))
             Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
     }
 
@@ -180,7 +180,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return Target;
     }
-    public UnitStatus GetUnitData()
+    public UnitStatus GetUnitStatus()
     {
         return Status;
     }

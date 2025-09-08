@@ -19,13 +19,12 @@ public abstract class UIBase : MonoBehaviour
             var attr = field.GetCustomAttribute<UIBindAttribute>();
             if (attr == null) continue;
 
-            string path = attr.Path ?? field.Name;
+            string targetName = attr.Path ?? field.Name;
 
-            var target = transform.Find(path);
-
+            var target = FindByName(transform, targetName);
             if (target == null)
             {
-                Debug.LogError($"[UIBase] 경로를 찾을 수 없습니다.: {path} : {field.Name} 의 {GetType().Name}");
+                Debug.LogError($"[UIBase] 이름으로 오브젝트를 찾을 수 없습니다: {targetName} ({field.Name}) in {GetType().Name}");
                 continue;
             }
 
@@ -33,11 +32,24 @@ public abstract class UIBase : MonoBehaviour
 
             if (component == null)
             {
-                Debug.LogError($"[UIBase] 컴포넌트를 찾을 수 없습니다.: {path} : {field.Name} 의 {GetType().Name}");
+                Debug.LogError($"[UIBase] 컴포넌트를 찾을 수 없습니다.: {targetName} : {field.Name} 의 {GetType().Name}");
                 continue;
             }
 
             field.SetValue(this, component);
         }
+    }
+    private Transform FindByName(Transform root, string name)
+    {
+        if (root.name == name)
+            return root;
+
+        foreach (Transform child in root)
+        {
+            var result = FindByName(child, name);
+            if (result != null)
+                return result;
+        }
+        return null;
     }
 }

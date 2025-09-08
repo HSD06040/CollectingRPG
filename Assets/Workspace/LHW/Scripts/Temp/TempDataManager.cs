@@ -31,8 +31,8 @@ public class TempDataManager : MonoBehaviour
     public List<TeamPresetData> PresetData => _presetData;
 
     // 업그레이드 관련
-    [SerializeField] private TempUpgradeUnitData _upgradeUnitData;
-    public TempUpgradeUnitData UpgradeData => _upgradeUnitData;
+    [SerializeField] private UpgradeUnitData _upgradeUnitData;
+    public UpgradeUnitData UpgradeData => _upgradeUnitData;
 
     #endregion    
 

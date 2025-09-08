@@ -16,7 +16,7 @@ public class BaseFSM : MonoBehaviour
 
     #region State
     public StateMachine StateMachine { get; private set; }
-    public StanbyState StanbyState { get; private set; }
+    public StandbyState StandbyState { get; private set; }
     public IdleState IdleState {  get; private set; }
     public MoveState MoveState { get; private set; }
     public DeadState DeadState { get; private set; }
@@ -26,20 +26,24 @@ public class BaseFSM : MonoBehaviour
     #endregion
 
     private Coroutine _fightRoutine;
-
+    private bool _isInit = false;
     public virtual void Init(UnitBase owner)
     {
+        if (_isInit) return;
+
         Owner = owner;
 
         StateMachine ??= new StateMachine();
 
-        StanbyState ??= new StanbyState(this, _idleHash);
+        StandbyState ??= new StandbyState(this, _idleHash);
         IdleState ??= new IdleState(this, _idleHash);
         MoveState ??= new MoveState(this, _moveHash);
         AttackState ??= new AttackState(this, _attackHash);
         SkillState ??= new SkillState(this, _skillHash);
         DeadState ??= new DeadState(this, _deadHash);
         StunState ??= new StunState(this, _stunHash);
+
+        _isInit = true;
     }
 
     public void Standby()
@@ -50,13 +54,13 @@ public class BaseFSM : MonoBehaviour
             _fightRoutine = null;
         }
 
-        StateMachine.ChangeState(StanbyState);
+        StateMachine.ChangeState(StandbyState);
         StateMachine.Update();
     }
 
     public void Fight()
     {
-        _fightRoutine = StartCoroutine(FightRoutine());        
+        _fightRoutine = StartCoroutine(FightRoutine());
         StateMachine.ChangeState(MoveState);
     }
 

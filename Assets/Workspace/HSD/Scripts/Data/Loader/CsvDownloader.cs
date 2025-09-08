@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -77,7 +78,7 @@ public class CsvDownloader
 
     private void UnitStatSetup(string[][] data)
     {
-        UnitData[] unitDatas = Manager.Data.UnitDatas;
+        UnitData[] unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
  
         foreach (var row in data)
         {
