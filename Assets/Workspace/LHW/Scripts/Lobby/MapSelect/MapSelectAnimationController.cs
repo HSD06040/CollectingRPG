@@ -1,11 +1,20 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using DG.Tweening;
 
-public class MapSelectAnimationController : MonoBehaviour, IDragHandler, IEndDragHandler
+public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    [Header("RectTransform")]
     [SerializeField] private Scrollbar _scrollBar;
+
+    [Header("MapDescription PopUp")]
+    [SerializeField] private GameObject[] _popUps;
+
+    [Header("Map Image")]
+    [SerializeField] private GameObject[] _mapImage;
 
     // Init
     const int SIZE = 7;
@@ -13,6 +22,7 @@ public class MapSelectAnimationController : MonoBehaviour, IDragHandler, IEndDra
     private float _distance;
 
     // 드래그 중 지정 변수
+    private float _currentPos;
     private float _targetPos;
     private float _scrollSpeed;
 
@@ -23,10 +33,14 @@ public class MapSelectAnimationController : MonoBehaviour, IDragHandler, IEndDra
 
     private Coroutine _dragCoroutine;
 
+    public Action OnTargetPosSelected;
+
     private void Start()
     {
         _distance = 1f / (SIZE - 1);
         for (int i = 0; i < SIZE; i++) _pos[i] = _distance * i;
+
+        InActivateMapInfo();
     }
 
     private void Update()
@@ -34,12 +48,30 @@ public class MapSelectAnimationController : MonoBehaviour, IDragHandler, IEndDra
         if (!_isDrag)
         {
             _scrollBar.value = Mathf.Lerp(_scrollBar.value, _targetPos, Time.deltaTime * 5f);
-            if(Mathf.Abs(_scrollBar.value - _targetPos) < 0.01)
+            if (Mathf.Abs(_scrollBar.value - _targetPos) < 0.01)
+            {
                 _scrollBar.value = _targetPos;
+                OnTargetPosSelected?.Invoke();
+            }
         }
+
+        DragScaleAnimation();
+    }
+
+    private void OnEnable()
+    {
+        OnTargetPosSelected += ActivateMapInfo;
+    }
+
+    private void OnDisable()
+    {
+        OnTargetPosSelected -= ActivateMapInfo;
     }
 
     #region Drag Event
+
+    public void OnBeginDrag(PointerEventData eventData) => InActivateMapInfo();
+
 
     public void OnDrag(PointerEventData eventData) => _isDrag = true;
 
@@ -71,6 +103,15 @@ public class MapSelectAnimationController : MonoBehaviour, IDragHandler, IEndDra
         return 0;
     }
 
+    private void DragScaleAnimation()
+    {
+        _currentPos = SetPos();
+        for(int i = 0; i < SIZE; i++)
+        {
+            _mapImage[i].transform.DOScale(1f - (Mathf.Abs(_pos[i] - _currentPos)), Time.deltaTime * 5f);
+        }
+    }
+
     /// <summary>
     /// 드래그가 종료되었을 때, 해당 드래그의 속도에 따라
     /// 타겟의 위치를 지정
@@ -88,6 +129,28 @@ public class MapSelectAnimationController : MonoBehaviour, IDragHandler, IEndDra
         _isDrag = false;
         _dragCoroutine = null;
     }
+
+    #endregion
+
+    #region MapInfo PopUp
+
+    private void ActivateMapInfo()
+    {
+        for(int i = 0; i < _popUps.Length; i++)
+        {
+            _popUps[i].transform.DOScale(1f, 0.3f);
+            _popUps[i].gameObject.SetActive(true);
+        }
+    }
+    
+    private void InActivateMapInfo()
+    {
+        for(int i = 0; i < _popUps.Length; i++)
+        {
+            _popUps[i].transform.DOScale(0f, 0.3f);
+            _popUps[i].gameObject.SetActive(false);
+        }
+    }    
 
     #endregion
 }
