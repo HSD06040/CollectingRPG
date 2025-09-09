@@ -16,6 +16,11 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
     [Header("Map Image")]
     [SerializeField] private GameObject[] _mapImage;
 
+    [Header("Offset")]
+    [SerializeField] private float _mapImgShrinkDuration = 3f;
+    [SerializeField] private float _mapImgShrinkSize = 1.5f;
+    [SerializeField] private float _mapInfoActivateDuration = 0.5f;
+
     // Init
     const int SIZE = 7;
     private float[] _pos = new float[SIZE];
@@ -108,7 +113,7 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
         _currentPos = SetPos();
         for(int i = 0; i < SIZE; i++)
         {
-            _mapImage[i].transform.DOScale(1f - (Mathf.Abs(_pos[i] - _currentPos)), Time.deltaTime * 5f);
+            _mapImage[i].transform.DOScale(1f - _mapImgShrinkSize * (Mathf.Abs(_pos[i] - _currentPos)), Time.deltaTime * _mapImgShrinkDuration);
         }
     }
 
@@ -138,7 +143,7 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
     {
         for(int i = 0; i < _popUps.Length; i++)
         {
-            _popUps[i].transform.DOScale(1f, 0.3f);
+            _popUps[i].transform.DOScale(1f, _mapInfoActivateDuration);
             _popUps[i].gameObject.SetActive(true);
         }
     }
@@ -147,7 +152,7 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
     {
         for(int i = 0; i < _popUps.Length; i++)
         {
-            _popUps[i].transform.DOScale(0f, 0.3f);
+            _popUps[i].transform.DOScale(0f, _mapInfoActivateDuration);
             _popUps[i].gameObject.SetActive(false);
         }
     }    
