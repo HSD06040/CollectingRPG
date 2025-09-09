@@ -25,6 +25,11 @@ public class LobbyPopupManager : MonoBehaviour
     [SerializeField] private MailBoxPopup _mailPopup;
     [SerializeField] private Button _mailboxButton;
 
+    [Header("Coupon")]
+    [SerializeField] private GameObject _couponPopup;
+    [SerializeField] private CouponPanel _couponPopupCs;
+    [SerializeField] private Button _couponButton;
+
 
     private void Start()
     {
@@ -50,9 +55,14 @@ public class LobbyPopupManager : MonoBehaviour
         {
             ShowPopup_mail();
         });
+
+        _couponButton.onClick.AddListener(() =>
+        {
+            ShowPopup_coupon();
+        });
     }
 
-    public void ShowPopup_playerProfile()
+    private void ShowPopup_playerProfile()
     {
         HideAllPopup();
 
@@ -62,11 +72,9 @@ public class LobbyPopupManager : MonoBehaviour
             _profilePopup.EnableDataBind(true);
             _playerProfilePopup.SetActive(true);
         }
-
-        gameObject.SetActive(true);
     }
 
-    public void ShowPopup_mail()
+    private void ShowPopup_mail()
     {
         HideAllPopup();
 
@@ -76,14 +84,23 @@ public class LobbyPopupManager : MonoBehaviour
             _mailPopup.EnableDataBind(true);
             _mailboxPopup.SetActive(true);
         }
+    }
 
-        gameObject.SetActive(true);
+    private void ShowPopup_coupon()
+    {
+        HideAllPopup();
+
+        if (_couponPopup != null)
+        {
+            _couponPopup.SetActive(true);
+        }
     }
 
     private void HideAllPopup()
     {
-        if (_playerProfilePopup != null) _playerProfilePopup.SetActive(false);
-        if (_googleLinkPopup != null) _googleLinkPopup.SetActive(false);
-        if (_mailboxPopup != null) _mailboxPopup.SetActive(false);
+        _playerProfilePopup.SetActive(false);
+        _googleLinkPopup.SetActive(false);
+        _mailboxPopup.SetActive(false);
+        _couponPopup.SetActive(false);
     }
 }
