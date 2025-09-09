@@ -27,6 +27,7 @@ public class UnitData : MetaData
     [Header("Upgrade")]
     public int UpgradeCount;
     public UpgradeUnitData UpgradeData;
+    public LevelUpData LevelUpData;
 
     public UnitStats GetUnitStat(int level)
     {
@@ -35,6 +36,6 @@ public class UnitData : MetaData
 
     public void Init()
     {
-        UpgradeData?.Init(Grade);
+        UpgradeData?.Init(Grade, LevelUpData);
     }
 }

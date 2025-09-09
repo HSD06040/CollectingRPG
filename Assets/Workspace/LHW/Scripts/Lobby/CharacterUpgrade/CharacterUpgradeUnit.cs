@@ -1,10 +1,8 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class CharacterUpgradeUnit : MonoBehaviour
 {
     [Header("Data Input")]
     private UnitStatus _status;
@@ -28,8 +26,6 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     [Header("Reference")]
     [SerializeField] private Sprite[] costSprites;
-    [SerializeField] private UpgradeUnitData _upgradeData;
-    public UpgradeUnitData UpgradeData => _upgradeData;
 
     private UpgradeManager _manager;
 
@@ -71,7 +67,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void ShowPopUp()
     {
-        if (_upgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        if (_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
             if (PopupManager.Instance != null)
             {
@@ -87,37 +83,11 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     #endregion
 
-    #region OnPointerDown - Character Info UI PopUp
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        _holdCoroutine = StartCoroutine(HoldRoutine());
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        if (_holdCoroutine != null)
-        {
-            StopCoroutine(_holdCoroutine);
-            _holdCoroutine = null;
-        }
-    }
-
-    private IEnumerator HoldRoutine()
-    {
-        yield return new WaitForSeconds(_requiredPointerDownTime);
-
-        // UI 활성화
-        Debug.Log("UI 활성화");
-    }
-
-    #endregion
-
     #region UI Update
 
     private void UIUpdate()
     {
-        if (_upgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        if (_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
             _backgroundPanel.SetActive(true);
         }
@@ -135,7 +105,7 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
             _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
         }
         //_overallPowerText.text = $"{_status.CombatPower}";
-        _levelText.text = $"Lv.{_upgradeData.CurrentUpgradeData.UpgradeLevel}";
+        _levelText.text = $"Lv.{_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel}";
 
         PieceGaugeUpdate();
         OutlineUpdate();
@@ -143,32 +113,32 @@ public class CharacterUpgradeUnit : MonoBehaviour, IPointerDownHandler, IPointer
 
     private void PieceGaugeUpdate()
     {
-        int requirePiece = _upgradeData.GetRequiredPiece();
-        if (_upgradeData.CurrentUpgradeData.CurrentPieces == 0)
+        int requirePiece = _status.Data.UpgradeData.GetRequiredPiece();
+        if (_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
         {
             _pieceGauge.fillAmount = 0;
         }
         else
         {
-            _pieceGauge.fillAmount = ((float)_upgradeData.CurrentUpgradeData.CurrentPieces / requirePiece);
+            _pieceGauge.fillAmount = (float)_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
         }
-        _pieceNum.text = $"{_upgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
+        _pieceNum.text = $"{_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
     }
 
     private void OutlineUpdate()
     {
-        if (_upgradeData.CurrentUpgradeData.UpgradeLevel >= 4)
+        if (_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 4)
         {
             _outlineImage.gameObject.SetActive(true);
-            if (_upgradeData.CurrentUpgradeData.UpgradeLevel == 10)
+            if (_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 10)
             {
                 _outlineImage.color = Color.red;
             }
-            else if (_upgradeData.CurrentUpgradeData.UpgradeLevel >= 8)
+            else if (_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 8)
             {
                 _outlineImage.color = Color.yellow;
             }
-            else if(_upgradeData.CurrentUpgradeData.UpgradeLevel >= 6)
+            else if(_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 6)
             {
                 _outlineImage.color = Color.blue;
             }
