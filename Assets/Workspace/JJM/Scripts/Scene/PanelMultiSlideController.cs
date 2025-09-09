@@ -26,6 +26,7 @@ public class PanelMultiSlideController : MonoBehaviour
     private Vector2[] originalPositions;
     private Vector2 summonSceneOriginalPos;
 
+    public static bool IsBattleActive = false;
     void Awake()
     {
         // 기존 패널 원래 위치 저장
@@ -94,9 +95,15 @@ public class PanelMultiSlideController : MonoBehaviour
         for (int i = 0; i < slideInPanels.Length; i++)
         {
             int idx = i;
-            slideInPanels[idx].gameObject.SetActive(true); // 애니메이션 시작 전에 활성화
+            // 전투 중이면 WaitingBattlePlayer, WaitingBattleEnemy 위치 건너뜀
+            if (IsBattleActive &&
+                (slideInPanels[idx].gameObject.name == "WaitingBattlePlayer" ||
+                 slideInPanels[idx].gameObject.name == "WaitingBattleEnemy"))
+                continue;
+
+            slideInPanels[idx].gameObject.SetActive(true);
             slideInPanels[idx].DOKill();
-            slideInPanels[idx].anchoredPosition = slideInOriginalPositions[idx] - new Vector2(0, slideOffset); // 시작 위치 재설정
+            slideInPanels[idx].anchoredPosition = slideInOriginalPositions[idx] - new Vector2(0, slideOffset);
             slideInPanels[idx].DOAnchorPos(slideInOriginalPositions[idx], slideDuration)
                 .SetEase(Ease.OutCubic)
                 .SetDelay(idx * delayStep);
