@@ -95,20 +95,21 @@ public class RequirePiece
 [Serializable]
 public class PieceLevelRatio
 {
-    public int Level;
     public int RequirePiece;
+    public int Level;
 }
 
 [Serializable]
 public class CurrentUpgradeData
 {
-    public int UpgradeLevel;
     // 현재 보유 캐릭터 조각 수
     public int CurrentPieces;
 
-    public void SetData(int upgradeLevel, int currentPieces)
+    public int UpgradeLevel;
+
+    public void SetData(int currentPieces, int upgradeLevel)
     {
-        UpgradeLevel = upgradeLevel;
         CurrentPieces = currentPieces;
+        UpgradeLevel = upgradeLevel;
     }
 }

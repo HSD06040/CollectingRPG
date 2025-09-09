@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks.Triggers;
 using System;
+using System.Threading.Tasks;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -67,7 +68,7 @@ public class UpgradePopupUI : MonoBehaviour
 
     #region Level Up
 
-    private void LevelUp()
+    private async void LevelUp()
     {
         if(_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 10)
         {
@@ -78,6 +79,8 @@ public class UpgradePopupUI : MonoBehaviour
             }
         }
         _currentCharUnit.Status.Data.UpgradeData.LevelUp();
+
+        await DBManager.Instance.charDB.SaveCharacterData(_currentCharUnit.Status.Data);
 
         OnCharacterStatusChanged?.Invoke();
     }
