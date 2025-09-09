@@ -10,8 +10,9 @@ public class Projectile : MonoBehaviour
     protected LayerMask _targetLayer;
     protected Transform _target;
     protected UnitStatusController _status;
+    protected GameObject _effect;
     protected float _speed;
-    protected Vector2 _direction;
+    protected Vector2 _direction => GetTargetDir();
 
     private void Awake()
     {
@@ -23,7 +24,8 @@ public class Projectile : MonoBehaviour
         ComponentProvider.Remove<Projectile>(gameObject);
     }
 
-    public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
+    public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
+        LayerMask targetLayer, float speed, GameObject effect)
     {        
         _status = status;
         _target = target;
@@ -32,8 +34,9 @@ public class Projectile : MonoBehaviour
         _pireceCount = status.AttackCount.Value;
         _attackPower = attackPower;
         _speed = speed;
+        _effect = effect;
 
-        if(_target == null)
+        if (_target == null)
         {
             _target = Physics2D.OverlapCircle(transform.position, status.AttackRange.Value, targetLayer)?.transform;
 
@@ -55,6 +58,8 @@ public class Projectile : MonoBehaviour
 
             _pireceCount--;
 
+            Manager.Resources.Instantiate(_effect, collision.transform.position, true);
+
             if (_pireceCount <= 0)
             {
                 Destroy(gameObject);
@@ -65,5 +70,13 @@ public class Projectile : MonoBehaviour
     protected virtual async UniTask MoveAndDestroyAsync(float duration)
     {
         await UniTask.Delay(1);
+    }
+
+    protected Vector2 GetTargetDir()
+    {
+        if (_target == null) 
+            return new Vector2(_status.transform.GetFacingDir(), 0);
+
+        return (_target.position - transform.position).normalized;
     }
 }

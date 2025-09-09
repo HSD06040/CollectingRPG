@@ -133,6 +133,12 @@ public enum SearchType
     Circle, Box, Capsule
 }
 
+public enum EffectSpawnType
+{
+    OwnerFront,
+    Target
+}
+
 #endregion
 
 public enum CsvType
@@ -150,6 +156,7 @@ public enum AutoUnitType
 public enum Priority
 {
     None,
+    Target,
     Close,
     Far,
     LowHp,

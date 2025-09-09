@@ -12,6 +12,8 @@ public class UnitBase : MonoBehaviour, IAttacker
     public LayerMask TargetLayer { get; set; }
     public Vector2 TargetDir => GetTargetDirection();
     public Vector2Int CurrentSlot { get; set; }
+    public int AttackPointOffset { get; set; }
+
     private Vector3 _localScale;
     private int _enemyLayer;
 
@@ -78,6 +80,14 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         Init();
         _fsm.Fight();
+    }
+
+    public void GameEndedStanby()
+    {
+        if (StatusController.IsDead)
+            return;
+
+        Standby();
     }
 
     public void Standby()
@@ -182,6 +192,9 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
     public Transform GetTarget()
     {
+        if (Target == null)
+            FindTarget();
+
         return Target;
     }
     public UnitStatus GetUnitStatus()
@@ -191,6 +204,10 @@ public class UnitBase : MonoBehaviour, IAttacker
     public Transform GetTransform()
     {
         return transform;
+    }
+    public Vector2 GetCenter()
+    {
+        return Col.bounds.center;
     }
     public UnitStatusController GetStatusController()
     {
@@ -209,8 +226,8 @@ public class UnitBase : MonoBehaviour, IAttacker
         if (Status == null || StatusController == null) return;
 
         // 찾는 거리
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, StatusController.DetectionRange);
+        //Gizmos.color = Color.cyan;
+        //Gizmos.DrawWireSphere(transform.position, StatusController.DetectionRange);
 
         // 공격 사거리
         Gizmos.color = Color.green;
@@ -219,25 +236,13 @@ public class UnitBase : MonoBehaviour, IAttacker
         if (Status.Data == null) return;
 
         if (Status.Data.AttackData == null) return;
-        // 공격 범위
-        Gizmos.color = Color.red;
-        Vector2 center = transform.position;
-        if (Status.Data.AttackData is UnitMeleeAttack MeleeAttackData)
+        
+        if (Status.Data.AttackData is UnitRangedAttack RandAttackData)
         {
-            if (MeleeAttackData.SearchType == SearchType.Circle)
-            {
-                Vector2 offset = new Vector2(Status.Data.AttackData.AttackPointOffset.x, Status.Data.AttackData.AttackPointOffset.x);
-                offset *= TargetDir;
-
-                Gizmos.DrawWireSphere(center + offset, MeleeAttackData.SizeOrRadius);
-            }
-        }
-        else if (Status.Data.AttackData is UnitRangedAttack RandAttackData)
-        {
-            Vector2 offset = Status.Data.AttackData.AttackPointOffset;
+            Vector2 offset = new Vector2 (AttackPointOffset, AttackPointOffset);
             offset.x *= transform.GetFacingDir();
 
-            Gizmos.DrawWireSphere(center + offset, .1f);
+            Gizmos.DrawWireSphere((Vector2)transform.position + offset, .1f);
         }
 
         if(Status.Data.Skill != null && Status.Data.Skill is AttackSkill attackSkill)

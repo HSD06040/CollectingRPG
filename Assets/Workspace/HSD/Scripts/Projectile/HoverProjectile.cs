@@ -8,9 +8,10 @@ public class HoverProjectile : Projectile
 {
     private bool isHovering = true;
 
-    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
+    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
+        LayerMask targetLayer, float speed, GameObject effect)
     {
-        base.Init(target, status, attackPower, damageType, targetLayer, speed);
+        base.Init(target, status, attackPower, damageType, targetLayer, speed, effect);
 
     }
 
@@ -33,7 +34,6 @@ public class HoverProjectile : Projectile
 
         while (elapsed < duration && !token.IsCancellationRequested && isHovering)
         {
-            _direction = (_target.position - transform.position).normalized;
             transform.Translate(_direction * _speed * Time.deltaTime, Space.World);
             transform.right = _direction;
             elapsed += Time.deltaTime;

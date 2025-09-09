@@ -207,20 +207,20 @@ public class ResourcesManager : Singleton<ResourcesManager>
         return Instantiate(original, position, Quaternion.identity, null, isPool);
     }
 
-    public async UniTask<T> Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
+    public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
-        T obj = await Load<T>(path);
+        T obj = Get<T>(path);
         return Instantiate(obj, position, rotation, parent, isPool);
     }
 
-    public async UniTask<T> Instantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
+    public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, bool isPool = false) where T : Object
     {
-        return await Instantiate<T>(path, position, rotation, null, isPool);
+        return Instantiate<T>(path, position, rotation, null, isPool);
     }
 
-    public async UniTask<T> Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
+    public T Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
     {
-        return await Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
+        return Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
     }
 
     public void Destroy(GameObject obj)

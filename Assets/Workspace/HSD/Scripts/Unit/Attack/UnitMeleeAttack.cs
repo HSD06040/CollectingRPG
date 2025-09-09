@@ -5,26 +5,29 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MeleeAttack", menuName = "Data/Unit/Attack/Melee")]
 public class UnitMeleeAttack : UnitAttackData
 {
-    [Header("Serch")]
-    public SearchType SearchType;
-    public float SizeOrRadius;
-    public float Angle;
-    public Vector2 BoxSize;
-
     public override void Attack(IAttacker attacker)
     {
         base.Attack(attacker);
 
-        UnitStatusController status = attacker.GetStatusController();
-        Transform transform = attacker.GetTransform();
-
-        foreach (GameObject obj in Utils.GetTargetsNonAlloc(attacker,
-            (Vector2)transform.position + (new Vector2(AttackPointOffset.x, AttackPointOffset.x) * attacker.GetTargetDir()),
-            SearchType.Circle, SizeOrRadius, BoxSize, Angle, status.AttackCount.Value, attacker.TargetLayer
-            ))
+        UnitStatusController status = attacker.GetStatusController();        
+        
+        if(attacker.GetTarget() == null)
         {
-            status.CalculateDamage(AttackPower, DamageType, ComponentProvider.Get<UnitBase>(obj).StatusController);
+            Debug.Log("[일반 공격] 타겟이 없습니다.");
+            return;
         }
+
+        status.CalculateDamage(
+            AttackPower,
+            DamageType,
+            ComponentProvider.Get<UnitBase>(attacker.GetTarget()?.gameObject).StatusController
+            );
+
+        Manager.Resources.Instantiate<GameObject>(
+                EffectAddress,
+                attacker.GetTarget().gameObject.GetCenter(),
+                true
+                );
 
         status.GetMana();
     }

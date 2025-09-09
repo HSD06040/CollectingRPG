@@ -24,6 +24,6 @@ public class RangedSkill : AttackSkill
         if(target == null)
             target = Utils.GetClosestTargetNonAlloc(spawnPoint, 100f, attacker.TargetLayer);
 
-        projectile.Init(target, attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, projectileSpeed);
+        projectile.Init(target, attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, projectileSpeed, null);
     }
 }

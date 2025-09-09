@@ -27,6 +27,9 @@ public static class ComponentProvider
 
     public static T Get<T>(GameObject obj) where T : Component
     {
+        if(obj == null)
+            return null;
+
         string key = GenerateKey<T>(obj);
 
         if (_components.TryGetValue(key, out Component component))
