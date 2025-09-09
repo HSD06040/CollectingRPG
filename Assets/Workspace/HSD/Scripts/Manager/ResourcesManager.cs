@@ -51,15 +51,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
     }
     #endregion
 
-    private async UniTask<string> GetPrimaryKey(AssetReference reference)
-    {
-        var locationsHandle = Addressables.LoadResourceLocationsAsync(reference);
-        var locations = await locationsHandle.Task;
-        string primaryKey = locations.FirstOrDefault()?.PrimaryKey ?? reference.RuntimeKey.ToString();
-        Addressables.Release(locationsHandle);
-        return primaryKey;
-    }
-
     #region Load
     public async UniTask LoadLabel(string label)
     {
@@ -171,7 +162,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         if (_resources.TryGetValue(path, out var asset))
         {
-            Addressables.Release(asset);
+            Addressables.Release(path);
             _resources.Remove(path);
         }
     }
@@ -185,6 +176,15 @@ public class ResourcesManager : Singleton<ResourcesManager>
         _resources.Clear();
     }
     #endregion
+
+    private async UniTask<string> GetPrimaryKey(AssetReference reference)
+    {
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(reference);
+        var locations = await locationsHandle.Task;
+        string primaryKey = locations.FirstOrDefault()?.PrimaryKey ?? reference.RuntimeKey.ToString();
+        Addressables.Release(locationsHandle);
+        return primaryKey;
+    }
 
     #region Instantiate&Destroy
     public T Instantiate<T>(T original, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
