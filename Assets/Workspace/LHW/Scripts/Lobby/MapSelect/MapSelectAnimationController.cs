@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
+using System.Collections.Generic;
+using TMPro;
 
 public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -15,6 +17,10 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
 
     [Header("MapDescription PopUp")]
     [SerializeField] private GameObject[] _popUps;
+
+    [Header("MapDescription UI")]
+    [SerializeField] private TMP_Text _mapNameText;
+    [SerializeField] private TMP_Text _mapDescriptionText;
 
     [Header("Map Image")]
     [SerializeField] private GameObject[] _mapImage;
@@ -46,11 +52,19 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
 
     public Action OnTargetPosSelected;
 
+    private List<MapData> _mapData;
+
     private void Start()
     {
-        _distance = 1f / (SIZE - 1);
-        for (int i = 0; i < SIZE; i++) _pos[i] = _distance * i;
+        _mapData = TempDataManager.Instance.ReturnAllMapData();
 
+        _distance = 1f / (SIZE - 1);
+        for (int i = 0; i < SIZE; i++)
+        {
+            _pos[i] = _distance * i;
+
+            _mapImage[i].GetComponent<Image>().sprite = _mapData[i].MapImage;
+        }
         _selectButton.onClick.AddListener(SelectMap);
 
         InActivateMapInfo();
@@ -64,6 +78,7 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
             if (Mathf.Abs(_scrollBar.value - _targetPos) < 0.01)
             {
                 _scrollBar.value = _targetPos;
+                MapInfoUIUpdate(_targetIndex);
                 OnTargetPosSelected?.Invoke();
             }
         }
@@ -163,6 +178,16 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
             _popUps[i].transform.DOScale(0f, _mapInfoActivateDuration);
             _popUps[i].gameObject.SetActive(false);
         }
+    }
+
+    #endregion
+
+    #region MapInfo UIUpdate
+
+    private void MapInfoUIUpdate(int index)
+    {
+        _mapNameText.text = _mapData[index].MapName;
+        _mapDescriptionText.text = _mapData[index].MapDescription;
     }
 
     #endregion
