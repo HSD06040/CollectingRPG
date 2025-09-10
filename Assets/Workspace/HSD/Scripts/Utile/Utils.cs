@@ -232,10 +232,10 @@ public static class Utils
     {
         return status.Data.Grade switch
         {
-            Grade.Normal => new Color(173f / 255f, 255f / 255f, 47f / 255f),
-            Grade.Rare => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
-            Grade.Unique => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
-            Grade.Legendary => new Color32(0xF2, 0x93, 0x38, 0xFF),
+            Grade.NORMAL => new Color(173f / 255f, 255f / 255f, 47f / 255f),
+            Grade.RARE => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
+            Grade.UNIQUE => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
+            Grade.LEGENDARY => new Color32(0xF2, 0x93, 0x38, 0xFF),
             _ => Color.grey,
         };
     }

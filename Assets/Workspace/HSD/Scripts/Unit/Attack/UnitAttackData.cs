@@ -4,6 +4,9 @@ using UnityEngine;
 
 public abstract class UnitAttackData : ScriptableObject
 {
+    [Header("ID")]
+    public int ID;
+
     public DamageType DamageType;
     public float AttackPower;
 

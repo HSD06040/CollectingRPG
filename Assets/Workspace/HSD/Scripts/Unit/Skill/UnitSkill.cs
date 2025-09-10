@@ -6,6 +6,9 @@ using UnityEngine;
 
 public abstract class UnitSkill : ScriptableObject
 {
+    [Header("ID")]
+    public int ID;
+
     [Header("Default")]
     public Sprite Icon;
     public string SkillName;
@@ -83,13 +86,13 @@ public abstract class UnitSkill : ScriptableObject
             case Priority.HightHp:
                 return HighHp;
             case Priority.Tank:
-                return ClassFilter(ClassType.Tank);
+                return ClassFilter(ClassType.TANK);
             case Priority.Melee:
-                return ClassFilter(ClassType.Melee);
+                return ClassFilter(ClassType.MELEE);
             case Priority.Ranged:
-                return ClassFilter(ClassType.Ranged);
+                return ClassFilter(ClassType.RANGED);
             case Priority.Support:
-                return ClassFilter(ClassType.Support);
+                return ClassFilter(ClassType.SUPPORT);
             default:
                 return null;
         }
