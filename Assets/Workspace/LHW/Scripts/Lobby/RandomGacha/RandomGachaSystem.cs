@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,7 +34,6 @@ public class RandomGachaSystem : MonoBehaviour
 
     [Header("DB Test")]
     [SerializeField] private UnitData _testData;
-    [SerializeField] private UpgradeUnitData _testUpgradeData;
     [SerializeField] private Button _testCharacterGachaButton;
 
     private WeightedRandom<Grade> _gradeRandom = new WeightedRandom<Grade>();
@@ -197,13 +197,13 @@ public class RandomGachaSystem : MonoBehaviour
     /// <summary>
     /// 데이터베이스 연동 테스트용 기능. 1회 뽑기와 동일 로직
     /// </summary>
-    private void TestItemSelect()
+    private async void TestItemSelect()
     {
         UnitData data = _testData;
 
-        if (_testUpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        if (_testData.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
-            _testUpgradeData.ObtainCharacter();
+            _testData.UpgradeData.ObtainCharacter();
 
             _resultUI.HeroGachaUpdate(data, 0, "New");
         }
@@ -212,10 +212,12 @@ public class RandomGachaSystem : MonoBehaviour
             // 조각 등장 확률도 나중에 가중치로 전환되면 가중치로 적용 필요
             int pieceNum = UnityEngine.Random.Range(1, 11);
 
-            _testUpgradeData.AddPiece(pieceNum);
+            _testData.UpgradeData.AddPiece(pieceNum);
 
             _resultUI.HeroGachaUpdate(data, 0, pieceNum.ToString());
         }
+
+        await DBManager.Instance.charDB.SaveCharacterData(_testData);
 
         _resultUI.gameObject.SetActive(true);
     }
