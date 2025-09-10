@@ -7,6 +7,9 @@ using DG.Tweening;
 
 public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    [Header("Reference")]
+    [SerializeField] private StageUIController _UIController;
+
     [Header("RectTransform")]
     [SerializeField] private Scrollbar _scrollBar;
 
@@ -15,6 +18,9 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
 
     [Header("Map Image")]
     [SerializeField] private GameObject[] _mapImage;
+
+    [Header("Button")]
+    [SerializeField] private Button _selectButton;
 
     [Header("Offset")]
     [SerializeField] private float _mapImgShrinkDuration = 3f;
@@ -44,6 +50,8 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
     {
         _distance = 1f / (SIZE - 1);
         for (int i = 0; i < SIZE; i++) _pos[i] = _distance * i;
+
+        _selectButton.onClick.AddListener(SelectMap);
 
         InActivateMapInfo();
     }
@@ -155,7 +163,16 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
             _popUps[i].transform.DOScale(0f, _mapInfoActivateDuration);
             _popUps[i].gameObject.SetActive(false);
         }
-    }    
+    }
+
+    #endregion
+
+    #region Button Click
+
+    private void SelectMap()
+    {
+        _UIController.MapUIUpdate(_targetIndex);
+    }
 
     #endregion
 }

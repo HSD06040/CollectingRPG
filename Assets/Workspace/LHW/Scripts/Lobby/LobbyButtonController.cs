@@ -15,6 +15,7 @@ public class LobbyButtonController : MonoBehaviour
     [SerializeField] private Button[] _disabledPartyButtons;
     [SerializeField] private Button _mapSelectButton;
     [SerializeField] private Button _mapBackButton;
+    [SerializeField] private Button _mapSelectConfirmButton;
 
     [Header("Panels")]
     [SerializeField] private GameObject _shopPanel;
@@ -45,6 +46,7 @@ public class LobbyButtonController : MonoBehaviour
         }
         _mapSelectButton.onClick.AddListener(MapSelectOpen);
         _mapBackButton.onClick.AddListener(StageOpen);
+        _mapSelectConfirmButton.onClick.AddListener(StageOpen);
 
         StageOpen();
     }
