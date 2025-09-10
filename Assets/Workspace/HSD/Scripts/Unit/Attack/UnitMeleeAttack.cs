@@ -23,11 +23,13 @@ public class UnitMeleeAttack : UnitAttackData
             ComponentProvider.Get<UnitBase>(attacker.GetTarget()?.gameObject).StatusController
             );
 
-        Manager.Resources.Instantiate<GameObject>(
+        Manager.Resources.Destroy(
+            Manager.Resources.Instantiate<GameObject>(
                 EffectAddress,
                 attacker.GetTarget().gameObject.GetCenter(),
                 true
-                );
+                ),
+            2f);
 
         status.GetMana();
     }

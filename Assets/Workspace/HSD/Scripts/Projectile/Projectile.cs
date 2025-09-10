@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(CircleCollider2D))]
 public class Projectile : MonoBehaviour
 {
     [SerializeField] protected float _lifeTime = 5f; // 발사체의 생명 시간
@@ -10,9 +11,9 @@ public class Projectile : MonoBehaviour
     protected LayerMask _targetLayer;
     protected Transform _target;
     protected UnitStatusController _status;
-    protected GameObject _effect;
     protected float _speed;
-    protected Vector2 _direction => GetTargetDir();
+    protected Vector2 _targetDir => GetTargetDir();
+    protected Vector2 _dir;
 
     private void Awake()
     {
@@ -25,7 +26,7 @@ public class Projectile : MonoBehaviour
     }
 
     public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-        LayerMask targetLayer, float speed, GameObject effect)
+        LayerMask targetLayer, float speed)
     {        
         _status = status;
         _target = target;
@@ -34,7 +35,6 @@ public class Projectile : MonoBehaviour
         _pireceCount = status.AttackCount.Value;
         _attackPower = attackPower;
         _speed = speed;
-        _effect = effect;
 
         if (_target == null)
         {
@@ -57,8 +57,6 @@ public class Projectile : MonoBehaviour
             _status.CalculateDamage(_attackPower, _damageType, ComponentProvider.Get<UnitBase>(collision.gameObject).StatusController);
 
             _pireceCount--;
-
-            Manager.Resources.Instantiate(_effect, collision.transform.position, true);
 
             if (_pireceCount <= 0)
             {

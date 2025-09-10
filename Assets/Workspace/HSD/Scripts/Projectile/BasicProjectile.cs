@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-public class BaseProjectile : Projectile
+public class BasicProjectile : Projectile
 {
     public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-        LayerMask targetLayer, float speed, GameObject effect)
+        LayerMask targetLayer, float speed)
     {
-        base.Init(target, status, attackPower, damageType, targetLayer, speed, effect);
-        transform.right = _direction;
+        base.Init(target, status, attackPower, damageType, targetLayer, speed);
+        transform.right = _targetDir;
     }
 
     protected override async UniTask MoveAndDestroyAsync(float duration)
@@ -22,7 +22,7 @@ public class BaseProjectile : Projectile
 
         while (elapsed < duration && !token.IsCancellationRequested)
         {            
-            transform.Translate(_direction * _speed * Time.deltaTime, Space.World);
+            transform.Translate(_targetDir * _speed * Time.deltaTime, Space.World);
             elapsed += Time.deltaTime;
             await UniTask.Yield(PlayerLoopTiming.Update, token); // 프레임마다 대기
         }

@@ -245,7 +245,7 @@ public class UnitBase : MonoBehaviour, IAttacker
             Gizmos.DrawWireSphere((Vector2)transform.position + offset, .1f);
         }
 
-        if(Status.Data.Skill != null && Status.Data.Skill is AttackSkill attackSkill)
+        if(Status.Data.Skill != null && Status.Data.Skill is OverlapSkill attackSkill)
         {
             attackSkill.DrawGizmos(this);
         }

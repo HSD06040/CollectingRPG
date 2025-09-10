@@ -31,8 +31,7 @@ public class UnitRangedAttack : UnitAttackData
             AttackPower,
             DamageType,
             attacker.TargetLayer,
-            _projectileSpeed,
-            Manager.Resources.Get<GameObject>(EffectAddress)
+            _projectileSpeed
             );
     }
 }
