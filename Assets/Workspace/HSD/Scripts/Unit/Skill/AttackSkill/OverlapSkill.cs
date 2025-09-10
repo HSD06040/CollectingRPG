@@ -93,7 +93,7 @@ public class OverlapSkill : AttackSkill
     {
         return attacker.GetCenter()
             + new Vector2(
-            attacker.GetTransform().GetFacingDir() * AttackPointOffset.x * Mathf.Abs(attacker.GetTransform().localScale.x),
+            attacker.GetTransform().GetFacingDir() * AttackPointOffset.x * ((1 + Mathf.Abs(attacker.GetTransform().localScale.x))/2),
             AttackPointOffset.y * Mathf.Abs(attacker.GetTransform().localScale.y
             )
         );
@@ -112,6 +112,7 @@ public class OverlapSkill : AttackSkill
         //// DrawSolidArc 함수를 이용하여 시야 범위를 나타내는 부채꼴 그리기
         //Handles.DrawSolidArc(transform.position, Vector3.back, startDirection, Fov, SizeOrRadius);
         */
+        base.DrawGizmos(attacker);
 
         if (attacker == null) return;
 

@@ -7,7 +7,7 @@ using UnityEngine;
 public class BasicProjectile : Projectile
 {
     public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-        LayerMask targetLayer, float speed)
+        LayerMask targetLayer, float speed, float distance)
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
         transform.right = _targetDir;

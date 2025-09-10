@@ -6,16 +6,43 @@ using UnityEngine;
 
 public class StraightProjectile : Projectile
 {
+    enum StraightType { Facing, Up, Down, Left, Right}
+
     [Header("Straight")]
-    [SerializeField] float _distance;
+    [SerializeField] StraightType _straightType;
 
     protected override async UniTask MoveAndDestroyAsync(float duration)
     {
-        _dir = new Vector2(_status.transform.GetFacingDir(), 0);
+        duration = _distance / _speed;
 
-        await transform.DOMoveX(transform.position.x + _distance, duration)
+        SetDirection();
+
+        await transform.DOMove((Vector2)transform.position + (_dir * _distance), duration)
+            .SetEase(Ease.Linear)
             .AsyncWaitForCompletion();
 
         Manager.Resources.Destroy(gameObject);
+    }
+
+    private void SetDirection()
+    {
+        switch (_straightType)
+        {
+            case StraightType.Facing:
+                _dir = new Vector2(_status.transform.GetFacingDir(), 0);
+                break;
+            case StraightType.Up:
+                _dir = new Vector2(0,1);
+                break;
+            case StraightType.Down:
+                _dir = new Vector2(0, -1);
+                break;
+            case StraightType.Left:
+                _dir = new Vector2(-1,0);
+                break;
+            case StraightType.Right:
+                _dir = new Vector2(1, 0);
+                break;
+        }
     }
 }

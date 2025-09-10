@@ -237,15 +237,15 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         if (Status.Data.AttackData == null) return;
         
-        if (Status.Data.AttackData is UnitRangedAttack RandAttackData)
-        {
-            Vector2 offset = new Vector2 (AttackPointOffset, AttackPointOffset);
-            offset.x *= transform.GetFacingDir();
+        //if (Status.Data.AttackData is UnitRangedAttack RandAttackData)
+        //{
+        //    Vector2 offset = new Vector2 (AttackPointOffset, AttackPointOffset);
+        //    offset.x *= transform.GetFacingDir();
 
-            Gizmos.DrawWireSphere((Vector2)transform.position + offset, .1f);
-        }
+        //    Gizmos.DrawWireSphere((Vector2)transform.position + offset, .1f);
+        //}
 
-        if(Status.Data.Skill != null && Status.Data.Skill is OverlapSkill attackSkill)
+        if(Status.Data.Skill != null && Status.Data.Skill is AttackSkill attackSkill)
         {
             attackSkill.DrawGizmos(this);
         }

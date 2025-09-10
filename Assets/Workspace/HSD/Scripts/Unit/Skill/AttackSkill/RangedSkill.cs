@@ -7,7 +7,8 @@ using static UnityEngine.GraphicsBuffer;
 [CreateAssetMenu(fileName = "RangedSkill", menuName = "Data/Unit/Skill/Ranged")]
 public class RangedSkill : AttackSkill
 {
-    [SerializeField] float projectileSpeed = 10f;
+    [SerializeField] float _projectileSpeed = 10f;
+    [SerializeField] float _distance = 5f;
 
     public override void Active(IAttacker attacker)
     {
@@ -27,7 +28,7 @@ public class RangedSkill : AttackSkill
             target = Utils.GetClosestTargetNonAlloc(GetSpawnPoint(attacker), 100f, attacker.TargetLayer);
         }
 
-        projectile.Init(target, attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, projectileSpeed);
+        projectile.Init(target, attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, _projectileSpeed, _distance);
     }
 
     protected GameObject GetTargetSingle(IAttacker attacker)

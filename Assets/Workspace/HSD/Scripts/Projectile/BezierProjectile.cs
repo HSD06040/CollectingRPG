@@ -15,7 +15,7 @@ public class BezierProjectile : Projectile
     private int curveIndex;
 
     public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-        LayerMask targetLayer, float speed)
+        LayerMask targetLayer, float speed, float distance)
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
         SetPoints();

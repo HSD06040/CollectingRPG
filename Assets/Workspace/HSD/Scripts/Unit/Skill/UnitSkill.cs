@@ -64,7 +64,7 @@ public abstract class UnitSkill : ScriptableObject
     {
         return attacker.GetCenter()
             + new Vector2(
-            attacker.GetTransform().GetFacingDir() * SpawnPointOffset.x * Mathf.Abs(attacker.GetTransform().localScale.x),
+            attacker.GetTransform().GetFacingDir() * SpawnPointOffset.x * ((1 + Mathf.Abs(attacker.GetTransform().localScale.x)) / 2),
             SpawnPointOffset.y * Mathf.Abs(attacker.GetTransform().localScale.y
             )
         );
