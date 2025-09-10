@@ -4,19 +4,13 @@ using UnityEditor;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Unit_Data", menuName = "Data/Unit/Unit_Data")]
-public class UnitData : ScriptableObject
+public class UnitData : MetaData
 {
-    [Header("MetaData")]  
-    public Grade Grade;
+    [Header("MetaData")]    
     public string AddressableAddress;
     public GameObject UnitPrefab => Manager.Resources.Get<GameObject>(AddressableAddress);
-    public Sprite Icon;
     public int ID;
     public int PerferredLine;
-    public string Name;
-
-    [TextArea]
-    public string Description;
     public int Cost;
 
     [Header("Attack_Data")]
@@ -32,10 +26,16 @@ public class UnitData : ScriptableObject
 
     [Header("Upgrade")]
     public int UpgradeCount;
-    public UnitUpgradeData UpgradeData;
+    public UpgradeUnitData UpgradeData;
+    public LevelUpData LevelUpData;
 
     public UnitStats GetUnitStat(int level)
     {
         return UnitStats[level];
+    }
+
+    public void Init()
+    {
+        UpgradeData?.Init(Grade, LevelUpData);
     }
 }

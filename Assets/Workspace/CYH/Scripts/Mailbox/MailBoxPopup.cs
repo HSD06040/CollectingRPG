@@ -12,7 +12,7 @@ public class MailBoxPopup : MonoBehaviour
 
     [Header("Button")]
     [SerializeField] private Button _receiveAllButton;
-    [SerializeField] private Button _closePanelButton;
+   
 
     [Header("Panel")]
     [SerializeField] private GameObject _emptyMailViewPanel;
@@ -31,7 +31,6 @@ public class MailBoxPopup : MonoBehaviour
     {
         _receiveAllButton.onClick.RemoveAllListeners();
         _receiveAllButton.onClick.AddListener(OnClickReceiveAll);
-        _closePanelButton.onClick.AddListener(() => _receiveAllInfoPanel.SetActive(false));
     }
 
     private void OnEnable()

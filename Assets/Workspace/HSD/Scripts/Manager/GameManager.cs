@@ -4,18 +4,21 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
-    private const float DEFAULT_ACCELERATE = 1.0f;
-    public float CurrentAccelerate;
+    private static readonly int[] accelerates = { 1, 2, 4 };    
+    public Property<float> CurrentAccelerate = new Property<float>();
+    private int _currentIdx = 0;
 
-    private void Awake()
+    public void NextAccelerate()
     {
-        SetAccelerate(DEFAULT_ACCELERATE);
+        _currentIdx = (_currentIdx + 1) % accelerates.Length;
+        SetAccelerate(_currentIdx);
+        CurrentAccelerate.Value = accelerates[_currentIdx];
     }
 
-    public void SetAccelerate(float accelerate)
+    private void SetAccelerate(int idx)
     {
-        Time.timeScale = accelerate;
-        Time.fixedDeltaTime = 0.02f * accelerate;
-        CurrentAccelerate = accelerate;
+        _currentIdx = idx;
+        Time.timeScale = accelerates[_currentIdx];
+        Time.fixedDeltaTime = 0.02f * accelerates[_currentIdx];
     }
 }

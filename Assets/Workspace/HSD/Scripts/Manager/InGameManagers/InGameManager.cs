@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class InGameManager : InGameSingleton<InGameManager>
 {
-    public Property<int> Gold = new(); 
+    public Property<int> Gold = new();
     public bool IsBattle = false;
     public int SpawnGold = 20;
     [SerializeField] int _startingGold = 100;

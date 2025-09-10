@@ -132,7 +132,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e0981001065bd64bb679272b43bc24c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Target>k__BackingField: {fileID: 0}
   <Anim>k__BackingField: {fileID: 7218880911717816866}
   <Rb>k__BackingField: {fileID: 3345096845210862023}
   <Status>k__BackingField:
@@ -140,6 +139,7 @@ MonoBehaviour:
     Level: 0
   <Col>k__BackingField: {fileID: 275557184095723888}
   <TriggerCol>k__BackingField: {fileID: 4851710822050351540}
+  <Target>k__BackingField: {fileID: 0}
   StatusController: {fileID: 6850276540922767826}
   _fsm: {fileID: 5025259217398951647}
 --- !u!70 &275557184095723888
@@ -213,9 +213,6 @@ MonoBehaviour:
   CritChance:
     _baseValue: 0
     _modifiers: []
-  CritDamage:
-    _baseValue: 0
-    _modifiers: []
   PhysicalDefense:
     _baseValue: 0
     _modifiers: []
@@ -229,6 +226,7 @@ MonoBehaviour:
     _baseValue: 100
     _modifiers: []
   DetectionRange: 5
+  StatMultiplier: 0
 --- !u!50 &3345096845210862023
 Rigidbody2D:
   serializedVersion: 4
@@ -3767,7 +3765,7 @@ GameObject:
   - component: {fileID: 7218880911717816866}
   - component: {fileID: 5025259217398951647}
   - component: {fileID: 4851710822050351540}
-  m_Layer: 7
+  m_Layer: 0
   m_Name: UnitRoot
   m_TagString: UnitTrigger
   m_Icon: {fileID: 0}

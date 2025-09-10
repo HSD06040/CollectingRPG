@@ -7,6 +7,7 @@ public class StateMachine
 {
     public BaseState _currentState;
     private BaseState _nextState;
+    private bool _isTransitioning;
 
     public void Update()
     {
@@ -21,7 +22,14 @@ public class StateMachine
 
     public void ChangeState(BaseState newState)
     {
+        if (_isTransitioning) return;
+        _isTransitioning = true;
         _nextState = newState;
+    }
+
+    public void SetStateImmediate(BaseState newState)
+    {
+        _currentState = newState;
     }
 
     private void Transition(BaseState newState)
@@ -29,5 +37,6 @@ public class StateMachine
         _currentState?.Exit();
         _currentState = newState;
         _currentState?.Enter();
+        _isTransitioning = false;
     }
 }

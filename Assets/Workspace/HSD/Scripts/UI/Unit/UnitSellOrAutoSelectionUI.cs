@@ -13,7 +13,7 @@ public class UnitSellOrAutoSelectionUI : UIBase
 
     [UIBind("SellButton")] Button _sellButton;
     [UIBind("AutoButton")] Button _autoSelectionButton;
-    [UIBind("SellButton/Gold/Amount")] TMP_Text _sellAmountText;
+    [UIBind("Amount")] TMP_Text _sellAmountText;
 
     private int _sellGold;
     private UnitStatus _currentUnit;
