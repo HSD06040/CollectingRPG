@@ -11,6 +11,7 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
 {
     [Header("Reference")]
     [SerializeField] private StageUIController _UIController;
+    [SerializeField] private GameObject _mapSelectPanel;
 
     [Header("RectTransform")]
     [SerializeField] private Scrollbar _scrollBar;
@@ -27,6 +28,7 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
 
     [Header("Button")]
     [SerializeField] private Button _selectButton;
+    [SerializeField] private Button _backButton;
 
     [Header("Offset")]
     [SerializeField] private float _mapImgShrinkDuration = 3f;
@@ -66,8 +68,11 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
             _mapImage[i].GetComponent<Image>().sprite = _mapData[i].MapImage;
         }
         _selectButton.onClick.AddListener(SelectMap);
+        _backButton.onClick.AddListener(Back);
 
         InActivateMapInfo();
+
+        _mapSelectPanel.SetActive(false);
     }
 
     private void Update()
@@ -197,6 +202,12 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
     private void SelectMap()
     {
         _UIController.MapUIUpdate(_targetIndex);
+        _mapSelectPanel.SetActive(false);
+    }
+
+    private void Back()
+    {
+        _mapSelectPanel.SetActive(false);
     }
 
     #endregion
