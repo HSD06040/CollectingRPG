@@ -30,9 +30,7 @@ public class TempDataManager : MonoBehaviour
     private List<TeamPresetData> _presetData = new List<TeamPresetData>();
     public List<TeamPresetData> PresetData => _presetData;
 
-    // 업그레이드 관련
-    [SerializeField] private UpgradeUnitData _upgradeUnitData;
-    public UpgradeUnitData UpgradeData => _upgradeUnitData;
+    [SerializeField] private MapDatabaseSO _mapDatabase;
 
     #endregion    
 
@@ -90,6 +88,20 @@ public class TempDataManager : MonoBehaviour
     public void SelectPresetIndex(int index)
     {
         _selectedPresetIndex = index;
+    }
+
+    #endregion
+
+    #region
+
+    public List<MapData> ReturnAllMapData()
+    {
+        return _mapDatabase.Maps;
+    }
+
+    public MapData ReturnMapData(int index)
+    {
+        return _mapDatabase.Maps[index];
     }
 
     #endregion

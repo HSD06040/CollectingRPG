@@ -48,6 +48,8 @@ public class DataManager : Singleton<DataManager>
         {
             if (!UnitDataDic.ContainsKey(unitData.Name))
                 UnitDataDic.Add(unitData.Name, unitData);
+
+            unitData.Init();
         }
     }
 

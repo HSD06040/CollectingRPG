@@ -13,6 +13,7 @@ public class CharDB
     {
         FirebaseManager.DataReference.Child("UserData").Child(_uid).Child("CharacterData").
             ChildChanged += UpdateCharacterDatas;
+        Debug.Log("캐릭터 데이터 연동됨");
     }
 
     public async UniTask SaveAllCharacterDatas()

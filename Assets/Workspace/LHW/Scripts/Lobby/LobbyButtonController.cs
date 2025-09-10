@@ -13,6 +13,9 @@ public class LobbyButtonController : MonoBehaviour
     [SerializeField] private Button[] _stageSelectButtons;
     [SerializeField] private Button _rearrangeButton;
     [SerializeField] private Button[] _disabledPartyButtons;
+    [SerializeField] private Button _mapSelectButton;
+    [SerializeField] private Button _mapBackButton;
+    [SerializeField] private Button _mapSelectConfirmButton;
 
     [Header("Panels")]
     [SerializeField] private GameObject _shopPanel;
@@ -22,6 +25,7 @@ public class LobbyButtonController : MonoBehaviour
     [SerializeField] private GameObject _gachaPanel;
     [SerializeField] private GameObject _stageSelectPanel;
     [SerializeField] private GameObject _partySelectPanel;
+    [SerializeField] private GameObject _mapSelectPanel;
 
     private void Start()
     {
@@ -40,6 +44,9 @@ public class LobbyButtonController : MonoBehaviour
         {
             _disabledPartyButtons[i].onClick.AddListener(CharacterCompositionOpen);
         }
+        _mapSelectButton.onClick.AddListener(MapSelectOpen);
+        _mapBackButton.onClick.AddListener(StageOpen);
+        _mapSelectConfirmButton.onClick.AddListener(StageOpen);
 
         StageOpen();
     }
@@ -79,6 +86,11 @@ public class LobbyButtonController : MonoBehaviour
         SetActivePanel("GachaUIPanel");
     }
 
+    private void MapSelectOpen()
+    {
+        SetActivePanel("MapSelectPanel");
+    }
+
     private void SetActivePanel(string activePanel)
     {
         _shopPanel.SetActive(activePanel.Equals(_shopPanel.name));
@@ -88,5 +100,6 @@ public class LobbyButtonController : MonoBehaviour
         _gachaPanel.SetActive(activePanel.Equals(_gachaPanel.name));
         _stageSelectPanel.SetActive(activePanel.Equals(_stageSelectPanel.name));
         _partySelectPanel.SetActive(activePanel.Equals(_partySelectPanel.name));
+        _mapSelectPanel.SetActive(activePanel.Equals(_mapSelectPanel.name));
     }
 }

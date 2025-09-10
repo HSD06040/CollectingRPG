@@ -3,12 +3,11 @@ using Firebase.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class DBManager : Singleton<DBManager>
 {
-    public CharDB CharDB = new CharDB();
+    public CharDB charDB = new CharDB();
 
     #region Nickname/LobbyData
 
@@ -140,6 +139,9 @@ public class DBManager : Singleton<DBManager>
             MaxStamina = 30,
             LastStaminaRecoveryTime = newRecoveryTime
         };
+
+        await charDB.LoadAllCharacterDatas();
+        charDB.EventHandler();
 
         return data;
     }
