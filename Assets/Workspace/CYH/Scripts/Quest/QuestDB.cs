@@ -1,6 +1,6 @@
 using Firebase.Database;
 
-public class QuestDBManager 
+public class QuestDB
 {
     /// <summary>
     /// 퀘스트 진행 플래그

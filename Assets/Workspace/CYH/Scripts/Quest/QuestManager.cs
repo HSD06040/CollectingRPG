@@ -93,6 +93,7 @@ public class QuestManager : MonoBehaviour
                 quest.ResetProgress();
             }
         }
+        _totalPoint = 0; 
     }
 
     public void ReceiveReward (IQuestView condition)
@@ -110,6 +111,11 @@ public class QuestManager : MonoBehaviour
                 _totalPoint = _maxPoint;
             }
         }
+    }
+
+    public async void RewardGoldAsync(int amount)
+    {
+        await Manager.DB.AddGoldAsync(amount);
     }
 
     #region 각 조건 클리어 시 호출할 함수

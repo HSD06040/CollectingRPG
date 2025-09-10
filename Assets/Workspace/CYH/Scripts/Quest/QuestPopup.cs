@@ -16,16 +16,20 @@ public class QuestPopup : MonoBehaviour
     [Header("UI")]
     [SerializeField] private TMP_Text _remainTime;
     [SerializeField] private Image _progressBar;
+    [SerializeField] private Sprite _openedBox;
+    [SerializeField] private Sprite _closedBox;
+
+    [Header("Milestones")]
+    [SerializeField] private Button[] _milestoneReward = new Button[5];
+    private int[] _milestonePoints = { 20, 40, 60, 80, 100 };
 
     private DateTime _resetTime;
     private Coroutine _initRoutine;
     private Coroutine _countdownRoutine;
 
+
     private void Start()
     {
-        // 현재 날짜/서버 저장 날짜 비교 후 
-        // 현재 시간 > 서버 저장 날짜 -> 퀘스트 리셋
-
         Init();
     }
 
@@ -75,7 +79,62 @@ public class QuestPopup : MonoBehaviour
             }
         }
 
+        // 마일스톤 초기화
+        InitMilestoneRewards();
+        RefreshMilestoneRewards();
+
         _progressBar.fillAmount = (float)_questManager.TotalPoint / _questManager.MaxPoint;
+    }
+
+    private void InitMilestoneRewards()
+    {
+        for (int i = 0; i < _milestoneReward.Length; i++)
+        {
+            if (_milestoneReward[i] == null) continue;
+
+            int milestone = _milestonePoints[i];
+            int index = i;
+
+            _milestoneReward[index].onClick.RemoveAllListeners();
+            _milestoneReward[index].onClick.AddListener(() =>
+            {
+                if (_milestoneReward[index].interactable)
+                {
+                    switch (index)
+                    {
+                        case 0: _questManager.RewardGoldAsync(500); break;
+                        case 1: _questManager.RewardGoldAsync(700); break;
+                        case 2: _questManager.RewardGoldAsync(1000); break;
+                        case 3: _questManager.RewardGoldAsync(2000); break;
+                        case 4: _questManager.RewardGoldAsync(5000); break;
+                    }
+
+                    _milestoneReward[index].image.sprite = _openedBox;
+                    _milestoneReward[index].interactable = false;
+                }
+            });
+        }
+    }
+
+    private void RefreshMilestoneRewards()
+    {
+        for (int i = 0; i < _milestoneReward.Length; i++)
+        {
+            if (_milestoneReward[i] == null) continue;
+
+            int milestone = _milestonePoints[i];
+
+            if (_questManager.TotalPoint >= milestone)
+            {
+                _milestoneReward[i].interactable = true;
+                _milestoneReward[i].image.sprite = _closedBox;
+            }
+            else
+            {
+                _milestoneReward[i].interactable = false;
+                _milestoneReward[i].image.sprite = _closedBox;
+            }
+        }
     }
 
     private IEnumerator InitAndStartRoutine()
@@ -84,14 +143,15 @@ public class QuestPopup : MonoBehaviour
         yield return new WaitUntil(() => task.IsCompleted);
 
         DateTime kstNow = task.Result;
-        DateTime todayReset = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 6, 0, 0);
+        //DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 6, 0, 0);
+        DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 16, 7, 0);
 
-        if (kstNow >= todayReset)
+        if (kstNow >= resetTime)
         {
-            todayReset = todayReset.AddDays(1);
+            resetTime = resetTime.AddDays(1);
         }
 
-        _resetTime = todayReset;
+        _resetTime = resetTime;
         _countdownRoutine = StartCoroutine(UpdateRemainRoutine());
     }
 
