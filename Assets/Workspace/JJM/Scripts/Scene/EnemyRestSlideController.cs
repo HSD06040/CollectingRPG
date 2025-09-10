@@ -19,6 +19,9 @@ public class EnemyRestSlideController : MonoBehaviour
     public float offScreenX = 800f;
     public float slideDuration = 0.4f;
 
+    private float topY = 33f; // 원하는 Y값(예: 0이 가장 위, Canvas 기준에 따라 다름)
+
+
     void Awake()
     {
         playerOriginPos = waitingBattlePlayer.anchoredPosition;
@@ -37,13 +40,14 @@ public class EnemyRestSlideController : MonoBehaviour
         waitingBattlePlayer.gameObject.SetActive(true);
         waitingBattleEnemy.gameObject.SetActive(true);
 
-        // Enemy: 오른쪽 밖에서 중앙으로, Player: 중앙에서 왼쪽 밖으로
-        waitingBattleEnemy.anchoredPosition = new Vector2(offScreenX, enemyOriginPos.y);
-        waitingBattlePlayer.anchoredPosition = playerOriginPos;
+        // Y값을 강제로 위쪽(topY)으로 설정
+        waitingBattlePlayer.anchoredPosition = new Vector2(playerOriginPos.x, topY);
+        waitingBattleEnemy.anchoredPosition = new Vector2(offScreenX, topY);
+
 
         Sequence seq = DOTween.Sequence();
-        seq.Append(waitingBattleEnemy.DOAnchorPos(enemyOriginPos, slideDuration).SetEase(Ease.OutCubic));
-        seq.Join(waitingBattlePlayer.DOAnchorPos(new Vector2(-offScreenX, playerOriginPos.y), slideDuration).SetEase(Ease.OutCubic));
+        seq.Append(waitingBattleEnemy.DOAnchorPos(new Vector2(enemyOriginPos.x, topY), slideDuration).SetEase(Ease.OutCubic));
+        seq.Join(waitingBattlePlayer.DOAnchorPos(new Vector2(-offScreenX, topY), slideDuration).SetEase(Ease.OutCubic));
     }
 
     // RestMove 버튼 클릭 시
@@ -55,12 +59,16 @@ public class EnemyRestSlideController : MonoBehaviour
         waitingBattlePlayer.gameObject.SetActive(true);
         waitingBattleEnemy.gameObject.SetActive(true);
 
-        // Enemy: 중앙에서 오른쪽 밖으로, Player: 왼쪽 밖에서 중앙으로
-        waitingBattleEnemy.anchoredPosition = enemyOriginPos;
-        waitingBattlePlayer.anchoredPosition = new Vector2(-offScreenX, playerOriginPos.y);
+        // Y값을 강제로 위쪽(topY)으로 설정
+        waitingBattlePlayer.anchoredPosition = new Vector2(-offScreenX, topY);
+        waitingBattleEnemy.anchoredPosition = new Vector2(enemyOriginPos.x, topY);
 
         Sequence seq = DOTween.Sequence();
-        seq.Append(waitingBattleEnemy.DOAnchorPos(new Vector2(offScreenX, enemyOriginPos.y), slideDuration).SetEase(Ease.OutCubic));
-        seq.Join(waitingBattlePlayer.DOAnchorPos(playerOriginPos, slideDuration).SetEase(Ease.OutCubic));
+        seq.Append(waitingBattleEnemy.DOAnchorPos(new Vector2(offScreenX, topY), slideDuration).SetEase(Ease.OutCubic));
+        seq.Join(waitingBattlePlayer.DOAnchorPos(new Vector2(playerOriginPos.x, topY), slideDuration).SetEase(Ease.OutCubic));
+    }
+    public void RestMoveToPlayer()
+    {
+        OnRestMove();
     }
 }

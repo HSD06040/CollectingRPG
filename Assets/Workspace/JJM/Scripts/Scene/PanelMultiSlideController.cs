@@ -84,6 +84,12 @@ public class PanelMultiSlideController : MonoBehaviour
         for (int i = 0; i < slideUpPanels.Length; i++)
         {
             int idx = i; // 지역 변수로 캡처
+            if (slideUpPanels[idx].gameObject.name == "WaitingBattlePlayer" ||
+                slideUpPanels[idx].gameObject.name == "WaitingBattleEnemy")
+            {
+                // 위치 복구 코드도 삭제
+                continue;
+            }
             slideUpPanels[idx].DOKill();
             slideUpPanels[idx].DOAnchorPos(slideUpOriginalPositions[idx] + new Vector2(0, slideOffset), slideDuration)
                 .SetEase(Ease.InOutQuad)
@@ -99,7 +105,11 @@ public class PanelMultiSlideController : MonoBehaviour
             if (IsBattleActive &&
                 (slideInPanels[idx].gameObject.name == "WaitingBattlePlayer" ||
                  slideInPanels[idx].gameObject.name == "WaitingBattleEnemy"))
-                continue;
+            {
+                // 위치를 원래대로 복구
+                slideUpPanels[idx].anchoredPosition = slideUpOriginalPositions[idx];
+                continue; 
+            }
 
             slideInPanels[idx].gameObject.SetActive(true);
             slideInPanels[idx].DOKill();
@@ -137,6 +147,12 @@ public class PanelMultiSlideController : MonoBehaviour
         for (int i = 0; i < slideUpPanels.Length; i++)
         {
             int idx = i;
+            if (slideUpPanels[idx].gameObject.name == "WaitingBattlePlayer" ||
+                slideUpPanels[idx].gameObject.name == "WaitingBattleEnemy")
+            {
+                // 위치 복구 코드도 삭제
+                continue;
+            }
             slideUpPanels[idx].gameObject.SetActive(true);
             slideUpPanels[idx].DOKill();
             slideUpPanels[idx].DOAnchorPos(slideUpOriginalPositions[idx], slideDuration)
