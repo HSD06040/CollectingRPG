@@ -87,8 +87,8 @@ public class GuestSignIn : MonoBehaviour
         bool isTutorialCompleted = await Manager.DB.CheckTutorialCompletedAsync();
         if (isTutorialCompleted)
         {
-            SceneManager.LoadScene("USW_LobbyScene");
-            //SceneManager.LoadScene("USW_LobbyScene_Copy2");
+            //SceneManager.LoadScene("USW_LobbyScene");
+            SceneManager.LoadScene("USW_LobbyScene_Copy");
         }
         else
         {
