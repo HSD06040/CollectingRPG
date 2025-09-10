@@ -1,6 +1,7 @@
-using TMPro;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class QuestItem : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class QuestItem : MonoBehaviour
     [SerializeField] private GameObject _BadgeImage;
     [SerializeField] private TMP_Text _conditionText;
 
+    public event Action OnRewardReceived;
 
     public void Init(IQuestView questData)
     {
@@ -28,22 +30,25 @@ public class QuestItem : MonoBehaviour
         _progressBar.fillAmount = (float)questData.CurProgress / questData.MaxProgress;
         _conditionText.text = $"{questData.CurProgress} / {questData.MaxProgress}";
 
-        // 클리어 퀘스트
-        if (questData.IsReceived)
+        if (questData.IsReceive)
         {
             _questButton.interactable = false;
         }
 
-        if (questData.IsComplete && !questData.IsReceived)
+        if (questData.IsComplete && !questData.IsReceive)
         {
             _questBoxImage.color = Color.red;
             _BadgeImage.SetActive(true);
         }
-
+                
         _questButton.onClick.RemoveAllListeners();
         _questButton.onClick.AddListener(() =>
         {
-            // TODO: [CYH] totalPoint 획득
+            if(questData.IsComplete)
+            {
+                QuestManager.Instance.ReceiveReward(questData);
+                OnRewardReceived?.Invoke();
+            } 
         });
     }
 }

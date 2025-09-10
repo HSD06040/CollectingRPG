@@ -2,7 +2,7 @@
 public interface IQuestView 
 {
     bool IsComplete { get; }
-    bool IsReceived { get; }
+    bool IsReceive { get; set; }
     int QuestID { get; }
     QuestType QuestType { get; }
     string QuestDesc { get; }

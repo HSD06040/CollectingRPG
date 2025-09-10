@@ -3,10 +3,15 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
-    public static QuestManager Instance { get; private set; }
-
     //  모든 퀘스트 데이터
     [SerializeField] internal List<ScriptableObject> _quests;
+    
+    public static QuestManager Instance { get; private set; }
+    public int _totalPoint;
+    public int _maxPoint = 100;
+    public int TotalPoint { get { return _totalPoint; } }
+    public int MaxPoint { get { return _maxPoint; } }
+
 
     private void Awake()
     {
@@ -86,6 +91,23 @@ public class QuestManager : MonoBehaviour
             if (questObj is IQuest quest)
             {
                 quest.ResetProgress();
+            }
+        }
+    }
+
+    public void ReceiveReward (IQuestView condition)
+    {
+        if (!condition.IsReceive && condition.IsComplete)
+        {
+            condition.IsReceive = true;
+
+            if (_totalPoint < _maxPoint)
+            {
+                _totalPoint += condition.RewardPoint;
+            }
+            else
+            {
+                _totalPoint = _maxPoint;
             }
         }
     }

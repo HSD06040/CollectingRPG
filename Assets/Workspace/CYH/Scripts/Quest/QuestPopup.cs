@@ -1,10 +1,9 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
-using System.Threading.Tasks;
 
 public class QuestPopup : MonoBehaviour
 {
@@ -52,16 +51,31 @@ public class QuestPopup : MonoBehaviour
         }
     }
 
-    private void Init()
+    public void Init()
     {
+        // 퀘스트 UI 갱신
+        if (_content != null)
+        {
+            for (int i = _content.childCount - 1; i >= 0; i--)
+            {
+                Destroy(_content.GetChild(i).gameObject);
+            }
+
+        }
+
         foreach (var quest in _questManager._quests)
         {
             if (quest is IQuestView view)
             {
                 GameObject questItem = Instantiate(_QuestPrefab, _content);
-                questItem.GetComponent<QuestItem>().Init(view);
+                QuestItem item = questItem.GetComponent<QuestItem>();
+                item.Init(view);
+
+                item.OnRewardReceived += () => Init();
             }
         }
+
+        _progressBar.fillAmount = (float)_questManager.TotalPoint / _questManager.MaxPoint;
     }
 
     private IEnumerator InitAndStartRoutine()
@@ -71,7 +85,7 @@ public class QuestPopup : MonoBehaviour
 
         DateTime kstNow = task.Result;
         DateTime todayReset = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 6, 0, 0);
-       
+
         if (kstNow >= todayReset)
         {
             todayReset = todayReset.AddDays(1);
@@ -90,24 +104,17 @@ public class QuestPopup : MonoBehaviour
             if (remain <= TimeSpan.Zero)
             {
                 Debug.Log($"{DateTime.Now} 퀘스트 초기화 시간 / 서버 시간 재동기화");
-                
+
                 // 퀘스트 초기화
                 QuestManager.Instance.ResetAllQuests();
-                
-                // 퀘스트 UI 갱신
-                for (int i = _content.childCount - 1; i >= 0; i--)
-                {
-                    Destroy(_content.GetChild(i).gameObject);
-                }
-                
                 Init();
-                
+
                 _initRoutine = StartCoroutine(InitAndStartRoutine());
                 yield break;
             }
 
             _remainTime.text = string.Format("{0:D2}:{1:D2}:{2:D2}", remain.Hours, remain.Minutes, remain.Seconds);
-            
+
             yield return new WaitForSeconds(1f);
         }
     }

@@ -20,7 +20,7 @@ public class QuestDataSO<T> : ScriptableObject, IQuest, IQuestView
     [SerializeField] bool _isCompleted;
     [SerializeField] bool _isReceived;
     public bool IsComplete { get { return _isCompleted; } set { _isCompleted = value; } }
-    public bool IsReceived { get { return _isReceived; } set { _isReceived = value; } }
+    public bool IsReceive { get { return _isReceived; } set { _isReceived = value; } }
 
     [Header("퀘스트 데이터")]
     [SerializeField] int _questID;
@@ -52,6 +52,7 @@ public class QuestDataSO<T> : ScriptableObject, IQuest, IQuestView
     {
         _curProgress = 0;
         _isCompleted = false;
+        _isReceived = false;
     }
 
     public void ClearQuest()
