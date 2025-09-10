@@ -76,6 +76,20 @@ public class QuestManager : MonoBehaviour
         condition.ClearCondition(value);
     }
 
+    /// <summary>
+    /// 모든 퀘스트 진행 상태를 초기화하는 메서드
+    /// </summary>
+    public void ResetAllQuests()
+    {
+        foreach (var questObj in _quests)
+        {
+            if (questObj is IQuest quest)
+            {
+                quest.ResetProgress();
+            }
+        }
+    }
+
     #region 각 조건 클리어 시 호출할 함수
 
     public void OnMonsterKilled(BattleQuest condition, int monsterID)

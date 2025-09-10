@@ -71,7 +71,7 @@ public class QuestPopup : MonoBehaviour
 
         DateTime kstNow = task.Result;
         DateTime todayReset = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 6, 0, 0);
-        
+       
         if (kstNow >= todayReset)
         {
             todayReset = todayReset.AddDays(1);
@@ -89,7 +89,19 @@ public class QuestPopup : MonoBehaviour
 
             if (remain <= TimeSpan.Zero)
             {
-                Debug.Log("퀘스트 초기화 시간 / 서버 시간 재동기화");
+                Debug.Log($"{DateTime.Now} 퀘스트 초기화 시간 / 서버 시간 재동기화");
+                
+                // 퀘스트 초기화
+                QuestManager.Instance.ResetAllQuests();
+                
+                // 퀘스트 UI 갱신
+                for (int i = _content.childCount - 1; i >= 0; i--)
+                {
+                    Destroy(_content.GetChild(i).gameObject);
+                }
+                
+                Init();
+                
                 _initRoutine = StartCoroutine(InitAndStartRoutine());
                 yield break;
             }

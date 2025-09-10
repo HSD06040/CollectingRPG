@@ -10,4 +10,6 @@ public interface IQuest
     public void Subscribe(Action onClearCondition);
 
     public void Unsubscribe(Action onClearCondition);
+
+    public void ResetProgress();
 }
