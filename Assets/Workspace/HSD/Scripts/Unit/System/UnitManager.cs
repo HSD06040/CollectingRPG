@@ -35,7 +35,7 @@ public class UnitManager : MonoBehaviour
     }
     private void OnDestroy()
     {
-        UnSubscrube();
+        UnSubscrube();        
     }
 
     private async void InitAsync()
@@ -47,7 +47,8 @@ public class UnitManager : MonoBehaviour
         UnitController.Init();
         EnemyController.Init();
 
-        _unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
+        //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
+        _unitDatas = Manager.Data.EnemyUnitDatas;
 
         Subscribe();
 

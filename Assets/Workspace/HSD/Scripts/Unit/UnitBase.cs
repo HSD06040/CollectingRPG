@@ -29,7 +29,7 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         Anim = GetComponentInChildren<Animator>();
         Rb = GetComponent<Rigidbody2D>();
-        Col = GetComponent<CapsuleCollider2D>();
+        Col = GetComponent<Collider2D>();
         StatusController = GetComponent<UnitStatusController>();
         TriggerCol = GetComponentInChildren<BoxCollider2D>();
         _fsm = GetComponentInChildren<BaseFSM>();
@@ -53,6 +53,19 @@ public class UnitBase : MonoBehaviour, IAttacker
         Col.enabled = true;
         _fsm.Init(this);
         StatusController.Init(Status, plusUnitStat);
+
+        Vector3 scale = transform.localScale;
+
+        if (gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            scale.x = -Mathf.Abs(scale.x);
+        }
+        else if (gameObject.layer == LayerMask.NameToLayer("Enemy"))
+        {
+            scale.x = Mathf.Abs(scale.x);
+        }
+
+        transform.localScale = scale;
     }
 
     public void SetBattleUnit()

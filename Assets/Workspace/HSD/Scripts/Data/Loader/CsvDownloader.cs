@@ -48,7 +48,7 @@ public class CsvDownloader
 
         await UniTask.WhenAll(tasks);
 
-        Debug.Log("끝!");
+        Debug.Log("[파싱 종료]");
         
         OnDataSetupCompleted?.Invoke();
     }
@@ -151,7 +151,7 @@ public class CsvDownloader
         {
             int id = int.Parse(row[0]);
             UnitData unitData = Array.Find(_monsterUnitDatas, u => u.ID == id);
-            Debug.Log($"Setting up UnitData ID: {id}");
+
             if (unitData == null)
             {
                 Debug.LogWarning($"UnitData with ID {id} not found.");
@@ -179,6 +179,9 @@ public class CsvDownloader
             unitData.AttackData = Array.Find(_attackDatas, a => a.ID == int.Parse(row[14]));
 
             unitData.UnitStats = new UnitStats[4];
+            unitData.PerferredLine = stat.AttackRange;
+
+            unitData.AddressableAddress = $"Monster_{unitData.ID}";
 
             unitData.UnitStats[0] = stat;
             unitData.UnitStats[1] = stat;

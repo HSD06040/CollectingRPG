@@ -7,11 +7,12 @@ public class AddressableTest : MonoBehaviour
 {
     [SerializeField] AssetLabelReference labelReference;
     [SerializeField] string adress;
-    private void Update()
+    private async void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Manager.Resources.UnloadLabel(labelReference);
+            await Manager.Resources.UnloadLabel(labelReference);
+            Debug.Log("StageUnload");
         }
 
         if (Input.GetKeyDown(KeyCode.S))

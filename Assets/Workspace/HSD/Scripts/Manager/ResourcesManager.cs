@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.ResourceLocations;
@@ -57,16 +58,15 @@ public class ResourcesManager : Singleton<ResourcesManager>
         var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
         var locations = await locationsHandle.Task;
 
+        List<UniTask> tasks = new List<UniTask>(100);
+
         foreach (var location in locations)
         {
-            var handle = Addressables.LoadAssetAsync<Object>(location);
-            var asset = await handle.Task;
-
-            if (!_resources.ContainsKey(location.PrimaryKey))
-            {
-                _resources.Add(location.PrimaryKey, asset);
-            }
+            tasks.Add(LoadAndCache(location));
         }
+
+        await UniTask.WhenAll(tasks);
+
         Addressables.Release(locationsHandle);
     }
 
@@ -75,18 +75,29 @@ public class ResourcesManager : Singleton<ResourcesManager>
         var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
         var locations = await locationsHandle.Task;
 
+        List<UniTask> tasks = new List<UniTask>(100);
+
         foreach (var location in locations)
         {
-            var handle = Addressables.LoadAssetAsync<Object>(location);
-            var asset = await handle.Task;
-
-            if (!_resources.ContainsKey(location.PrimaryKey))
-            {
-                _resources.Add(location.PrimaryKey, asset);
-            }
+            tasks.Add(LoadAndCache(location));
         }
 
+        await UniTask.WhenAll(tasks);
+
         Addressables.Release(locationsHandle);
+    }
+
+    private async UniTask LoadAndCache(IResourceLocation location)
+    {
+        var handle = Addressables.LoadAssetAsync<Object>(location);
+        var asset = await handle.Task;
+
+        Debug.Log($"[로드 성공] : {location.PrimaryKey}");
+
+        if (!_resources.ContainsKey(location.PrimaryKey))
+        {
+            _resources.Add(location.PrimaryKey, asset);
+        }
     }
 
     public async UniTask<T[]> LoadAll<T>(string label) where T : Object
@@ -145,7 +156,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     public async UniTask UnloadLabel(AssetLabelReference label)
     {
         var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
-        var locations = await locationsHandle.Task;
+        var locations = await locationsHandle.Task;        
 
         foreach (var location in locations)
         {
@@ -162,7 +173,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         if (_resources.TryGetValue(path, out var asset))
         {
-            Addressables.Release(path);
+            Addressables.Release(asset);
             _resources.Remove(path);
         }
     }
