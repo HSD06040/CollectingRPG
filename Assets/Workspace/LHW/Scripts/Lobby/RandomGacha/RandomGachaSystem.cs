@@ -51,8 +51,8 @@ public class RandomGachaSystem : MonoBehaviour
         RandomInit(_prob);
 
         // 가챠 종류 전환용 버튼 이벤트
-        _characterGachaButton.onClick.AddListener(() => SetActivePanel("CharacterGacha"));
-        _stoneGachaButton.onClick.AddListener(() => SetActivePanel("MagicStoneGacha"));
+        //_characterGachaButton.onClick.AddListener(() => SetActivePanel("CharacterGacha"));
+        //_stoneGachaButton.onClick.AddListener(() => SetActivePanel("MagicStoneGacha"));
 
         // 캐릭터 가챠에 대한 버튼 이벤트
         _dailyCharacterGachaButton.onClick.AddListener(AdButtonClick);

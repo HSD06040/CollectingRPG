@@ -15,7 +15,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] UnitData _unitData;
 
     [Header("UI")]
-    [SerializeField] private TMP_Text _charText;
+    //[SerializeField] private TMP_Text _charText;
     [SerializeField] private Image _characterImg;
     [SerializeField] private Image _costImg;
     [SerializeField] private Image _jobSynergyImg;
@@ -24,7 +24,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] private TMP_Text _levelText;
 
     [Header("Reference")]
-    [SerializeField] Sprite[] costSprites;
+    [SerializeField] ImageSO _costImages;
 
 
     private bool _isCollected = true;
@@ -114,9 +114,9 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void UIUpdate()
     {
-        _charText.text = $"{_status.Data.Name}";
+        //_charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
-        _costImg.sprite = costSprites[_status.Data.Cost - 1];
+        _costImg.sprite = _costImages.CostSprites[_status.Data.Cost - 1];
         if (Manager.Data.SynergyDB != null)
         {
             _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;

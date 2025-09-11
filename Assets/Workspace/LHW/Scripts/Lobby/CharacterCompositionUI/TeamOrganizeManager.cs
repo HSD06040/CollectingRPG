@@ -267,7 +267,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowTotalOverallPowerInfo()
     {
-        _totalOverallPowerText.text = $"팀 전투력 {_currentOverallPower}";
+        //_totalOverallPowerText.text = $"팀 전투력 {_currentOverallPower}";
     }
 
     
