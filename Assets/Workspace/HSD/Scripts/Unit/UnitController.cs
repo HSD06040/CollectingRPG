@@ -73,14 +73,14 @@ public class UnitController : MonoBehaviour
         _unitDragDropSystem.enabled = true;
     }
 
-    public void UnitsStandby()
+    public void UnitsGameEndedStandby()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
-            if (unit == null || unit.StatusController.IsDead)
+            if (unit == null)
                 continue;
 
-            unit.Standby();
+            unit.GameEndedStanby();
         }
     }
 
