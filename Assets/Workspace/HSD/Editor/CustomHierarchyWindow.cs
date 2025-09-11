@@ -29,10 +29,7 @@ public class CompleteHierarchyOverride
 
         if (colorRules == null)
         {
-            colorRules = ScriptableObject.CreateInstance<HierarchyColorRules>();
-            AssetDatabase.CreateAsset(colorRules, "Assets/HierarchyColorRules.asset");
-            AssetDatabase.SaveAssets();
-            Debug.Log("Created default HierarchyColorRules at Assets/HierarchyColorRules.asset");
+            return;
         }
     }
 
