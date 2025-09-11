@@ -14,6 +14,7 @@ public class UnitUIManager : MonoBehaviour
     public DamageMeterController DamageMeterController;
     public HpMeterController HpMeterController;
     public SkillPopUpController SkillPopUpController;
+    public UnitHealthBarManager UnitHealthBarManager;
 
     [Header("Not Battle")]
     public SynergyPanel SynergyPanel;

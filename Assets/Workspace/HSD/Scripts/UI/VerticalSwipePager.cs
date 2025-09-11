@@ -4,6 +4,8 @@ using DG.Tweening;
 
 public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 {
+    [SerializeField] SlotPositionSetter _slotPositionSetter;
+
     [Header("UI Content")]
     [SerializeField] RectTransform _content;
 
@@ -14,7 +16,6 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     [SerializeField] float _swipeThreshold = 200f;
     [SerializeField] float _tweenDuration = 0.3f;
     [SerializeField] Ease _easeType = Ease.OutCubic;
-    [SerializeField] float _uiToWorldRatio = 0.01f;
     [SerializeField] int _currentPage = 0;
     [SerializeField] Vector2 _cameraOffset;
 
@@ -26,6 +27,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     #region LifeCycle
     private void Start()
     {
+        _slotPositionSetter.SetPositions();
         Init();
     }
 
@@ -38,7 +40,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         BattleManager.OnBattleStarted -= MoveToBattlePage;
     }
-    #endregion
+    #endregion    
 
     private void Init()
     {
@@ -84,9 +86,9 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         float diff = eventData.position.y - eventData.pressPosition.y;
         if (Mathf.Abs(diff) > _swipeThreshold)
         {
-            if (diff < 0 && _currentPage < _totalPages - 1) // 위로 드래그 다음 페이지
+            if (diff < 0 && _currentPage < _totalPages - 1) // 위로 드래그 → 다음 페이지
                 _currentPage++;
-            else if (diff > 0 && _currentPage > 0)         // 아래로 드래그 이전 페이지
+            else if (diff > 0 && _currentPage > 0)         // 아래로 드래그 → 이전 페이지
                 _currentPage--;
         }
 
@@ -95,13 +97,13 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private void MoveToPage(int pageIndex, bool instant = false)
     {
-        float height = ((RectTransform)transform).rect.height;
+        float height = Screen.height;
         Vector2 targetPos = new Vector2(0, -pageIndex * height);
 
         if (instant)
         {
             _content.anchoredPosition = targetPos;
-            SyncGameObjectsWithUI();    
+            SyncGameObjectsWithUI();
         }
         else
         {
@@ -115,8 +117,13 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
     {
         Vector2 uiOffset = _content.anchoredPosition - _originalUIPosition;
 
-        Vector3 worldOffset = new Vector3(0, uiOffset.y * _uiToWorldRatio, 0);
+        Vector3 screenOffset = new Vector3(0, uiOffset.y, 0);
 
+        Vector3 worldOffset = Camera.main.ScreenToWorldPoint(
+            Camera.main.WorldToScreenPoint(Vector3.zero) + screenOffset
+        ) - Camera.main.ScreenToWorldPoint(Camera.main.WorldToScreenPoint(Vector3.zero));
+
+        // 페이지 위치 적용
         for (int i = 0; i < _pages.Length; i++)
         {
             Vector3 basePos;

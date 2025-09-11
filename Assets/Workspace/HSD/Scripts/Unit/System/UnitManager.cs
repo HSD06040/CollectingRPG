@@ -159,6 +159,7 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
         _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
         _unitUIManager.HpMeterController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
+        _unitUIManager.UnitHealthBarManager.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
     #endregion
     public void GameEndedUnitStandby()

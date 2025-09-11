@@ -13,7 +13,7 @@ public class DamageMeterController : MonoBehaviour
     private CancellationTokenSource _cts;
     private int _unitCount;
 
-    private void Awake()
+    private void Start()
     {
         _gridLayoutGroup.SetupGridLayoutGroup(_content, 1, 5, 10);
     

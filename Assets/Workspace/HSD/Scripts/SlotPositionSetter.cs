@@ -1,0 +1,36 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SlotPositionSetter : MonoBehaviour
+{
+    [SerializeField] GameObject _battleSlot;
+    [SerializeField] GameObject _planSlot;
+    [SerializeField] GameObject _enemySlot;    
+    [SerializeField] float _zOffset = 10f;
+    [SerializeField] float _distance = 3;
+
+    [ContextMenu("SetPosition")]
+    public void SetPositions()
+    {
+        Rect safe = Screen.safeArea;
+
+        float centerX = safe.x + safe.width * 0.5f;
+        float centerYInSafe = safe.y + safe.height * 0.75f;
+        float centerYNextSafe = safe.y + safe.height * .7f;
+
+        float screenZ = Mathf.Abs(Camera.main.transform.position.z + _zOffset);
+
+        Vector3 planScreen = new Vector3(centerX, centerYInSafe + Screen.height * 0, screenZ);
+        Vector3 battleScreen = new Vector3(centerX, centerYNextSafe + Screen.height * 1, screenZ);
+        Vector3 enemyScreen = new Vector3(centerX + safe.width * _distance, centerYNextSafe + Screen.height * 1, screenZ);
+
+        Vector3 planWorld = Camera.main.ScreenToWorldPoint(planScreen);
+        Vector3 battleWorld = Camera.main.ScreenToWorldPoint(battleScreen);
+        Vector3 enemyWorld = Camera.main.ScreenToWorldPoint(enemyScreen);
+
+        _planSlot.transform.position = planWorld;
+        _battleSlot.transform.position = battleWorld;
+        _enemySlot.transform.position = enemyWorld;
+    }
+}

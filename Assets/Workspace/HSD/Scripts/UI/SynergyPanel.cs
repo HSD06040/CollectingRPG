@@ -19,11 +19,14 @@ public class SynergyPanel : MonoBehaviour
     private int _currentPage;
     private int _maxPage;
 
+    private void Start()
+    {
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, 3, 2, _offset);
+    }
+
     public void Init(SynergyDatabase db)
     {
         _synergySlotPrefab = Manager.Resources.Get<GameObject>(_synergySlotAddress);
-
-        _gridLayoutGroup.SetupGridLayoutGroup(_content, 3, 2, _offset);
 
         CreateSynergtSlots(db); 
         SetActivate();

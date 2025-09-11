@@ -97,18 +97,18 @@ public class PoolManager : Singleton<PoolManager>
                 GameObject obj = Instantiate(prefab);
                 obj.SetActive(false);
                 obj.name = name;
-                obj.transform.parent = root;
+                obj.transform.SetParent(root, false);
                 _lastUseTimeDic[name] = Time.time;
                 return obj;
             },
             actionOnGet: (GameObject go) =>
             {
-                go.transform.parent = null;
+                go.transform.SetParent(null, false);
                 _lastUseTimeDic[name] = Time.time;
             },
             actionOnRelease: (GameObject go) =>
             {
-                go.transform.parent = root;
+                go.transform.SetParent(root, false);
                 go.SetActive(false);
             },
             actionOnDestroy: (GameObject go) =>

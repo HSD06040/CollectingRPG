@@ -224,6 +224,10 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return Col.bounds.center;
     }
+    public Vector2 GetBarPosition()
+    {
+        return GetCenter() + new Vector2(0, (transform.localScale.y / 2) + .3f);
+    }
     public UnitStatusController GetStatusController()
     {
         return StatusController;
