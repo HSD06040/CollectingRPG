@@ -134,7 +134,6 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
 
             if (temp != null) // 만약 UI 슬롯이 비어있지 않다면
             {
-                Debug.Log("Temp != null");
                 // 인게임 해당 슬롯에 추가
                 _unitSlotController.AddInGameSlot(temp, _slotIdx, unitBase.CurrentSlot);
                 _unitSlotController.RemoveUnit(temp, _slotIdx);
