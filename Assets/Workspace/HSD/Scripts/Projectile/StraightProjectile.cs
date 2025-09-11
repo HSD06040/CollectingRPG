@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class StraightProjectile : Projectile
 {
-    enum StraightType { Facing, Up, Down, Left, Right}
+    enum StraightType { Facing, Up, Down, Left, Right, Target}
 
     [Header("Straight")]
     [SerializeField] StraightType _straightType;
@@ -28,6 +28,9 @@ public class StraightProjectile : Projectile
     {
         switch (_straightType)
         {
+            case StraightType.Target:
+                _dir = GetTargetDir();
+                break;
             case StraightType.Facing:
                 _dir = new Vector2(_status.transform.GetFacingDir(), 0);
                 break;

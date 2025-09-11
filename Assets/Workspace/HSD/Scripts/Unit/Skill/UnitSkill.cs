@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -44,10 +45,11 @@ public abstract class UnitSkill : ScriptableObject
         }
         else
         {
-            Vector2 spawnPosition = GetSpawnPoint(attacker);
-
             GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
-            GameObject obj = Manager.Resources.Instantiate<GameObject>(prefab, spawnPosition, true);
+            GameObject obj = Manager.Resources.Instantiate(prefab, GetSpawnPoint(attacker), true);
+
+            // 항상 프리팹 기준 스케일로 초기화
+            obj.transform.localScale = prefab.transform.localScale;
 
             Vector3 finalScale =
                 prefab.transform.localScale * Mathf.Abs(attacker.GetTransform().localScale.x);

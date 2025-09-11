@@ -56,6 +56,8 @@ public class UnitBase : MonoBehaviour, IAttacker
 
         Vector3 scale = transform.localScale;
 
+        // 임시
+
         if (gameObject.layer == LayerMask.NameToLayer("Player"))
         {
             scale.x = -Mathf.Abs(scale.x);

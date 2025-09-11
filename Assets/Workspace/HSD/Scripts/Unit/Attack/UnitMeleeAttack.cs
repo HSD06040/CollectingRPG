@@ -23,13 +23,23 @@ public class UnitMeleeAttack : UnitAttackData
             ComponentProvider.Get<UnitBase>(attacker.GetTarget()?.gameObject).StatusController
             );
 
-        Manager.Resources.Destroy(
-            Manager.Resources.Instantiate<GameObject>(
-                EffectAddress,
-                attacker.GetTarget().gameObject.GetCenter(),
-                true
-                ),
-            2f);
+        GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
+        GameObject obj = Manager.Resources.Instantiate(prefab, attacker.GetTarget().gameObject.GetCenter(), true);
+
+        // 항상 프리팹 기준 스케일로 초기화
+        obj.transform.localScale = prefab.transform.localScale;
+
+        Vector3 finalScale =
+            prefab.transform.localScale * Mathf.Abs(attacker.GetTransform().localScale.x);
+
+        if (obj.transform.GetFacingDir() == attacker.GetTransform().GetFacingDir())
+        {
+            finalScale.x *= -1;
+        }
+
+        obj.transform.localScale = finalScale;
+
+        Manager.Resources.Destroy(obj, 2f);
 
         status.GetMana();
     }

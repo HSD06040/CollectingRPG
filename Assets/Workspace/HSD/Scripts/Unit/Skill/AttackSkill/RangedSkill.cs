@@ -20,6 +20,8 @@ public class RangedSkill : AttackSkill
                 )
             );
 
+        projectile.transform.localScale = attacker.GetTransform().localScale;
+
         Transform target = GetTarget(attacker);
 
         // 타겟이 없다면 가까이 있는 적을 타겟으로 지정
