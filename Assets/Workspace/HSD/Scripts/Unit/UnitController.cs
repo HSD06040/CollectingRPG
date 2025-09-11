@@ -73,14 +73,14 @@ public class UnitController : MonoBehaviour
         _unitDragDropSystem.enabled = true;
     }
 
-    public void UnitsStandby()
+    public void UnitsGameEndedStandby()
     {
         foreach (var unit in _battleUnitManager.GetUnitGrid())
         {
-            if (unit == null || unit.StatusController.IsDead)
+            if (unit == null)
                 continue;
 
-            unit.Standby();
+            unit.GameEndedStanby();
         }
     }
 
@@ -189,6 +189,7 @@ public class UnitController : MonoBehaviour
 
         newUnit.transform.SetParent(slot.transform);
         newUnit.transform.position = slot.transform.position;
+        newUnit.Init();
 
         AddUnit(slot, newUnit);
     }
@@ -202,6 +203,7 @@ public class UnitController : MonoBehaviour
 
         newUnit.transform.SetParent(slot.transform);
         newUnit.transform.position = slot.transform.position;
+        newUnit.Init();
 
         AddUnit(slot, newUnit);
     }

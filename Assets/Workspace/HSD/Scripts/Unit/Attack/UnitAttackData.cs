@@ -4,11 +4,14 @@ using UnityEngine;
 
 public abstract class UnitAttackData : ScriptableObject
 {
+    [Header("ID")]
+    public int ID;
+
     public DamageType DamageType;
-    public float AttackPower;    
-    
-    [Header("Offset")]
-    public Vector2 AttackPointOffset;
+    public float AttackPower;
+
+    [Header("Effect")]
+    public string EffectAddress;
 
     public virtual void Attack(IAttacker attacker)
     {

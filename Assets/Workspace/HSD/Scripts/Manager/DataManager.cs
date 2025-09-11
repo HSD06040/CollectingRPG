@@ -1,12 +1,11 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 
 public class DataManager : Singleton<DataManager>
 {
     public Dictionary<string, UnitData> UnitDataDic;
+    public UnitData[] EnemyUnitDatas;
     public SynergyDatabase SynergyDB;
 
     private void Awake()
@@ -40,6 +39,7 @@ public class DataManager : Singleton<DataManager>
 
     private async UniTask PreLoadUnitDatas()
     {
+        EnemyUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");
         UnitData[] UnitDatas = await Manager.Resources.LoadAll<UnitData>("UnitData");
 
         UnitDataDic = new Dictionary<string, UnitData>(UnitDatas.Length);

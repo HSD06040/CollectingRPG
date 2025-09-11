@@ -24,6 +24,6 @@ public class UnitStats
     public int MagicDefense;
 
     [Header("Range")]
-    public int AttackRange;
+    public float AttackRange;
     public int AttackCount;
 }

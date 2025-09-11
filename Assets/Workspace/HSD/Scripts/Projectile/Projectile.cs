@@ -1,9 +1,11 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+[RequireComponent(typeof(CircleCollider2D))]
 public class Projectile : MonoBehaviour
 {
     [SerializeField] protected float _lifeTime = 5f; // 발사체의 생명 시간
+    [SerializeField] protected bool _isPirece = true;
     protected int _pireceCount;
     protected float _attackPower;
     protected DamageType _damageType;
@@ -11,7 +13,9 @@ public class Projectile : MonoBehaviour
     protected Transform _target;
     protected UnitStatusController _status;
     protected float _speed;
-    protected Vector2 _direction;
+    protected float _distance;
+    protected Vector2 _targetDir => GetTargetDir();
+    protected Vector2 _dir;
 
     private void Awake()
     {
@@ -23,7 +27,8 @@ public class Projectile : MonoBehaviour
         ComponentProvider.Remove<Projectile>(gameObject);
     }
 
-    public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
+    public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
+        LayerMask targetLayer, float speed, float distance = 0)
     {        
         _status = status;
         _target = target;
@@ -32,17 +37,7 @@ public class Projectile : MonoBehaviour
         _pireceCount = status.AttackCount.Value;
         _attackPower = attackPower;
         _speed = speed;
-
-        if(_target == null)
-        {
-            _target = Physics2D.OverlapCircle(transform.position, status.AttackRange.Value, targetLayer)?.transform;
-
-            if (_target == null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-        }
+        _distance = distance;
 
         MoveAndDestroyAsync(_lifeTime).Forget(); // 발사체 이동 및 파괴 비동기 작업 시작
     }
@@ -53,17 +48,28 @@ public class Projectile : MonoBehaviour
         {
             _status.CalculateDamage(_attackPower, _damageType, ComponentProvider.Get<UnitBase>(collision.gameObject).StatusController);
 
-            _pireceCount--;
-
-            if (_pireceCount <= 0)
+            if(!_isPirece)
             {
-                Destroy(gameObject);
-            }
+                _pireceCount--;
+
+                if (_pireceCount <= 0)
+                {
+                    Destroy(gameObject);
+                }
+            }            
         }
     }
 
     protected virtual async UniTask MoveAndDestroyAsync(float duration)
     {
         await UniTask.Delay(1);
+    }
+
+    protected Vector2 GetTargetDir()
+    {
+        if (_target == null) 
+            return new Vector2(_status.transform.GetFacingDir(), 0);
+
+        return (_target.position - transform.position).normalized;
     }
 }

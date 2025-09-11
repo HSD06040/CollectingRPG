@@ -82,8 +82,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Init&Clear
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
+        Transform root = transform.GetChild(0);    
+
+        if(root.childCount > 0)
+            root = root.GetChild(0);
+
         PassiveController = new UnitPassiveController(gameObject);
-        UnitFXController = new UnitFXController(GetComponentsInChildren<SpriteRenderer>());
+        UnitFXController = new UnitFXController(
+            root.
+            GetComponentsInChildren<SpriteRenderer>()
+            );
 
         Status = status;
         IsDead = false;

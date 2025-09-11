@@ -362,7 +362,9 @@ public class GlobalPassive
                 spawnUnit.Status.Level = unit.Status.Level - 1 >= 0 ? unit.Status.Level - 1 : 0;
                 spawnUnit.Init();
             }
-        }   
+        }
+
+        BattleManager.OnSpawnUnit?.Invoke(spawnUnit);
     }
     #endregion
 #endregion

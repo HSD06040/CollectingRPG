@@ -3,24 +3,24 @@ using System;
 #region Synergy
 public enum ClassType
 {
-    Tank = 0, Melee, Ranged, Support
+    TANK = 0, MELEE, RANGED, SUPPORT
 }
 
 public enum Synergy
 {
-    KingdomGuard = 4,     // 왕국 경비대
-    ForestPatrol,         // 숲의 순찰자
-    HighMageOrder,        // 고위 마법사단
-    SacredOrder,          // 신성 교단
-    NightStreetAssassins, // 밤거리 암살단
-    UndergroundOrg,      // 지하 조직
+    KINGDOM = 4,    // 왕국 경비대
+    FOREST,         // 숲의 순찰자
+    WIZARD,         // 고위 마법사단
+    HOLY,           // 신성 교단
+    SHADOW,         // 밤거리 암살단
+    BANDIT,         // 지하 조직
     Length
 }
 #endregion
 
 public enum Grade
 {
-    Normal, Rare, Unique, Legendary
+    NORMAL, RARE, UNIQUE, LEGENDARY
 }
 
 #region Type
@@ -133,13 +133,13 @@ public enum SearchType
     Circle, Box, Capsule
 }
 
-#endregion
-
-public enum CsvType
+public enum EffectSpawnType
 {
-    UnitStat,
-    Skill,
+    OwnerFront,
+    Target
 }
+
+#endregion
 
 public enum AutoUnitType
 {
@@ -150,6 +150,7 @@ public enum AutoUnitType
 public enum Priority
 {
     None,
+    Target,
     Close,
     Far,
     LowHp,
