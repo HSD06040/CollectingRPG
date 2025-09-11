@@ -14,7 +14,8 @@ public class BezierProjectile : Projectile
     private Vector2 control;
     private int curveIndex;
 
-    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
+    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
+        LayerMask targetLayer, float speed, float distance)
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
         SetPoints();
@@ -60,7 +61,6 @@ public class BezierProjectile : Projectile
 
     public void SetPoints()
     {
-        _direction = (_target.position - transform.position).normalized;
         start = transform.position;
         end = (Vector2)_target.position;
 

@@ -113,10 +113,8 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private void SyncGameObjectsWithUI()
     {
-        // UI가 원래 위치에서 얼마나 움직였는지 계산
         Vector2 uiOffset = _content.anchoredPosition - _originalUIPosition;
 
-        // UI 오프셋을 월드 좌표로 변환
         Vector3 worldOffset = new Vector3(0, uiOffset.y * _uiToWorldRatio, 0);
 
         for (int i = 0; i < _pages.Length; i++)

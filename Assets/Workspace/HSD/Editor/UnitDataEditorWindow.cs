@@ -221,7 +221,7 @@ public class UnitDataEditorWindow : EditorWindow
 
         // Range 섹션
         EditorGUILayout.LabelField("Range", EditorStyles.boldLabel);
-        stats.AttackRange = EditorGUILayout.IntField("Attack Range", stats.AttackRange);
+        stats.AttackRange = EditorGUILayout.FloatField("Attack Range", stats.AttackRange);
         stats.AttackCount = EditorGUILayout.IntField("Attack Count", stats.AttackCount);
 
         EditorGUI.indentLevel--;
