@@ -68,6 +68,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
         await UniTask.WhenAll(tasks);
 
         Addressables.Release(locationsHandle);
+        Debug.Log($"[로드 성공] : {label}");
     }
 
     public async UniTask LoadLabel(AssetLabelReference label)
@@ -91,8 +92,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         var handle = Addressables.LoadAssetAsync<Object>(location);
         var asset = await handle.Task;
-
-        Debug.Log($"[로드 성공] : {location.PrimaryKey}");
 
         if (!_resources.ContainsKey(location.PrimaryKey))
         {
