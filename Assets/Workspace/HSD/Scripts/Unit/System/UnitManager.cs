@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -22,7 +23,9 @@ public class UnitManager : MonoBehaviour
     [Header("Data")]
     [SerializeField] UnitData[] _unitDatas;
     [SerializeField] int _upgradeNeedCount = 3;
-    
+
+    private List<UnitBase> _spawnUnitList = new List<UnitBase>(10);
+
     private void Awake()
     {
         if (IsTest)
@@ -32,7 +35,7 @@ public class UnitManager : MonoBehaviour
     }
     private void OnDestroy()
     {
-        UnSubscrube();
+        UnSubscrube();        
     }
 
     private async void InitAsync()
@@ -44,7 +47,8 @@ public class UnitManager : MonoBehaviour
         UnitController.Init();
         EnemyController.Init();
 
-        _unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
+        //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
+        _unitDatas = Manager.Data.EnemyUnitDatas;
 
         Subscribe();
 
@@ -101,7 +105,9 @@ public class UnitManager : MonoBehaviour
     #region EventHandler
     private void Subscribe()
     {
+        BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
+
         UnitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergyPanel.UpdateSynergySlot;
@@ -116,7 +122,9 @@ public class UnitManager : MonoBehaviour
 
     private void UnSubscrube()
     {
+        BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
+
         UnitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergyPanel.UpdateSynergySlot;
@@ -144,12 +152,6 @@ public class UnitManager : MonoBehaviour
         _battleManager.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
 
-    public void GameEndedUnitStandby()
-    {
-        UnitController.UnitsStandby();
-        EnemyController.EnemyStandby();     
-    }
-
     private void FightUISetup()
     {
         _unitUIManager.BattleUISetting();
@@ -159,9 +161,16 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.HpMeterController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
     #endregion
+    public void GameEndedUnitStandby()
+    {
+        SpawnUnitStnaby();
+        UnitController.UnitsGameEndedStandby();
+        EnemyController.EnemyStandby();
+    }
 
     public void StandbyGame()
     {
+        ClearSpawnUnit();
         EnemyController.ResetEnemy();
         UnitController.UnitStandbyAndSetSlotPosition();
         _unitUIManager.StandbyUISetting();
@@ -269,4 +278,27 @@ public class UnitManager : MonoBehaviour
         return UnitController.GetUnitCount(unit) + _unitSlotController.GetUnitCount(unit);
     }
     #endregion
+
+    private void SpawnUnitAdded(UnitBase unit)
+    {
+        _spawnUnitList.Add(unit);
+    }
+
+    private void SpawnUnitStnaby()
+    {
+        foreach (var unit in _spawnUnitList)
+        {
+            unit.GameEndedStanby();
+        }
+    }
+
+    private void ClearSpawnUnit()
+    {
+        foreach (var unit in _spawnUnitList)
+        {
+            Destroy(unit.gameObject);
+        }
+
+        _spawnUnitList.Clear();
+    }
 }

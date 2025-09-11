@@ -31,12 +31,7 @@ public class PoolManager : Singleton<PoolManager>
         SceneManager.sceneLoaded += OnSceneLoaded;        
     }
 
-    //public void PopUpInit(Transform uiParent)
-    //{
-    //    _uiParent = uiParent;
-    //    _damagePopUp = Manager.Resources.Get<GameObject>("DamagePopUp").GetComponent<DamagePopUp>();
-    //    CreatePopUpPool();
-    //}
+    
 
     public void ResetPool()
     {
@@ -100,6 +95,7 @@ public class PoolManager : Singleton<PoolManager>
             createFunc: () =>
             {
                 GameObject obj = Instantiate(prefab);
+                obj.SetActive(false);
                 obj.name = name;
                 obj.transform.parent = root;
                 _lastUseTimeDic[name] = Time.time;
@@ -108,7 +104,6 @@ public class PoolManager : Singleton<PoolManager>
             actionOnGet: (GameObject go) =>
             {
                 go.transform.parent = null;
-                go.SetActive(true);
                 _lastUseTimeDic[name] = Time.time;
             },
             actionOnRelease: (GameObject go) =>
@@ -128,6 +123,12 @@ public class PoolManager : Singleton<PoolManager>
     }
 
     //#region Popup
+    //public void PopUpInit(Transform uiParent)
+    //{
+    //    _uiParent = uiParent;
+    //    _damagePopUp = Manager.Resources.Get<GameObject>("DamagePopUp").GetComponent<DamagePopUp>();
+    //    CreatePopUpPool();
+    //}
     //private void CreatePopUpPool()
     //{
     //    _popUpPool = new ObjectPool<DamagePopUp>
@@ -188,6 +189,8 @@ public class PoolManager : Singleton<PoolManager>
 
         go.transform.localPosition = position;
         go.transform.rotation = rotation;
+
+        go.SetActive(true);
 
         return go as T;
     }

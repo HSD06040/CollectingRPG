@@ -19,16 +19,19 @@ public class EnemyController : MonoBehaviour
 
     public void SetUnit()
     {
-        foreach (var unitDatas in _gridDataSO.unitDatas)
+        foreach (var unitData in _gridDataSO.unitDatas)
         {
-            UnitSlot slot = _slotManager.GetUnitSlot(unitDatas.position + new Vector2Int(1, 1));
+            UnitSlot slot = _slotManager.GetUnitSlot(unitData.position + new Vector2Int(1, 1));
 
-            int x = unitDatas.position.x;
-            int y = unitDatas.position.y;
+            int x = unitData.position.x;
+            int y = unitData.position.y;
 
-            GameObject obj = Instantiate(unitDatas.unitStatus.Data.UnitPrefab);
+            GameObject obj = Instantiate(unitData.unitStatus.Data.UnitPrefab);
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
-            unit.Status = unitDatas.unitStatus;
+
+            if(unitData.unitStatus == null)
+                Debug.Log($"UnitStatus is null at position {unitData.position}");
+            unit.Status = unitData.unitStatus;
 
             unit.transform.position = slot.transform.position;
             unit.transform.SetParent(slot.transform);

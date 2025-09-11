@@ -8,7 +8,8 @@ public class HoverProjectile : Projectile
 {
     private bool isHovering = true;
 
-    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed)
+    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
+        LayerMask targetLayer, float speed, float distancez)
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
 
@@ -33,9 +34,8 @@ public class HoverProjectile : Projectile
 
         while (elapsed < duration && !token.IsCancellationRequested && isHovering)
         {
-            _direction = (_target.position - transform.position).normalized;
-            transform.Translate(_direction * _speed * Time.deltaTime, Space.World);
-            transform.right = _direction;
+            transform.Translate(_targetDir * _speed * Time.deltaTime, Space.World);
+            transform.right = _targetDir;
             elapsed += Time.deltaTime;
             await UniTask.Yield(PlayerLoopTiming.Update, token); // 프레임마다 대기
         }

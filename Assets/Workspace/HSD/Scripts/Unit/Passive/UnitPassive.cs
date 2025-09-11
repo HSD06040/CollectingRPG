@@ -359,6 +359,7 @@ public class UnitPassive
                 {
                     spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;
                     spawnUnit.Init(Effect.SpawnUnitStats);
+                    spawnUnit.Fight();
                 }
                 else
                 {

@@ -3,6 +3,7 @@ using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -70,8 +71,14 @@ public class TeamOrganizeManager : MonoBehaviour
     }    
     private void Start()
     {
-        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;       
+        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
+        LoadData();
     }    
+
+    private async void LoadData()
+    {
+        await Manager.Resources.LoadLabel("Stage");
+    }
 
     #region Event
 
@@ -103,8 +110,13 @@ public class TeamOrganizeManager : MonoBehaviour
     #region Read Data
 
     public UnitStatus GetCurrentPresetData(int index)
-    { 
-        return _currentPreset[index];
+    {
+        if (_currentPreset != null)
+        {
+            return _currentPreset[index];
+        }
+
+        return null;
     }
 
     #endregion
@@ -267,7 +279,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowTotalOverallPowerInfo()
     {
-        _totalOverallPowerText.text = $"팀 전투력 {_currentOverallPower}";
+        //_totalOverallPowerText.text = $"팀 전투력 {_currentOverallPower}";
     }
 
     

@@ -25,7 +25,7 @@ public class CharacterUpgradeUnit : MonoBehaviour
     [SerializeField] private TMP_Text _pieceNum;
 
     [Header("Reference")]
-    [SerializeField] private Sprite[] costSprites;
+    [SerializeField] private ImageSO _costSprites;
 
     private UpgradeManager _manager;
 
@@ -98,7 +98,7 @@ public class CharacterUpgradeUnit : MonoBehaviour
 
         //_charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
-        _costImg.sprite = costSprites[_status.Data.Cost - 1];
+        _costImg.sprite = _costSprites.CostSprites[_status.Data.Cost - 1];
         if (Manager.Data.SynergyDB != null)
         {
             _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
