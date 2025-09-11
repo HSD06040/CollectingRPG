@@ -15,7 +15,7 @@ public class QuestItem : MonoBehaviour
     [Header("Condition")]
     [SerializeField] private Button _questButton;
     [SerializeField] private Image _questBoxImage;
-    [SerializeField] private GameObject _BadgeImage;
+    [SerializeField] private GameObject _badgeImage;
     [SerializeField] private TMP_Text _conditionText;
 
     public event Action OnRewardReceived;
@@ -38,7 +38,7 @@ public class QuestItem : MonoBehaviour
         if (questData.IsComplete && !questData.IsReceive)
         {
             _questBoxImage.color = Color.red;
-            _BadgeImage.SetActive(true);
+            _badgeImage.SetActive(true);
         }
                 
         _questButton.onClick.RemoveAllListeners();

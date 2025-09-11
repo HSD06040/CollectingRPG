@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class QuestPopup : MonoBehaviour
 {
@@ -28,9 +28,11 @@ public class QuestPopup : MonoBehaviour
     private Coroutine _countdownRoutine;
 
 
-    private void Start()
+    private async void Start()
     {
-        Init();
+        await Manager.DB.questDB.LoadUserQuestDataAsync();
+        await Manager.DB.questDB.LoadUserMilestoneAsync();
+        Init();       
     }
 
     private void OnEnable()
@@ -64,7 +66,6 @@ public class QuestPopup : MonoBehaviour
             {
                 Destroy(_content.GetChild(i).gameObject);
             }
-
         }
 
         foreach (var quest in _questManager._quests)
@@ -83,7 +84,7 @@ public class QuestPopup : MonoBehaviour
         InitMilestoneRewards();
         RefreshMilestoneRewards();
 
-        _progressBar.fillAmount = (float)_questManager.TotalPoint / _questManager.MaxPoint;
+        _progressBar.fillAmount = (float)_questManager.UserQuestData.TotalPoint / _questManager.MaxPoint;
     }
 
     private void InitMilestoneRewards()
@@ -102,11 +103,26 @@ public class QuestPopup : MonoBehaviour
                 {
                     switch (index)
                     {
-                        case 0: _questManager.RewardGoldAsync(500); break;
-                        case 1: _questManager.RewardGoldAsync(700); break;
-                        case 2: _questManager.RewardGoldAsync(1000); break;
-                        case 3: _questManager.RewardGoldAsync(2000); break;
-                        case 4: _questManager.RewardGoldAsync(5000); break;
+                        case 0:
+                            _questManager.RewardGoldAsync(500);
+                            _questManager.SetMilstoneState(index, true);
+                            break;
+                        case 1:
+                            _questManager.RewardGoldAsync(700);
+                            _questManager.SetMilstoneState(index, true);
+                            break;
+                        case 2:
+                            _questManager.RewardGoldAsync(1000);
+                            _questManager.SetMilstoneState(index, true);
+                            break;
+                        case 3:
+                            _questManager.RewardGoldAsync(2000);
+                            _questManager.SetMilstoneState(index, true);
+                            break;
+                        case 4:
+                            _questManager.RewardGoldAsync(5000);
+                            _questManager.SetMilstoneState(index, true);
+                            break;
                     }
 
                     _milestoneReward[index].image.sprite = _openedBox;
@@ -124,10 +140,18 @@ public class QuestPopup : MonoBehaviour
 
             int milestone = _milestonePoints[i];
 
-            if (_questManager.TotalPoint >= milestone)
+            if (_questManager.UserQuestData.TotalPoint >= milestone)
             {
-                _milestoneReward[i].interactable = true;
-                _milestoneReward[i].image.sprite = _closedBox;
+                if (_questManager.MilestoneData.MilestoneStates[i])
+                {
+                    _milestoneReward[i].interactable = false;
+                    _milestoneReward[i].image.sprite = _openedBox;
+                }
+                else
+                {
+                    _milestoneReward[i].interactable = true;
+                    _milestoneReward[i].image.sprite = _closedBox;
+                }
             }
             else
             {
@@ -143,8 +167,8 @@ public class QuestPopup : MonoBehaviour
         yield return new WaitUntil(() => task.IsCompleted);
 
         DateTime kstNow = task.Result;
-        //DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 6, 0, 0);
-        DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 16, 7, 0);
+        DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 6, 0, 0);
+        //DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 17, 24, 0);
 
         if (kstNow >= resetTime)
         {
