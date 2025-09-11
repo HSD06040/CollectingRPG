@@ -1,3 +1,4 @@
+using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,8 @@ public class SelectedCharacterUnit : MonoBehaviour
 
     [SerializeField] private UnitStatus _status;
 
+    private GameObject _obj;
+
     private void Awake()
     {
         _manager = GetComponentInParent<TeamOrganizeManager>();
@@ -35,11 +38,6 @@ public class SelectedCharacterUnit : MonoBehaviour
     private void OnDisable()
     {
         _manager.OnCharacterDataChanged -= UIUpdate;
-    }
-
-    private void Start()
-    {
-        UIUpdate();
     }
 
     private void TryDeleteCharacter()
@@ -58,23 +56,31 @@ public class SelectedCharacterUnit : MonoBehaviour
 
         if (_manager == null || _status == null || _status.Data == null)
         {
+            if (_obj != null)
+            {
+                Manager.Pool.Release(_obj);
+                _obj = null;
+            }
+
             if (_manager.CurrentCost == _manager.TotalCost)
             {
-                _charImage.color = Color.black;
-                _charImage.sprite = _xImage;
+                //_charImage.color = Color.black;
+                //_charImage.sprite = _xImage;
             }
             else
             {
-                _charImage.color = Color.clear;
-                _charImage.sprite = null;
+                //_charImage.color = Color.clear;
+                //_charImage.sprite = null;
             }
         }
         else
         {
             if (_status.Data != null)
             {
-                _charImage.color = Color.white;
-                _charImage.sprite = _status.Data.Icon;
+                if (_obj == null)
+                {
+                    _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(-0.8f + (_index * 1.4f), 0, 0), Quaternion.identity);
+                }
             }
         }
     }

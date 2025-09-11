@@ -3,6 +3,7 @@ using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -70,8 +71,14 @@ public class TeamOrganizeManager : MonoBehaviour
     }    
     private void Start()
     {
-        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;       
+        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
+        LoadData();
     }    
+
+    private async void LoadData()
+    {
+        await Manager.Resources.LoadLabel("Stage");
+    }
 
     #region Event
 
