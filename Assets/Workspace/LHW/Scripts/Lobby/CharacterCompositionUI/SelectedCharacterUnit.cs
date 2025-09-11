@@ -15,6 +15,7 @@ public class SelectedCharacterUnit : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private Image _charImage;
+    [SerializeField] private GameObject _crownImage;
 
     private CharacterSO _charData;
     private TeamOrganizeManager _manager;
@@ -28,6 +29,11 @@ public class SelectedCharacterUnit : MonoBehaviour
         _manager = GetComponentInParent<TeamOrganizeManager>();
         GetComponent<Button>().onClick.AddListener(TryDeleteCharacter);
         _status = new UnitStatus(null, 0);
+    }
+
+    private void Start()
+    {
+        UIUpdate();
     }
 
     private void OnEnable()
@@ -62,6 +68,11 @@ public class SelectedCharacterUnit : MonoBehaviour
                 _obj = null;
             }
 
+            if(_index == 0)
+            {
+                _crownImage.SetActive(false);
+            }
+
             if (_manager.CurrentCost == _manager.TotalCost)
             {
                 //_charImage.color = Color.black;
@@ -77,6 +88,11 @@ public class SelectedCharacterUnit : MonoBehaviour
         {
             if (_status.Data != null)
             {
+                if(_index == 0)
+                {
+                    _crownImage.SetActive(true);
+                }
+
                 if (_obj == null)
                 {
                     _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(-0.8f + (_index * 1.4f), 0, 0), Quaternion.identity);

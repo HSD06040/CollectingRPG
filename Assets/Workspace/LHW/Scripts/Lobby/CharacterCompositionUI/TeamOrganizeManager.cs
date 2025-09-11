@@ -110,8 +110,13 @@ public class TeamOrganizeManager : MonoBehaviour
     #region Read Data
 
     public UnitStatus GetCurrentPresetData(int index)
-    { 
-        return _currentPreset[index];
+    {
+        if (_currentPreset != null)
+        {
+            return _currentPreset[index];
+        }
+
+        return null;
     }
 
     #endregion
