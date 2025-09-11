@@ -3,14 +3,25 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+public enum CsvType
+{
+    UnitStat,
+    Skill,
+    Monster
+}
 
 public class CsvDownloader
 {
     private CsvLoadData _csvLoadData;
 
     public static event Action OnDataSetupCompleted;
+
+    private UnitSkill[] _unitSkills;
+    private UnitData[] _monsterUnitDatas;
+    private UnitAttackData[] _attackDatas;
 
     public CsvDownloader(CsvLoadData csvLoadData)
     {
@@ -22,6 +33,10 @@ public class CsvDownloader
     /// </summary>
     public async UniTask DownloadDataAsync()
     {
+        _unitSkills = await Manager.Resources.LoadAll<UnitSkill>("SkillData");
+        _monsterUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");
+        _attackDatas = await Manager.Resources.LoadAll<UnitAttackData>("AttackData");
+
         List<UniTask> tasks = new List<UniTask>(10);
 
         foreach (var csvData in _csvLoadData.CsvDatas)
@@ -29,9 +44,11 @@ public class CsvDownloader
             //tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));
         }
 
+        await LoadCSV(_csvLoadData.CsvDatas[2].GetURL(), GetSetupMethod(CsvType.Monster));
+
         await UniTask.WhenAll(tasks);
 
-        Debug.Log("끝!");
+        Debug.Log("[파싱 종료]");
         
         OnDataSetupCompleted?.Invoke();
     }
@@ -70,6 +87,10 @@ public class CsvDownloader
         {
             case CsvType.UnitStat:
                 return UnitStatSetup;
+            case CsvType.Skill:
+                return UnitSkillSetup;
+            case CsvType.Monster: 
+                return MonsterSetup;
             default:
                 Debug.LogError($"알 수 없는 CSV 이름: {csvType.ToString()}");
                 return null;
@@ -82,9 +103,6 @@ public class CsvDownloader
  
         foreach (var row in data)
         {
-            // No.	Grade	Cost	PreferredLine	Role	Faction	AttackRange	AttackType	AttackSpeed	ManaGain	PhysicalAttack	MagicAttack	PhysicalDefense	MagicDefense 	CritRate	HP	MP
-            // 10001	UNIQUE	4	1	TANK	KINGDOM	1	SINGLE	1	10	48	0(수정중)	76	68	0	1200	0
-
             int id = int.Parse(row[0]);
             UnitData unitData = Array.Find(unitDatas, u => u.ID == id);
             Debug.Log($"Setting up UnitData ID: {id}");
@@ -94,11 +112,11 @@ public class CsvDownloader
                 continue;
             }
 
-            unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.Normal;                        
+            unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.NORMAL;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
             unitData.PerferredLine = int.TryParse(row[3], out int line) ? line : 0;
-            unitData.ClassSynergy = Enum.TryParse(row[4], out ClassType classSynergy) ? classSynergy : ClassType.Tank;
-            unitData.Synergy = Enum.TryParse(row[5], out Synergy synergy) ? synergy : Synergy.KingdomGuard;
+            unitData.ClassSynergy = Enum.TryParse(row[4], out ClassType classSynergy) ? classSynergy : ClassType.TANK;
+            unitData.Synergy = Enum.TryParse(row[5], out Synergy synergy) ? synergy : Synergy.KINGDOM;
 
             UnitStats stat = new UnitStats
             {

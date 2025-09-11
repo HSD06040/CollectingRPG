@@ -74,10 +74,10 @@ public class GachaEffectController : MonoBehaviour
 
         switch (classType)
         {
-            case ClassType.Tank: operRoleText.text = "탱커"; break;
-            case ClassType.Melee: operRoleText.text = "근접형"; break;
-            case ClassType.Ranged: operRoleText.text = "원거리형"; break;
-            case ClassType.Support: operRoleText.text = "지원형"; break;
+            case ClassType.TANK: operRoleText.text = "탱커"; break;
+            case ClassType.MELEE: operRoleText.text = "근접형"; break;
+            case ClassType.RANGED: operRoleText.text = "원거리형"; break;
+            case ClassType.SUPPORT: operRoleText.text = "지원형"; break;
             default: operRoleText.text = ""; break;
         }
     }
