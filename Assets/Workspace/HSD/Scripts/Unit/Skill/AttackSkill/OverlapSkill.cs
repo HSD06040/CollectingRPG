@@ -48,7 +48,6 @@ public class OverlapSkill : AttackSkill
                 DamageType,
                 ComponentProvider.Get<UnitBase>(target.gameObject).StatusController
                 );
-                Debug.Log($"[오버렙 스킬 공격 적중] {target.name}");
             }
         }
     }

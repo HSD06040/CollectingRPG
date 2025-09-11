@@ -189,6 +189,7 @@ public class UnitController : MonoBehaviour
 
         newUnit.transform.SetParent(slot.transform);
         newUnit.transform.position = slot.transform.position;
+        newUnit.Init();
 
         AddUnit(slot, newUnit);
     }
@@ -202,6 +203,7 @@ public class UnitController : MonoBehaviour
 
         newUnit.transform.SetParent(slot.transform);
         newUnit.transform.position = slot.transform.position;
+        newUnit.Init();
 
         AddUnit(slot, newUnit);
     }

@@ -20,6 +20,10 @@ public class SortingGroupSetting : MonoBehaviour
 
             if(t.GetComponent<SortingGroup>() == null)
                 t.AddComponent<SortingGroup>();
+
+            t.GetComponent<SortingGroup>().sortingLayerName = "Unit";
+            
+            t.tag = "UnitTrigger";
         }
     }
 }

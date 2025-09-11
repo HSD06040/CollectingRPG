@@ -15,6 +15,10 @@ public static class Utils
     {
         return transform.localScale.x > 0 ? -1 : 1;
     }
+    public static int GetRotFacingDir(this Transform transform)
+    {        
+        return transform.rotation.y == 0 ? 1 : -1;
+    }
     public static Vector2 GetCenter(this GameObject obj)
     {
         return ComponentProvider.Get<UnitBase>(obj).GetCenter();

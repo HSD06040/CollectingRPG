@@ -46,19 +46,21 @@ public abstract class UnitSkill : ScriptableObject
         else
         {
             GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
-            GameObject obj = Manager.Resources.Instantiate(prefab, GetSpawnPoint(attacker), true);
+            GameObject obj = Manager.Resources.Instantiate(
+                prefab,
+                GetSpawnPoint(attacker),
+                prefab.transform.rotation,
+                true
+            );
+            Debug.Log(prefab.transform.rotation.x);
+            int attackerDir = attacker.GetTransform().GetFacingDir();
+            int objDir = obj.transform.GetRotFacingDir();
 
-            obj.transform.localScale = prefab.transform.localScale;
-
-            Vector3 finalScale =
-                prefab.transform.localScale * Mathf.Abs(attacker.GetTransform().localScale.x);
-
-            if (obj.transform.GetFacingDir() == attacker.GetTransform().GetFacingDir())
-            {
-                finalScale.x *= -1;
-            }
-
-            obj.transform.localScale = finalScale;
+            obj.transform.rotation = Quaternion.Euler(
+                prefab.transform.eulerAngles.x,
+                attackerDir != objDir ? 180 : 0,
+                prefab.transform.eulerAngles.z
+                );
 
             Manager.Resources.Destroy(obj, 2f);
         }
