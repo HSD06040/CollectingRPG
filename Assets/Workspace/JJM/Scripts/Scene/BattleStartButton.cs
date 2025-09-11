@@ -43,7 +43,8 @@ public class BattleStartButton : MonoBehaviour
 
     public EnemyRestSlideController enemyRestSlideController;
 
-
+    private Transform backgroundTransform;
+    private Vector3 backgroundStartPosition; // 전투 시작 시점의 배경 위치
     void Awake()
     {
         // 원래 값 저장
@@ -72,10 +73,31 @@ public class BattleStartButton : MonoBehaviour
         battleStartButton.onClick.AddListener(OnBattleStart);
     }
 
+    void Start()
+    {
+        // 배경 오브젝트를 찾아서 Transform 저장 (예: AreaBackgroundMap, Grid 등)
+        var bgObj = FindObjectOfType<AreaBackgroundMap>();
+        if (bgObj != null)
+        {
+            backgroundTransform = bgObj.transform;
+            
+        }
+    }
+
     // 전투 종료 시 호출
     public void OnBattleEnd()
     {
         PanelMultiSlideController.IsBattleActive = false; // 전투 상태 비활성화
+
+        // 배경 트윈 중지
+        if (backgroundTransform != null)
+        {
+            backgroundTransform.DOKill();
+            // x축만 원래 위치로 복귀
+            Vector3 currentPos = backgroundTransform.position;
+            Vector3 returnPos = new Vector3(backgroundStartPosition.x, currentPos.y, currentPos.z);
+            backgroundTransform.DOMove(returnPos, 0.5f).SetEase(Ease.InOutCubic);
+        }
 
         // FightButtonS는 항상 활성화
         fightButtonS.SetActive(true);
@@ -114,6 +136,7 @@ public class BattleStartButton : MonoBehaviour
 
     public void OnBattleStart()
     {
+
         // 항상 플레이어 위치에서 시작
         if (enemyRestSlideController != null)
             enemyRestSlideController.RestMoveToPlayer();
@@ -153,7 +176,7 @@ public class BattleStartButton : MonoBehaviour
             float rightOutX = offScreenX; // 오른쪽 화면 밖 X값
             float centerX = waitingBattlePlayerOriginPos.x; // 플레이어의 원래 X 위치
             float enemyTargetX = waitingBattleEnemyOriginPos.x; // 적의 원래 X 위치
-
+            
 
             // 플레이어 배치: 중앙에서 왼쪽 화면 밖으로 이동
             playerBatchUI.anchoredPosition = new Vector2(centerX, startY); // 중앙 위치로 세팅
@@ -165,14 +188,43 @@ public class BattleStartButton : MonoBehaviour
             batchSlideSeq.Append(playerBatchUI.DOAnchorPos(new Vector2(leftOutX, startY), batchSlideDuration).SetEase(Ease.InOutCubic)); // 플레이어 배치 왼쪽 밖으로 슬라이드
             batchSlideSeq.Join(enemyBatchUI.DOAnchorPos(new Vector2(enemyTargetX, startY), batchSlideDuration).SetEase(Ease.InOutCubic));     // 적 배치 중앙으로 슬라이드
 
+            // 배경 이동 시작 위치 저장
+            if (backgroundTransform != null)
+                backgroundStartPosition = backgroundTransform.position;
+
+            // 배경 이동
+            if (backgroundTransform != null)
+            {
+                Vector3 bgTargetPos = backgroundTransform.position + new Vector3(-500f, 0f, 0f); // 원하는 이동값
+                float backgroundMoveDuration = 15f;
+                backgroundTransform.DOMove(bgTargetPos, backgroundMoveDuration).SetEase(Ease.InOutCubic);
+            }
+
             // 슬라이드 끝나면 전투 종료 처리
             batchSlideSeq.OnComplete(() =>
             {
                 OnBattleEnd(); // 전투 종료 함수 호출
             });
         });
+        // 배경도 동일하게 이동
+        
+
         //// 3초 후 자동 전투 종료
         //StartCoroutine(EndBattleAfterDelay(3f));
+    }
+
+    public void MoveBatchAndBackground(Vector2 targetPos, float duration)
+    {
+        // 배치 UI 이동
+        playerBatchUI.DOKill();
+        playerBatchUI.DOAnchorPos(targetPos, duration).SetEase(Ease.InOutCubic);
+
+        // 배경 이동 (Transform.position 기준, 필요시 anchoredPosition 사용)
+        if (backgroundTransform != null)
+        {
+            Vector3 bgTargetPos = new Vector3(targetPos.x, backgroundTransform.position.y, backgroundTransform.position.z);
+            backgroundTransform.DOMove(bgTargetPos, duration).SetEase(Ease.InOutCubic);
+        }
     }
     ////테스트용 배틀종료
     //private IEnumerator EndBattleAfterDelay(float delay)
@@ -181,5 +233,5 @@ public class BattleStartButton : MonoBehaviour
     //    OnBattleEnd();
     //}
     // EnemyRestSlideController.cs
-    
+
 }
