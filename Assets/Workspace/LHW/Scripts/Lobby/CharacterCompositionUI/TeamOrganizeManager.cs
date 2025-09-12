@@ -88,11 +88,11 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged += ShowCostInfo;
         OnCharacterDataChanged += ShowTotalOverallPowerInfo;
         OnCharacterDataChanged += ShowLeaderEffectInfo;
-        OnCharacterDataChanged += ShowCharacterCountInfo;
+        //OnCharacterDataChanged += ShowCharacterCountInfo;
         OnCharacterDataChanged += ShowButtonPreset;
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
-        ShowCharacterCountInfo();
+        //ShowCharacterCountInfo();
         ShowButtonPreset();
     }
 
@@ -101,7 +101,7 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged -= ShowCostInfo;
         OnCharacterDataChanged -= ShowTotalOverallPowerInfo;
         OnCharacterDataChanged -= ShowLeaderEffectInfo;
-        OnCharacterDataChanged -= ShowCharacterCountInfo;
+        //OnCharacterDataChanged -= ShowCharacterCountInfo;
         OnCharacterDataChanged -= ShowButtonPreset;
     }
 
@@ -279,7 +279,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowTotalOverallPowerInfo()
     {
-        //_totalOverallPowerText.text = $"팀 전투력 {_currentOverallPower}";
+        _totalOverallPowerText.text = $"{_currentOverallPower}";
     }
 
 
@@ -291,8 +291,8 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowCharacterCountInfo()
     {
-        _characterCountText.text = $"보유 영웅 {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
-        Debug.Log($"캐릭터 수 : {_collectedCharacterData.CollectedCharacterCount}");
+        //_characterCountText.text = $"보유 영웅 {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
+        //Debug.Log($"캐릭터 수 : {_collectedCharacterData.CollectedCharacterCount}");
     }
 
     private void ShowButtonPreset()
@@ -384,6 +384,7 @@ public class TeamOrganizeManager : MonoBehaviour
                 _currentOverallPower += _currentPreset[i].CombatPower;
             }
         }
+        Debug.Log($"현재 선택 프리셋 : {index}");
 
         OnCharacterDataChanged?.Invoke();
     }
