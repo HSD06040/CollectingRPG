@@ -5,37 +5,46 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// 여러 UI 패널의 슬라이드 애니메이션 및 배경 이동을 관리하는 컨트롤러
+/// 플레이어/적 각각의 패널 전환을 지원
+/// </summary>
 public class PanelMultiSlideController : MonoBehaviour
 {
-    public RectTransform[] slideUpPanels;      // 기존 UI 패널들 (위로 올라감)
-    public RectTransform[] slideInPanels;      // 새로 올라올 UI 패널들 (아래에서 올라옴)
+    public RectTransform[] slideUpPanels;      // 플레이어용: 위로 사라질 패널들
+    public RectTransform[] slideInPanels;      // 플레이어용: 아래에서 올라올 패널들
 
     private Vector2[] slideUpOriginalPositions;
     private Vector2[] slideInOriginalPositions;
 
-    public RectTransform[] enemySlideUpPanels;    // 적용 UI 패널들 (위로 올라감)
-    public RectTransform[] enemySlideInPanels;    // 적용 UI 패널들 (아래에서 올라옴)
+    public RectTransform[] enemySlideUpPanels;    // 적용: 위로 사라질 패널들
+    public RectTransform[] enemySlideInPanels;    // 적용: 아래에서 올라올 패널들
 
     private Vector2[] enemySlideUpOriginalPositions;
     private Vector2[] enemySlideInOriginalPositions;
 
-    public float slideDuration = 0.5f;
-    public float slideOffset = 2280f;          // 화면 밖으로 이동할 오프셋
+    public float slideDuration = 0.5f;          // 슬라이드 애니메이션 지속 시간(초)
+    public float slideOffset = 2280f;           // 패널이 이동할 오프셋(화면 밖 위치)
 
+    // UI 버튼
     public Button moveButton;
     public Button summonSceneButton;
 
-    
-    public Transform backgroundTransform; // Inspector에서 할당
+    // 배경 오브젝트(Inspector에서 할당)
+    public Transform backgroundTransform; 
     private Vector3 backgroundOriginalPosition;
 
     private Vector2[] originalPositions;
     private Vector2 summonSceneOriginalPos;
 
-    public static bool IsBattleActive = false;
+    public static bool IsBattleActive = false; // 전투 중 여부(패널 전환 예외 처리용)
+
+    /// <summary>
+    /// 패널 원래 위치 저장 및 초기화, 버튼 이벤트 연결
+    /// </summary>
     void Awake()
     {
-        // 기존 패널 원래 위치 저장
+        // 플레이어 패널 원래 위치 저장 및 초기화
         slideUpOriginalPositions = new Vector2[slideUpPanels.Length];
         for (int i = 0; i < slideUpPanels.Length; i++)
             slideUpOriginalPositions[i] = slideUpPanels[i].anchoredPosition;
@@ -50,7 +59,7 @@ public class PanelMultiSlideController : MonoBehaviour
             slideInPanels[i].gameObject.SetActive(false);
         }
 
-        // Enemy 패널 초기화
+        // 적 패널 원래 위치 저장 및 초기화
         if (enemySlideUpPanels != null)
         {
             enemySlideUpOriginalPositions = new Vector2[enemySlideUpPanels.Length];
@@ -74,7 +83,7 @@ public class PanelMultiSlideController : MonoBehaviour
             }
         }
 
-        // 씬 로드 이벤트 등록
+        // 씬 로드 이벤트 등록(배경 자동 할당)
         SceneManager.sceneLoaded += OnSceneLoaded;
 
         if (backgroundTransform != null)
@@ -92,7 +101,9 @@ public class PanelMultiSlideController : MonoBehaviour
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
-    // 씬이 로드될 때마다 백그라운드 오브젝트 자동 할당
+    /// <summary>
+    /// 씬이 로드될 때마다 배경 오브젝트 자동 할당
+    /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (backgroundTransform == null)
@@ -105,7 +116,10 @@ public class PanelMultiSlideController : MonoBehaviour
             }
         }
     }
-    // 위로 슬라이드
+    /// <summary>
+    /// 플레이어용: 기존 패널 위로 슬라이드(사라짐), 새 패널 아래에서 슬라이드(등장)
+    /// 배경도 y=1.1로 이동
+    /// </summary>
     public void SlideUpPanels()
     {
         float delayStep = 0.08f;
@@ -113,11 +127,10 @@ public class PanelMultiSlideController : MonoBehaviour
         // 기존 패널 위로 슬라이드 & 비활성화
         for (int i = 0; i < slideUpPanels.Length; i++)
         {
-            int idx = i; // 지역 변수로 캡처
+            int idx = i; 
             if (slideUpPanels[idx].gameObject.name == "WaitingBattlePlayer" ||
                 slideUpPanels[idx].gameObject.name == "WaitingBattleEnemy")
             {
-                // 위치 복구 코드도 삭제
                 continue;
             }
             slideUpPanels[idx].DOKill();
@@ -131,12 +144,10 @@ public class PanelMultiSlideController : MonoBehaviour
         for (int i = 0; i < slideInPanels.Length; i++)
         {
             int idx = i;
-            // 전투 중이면 WaitingBattlePlayer, WaitingBattleEnemy 위치 건너뜀
             if (IsBattleActive &&
                 (slideInPanels[idx].gameObject.name == "WaitingBattlePlayer" ||
                  slideInPanels[idx].gameObject.name == "WaitingBattleEnemy"))
             {
-                // 위치를 원래대로 복구
                 slideUpPanels[idx].anchoredPosition = slideUpOriginalPositions[idx];
                 continue; 
             }
@@ -148,6 +159,7 @@ public class PanelMultiSlideController : MonoBehaviour
                 .SetEase(Ease.OutCubic)
                 .SetDelay(idx * delayStep);
         }
+        // 배경도 y=1.1로 이동
         if (backgroundTransform != null)
         {
             Vector3 targetPos = new Vector3(backgroundOriginalPosition.x, 1.1f, backgroundOriginalPosition.z);
@@ -157,7 +169,10 @@ public class PanelMultiSlideController : MonoBehaviour
         }
     }
 
-    // 아래로 슬라이드(복귀)
+    /// <summary>
+    /// 플레이어용: 새 패널 아래로 슬라이드(사라짐), 기존 패널 위에서 아래로 슬라이드(복귀)
+    /// 배경도 원래 위치로 복귀
+    /// </summary>
     public void SlideDownPanels()
     {
         float delayStep = 0.08f;
@@ -180,7 +195,6 @@ public class PanelMultiSlideController : MonoBehaviour
             if (slideUpPanels[idx].gameObject.name == "WaitingBattlePlayer" ||
                 slideUpPanels[idx].gameObject.name == "WaitingBattleEnemy")
             {
-                // 위치 복구 코드도 삭제
                 continue;
             }
             slideUpPanels[idx].gameObject.SetActive(true);
@@ -189,6 +203,7 @@ public class PanelMultiSlideController : MonoBehaviour
                 .SetEase(Ease.OutCubic)
                 .SetDelay(idx * delayStep);
         }
+        // 배경 원래 위치로 복귀
         if (backgroundTransform != null)
         {
             backgroundTransform.DOMove(backgroundOriginalPosition, slideDuration)
@@ -196,10 +211,14 @@ public class PanelMultiSlideController : MonoBehaviour
                 .SetDelay((slideUpPanels.Length + 1) * delayStep);
         }
     }
+    /// <summary>
+    /// 적용: 기존 패널 아래로 슬라이드(사라짐), 새 패널 위에서 아래로 슬라이드(등장)
+    /// 배경도 y=1.1 또는 원하는 값으로 이동
+    /// </summary>
     public void SlideEnemyToSummonScene()
     {
         float delayStep = 0.08f;
-        // 아래로 슬라이드 & 비활성화 (WaitingBattleEnemy 등)
+        // 기존 패널 아래로 슬라이드 & 비활성화
         for (int i = 0; i < enemySlideUpPanels.Length; i++)
         {
             int idx = i;
@@ -209,7 +228,7 @@ public class PanelMultiSlideController : MonoBehaviour
                 .SetDelay(idx * delayStep)
                 .OnComplete(() => enemySlideUpPanels[idx].gameObject.SetActive(false));
         }
-        // 위에서 아래로 슬라이드 & 활성화 (SummonScene 등)
+        // 새 패널 위에서 아래로 슬라이드 & 활성화
         for (int i = 0; i < enemySlideInPanels.Length; i++)
         {
             int idx = i;

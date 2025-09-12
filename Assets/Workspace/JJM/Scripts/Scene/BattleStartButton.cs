@@ -206,11 +206,7 @@ public class BattleStartButton : MonoBehaviour
                 OnBattleEnd(); // 전투 종료 함수 호출
             });
         });
-        // 배경도 동일하게 이동
         
-
-        //// 3초 후 자동 전투 종료
-        //StartCoroutine(EndBattleAfterDelay(3f));
     }
 
     public void MoveBatchAndBackground(Vector2 targetPos, float duration)
@@ -226,12 +222,5 @@ public class BattleStartButton : MonoBehaviour
             backgroundTransform.DOMove(bgTargetPos, duration).SetEase(Ease.InOutCubic);
         }
     }
-    ////테스트용 배틀종료
-    //private IEnumerator EndBattleAfterDelay(float delay)
-    //{
-    //    yield return new WaitForSeconds(delay);
-    //    OnBattleEnd();
-    //}
-    // EnemyRestSlideController.cs
-
+    
 }
