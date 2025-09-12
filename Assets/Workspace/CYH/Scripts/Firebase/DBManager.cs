@@ -8,6 +8,8 @@ using UnityEngine;
 public class DBManager : Singleton<DBManager>
 {
     public CharDB charDB = new CharDB();
+    public QuestDB questDB = new QuestDB();
+
 
     #region Nickname/LobbyData
 

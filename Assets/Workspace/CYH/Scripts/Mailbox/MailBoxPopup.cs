@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -67,22 +66,24 @@ public class MailBoxPopup : MonoBehaviour
             Destroy(_content.GetChild(i).gameObject);
         }
 
-        // 메일 생성 + 바인딩
+        // IsReceived = false 메일을 우편함에 생성 + 바인딩
         foreach (var mail in mails)
         {
-            GameObject mailObject = Instantiate(_mailItemPrefab, _content);
-
-            // 비활성화로 생성 / 데이터 바인드 이후 OnEnable 실행
-            mailObject.SetActive(false);
-
-            MailItem mailItem = mailObject.GetComponent<MailItem>();
-            
-            if (mailItem != null)
+            if (mail.IsReceived == false)
             {
-                mailItem.Bind(mail, _controller);
-            }
+                GameObject mailObject = Instantiate(_mailItemPrefab, _content);
 
-            mailObject.SetActive(true);
+                // 비활성화로 생성 / 데이터 바인드 이후 OnEnable 실행
+                mailObject.SetActive(false);
+
+                MailItem mailItem = mailObject.GetComponent<MailItem>();
+                if (mailItem != null)
+                {
+                    mailItem.Bind(mail, _controller);
+                }
+
+                mailObject.SetActive(true);
+            }
         }
     }
 
