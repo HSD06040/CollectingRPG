@@ -31,8 +31,6 @@ public class PoolManager : Singleton<PoolManager>
         SceneManager.sceneLoaded += OnSceneLoaded;        
     }
 
-    
-
     public void ResetPool()
     {
         _poolDic = new();
