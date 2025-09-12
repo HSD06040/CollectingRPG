@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+// 사용하지 않는 코드입니다.
 public class LobbyClassSynergySlot : MonoBehaviour
 {
     [SerializeField] private Image _icon;

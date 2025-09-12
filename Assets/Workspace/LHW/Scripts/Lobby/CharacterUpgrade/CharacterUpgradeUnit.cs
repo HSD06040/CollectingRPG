@@ -54,13 +54,16 @@ public class CharacterUpgradeUnit : MonoBehaviour
 
     private void OnEnable()
     {
-        _manager.PopUpUI.OnCharacterStatusChanged += UIUpdate;
-        UIUpdate();
+        if (_manager != null)
+        {
+            _manager.PopUpUI.OnCharacterStatusChanged += UIUpdate;
+            UIUpdate();
+        }
     }
 
     private void OnDisable()
     {
-        _manager.PopUpUI.OnCharacterStatusChanged -= UIUpdate;
+        if(_manager != null) _manager.PopUpUI.OnCharacterStatusChanged -= UIUpdate;
     }
 
     #region Onclick
@@ -102,7 +105,7 @@ public class CharacterUpgradeUnit : MonoBehaviour
         if (Manager.Data.SynergyDB != null)
         {
             _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
-            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
+            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).Icon;
         }
         //_overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel}";
