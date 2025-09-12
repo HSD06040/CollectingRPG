@@ -80,7 +80,7 @@ public class QuestDataSO<T> : ScriptableObject, IQuest, IQuestView
 
     public async virtual void Clear()
     {
-        ////OnClearCondition?.Invoke();
+        //OnClearCondition?.Invoke();
 
         if (_curProgress >= _maxProgress)
         {

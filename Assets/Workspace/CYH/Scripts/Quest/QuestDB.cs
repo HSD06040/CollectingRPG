@@ -46,10 +46,10 @@ public class QuestDB
     }
 
     /// <summary>
-    /// 유저의 마일스톤 데이터를 로드하는 메서드
+    /// 유저의 Milestone 데이터를 로드하는 메서드
     /// 데이터가 없으면 생성 후 반환
     /// </summary>
-    /// <returns>로드된 마일스톤 데이터</returns>
+    /// <returns>로드된 Milestone 데이터</returns>
     public async Task<MilestoneData> LoadUserMilestoneAsync()
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
@@ -88,7 +88,7 @@ public class QuestDB
     /// 유저 일일 퀘스트 진행 상태를 로드하는 메서드
     /// 데이터가 없으면 퀘스트 리스트 기준으로 생성 후 반환
     /// </summary>
-    /// <returns>퀘스트 ID와 해당 진행 상태를 담은 딕셔너리</returns>
+    /// <returns>퀘스트 ID, 해당 진행 상태를 담은 딕셔너리</returns>
     public async Task<Dictionary<int, DailyQuestState>> LoadDailyQuestStatesAsync()
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
@@ -150,7 +150,7 @@ public class QuestDB
     }
 
     /// <summary>
-    /// Milestone 전체 데이터를 유저DB에 저장하는 메서드
+    /// Milestone 전체 데이터를 유저 DB에 저장하는 메서드
     /// </summary>
     public async void SaveUserMilestoneAsync()
     {
