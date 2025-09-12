@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuestManager : Singleton<QuestManager>
+public class QuestManager : MonoBehaviour
 {
     //  모든 퀘스트 데이터
-    [SerializeField] internal List<ScriptableObject> _quests;
+    [SerializeField] public List<ScriptableObject> _quests;
     [SerializeField] public StateQuest loginQuest;
     [SerializeField] public ItemQuest adWatchQuest;
+
+    public static QuestManager Instance { get; private set; }
 
     private int _maxPoint = 100;
     public int MaxPoint { get { return _maxPoint; } }
@@ -20,6 +22,8 @@ public class QuestManager : Singleton<QuestManager>
 
     private void Awake()
     {
+        SetSingleton();
+
         Subscribe();
     }
 
@@ -34,6 +38,20 @@ public class QuestManager : Singleton<QuestManager>
     }
 
     #region Init
+
+    //  (이벤트 연결 및 해제 / 싱글톤 세팅)
+    private void SetSingleton()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void Subscribe()
     {
