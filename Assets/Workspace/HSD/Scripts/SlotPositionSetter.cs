@@ -4,20 +4,25 @@ using UnityEngine;
 
 public class SlotPositionSetter : MonoBehaviour
 {
+    [SerializeField] BattleCameraController _battleCameraController;
+
+    [Header("Slots")]
     [SerializeField] GameObject _battleSlot;
     [SerializeField] GameObject _planSlot;
-    [SerializeField] GameObject _enemySlot;    
+    [SerializeField] GameObject _enemySlot;
+    [Space]
+
     [SerializeField] float _zOffset = 10f;
     [SerializeField] float _distance = 3;
-    [SerializeField] float _battleSlotRatio;
-
-    [ContextMenu("SetPosition")]
+    [SerializeField] float _battleSlotRatio = 0.65f;
+    [SerializeField] float _unitSlotRatio = 0.75f;
+    
     public void SetPositions()
     {
         Rect safe = Screen.safeArea;
 
         float centerX = safe.x + safe.width * 0.5f;
-        float centerYInSafe = safe.y + safe.height * 0.75f;
+        float centerYInSafe = safe.y + safe.height * _unitSlotRatio;
         float centerYNextSafe = safe.y + safe.height * _battleSlotRatio;
 
         float screenZ = Mathf.Abs(Camera.main.transform.position.z + _zOffset);
@@ -28,10 +33,12 @@ public class SlotPositionSetter : MonoBehaviour
 
         Vector3 planWorld = Camera.main.ScreenToWorldPoint(planScreen);
         Vector3 battleWorld = Camera.main.ScreenToWorldPoint(battleScreen);
-        Vector3 enemyWorld = Camera.main.ScreenToWorldPoint(enemyScreen);
+        Vector3 enemyWorld = battleWorld + Vector3.right * _distance;
 
         _planSlot.transform.position = planWorld;
         _battleSlot.transform.position = battleWorld;
         _enemySlot.transform.position = enemyWorld;
+
+        _battleCameraController.XLimit = _distance;
     }
 }

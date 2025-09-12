@@ -95,7 +95,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
         MoveToPage(_currentPage);
     }
 
-    private void MoveToPage(int pageIndex, bool instant = false)
+    public void MoveToPage(int pageIndex, bool instant = false)
     {
         float height = Screen.height;
         Vector2 targetPos = new Vector2(0, -pageIndex * height);
@@ -123,7 +123,6 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
             Camera.main.WorldToScreenPoint(Vector3.zero) + screenOffset
         ) - Camera.main.ScreenToWorldPoint(Camera.main.WorldToScreenPoint(Vector3.zero));
 
-        // 페이지 위치 적용
         for (int i = 0; i < _pages.Length; i++)
         {
             Vector3 basePos;

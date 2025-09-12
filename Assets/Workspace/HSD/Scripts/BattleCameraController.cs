@@ -1,11 +1,12 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BattleCameraController : MonoBehaviour
 {
+    public float XLimit = 10f;
     [SerializeField] float _sensitivity = 2f;
-    [SerializeField] float _xLimit = 10f;
     [SerializeField] float _smoothSpeed = 5f;
 
     private Vector3 _initialPosition;
@@ -20,7 +21,7 @@ public class BattleCameraController : MonoBehaviour
 
     private void Update()
     {
-        MoveCamera();
+        //MoveCamera();
     }
 
     public void StartDrag()
@@ -49,7 +50,7 @@ public class BattleCameraController : MonoBehaviour
 
         _targetPosition += movement;
 
-        float clampedX = Mathf.Clamp(_targetPosition.x, _initialPosition.x, _initialPosition.x + _xLimit);
+        float clampedX = Mathf.Clamp(_targetPosition.x, _initialPosition.x, _initialPosition.x + XLimit);
         _targetPosition = new Vector3(clampedX, _targetPosition.y, _targetPosition.z);
     }
 
@@ -61,5 +62,15 @@ public class BattleCameraController : MonoBehaviour
     public void ResetCamera()
     {
         _targetPosition = _initialPosition;
+    }
+
+    public void MoveToEnemy()
+    {
+        transform.DOMoveX(transform.position.x + XLimit, .3f);
+    }
+
+    public void MoveToBattle()
+    {
+        transform.DOMoveX(transform.position.x - XLimit, .3f);
     }
 }
