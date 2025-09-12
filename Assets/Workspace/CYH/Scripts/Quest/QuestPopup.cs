@@ -32,13 +32,18 @@ public class QuestPopup : MonoBehaviour
     {
         await Manager.DB.questDB.LoadUserQuestDataAsync();
         await Manager.DB.questDB.LoadUserMilestoneAsync();
-        Init();       
+        await Manager.DB.questDB.LoadDailyQuestStatesAsync();
+
+        Init();
+        _initRoutine = StartCoroutine(InitAndStartRoutine());
     }
 
     private void OnEnable()
     {
-        // 타이머 시작
-        _initRoutine = StartCoroutine(InitAndStartRoutine());
+        Init();
+
+        if (_initRoutine == null)
+            _initRoutine = StartCoroutine(InitAndStartRoutine());
     }
 
     private void OnDisable()
@@ -121,6 +126,7 @@ public class QuestPopup : MonoBehaviour
                             break;
                         case 4:
                             _questManager.RewardGoldAsync(5000);
+                            _questManager.RewardDiamondAsync(150);
                             _questManager.SetMilstoneState(index, true);
                             break;
                     }
@@ -168,7 +174,7 @@ public class QuestPopup : MonoBehaviour
 
         DateTime kstNow = task.Result;
         DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 6, 0, 0);
-        //DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 17, 24, 0);
+        //DateTime resetTime = new DateTime(kstNow.Year, kstNow.Month, kstNow.Day, 7, 04, 00);
 
         if (kstNow >= resetTime)
         {

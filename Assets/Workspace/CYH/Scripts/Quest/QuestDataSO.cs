@@ -78,8 +78,21 @@ public class QuestDataSO<T> : ScriptableObject, IQuest, IQuestView
     /// <param name="value">condition</param>
     public virtual void ClearCondition(T value) { }
 
-    public virtual void Clear()
+    public async virtual void Clear()
     {
-        OnClearCondition?.Invoke();
+        ////OnClearCondition?.Invoke();
+
+        if (_curProgress >= _maxProgress)
+        {
+            Debug.Log($"{_questDesc} 완료");
+            return;
+        }
+        _curProgress++;
+
+        if (_curProgress == _maxProgress)
+        {
+            _isCompleted = true;
+        }
+        await Manager.DB.questDB.SaveQuestCompletedAsync(_questID, _isCompleted);
     }
 }

@@ -1,15 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using static UnityEditor.VersionControl.Asset;
 
 public class QuestManager : MonoBehaviour
 {
     //  모든 퀘스트 데이터
     [SerializeField] internal List<ScriptableObject> _quests;
+    [SerializeField] public StateQuest loginQuest;
+    [SerializeField] public ItemQuest adWatchQuest;
+
     public static QuestManager Instance { get; private set; }
-    
+
     private int _maxPoint = 100;
     public int MaxPoint { get { return _maxPoint; } }
 
@@ -25,6 +25,11 @@ public class QuestManager : MonoBehaviour
         SetSingleton();
 
         Subscribe();
+    }
+
+    private void Start()
+    {
+        OnStateChanged(loginQuest, true);
     }
 
     private void OnDestroy()
@@ -78,7 +83,8 @@ public class QuestManager : MonoBehaviour
         {
             if (!quest.IsComplete)
             {
-                quest.ClearQuest();
+                quest.IsComplete = true;
+                //Manager.DB.questDB.SaveQuestCompletedAsync(quest.QuestID, quest.IsComplete);
             }
         }
     }
@@ -107,6 +113,11 @@ public class QuestManager : MonoBehaviour
         {
             _milestoneData.MilestoneStates[i] = false;
         }
+
+        Manager.DB.questDB.DeleteUserQuestDataAsync();
+
+        // 로그인 퀘스트
+        OnStateChanged(loginQuest, true);
     }
 
     /// <summary>
@@ -122,6 +133,7 @@ public class QuestManager : MonoBehaviour
             {
                 _userQuestData.TotalPoint += condition.RewardPoint;
                 Manager.DB.questDB.SaveUserQuestDataAsync();
+                Manager.DB.questDB.SaveQuestReceivedAsync(condition.QuestID, true);
             }
             else
             {
@@ -137,6 +149,15 @@ public class QuestManager : MonoBehaviour
     public async void RewardGoldAsync(int amount)
     {
         await Manager.DB.AddGoldAsync(amount);
+    }
+
+    /// <summary>
+    /// 지정한 양의 다이아를 유저 DB에 저장하는 메서드
+    /// </summary>
+    /// <param name="amount">지급할 Diamond 양</param>
+    public async void RewardDiamondAsync(int amount)
+    {
+        await Manager.DB.AddDiamondAsync(amount);
     }
 
     /// <summary>
@@ -164,6 +185,21 @@ public class QuestManager : MonoBehaviour
     public void ApplyMilestoneData(MilestoneData data)
     {
         _milestoneData = data;
+    }
+
+    public void ApplyDailyQuestStates(Dictionary<int, DailyQuestState> states)
+    {
+        foreach (var questObj in _quests)
+        {
+            if (questObj is QuestDataSO<object> quest)
+            {
+                if (states.TryGetValue(quest.QuestID, out DailyQuestState state))
+                {
+                    quest.IsComplete = state.IsCompleted;
+                    quest.IsReceive = state.IsReceived;
+                }
+            }
+        }
     }
 
     #region 각 조건 클리어 시 호출할 함수
@@ -198,5 +234,4 @@ public class QuestManager : MonoBehaviour
         CallHandler<bool>(condition, state);
     }
     #endregion
-
 }
