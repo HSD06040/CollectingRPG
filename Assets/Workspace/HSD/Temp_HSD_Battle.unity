@@ -3047,7 +3047,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _verticalSwipePager: {fileID: 1545470065}
-  _battleCameraController: {fileID: 2137366917}
   _battleSwitchButton: {fileID: 1929354230}
   _unitSwitchButton: {fileID: 197785699}
   _enemySwitchButton: {fileID: 740088357}
@@ -4872,6 +4871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _slotPositionSetter: {fileID: 1545470067}
+  _switchButtonController: {fileID: 867832731}
   _content: {fileID: 952862532}
   _pages:
   - {fileID: 134434908}
@@ -4881,6 +4881,8 @@ MonoBehaviour:
   _easeType: 9
   _currentPage: 0
   _cameraOffset: {x: 0, y: 0}
+  _xDragSensitivity: 30
+  _xTweenDuration: 0.5
 --- !u!114 &1545470066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4905,7 +4907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff870620c6e98f14db3a32c2409c044a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _battleCameraController: {fileID: 2137366917}
+  _swipePager: {fileID: 1545470065}
   _center: {fileID: 1750745815}
   _battleSlot: {fileID: 335691367}
   _planSlot: {fileID: 187535050}
@@ -6270,7 +6272,6 @@ GameObject:
   - component: {fileID: 2137366914}
   - component: {fileID: 2137366913}
   - component: {fileID: 2137366916}
-  - component: {fileID: 2137366917}
   m_Layer: 0
   m_Name: UICamera
   m_TagString: MainCamera
@@ -6397,20 +6398,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &2137366917
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2137366912}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69a30b13690dfa04aa2ecf2c1714b7a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _sensitivity: 5
-  _smoothSpeed: 5
 --- !u!1 &2138316765
 GameObject:
   m_ObjectHideFlags: 0
@@ -7697,7 +7684,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _cameraController
       value: 
-      objectReference: {fileID: 2137366917}
+      objectReference: {fileID: 0}
     - target: {fileID: 8565230051016588581, guid: c30d4f23bd3dbc144bb61ec7cefcf6d1,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -7759,7 +7746,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5373981438783233269, guid: c30d4f23bd3dbc144bb61ec7cefcf6d1, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 8214527186711379371, guid: c30d4f23bd3dbc144bb61ec7cefcf6d1,
         type: 3}

@@ -156,15 +156,14 @@ public class UnitManager : MonoBehaviour
 
     private async UniTask FightRoutine()
     {
+        await Camera.main.DOFieldOfView(120, 0.5f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
         SlotsDeActive();
 
-        await Camera.main.DOFieldOfView(120, 0.5f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
-
-        await UniTask.Delay(TimeSpan.FromSeconds(.2f));
+        await UniTask.Delay(TimeSpan.FromSeconds(.1f));
         UnitsMove();
 
         UnitController.BattleParent.DOMoveX(_center.position.x - 5, 2).SetEase(Ease.Linear);
-        Camera.main.transform.DOMoveX(_center.position.x, 2);
+        Camera.main.transform.DOMoveX(_center.position.x, 2.2f);
         await UniTask.Delay(TimeSpan.FromSeconds(1));
         EnemyController.BattleParent.DOMoveX(-(_center.position.x - 5), 1).SetEase(Ease.Linear);
         await UniTask.Delay(TimeSpan.FromSeconds(1));

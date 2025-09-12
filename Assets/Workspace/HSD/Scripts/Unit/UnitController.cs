@@ -104,12 +104,8 @@ public class UnitController : MonoBehaviour
             if (unit == null)
                 continue;
 
-            unit.transform.SetParent(BattleParent);
             unit.Move();
         }
-
-        
-        _battleUnitManager._unitSlotManager.SlotCreater.DeActiveSlots();
 
         _unitDragDropSystem.enabled = false;
     }    
@@ -127,6 +123,15 @@ public class UnitController : MonoBehaviour
 
     public void SlotsDeActive()
     {
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
+        {
+            if (unit == null)
+                continue;
+
+            unit.transform.SetParent(BattleParent);
+        }
+
+        _battleUnitManager._unitSlotManager.SlotCreater.DeActiveSlots();
         _unitSlotManager.SlotCreater.DeActiveSlots();
     }
     #endregion

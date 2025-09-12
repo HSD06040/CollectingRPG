@@ -69,7 +69,6 @@ public class EnemyController : MonoBehaviour
             if (unit == null)
                 continue;
 
-            unit.transform.SetParent(BattleParent);
             unit.Move();
         }
     }
@@ -97,6 +96,14 @@ public class EnemyController : MonoBehaviour
     }
     public void SlotsDeActive()
     {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit == null)
+                continue;
+
+            unit.transform.SetParent(BattleParent);
+        }
+
         _slotManager.SlotCreater.DeActiveSlots();
     }
 

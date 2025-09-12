@@ -120,7 +120,7 @@ public class CsvDownloader
 
             UnitStats stat = new UnitStats
             {
-                AttackRange = int.TryParse(row[6], out int attackRange) ? attackRange : 1,
+                AttackRange = int.TryParse(row[6], out int attackRange) ? attackRange * 1.5f : 1,
                 AttackSpeed = float.TryParse(row[8], out float attackSpeed) ? attackSpeed : 1f,
                 ManaGain = int.TryParse(row[9], out int manaGain) ? manaGain : 0,
                 PhysicalDamage = int.TryParse(row[10], out int physicalAttack) ? physicalAttack : 0,

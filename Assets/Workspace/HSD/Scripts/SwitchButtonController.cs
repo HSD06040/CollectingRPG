@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class SwitchButtonController : MonoBehaviour
 {
     [SerializeField] VerticalSwipePager _verticalSwipePager;
-    [SerializeField] BattleCameraController _battleCameraController;
 
     [Header("Buttons")]
     [SerializeField] Button _battleSwitchButton;
@@ -25,7 +24,7 @@ public class SwitchButtonController : MonoBehaviour
         _enemyUnitSwitchButton.onClick.AddListener(() => _verticalSwipePager.MoveToPage(0));
 
         _enemySwitchButton.onClick.AddListener(EnemySwitchButtonClick);
-        _enemyBattleSwitchButton.onClick.AddListener(EnemyUnitSwitchButtonClick);
+        _enemyBattleSwitchButton.onClick.AddListener(EnemyBattleSwitchButtonClick);
 
         _enemyBattleSwitchButton.transform.parent.gameObject.SetActive(false);
         _enemyUnitSwitchButton.transform.parent.gameObject.SetActive(false);
@@ -33,7 +32,18 @@ public class SwitchButtonController : MonoBehaviour
 
     private void EnemySwitchButtonClick()
     {
-        _battleCameraController.MoveToEnemy();
+        _verticalSwipePager.MoveToEnemy();
+        EnemySlotButtonSetting();
+    }    
+
+    private void EnemyBattleSwitchButtonClick()
+    {
+        _verticalSwipePager.MoveToBattle();
+        EnemyBattleSlotButtonSetting();
+    }
+
+    public void EnemySlotButtonSetting()
+    {
         _enemySwitchButton.transform.parent.gameObject.SetActive(false);
         _unitSwitchButton.transform.parent.gameObject.SetActive(false);
 
@@ -41,9 +51,8 @@ public class SwitchButtonController : MonoBehaviour
         _enemyUnitSwitchButton.transform.parent.gameObject.SetActive(true);
     }
 
-    private void EnemyUnitSwitchButtonClick()
+    public void EnemyBattleSlotButtonSetting()
     {
-        _battleCameraController.MoveToBattle();
         _enemySwitchButton.transform.parent.gameObject.SetActive(true);
         _unitSwitchButton.transform.parent.gameObject.SetActive(true);
 

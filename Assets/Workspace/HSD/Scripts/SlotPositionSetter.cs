@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SlotPositionSetter : MonoBehaviour
 {
-    [SerializeField] BattleCameraController _battleCameraController;
+    [SerializeField] VerticalSwipePager _swipePager;
 
     [Header("Center")]
     [SerializeField] Transform _center;
@@ -45,6 +45,6 @@ public class SlotPositionSetter : MonoBehaviour
         _enemySlot.transform.position = enemyWorld;
         _center.position = centerWorld;
 
-        _battleCameraController.XLimit = _distance;
+        _swipePager.XLimit = _distance;
     }
 }
