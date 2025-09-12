@@ -54,13 +54,16 @@ public class CharacterUpgradeUnit : MonoBehaviour
 
     private void OnEnable()
     {
-        _manager.PopUpUI.OnCharacterStatusChanged += UIUpdate;
-        UIUpdate();
+        if (_manager != null)
+        {
+            _manager.PopUpUI.OnCharacterStatusChanged += UIUpdate;
+            UIUpdate();
+        }
     }
 
     private void OnDisable()
     {
-        _manager.PopUpUI.OnCharacterStatusChanged -= UIUpdate;
+        if(_manager != null) _manager.PopUpUI.OnCharacterStatusChanged -= UIUpdate;
     }
 
     #region Onclick
