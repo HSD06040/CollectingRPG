@@ -19,7 +19,7 @@ public class UI_UnitSlotController : MonoBehaviour
     private UnitStatus[] _cachedUnitsArray = new UnitStatus[UnitController.UnitMaxCount];
     private Dictionary<string, List<int>> _unitSlotDic = new Dictionary<string, List<int>>(10);
 
-    private void Awake()
+    private void Start()
     {
         CreateSlots();
         UI_UnitSlot.OnUnitChanged += SetSlot;

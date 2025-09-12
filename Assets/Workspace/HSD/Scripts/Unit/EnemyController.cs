@@ -9,6 +9,9 @@ public class EnemyController : MonoBehaviour
     [SerializeField] LayerMask _targetLayer;
     private UnitBase[,] _unitGrid;
 
+    [Header("Parent")]
+    public Transform BattleParent;
+
     public void Init()
     {
         _slotManager.Init();
@@ -55,11 +58,30 @@ public class EnemyController : MonoBehaviour
             if (unit == null)
                 continue;
 
-            unit.transform.SetParent(null);
             unit.Fight();
-        }
+        }        
+    }
 
-        _slotManager.SlotCreater.DeActiveSlots();
+    public void EnemyMove()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit == null)
+                continue;
+
+            unit.Move();
+        }
+    }
+
+    public void EnemyIdle()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit == null)
+                continue;
+
+            unit.Idle();
+        }
     }
 
     public void EnemyStandby()
@@ -71,6 +93,18 @@ public class EnemyController : MonoBehaviour
 
             unit.Standby();
         }
+    }
+    public void SlotsDeActive()
+    {
+        foreach (var unit in _unitGrid)
+        {
+            if (unit == null)
+                continue;
+
+            unit.transform.SetParent(BattleParent);
+        }
+
+        _slotManager.SlotCreater.DeActiveSlots();
     }
 
     public void ResetEnemy()

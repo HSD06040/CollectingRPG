@@ -91,6 +91,16 @@ public class UnitBase : MonoBehaviour, IAttacker
     #endregion
 
     #region FSM
+    public void Move()
+    {
+        _fsm.Move();
+    }
+
+    public void Idle()
+    {
+        _fsm.Idle();
+    }
+
     public void Fight()
     {
         Init();
@@ -223,6 +233,10 @@ public class UnitBase : MonoBehaviour, IAttacker
     public Vector2 GetCenter()
     {
         return Col.bounds.center;
+    }
+    public Vector2 GetBarPosition()
+    {
+        return GetCenter() + new Vector2(0, (transform.localScale.y / 2) + .3f);
     }
     public UnitStatusController GetStatusController()
     {

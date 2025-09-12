@@ -12,6 +12,8 @@ public class UnitController : MonoBehaviour
     [SerializeField] BattleUnitManager _battleUnitManager;
     #endregion
 
+    public Transform BattleParent;
+
     #region Unit
     private UnitBase[,] _unitGrid;
     private Dictionary<string, List<UnitBase>> _unitBaseDic = new Dictionary<string, List<UnitBase>>(64);
@@ -91,14 +93,46 @@ public class UnitController : MonoBehaviour
             if (unit == null)
                 continue;
 
-            unit.transform.SetParent(null);
             unit.Fight();
         }
+    }
 
-        _unitSlotManager.SlotCreater.DeActiveSlots();
-        _battleUnitManager._unitSlotManager.SlotCreater.DeActiveSlots();
+    public void UnitMove()
+    {
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
+        {
+            if (unit == null)
+                continue;
+
+            unit.Move();
+        }
 
         _unitDragDropSystem.enabled = false;
+    }    
+
+    public void UnitIdle()
+    {
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
+        {
+            if (unit == null)
+                continue;
+            
+            unit.Idle();
+        }
+    }
+
+    public void SlotsDeActive()
+    {
+        foreach (var unit in _battleUnitManager.GetUnitGrid())
+        {
+            if (unit == null)
+                continue;
+
+            unit.transform.SetParent(BattleParent);
+        }
+
+        _battleUnitManager._unitSlotManager.SlotCreater.DeActiveSlots();
+        _unitSlotManager.SlotCreater.DeActiveSlots();
     }
     #endregion
 

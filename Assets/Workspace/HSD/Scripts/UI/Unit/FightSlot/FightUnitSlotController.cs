@@ -7,7 +7,7 @@ public class FightUnitSlotController : MonoBehaviour
     [SerializeField] GridLayoutGroup _grid;
     [SerializeField] UI_FightUnitSlot[] _slots;
 
-    private void Awake()
+    private void Start()
     {
         CreateSlots();
 

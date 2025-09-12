@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class SlotCreater : MonoBehaviour
 {
-    [SerializeField] GameObject _slotPrefab;
-    [SerializeField] Transform _slotParent;
-    private static Vector2 _offset = new Vector2(1.7f, 1.6f);
+    [SerializeField] protected GameObject _slotPrefab;
+    [SerializeField] protected Transform _slotParent;
+    protected static Vector2 _offset = new Vector2(1.7f, 1.6f);
     public Vector2Int Size;    
 
-    public Dictionary<Vector2Int, UnitSlot> Init()
+    public virtual Dictionary<Vector2Int, UnitSlot> Init()
     {
         Dictionary<Vector2Int, UnitSlot> unitSlotDic = new Dictionary<Vector2Int, UnitSlot>();
 
@@ -32,7 +32,7 @@ public class SlotCreater : MonoBehaviour
         return unitSlotDic;
     }
 
-    private Vector2 GetPos(int x, int y)
+    protected Vector2 GetPos(int x, int y)
     {
         Vector2 parentPos = _slotParent.position;
 
@@ -45,12 +45,12 @@ public class SlotCreater : MonoBehaviour
         return parentPos + new Vector2(x * _offset.x + xOffset, y * _offset.y + yOffset);
     }
 
-    public void DeActiveSlots()
+    public virtual void DeActiveSlots()
     {
         _slotParent.gameObject.SetActive(false);
     }
 
-    public void ActiveSlots()
+    public virtual void ActiveSlots()
     {
         _slotParent.gameObject.SetActive(true);
     }

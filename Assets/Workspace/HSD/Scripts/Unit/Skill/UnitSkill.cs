@@ -52,7 +52,7 @@ public abstract class UnitSkill : ScriptableObject
                 prefab.transform.rotation,
                 true
             );
-            Debug.Log(prefab.transform.rotation.x);
+
             int attackerDir = attacker.GetTransform().GetFacingDir();
             int objDir = obj.transform.GetRotFacingDir();
 
