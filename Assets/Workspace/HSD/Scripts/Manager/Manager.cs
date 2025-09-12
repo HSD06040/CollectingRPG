@@ -13,7 +13,6 @@ public static class Manager
     public static AuthManager Auth => AuthManager.Instance;
     public static DBManager DB => DBManager.Instance;
     public static PopupManager Popup => PopupManager.Instance;
-    public static QuestManager Quest => QuestManager.Instance;
 
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -27,6 +26,5 @@ public static class Manager
         AuthManager.CreateInstance();
         DBManager.CreateInstance();
         PopupManager.CreateInstance();
-        QuestManager.CreateInstance();
     }
 }
