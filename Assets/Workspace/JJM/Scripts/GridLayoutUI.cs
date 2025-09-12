@@ -14,9 +14,9 @@ public class GridLayoutUI : MonoBehaviour
     [Min(1)]
     public int columns = 10; // 한 줄에 몇 개
 
-    [Min(0)]
+   
     public float spacingX = 10f; // 가로 간격
-    [Min(0)]
+   
     public float spacingY = 10f; // 세로 간격
 
     [Header("Cell 비율 설정")]

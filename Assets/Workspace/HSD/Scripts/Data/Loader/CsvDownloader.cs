@@ -160,7 +160,7 @@ public class CsvDownloader
 
             UnitStats stat = new UnitStats
             {
-                AttackRange = int.TryParse(row[1], out int attackRange) ? attackRange : 1,
+                AttackRange = float.TryParse(row[1], out float attackRange) ? attackRange * 1.5f : 1,
                 AttackSpeed = float.TryParse(row[3], out float attackSpeed) ? attackSpeed : 1f,
                 ManaGain = int.TryParse(row[4], out int manaGain) ? manaGain : 0,
                 PhysicalDamage = int.TryParse(row[5], out int physicalAttack) ? physicalAttack : 0,
@@ -179,7 +179,7 @@ public class CsvDownloader
             unitData.AttackData = Array.Find(_attackDatas, a => a.ID == int.Parse(row[14]));
 
             unitData.UnitStats = new UnitStats[4];
-            unitData.PerferredLine = stat.AttackRange;
+            unitData.PerferredLine = Mathf.RoundToInt(stat.AttackRange / 1.5f);
 
             unitData.AddressableAddress = $"Monster_{unitData.ID}";
 

@@ -5,13 +5,21 @@ using UnityEngine.UI;
 
 public class PartySelectPanelController : MonoBehaviour
 {
+    [Header("Reference")]
+    [SerializeField] private GameObject _stageSelectPanel;
+    [SerializeField] private GameObject _partySelectPanel;
+    [SerializeField] private BottomPanelController _bottomPanelCtrl;
+
+    [Header("Button")]
     [SerializeField] private Button _gameStartButton;
+    [SerializeField] private Button _arrangeButton;
 
     public Action OnSelectedIndexChanged;
 
     private void OnEnable()
     {
         _gameStartButton.onClick.AddListener(GameStart);
+        _arrangeButton.onClick.AddListener(ArrangePreset);
         OnSelectedIndexChanged += ActivateGameStartButton;
         ActivateGameStartButton();
     }
@@ -50,5 +58,12 @@ public class PartySelectPanelController : MonoBehaviour
         await Manager.Resources.LoadLabel("Stage");
 
         Debug.Log("게임 시작");
+    }
+
+    private void ArrangePreset()
+    {
+        _bottomPanelCtrl.SelectButton(3);
+        _stageSelectPanel.SetActive(false);
+        _partySelectPanel.SetActive(false);
     }
 }
