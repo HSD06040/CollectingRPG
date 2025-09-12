@@ -27,7 +27,7 @@ public class TeamOrganizeManager : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private CollectedCharacterData _collectedCharacterData;
-    
+
     [Header("Data")]
     // TempDataManager 반영 이전
     //[SerializeField] private List<TeamPresetData> _presetData = new List<TeamPresetData>();
@@ -42,7 +42,7 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private TMP_Text _leaderEffectText;
     [SerializeField] private TMP_Text _characterCountText;
     [SerializeField] private ButtonManagerBasic[] _presetAddButton;
-    
+
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
     public int TotalCost => _totalCost;
@@ -52,6 +52,8 @@ public class TeamOrganizeManager : MonoBehaviour
     private int _currentCost = 0;
     public int CurrentCost => _currentCost;
     private int _currentOverallPower;
+
+    private Dictionary<Synergy, int> synergyCounts = new();
 
     private void Awake()
     {
@@ -66,14 +68,12 @@ public class TeamOrganizeManager : MonoBehaviour
         }
         _currentPreset = _presetData[0].Statuses;
         */
-
-        
-    }    
+    }
     private void Start()
     {
-        if(TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
+        if (TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
         LoadData();
-    }    
+    }
 
     private async void LoadData()
     {
@@ -142,7 +142,7 @@ public class TeamOrganizeManager : MonoBehaviour
             return;
         }
 
-        for(int i = 0; i < _currentPreset.Length; i++)
+        for (int i = 0; i < _currentPreset.Length; i++)
         {
             if (_currentPreset[i].Data == null)
             {
@@ -154,7 +154,7 @@ public class TeamOrganizeManager : MonoBehaviour
                 break;
             }
 
-            if(i == _currentPreset.Length - 1)
+            if (i == _currentPreset.Length - 1)
             {
                 Debug.Log("편성 제한치를 초과했습니다.");
                 return;
@@ -166,7 +166,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     public void RemoveUnitData(int index)
     {
-        if(_currentPreset[index].Data != null)
+        if (_currentPreset[index].Data != null)
         {
             _currentCost -= _currentPreset[index].Data.Cost;
             _currentOverallPower -= _currentPreset[index].CombatPower;
@@ -282,7 +282,7 @@ public class TeamOrganizeManager : MonoBehaviour
         //_totalOverallPowerText.text = $"팀 전투력 {_currentOverallPower}";
     }
 
-    
+
     private void ShowLeaderEffectInfo()
     {
         //if (_currentCharacterSOs[0] == null) _leaderEffectText.text = "LeaderEffect : None";
@@ -299,15 +299,15 @@ public class TeamOrganizeManager : MonoBehaviour
     {
         if (TempDataManager.Instance == null) return;
 
-        for(int i = 0; i < TempDataManager.Instance.PresetData.Count - 2; i++)
+        for (int i = 0; i < TempDataManager.Instance.PresetData.Count - 2; i++)
         {
             _presetAddButton[i].buttonText = $"{(i + 3)}";
             _presetAddButton[i].UpdateUI();
         }
 
-        for(int i = 0; i < _presetAddButton.Length; i++)
+        for (int i = 0; i < _presetAddButton.Length; i++)
         {
-            if(i <= TempDataManager.Instance.PresetData.Count- 2)
+            if (i <= TempDataManager.Instance.PresetData.Count - 2)
             {
                 _presetAddButton[i].GetComponent<Button>().interactable = true;
             }
@@ -338,7 +338,7 @@ public class TeamOrganizeManager : MonoBehaviour
         // 해당 프리셋이 생성되지 않은 프리셋일 시 확장 가능한지 확인하고, 확장을 진행      
         // TempDataManager 반영 이전
         //if (_presetData.Count < index + 1)
-        if(TempDataManager.Instance.PresetData.Count < index + 1)
+        if (TempDataManager.Instance.PresetData.Count < index + 1)
         {
             if (PopupManager.Instance != null)
             {
@@ -356,7 +356,7 @@ public class TeamOrganizeManager : MonoBehaviour
         // TODO : 금액이 부족할 시에 조건 추가
 
         Debug.Log("Used 500 Gold");
-        
+
         // TempDataManager 반영 이전
         //_presetData.Add(new TeamPresetData(5));
         TempDataManager.Instance.CreatePreset(5);
@@ -373,7 +373,7 @@ public class TeamOrganizeManager : MonoBehaviour
         // TempDataManager 반영 이전
         //_currentPreset = _presetData[index].Statuses;
         _currentPreset = TempDataManager.Instance.PresetData[index].Statuses;
-           
+
         _currentCost = 0;
         _currentOverallPower = 0;
         for (int i = 0; i < _currentPreset.Length; i++)
@@ -392,34 +392,25 @@ public class TeamOrganizeManager : MonoBehaviour
 
     #region Synergy
 
-    public Dictionary<ClassType, int> GetClassSynergyCount()
+    private void InitializeSynergy()
     {
-        Dictionary<ClassType, int> classSynergyCount = new();
-
-        foreach(var unit in _currentPreset)
+        foreach (Synergy synergy in Enum.GetValues(typeof(Synergy)))
         {
-            if(unit.Data == null) continue;
-            if(unit.Data == null) continue;
+            if (synergy == Synergy.Length)
+                continue;
 
-            ClassType classSynergy = unit.Data.ClassSynergy;
-
-            if (!classSynergyCount.ContainsKey(classSynergy))
-                classSynergyCount[classSynergy] = 0;
-
-            classSynergyCount[classSynergy]++;
-            Debug.Log($"{classSynergy.ToString()} : {classSynergyCount[classSynergy]}");
+            synergyCounts[synergy] = 0;
         }
-        
-        return classSynergyCount;
     }
 
     public Dictionary<Synergy, int> GetSynergyCount()
     {
-        Dictionary<Synergy, int> synergyCounts = new();
+        // 초기화를 안해주면 프리셋을 바꿀 때 UI가 초기화가 안되서 일단 이렇게 처리하는데...
+        // 더 좋은 방법이 있으면 개선할 필요가 있어 보입니다
+        InitializeSynergy();
 
         foreach (var unit in _currentPreset)
         {
-            if (unit.Data == null) continue;
             if (unit.Data == null) continue;
 
             Synergy synergy = unit.Data.Synergy;
