@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +8,7 @@ public class UnitHealthBar : MonoBehaviour
 {
     [SerializeField] Slider _slider;
     private UnitBase _owner;
+    private CancellationTokenSource _cts;
 
     public void Setup(UnitBase owner)
     {
@@ -19,15 +20,24 @@ public class UnitHealthBar : MonoBehaviour
         _slider.value = owner.StatusController.MaxHealth.Value;
 
         Subcribe();
-        ChaseOwner().Forget();
+
+        _cts = new CancellationTokenSource();
+        ChaseOwner(_cts.Token).Forget();
     }
 
-    private async UniTask ChaseOwner()
+    private async UniTask ChaseOwner(CancellationToken token)
     {
-        while (_owner != null)
+        try
         {
-            transform.position = _owner.GetBarPosition();
-            await UniTask.Yield(PlayerLoopTiming.Update);
+            while (_owner != null && !token.IsCancellationRequested)
+            {
+                transform.position = _owner.GetBarPosition();
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+
         }
     }
 
@@ -39,8 +49,17 @@ public class UnitHealthBar : MonoBehaviour
 
     private void Dispose()
     {
-        _owner.StatusController.CurHp.RemoveEvent(UpdateValue);
-        _owner.StatusController.OnDied -= BarDestroy;
+        if (_owner != null)
+        {
+            _owner.StatusController.CurHp.RemoveEvent(UpdateValue);
+            _owner.StatusController.OnDied -= BarDestroy;
+        }
+
+        _owner = null;
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = null;
     }
 
     private void UpdateValue(int value)
@@ -50,6 +69,7 @@ public class UnitHealthBar : MonoBehaviour
 
     private void BarDestroy()
     {
+        Dispose();
         Manager.Resources.Destroy(gameObject);
     }
 }

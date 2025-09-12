@@ -9,6 +9,7 @@ public class SlotPositionSetter : MonoBehaviour
     [SerializeField] GameObject _enemySlot;    
     [SerializeField] float _zOffset = 10f;
     [SerializeField] float _distance = 3;
+    [SerializeField] float _battleSlotRatio;
 
     [ContextMenu("SetPosition")]
     public void SetPositions()
@@ -17,7 +18,7 @@ public class SlotPositionSetter : MonoBehaviour
 
         float centerX = safe.x + safe.width * 0.5f;
         float centerYInSafe = safe.y + safe.height * 0.75f;
-        float centerYNextSafe = safe.y + safe.height * .7f;
+        float centerYNextSafe = safe.y + safe.height * _battleSlotRatio;
 
         float screenZ = Mathf.Abs(Camera.main.transform.position.z + _zOffset);
 
