@@ -1,3 +1,4 @@
+
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,219 +20,199 @@ public class BattleStartButton : MonoBehaviour
     public GameObject restMove;
     public GameObject summonSceneMoveMonster;
 
-
-    // 줌 애니메이션용
-    private Vector3 playerBatchOriginScale;
-    private Vector3 enemyBatchOriginScale;
-    private Vector2 waitingBattlePlayerOriginPos;
-    private Vector2 waitingBattleEnemyOriginPos;
+    private Vector3 playerBatchOriginScale;// 플레이어 배치 원래 스케일
+    private Vector3 enemyBatchOriginScale;// 적 배치 원래 스케일
+    private Vector2 waitingBattlePlayerOriginPos; // 플레이어 대기 패널 원래 위치
+    private Vector2 waitingBattleEnemyOriginPos;// 적 대기 패널 원래 위치
 
     public Button battleStartButton;
 
     public GameObject fightButtonS;   // 항상 활성화
     public GameObject fightButton;    // 활성/비활성 전환용
 
-    //전투 연출용 위치 저장
-    private Vector2 waitingBattlePlayerBattlePos;
-    private Vector2 waitingBattleEnemyBattlePos;
-    private Vector3 playerBatchZoomScale;
-    private Vector3 enemyBatchZoomScale;
-    private Transform fightButtonSOriginalParent;
+    private Vector2 waitingBattlePlayerBattlePos;// 플레이어 배치 전투 위치
+    private Vector2 waitingBattleEnemyBattlePos;// 적 배치 전투 위치
+    private Vector3 playerBatchZoomScale;// 플레이어 배치 줌 스케일
+    private Vector3 enemyBatchZoomScale; // 적 배치 줌 스케일
+    private Transform fightButtonSOriginalParent;// 버튼 원래 부모
 
-    public float offScreenX = 3000f; // 화면 밖 X값 (Inspector에서 조정 가능)
-    public float batchSlideDuration = 3f;  // 슬라이드 시간 (Inspector에서 조정 가능)
+    private const float DefaultGridOffsetX = 300f; // 배치 X 오프셋
+    private const float DefaultBattleY = 0f;// 배치 Y 위치
+    private const float DefaultBackgroundMoveX = -500f;// 배경 이동 X값
+    private const float DefaultBackgroundMoveDuration = 15f;// 배경 이동 시간
 
-    public EnemyRestSlideController enemyRestSlideController;
+    public float offScreenX = 3000f;// 화면 밖 X값
+    public float batchSlideDuration = 3f;// 슬라이드 시간
 
-    private Transform backgroundTransform;
-    private Vector3 backgroundStartPosition; // 전투 시작 시점의 배경 위치
+    public EnemyRestSlideController enemyRestSlideController;// 적 휴식 슬라이드 컨트롤러
+
+    private Transform backgroundTransform;// 배경 Transform
+    private Vector3 backgroundStartPosition;// 배경 시작 위치
+
     void Awake()
     {
-        // 원래 값 저장
-        playerBatchOriginScale = playerBatchUI.localScale;
-        enemyBatchOriginScale = enemyBatchUI.localScale;
+        playerBatchOriginScale = playerBatchUI.localScale;// 플레이어 배치 원래 스케일 저장
+        enemyBatchOriginScale = enemyBatchUI.localScale;// 적 배치 원래 스케일 저장
+        // 플레이어 대기 패널 원래 위치 저장
         waitingBattlePlayerOriginPos = waitingBattlePlayer.anchoredPosition;
+        // 적 대기 패널 원래 위치 저장
         waitingBattleEnemyOriginPos = waitingBattleEnemy.anchoredPosition;
+        // 버튼 원래 부모 저장
         fightButtonSOriginalParent = fightButtonS.transform.parent;
-        waitingBattlePlayerOriginPos = new Vector2(0f, 0f); 
+        // 플레이어 대기 패널 위치 초기화
+        waitingBattlePlayerOriginPos = Vector2.zero;
 
-        // 배틀 연출용 스케일 (작게)
+        // 플레이어 배치 줌 스케일 계산
         playerBatchZoomScale = playerBatchOriginScale * 0.5f;
+        // 적 배치 줌 스케일 계산
         enemyBatchZoomScale = enemyBatchOriginScale * 0.5f;
 
-        // 배틀 연출용 위치 (중앙 기준, 좌우로 이동)
-        float gridOffsetX = 300f; // 사진2 기준, 실제 UI에 맞게 조정
-
-        
-
-        // y값을 동일하게 맞춤 (예: waitingBattlePlayerOriginPos.y 사용)
-        float battleY = 0f;     // 화면 중앙에 가깝게 조정
-
-        waitingBattlePlayerBattlePos = new Vector2(-gridOffsetX, battleY);
-        waitingBattleEnemyBattlePos = new Vector2(gridOffsetX, battleY);
+        // 플레이어 전투 위치
+        waitingBattlePlayerBattlePos = new Vector2(-DefaultGridOffsetX, DefaultBattleY);
+        // 적 전투 위치
+        waitingBattleEnemyBattlePos = new Vector2(DefaultGridOffsetX, DefaultBattleY);
 
         battleStartButton.onClick.AddListener(OnBattleStart);
     }
 
     void Start()
     {
-        // 배경 오브젝트를 찾아서 Transform 저장 (예: AreaBackgroundMap, Grid 등)
-        var bgObj = FindObjectOfType<AreaBackgroundMap>();
+        var bgObj = FindObjectOfType<AreaBackgroundMap>();// 배경 오브젝트 찾기
         if (bgObj != null)
+            backgroundTransform = bgObj.transform; // 배경 Transform 저장
+    }
+
+    // UI 상태 일괄 설정
+    private void SetUIState(bool isBattle)
+    {
+        waitingBattleUI.SetActive(!isBattle);
+        fightSceneUI.SetActive(isBattle);
+        skillUI.SetActive(isBattle);
+        enemyInfoMove.SetActive(!isBattle);
+        summonSceneMovePlayer.SetActive(!isBattle);
+        restMove.SetActive(!isBattle);
+        summonSceneMoveMonster.SetActive(!isBattle);
+        fightButtonS.SetActive(true);
+        fightButton.SetActive(!isBattle);
+    }
+
+    // 배치 UI 스케일/위치 복원
+    private void RestoreBatchUI()
+    {
+        playerBatchUI.DOKill();// 플레이어 배치 트윈 중지
+        enemyBatchUI.DOKill(); // 적 배치 트윈 중지
+        playerBatchUI.localScale = playerBatchOriginScale;// 플레이어 배치 스케일 복원
+        enemyBatchUI.localScale = enemyBatchOriginScale;// 적 배치 스케일 복원
+        playerBatchUI.anchoredPosition = Vector2.zero;// 플레이어 배치 위치 복원
+        enemyBatchUI.anchoredPosition = Vector2.zero;// 적 배치 위치 복원
+    }
+
+    // 배경 위치 복원
+    private void RestoreBackground()
+    {
+        if (backgroundTransform != null)
         {
-            backgroundTransform = bgObj.transform;
-            
+            backgroundTransform.DOKill();// 배경 트윈 중지
+            Vector3 currentPos = backgroundTransform.position;// 현재 위치
+            // 복귀 위치
+            Vector3 returnPos = new Vector3(backgroundStartPosition.x, currentPos.y, currentPos.z);
+            // 배경 복귀 애니메이션
+            backgroundTransform.DOMove(returnPos, 0.5f).SetEase(Ease.InOutCubic);
         }
+    }
+
+    // FightButtonS 부모/위치 복원
+    private void RestoreFightButtonS()
+    {
+        fightButtonS.transform.SetParent(fightButtonSOriginalParent, true);// 부모 복원
+        var fightButtonSRect = fightButtonS.GetComponent<RectTransform>();// RectTransform 가져오기
+        if (fightButtonSRect != null)
+            fightButtonSRect.anchoredPosition = Vector2.zero;// 위치 복원
+    }
+
+    // 플레이어/적 배치 오브젝트 활성화 상태 복원
+    private void RestoreWaitingBattlePanels()
+    {
+        waitingBattlePlayer.gameObject.SetActive(true);
+        waitingBattleEnemy.gameObject.SetActive(false);
     }
 
     // 전투 종료 시 호출
     public void OnBattleEnd()
     {
-        PanelMultiSlideController.IsBattleActive = false; // 전투 상태 비활성화
-
-        // 배경 트윈 중지
-        if (backgroundTransform != null)
-        {
-            backgroundTransform.DOKill();
-            // x축만 원래 위치로 복귀
-            Vector3 currentPos = backgroundTransform.position;
-            Vector3 returnPos = new Vector3(backgroundStartPosition.x, currentPos.y, currentPos.z);
-            backgroundTransform.DOMove(returnPos, 0.5f).SetEase(Ease.InOutCubic);
-        }
-
-        // FightButtonS는 항상 활성화
-        fightButtonS.SetActive(true);
-        // FightButton만 활성화
-        fightButton.SetActive(true);
-
-        // 배치칸 스케일/위치 복원
-        playerBatchUI.DOKill();
-        enemyBatchUI.DOKill();
-        playerBatchUI.localScale = playerBatchOriginScale; // 플레이어 배치 스케일 복원
-        enemyBatchUI.localScale = enemyBatchOriginScale;   // 적 배치 스케일 복원
-        playerBatchUI.anchoredPosition = Vector2.zero;     // 플레이어 배치 위치 복원 (중앙)
-        enemyBatchUI.anchoredPosition = Vector2.zero;      // 적 배치 위치 복원 (중앙)
-
-        // 대기 UI, 전투 UI, 스킬 UI 등 복원
-        waitingBattleUI.SetActive(true);       // 대기 UI 활성화
-        fightSceneUI.SetActive(false);         // 전투 UI 비활성화
-        skillUI.SetActive(false);              // 스킬 UI 비활성화
-        enemyInfoMove.SetActive(true);         // 적 정보 UI 활성화
-        summonSceneMovePlayer.SetActive(true); // 소환 UI 활성화
-        restMove.SetActive(true);              // 휴식 UI 활성화
-        summonSceneMoveMonster.SetActive(true);// 몬스터 소환 UI 활성화
-
-        // FightButtonS 부모 복귀 후 위치 복원
-        fightButtonS.transform.SetParent(fightButtonSOriginalParent, true);
-        var fightButtonSRect = fightButtonS.GetComponent<RectTransform>();
-        if (fightButtonSRect != null)
-        {
-            fightButtonSRect.anchoredPosition = Vector2.zero; // 원래 위치값
-        }
-
-        // 플레이어/적 배치 오브젝트 활성화 상태 복원
-        waitingBattlePlayer.gameObject.SetActive(true);
-        waitingBattleEnemy.gameObject.SetActive(false);
+        PanelMultiSlideController.IsBattleActive = false;
+        RestoreBackground();// 배경 복원
+        SetUIState(false);// UI 상태 복원
+        RestoreBatchUI();// 배치 UI 복원
+        RestoreFightButtonS();// 버튼 복원
+        RestoreWaitingBattlePanels();// 대기 패널 복원
     }
 
     public void OnBattleStart()
     {
-
-        // 항상 플레이어 위치에서 시작
         if (enemyRestSlideController != null)
-            enemyRestSlideController.RestMoveToPlayer();
+            enemyRestSlideController.RestMoveToPlayer();// 적 휴식 패널 이동
 
         PanelMultiSlideController.IsBattleActive = true; // 전투 상태 활성화
 
-        waitingBattlePlayer.DOKill(); // 플레이어 배치 트윈 중지
-        waitingBattleEnemy.DOKill();  // 적 배치 트윈 중지
+        waitingBattlePlayer.DOKill();// 플레이어 배치 트윈 중지
+        waitingBattleEnemy.DOKill();// 적 배치 트윈 중지
 
-        waitingBattlePlayer.gameObject.SetActive(true); // 플레이어 배치 활성화
-        waitingBattleEnemy.gameObject.SetActive(true);  // 적 배치 활성화
+        waitingBattlePlayer.gameObject.SetActive(true);
+        waitingBattleEnemy.gameObject.SetActive(true);
 
-        fightButtonS.SetActive(true); // S버튼 항상 활성화
-        fightButton.SetActive(false); // 일반 버튼 비활성화
+        SetUIState(true);// UI 상태 전투로 변경
 
-        waitingBattleUI.SetActive(false); // 대기 UI 비활성화
-        fightButtonS.transform.SetParent(null, true);   // S버튼 부모 분리
-        fightButtonS.SetActive(true);                   // S버튼 활성화
+        fightButtonS.transform.SetParent(null, true);// 버튼 부모 분리
 
-        fightSceneUI.SetActive(true);   // 전투 UI 활성화
-        skillUI.SetActive(true);        // 스킬 UI 활성화
-        enemyInfoMove.SetActive(false); // 적 정보 UI 비활성화
-        summonSceneMovePlayer.SetActive(false); // 소환 UI 비활성화
-        restMove.SetActive(false);      // 휴식 UI 비활성화
-        summonSceneMoveMonster.SetActive(false); // 몬스터 소환 UI 비활성화
-
-        // 줌 애니메이션 시퀀스 생성
+        // 줌 애니메이션
         Sequence zoomSeq = DOTween.Sequence();
-        zoomSeq.Append(playerBatchUI.DOScale(playerBatchZoomScale, 0.3f).SetEase(Ease.InOutCubic)); // 플레이어 배치 줌
-        zoomSeq.Join(enemyBatchUI.DOScale(enemyBatchZoomScale, 0.3f).SetEase(Ease.InOutCubic));     // 적 배치 줌
+        // 플레이어 줌
+        zoomSeq.Append(playerBatchUI.DOScale(playerBatchZoomScale, 0.3f).SetEase(Ease.InOutCubic));
+        // 적 줌
+        zoomSeq.Join(enemyBatchUI.DOScale(enemyBatchZoomScale, 0.3f).SetEase(Ease.InOutCubic));
 
-        // 줌 끝나면 슬라이드 연출 시작
         zoomSeq.OnComplete(() =>
         {
-            float startY = playerBatchUI.anchoredPosition.y; // 현재 Y값 저장
-            float leftOutX = -offScreenX; // 왼쪽 화면 밖 X값
-            float rightOutX = offScreenX; // 오른쪽 화면 밖 X값
-            float centerX = waitingBattlePlayerOriginPos.x; // 플레이어의 원래 X 위치
-            float enemyTargetX = waitingBattleEnemyOriginPos.x; // 적의 원래 X 위치
-            
+            float startY = playerBatchUI.anchoredPosition.y;// 현재 Y값
+            float leftOutX = -offScreenX;// 왼쪽 밖 X값
+            float rightOutX = offScreenX;// 오른쪽 밖 X값
+            float centerX = waitingBattlePlayerOriginPos.x;// 플레이어 원래 X
+            float enemyTargetX = waitingBattleEnemyOriginPos.x; // 적 원래 X
 
-            // 플레이어 배치: 중앙에서 왼쪽 화면 밖으로 이동
-            playerBatchUI.anchoredPosition = new Vector2(centerX, startY); // 중앙 위치로 세팅
-                                                                           // 적 배치: 오른쪽 화면 밖에서 중앙으로 이동
-            enemyBatchUI.anchoredPosition = new Vector2(rightOutX, startY); // 오른쪽 밖 위치로 세팅
+            // 플레이어 왼쪽 밖으로
+            playerBatchUI.anchoredPosition = new Vector2(centerX, startY);
+            // 적 중앙으로
+            enemyBatchUI.anchoredPosition = new Vector2(rightOutX, startY);
 
-            // 슬라이드 애니메이션 시퀀스 생성
             Sequence batchSlideSeq = DOTween.Sequence();
-            batchSlideSeq.Append(playerBatchUI.DOAnchorPos(new Vector2(leftOutX, startY), batchSlideDuration).SetEase(Ease.InOutCubic)); // 플레이어 배치 왼쪽 밖으로 슬라이드
-            batchSlideSeq.Join(enemyBatchUI.DOAnchorPos(new Vector2(enemyTargetX, startY), batchSlideDuration).SetEase(Ease.InOutCubic));     // 적 배치 중앙으로 슬라이드
+            batchSlideSeq.Append(playerBatchUI.DOAnchorPos(new Vector2(leftOutX, startY), batchSlideDuration).SetEase(Ease.InOutCubic));
+            batchSlideSeq.Join(enemyBatchUI.DOAnchorPos(new Vector2(enemyTargetX, startY), batchSlideDuration).SetEase(Ease.InOutCubic));
 
-            // 배경 이동 시작 위치 저장
-            if (backgroundTransform != null)
-                backgroundStartPosition = backgroundTransform.position;
-
-            // 배경 이동
             if (backgroundTransform != null)
             {
-                Vector3 bgTargetPos = backgroundTransform.position + new Vector3(-500f, 0f, 0f); // 원하는 이동값
-                float backgroundMoveDuration = 15f;
-                backgroundTransform.DOMove(bgTargetPos, backgroundMoveDuration).SetEase(Ease.InOutCubic);
+                backgroundStartPosition = backgroundTransform.position;
+                // 배경 이동 위치
+                Vector3 bgTargetPos = backgroundTransform.position + new Vector3(DefaultBackgroundMoveX, 0f, 0f);
+                // 배경 이동
+                backgroundTransform.DOMove(bgTargetPos, DefaultBackgroundMoveDuration).SetEase(Ease.InOutCubic);
             }
 
-            // 슬라이드 끝나면 전투 종료 처리
-            batchSlideSeq.OnComplete(() =>
-            {
-                OnBattleEnd(); // 전투 종료 함수 호출
-            });
+            batchSlideSeq.OnComplete(OnBattleEnd);// 슬라이드 끝나면 전투 종료
         });
-        // 배경도 동일하게 이동
-        
-
-        //// 3초 후 자동 전투 종료
-        //StartCoroutine(EndBattleAfterDelay(3f));
     }
 
     public void MoveBatchAndBackground(Vector2 targetPos, float duration)
     {
-        // 배치 UI 이동
         playerBatchUI.DOKill();
-        playerBatchUI.DOAnchorPos(targetPos, duration).SetEase(Ease.InOutCubic);
+        playerBatchUI.DOAnchorPos(targetPos, duration).SetEase(Ease.InOutCubic);// 플레이어 배치 이동
 
-        // 배경 이동 (Transform.position 기준, 필요시 anchoredPosition 사용)
         if (backgroundTransform != null)
         {
+            // 배경 이동 위치
             Vector3 bgTargetPos = new Vector3(targetPos.x, backgroundTransform.position.y, backgroundTransform.position.z);
+            // 배경 이동
             backgroundTransform.DOMove(bgTargetPos, duration).SetEase(Ease.InOutCubic);
         }
     }
-    ////테스트용 배틀종료
-    //private IEnumerator EndBattleAfterDelay(float delay)
-    //{
-    //    yield return new WaitForSeconds(delay);
-    //    OnBattleEnd();
-    //}
-    // EnemyRestSlideController.cs
-
 }
