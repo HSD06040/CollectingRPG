@@ -80,7 +80,7 @@ public class CharacterUpgradeUnit : MonoBehaviour
         else
         {
             _manager.PopUpUI.GetCurrentCharacterUnitData(this);
-            _manager.ShowPopUp();
+            _manager.ShowCharacterPopUp();
         }
     }
 

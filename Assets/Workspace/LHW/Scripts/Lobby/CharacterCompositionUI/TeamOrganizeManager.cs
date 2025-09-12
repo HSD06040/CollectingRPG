@@ -384,7 +384,7 @@ public class TeamOrganizeManager : MonoBehaviour
                 _currentOverallPower += _currentPreset[i].CombatPower;
             }
         }
-        Debug.Log($"현재 선택 프리셋 : {index}");
+
 
         OnCharacterDataChanged?.Invoke();
     }

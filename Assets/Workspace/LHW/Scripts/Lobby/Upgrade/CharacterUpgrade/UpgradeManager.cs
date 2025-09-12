@@ -6,8 +6,9 @@ public class UpgradeManager : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private UpgradeCollectedCharacterData _collectedCharacterData;
-    [SerializeField] private UpgradePopupUI _popUpUI;
-    public UpgradePopupUI PopUpUI => _popUpUI;
+    [SerializeField] private UpgradeCharacterPopupUI _characterPopUpUI;
+    public UpgradeCharacterPopupUI PopUpUI => _characterPopUpUI;
+    [SerializeField] private UpgradeStonePopupUI _stonePopUpUI;
 
     [Header("UI")]
     [SerializeField] private GameObject _characterUI;
@@ -27,12 +28,17 @@ public class UpgradeManager : MonoBehaviour
     private void OnEnable()
     {
         ShowCharacterCountInfo();
-        _popUpUI.gameObject.SetActive(false);        
+        _characterPopUpUI.gameObject.SetActive(false);        
     }
 
-    public void ShowPopUp()
+    public void ShowCharacterPopUp()
     {
-        _popUpUI.gameObject.SetActive(true);
+        _characterPopUpUI.gameObject.SetActive(true);
+    }
+
+    public void ShowStonePopUp()
+    {
+        _stonePopUpUI.gameObject.SetActive(true);
     }
 
     private void SetActivePanel(string activePanel)
