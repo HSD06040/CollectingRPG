@@ -173,7 +173,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.33163625, y: 0.07277219}
   m_AnchorMax: {x: 0.66477174, y: 0.19376542}
-  m_AnchoredPosition: {x: 0.42903137, y: -1.8818665}
+  m_AnchoredPosition: {x: 0.42903137, y: -1.881958}
   m_SizeDelta: {x: -4.5030465, y: -0.61502683}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8779005983040867675
@@ -1186,13 +1186,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7174814133573889483}
+  - component: {fileID: 2458981509619414581}
   m_Layer: 5
   m_Name: UpgradeMagicStonePopUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7174814133573889483
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1200,7 +1201,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1971073053198237257}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1214,6 +1215,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0.0025024414, y: -7.8775635}
   m_SizeDelta: {x: 14.118164, y: 425.58008}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2458981509619414581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1971073053198237257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dfc9bd308ad64f4495cc17b08f26bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2109341870148290205
 GameObject:
   m_ObjectHideFlags: 0
@@ -1248,8 +1261,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 272.40625}
+  m_SizeDelta: {x: 0, y: 1745.9812}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4370623472788309651
 CanvasRenderer:
@@ -3569,8 +3582,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.4985962, y: 77.35098}
-  m_SizeDelta: {x: -166.687, y: -1350.1101}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -166.687, y: -873.4596}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8178929880510672991
 CanvasRenderer:

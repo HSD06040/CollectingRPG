@@ -385,6 +385,7 @@ public class TeamOrganizeManager : MonoBehaviour
             }
         }
 
+
         OnCharacterDataChanged?.Invoke();
     }
 

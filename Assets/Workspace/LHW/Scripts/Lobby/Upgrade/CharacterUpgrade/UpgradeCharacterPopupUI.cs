@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UpgradePopupUI : MonoBehaviour
+public class UpgradeCharacterPopupUI : MonoBehaviour
 {
     [Header("Character Profile")]
     [SerializeField] private TMP_Text _gradeText;
