@@ -8,7 +8,7 @@ public class CollectedCharacterData : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private CharacterUnit[] _charUnits;
-    
+
     [SerializeField] private List<UnitStatus> _collectedUnit = new List<UnitStatus>();
     public List<UnitStatus> CollectedUnit => _collectedUnit;
 
@@ -17,10 +17,16 @@ public class CollectedCharacterData : MonoBehaviour
 
     private int _collectedCharacterCount;
     public int CollectedCharacterCount => _collectedCharacterCount;
-
     private void Awake()
     {
-        for(int i = 0; i < _charUnits.Length; i++)
+        _characterCount = _charUnits.Length;
+    }
+
+    // 임시 처리 - DB 연동이 끝나면 구조 변경 필요
+    private void OnEnable()
+    {
+        _collectedUnit.Clear();
+        for (int i = 0; i < _charUnits.Length; i++)
         {
             // 획득여부 체크는 나중에 추가
             //if(_charUnits[i].IsCollected)
@@ -30,7 +36,7 @@ public class CollectedCharacterData : MonoBehaviour
             _collectedUnit.Add(_charUnits[i].Status);
             //}
         }
-        _characterCount = _charUnits.Length;
+        
         _collectedCharacterCount = _collectedUnit.Count;
     }
 }
