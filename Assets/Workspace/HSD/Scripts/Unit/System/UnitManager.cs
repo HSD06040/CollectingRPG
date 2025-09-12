@@ -45,7 +45,8 @@ public class UnitManager : MonoBehaviour
 
     private async void InitAsync()
     {
-        await Manager.Resources.LoadLabel("Stage");
+        if(IsTest)
+            await Manager.Resources.LoadLabel("Stage");
 
         Manager.Data.SynergyDB.ResetSynergys();
 
