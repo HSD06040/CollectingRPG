@@ -313,6 +313,16 @@ public class PopupManager : Singleton<PopupManager>
         
         HideAllPanels();
         ShowMailboxPanel();
+        
+        var playerDataController = FindObjectOfType<PlayerDataController>();
+        var mailboxController = FindObjectOfType<PlayerMailBoxController>();
+        
+        var mailboxPopup = mailboxPanel.GetComponent<MailBoxPopup>();
+        if (mailboxPopup != null)
+        {
+            mailboxPopup.Initialize(playerDataController, mailboxController);
+        }
+        
         currentPopupType = PopupType.Mailbox;
         gameObject.SetActive(true);
         ShowBackground(true); 

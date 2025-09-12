@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MailBoxPopup : MonoBehaviour
 {
-    [SerializeField] private PlayerMailBoxController _controller;
+    private PlayerMailBoxController _controller;
+    private PlayerDataController _playerDataController;
 
     [Header("List")]
     [SerializeField] private RectTransform _content;
@@ -13,7 +13,6 @@ public class MailBoxPopup : MonoBehaviour
 
     [Header("Button")]
     [SerializeField] private Button _receiveAllButton;
-   
 
     [Header("Panel")]
     [SerializeField] private GameObject _emptyMailViewPanel;
@@ -23,10 +22,44 @@ public class MailBoxPopup : MonoBehaviour
 
     private bool _isDataBind = false;
     private bool _isReceivingAll = false;
+    private bool _isInitialized = false;
 
     private List<MailData> _currentMails;
     private void Apply(List<MailData> mails) => Init(mails);
 
+    /// <summary>
+    /// 외부에서 컨트롤러들을 주입받아 초기화하는 메서드
+    /// </summary>
+    public void Initialize(PlayerDataController playerDataController, PlayerMailBoxController mailboxController)
+    {
+        _playerDataController = playerDataController;
+        _controller = mailboxController;
+        
+        if (_controller != null)
+        {
+            // 메일 데이터 초기화
+            if (_controller.Mail != null)
+            {
+                Init(_controller.Mail);
+            }
+            
+            // 데이터 바인딩 활성화
+            EnableDataBind(true);
+        }
+        
+        // 플레이어 데이터 이벤트 구독
+        if (_playerDataController != null)
+        {
+            _playerDataController.OnUpdateUI += OnPlayerDataUpdated;
+        }
+        
+        _isInitialized = true;
+    }
+
+    private void OnPlayerDataUpdated(PlayerData data)
+    {
+       
+    }
 
     private void Start()
     {
@@ -36,6 +69,22 @@ public class MailBoxPopup : MonoBehaviour
 
     private void OnEnable()
     {
+        // Initialize가 호출되지 않았다면 컨트롤러 찾기 시도
+        if (!_isInitialized)
+        {
+            _controller = FindObjectOfType<PlayerMailBoxController>();
+            _playerDataController = FindObjectOfType<PlayerDataController>();
+            
+            if (_controller != null)
+            {
+                EnableDataBind(true);
+                if (_controller.Mail != null)
+                {
+                    Init(_controller.Mail);
+                }
+            }
+        }
+        
         if (_currentMails == null || _currentMails.Count == 0)
         {
             CheckEmptyMailBox(_currentMails);
@@ -48,6 +97,11 @@ public class MailBoxPopup : MonoBehaviour
         {
             _controller.OnMailboxUpdated -= Apply;
             _isDataBind = false;
+        }
+        
+        if (_playerDataController != null)
+        {
+            _playerDataController.OnUpdateUI -= OnPlayerDataUpdated;
         }
     }
 
@@ -67,35 +121,35 @@ public class MailBoxPopup : MonoBehaviour
             Destroy(_content.GetChild(i).gameObject);
         }
 
-        // 메일 생성 + 바인딩
+        // IsReceived = false 메일을 우편함에 생성 + 바인딩
         foreach (var mail in mails)
         {
-            GameObject mailObject = Instantiate(_mailItemPrefab, _content);
-
-            // 비활성화로 생성 / 데이터 바인드 이후 OnEnable 실행
-            mailObject.SetActive(false);
-
-            MailItem mailItem = mailObject.GetComponent<MailItem>();
-            
-            if (mailItem != null)
+            if (mail.IsReceived == false)
             {
-                mailItem.Bind(mail, _controller);
-            }
+                GameObject mailObject = Instantiate(_mailItemPrefab, _content);
 
-            mailObject.SetActive(true);
+                // 비활성화로 생성 / 데이터 바인드 이후 OnEnable 실행
+                mailObject.SetActive(false);
+
+                MailItem mailItem = mailObject.GetComponent<MailItem>();
+                if (mailItem != null)
+                {
+                    mailItem.Bind(mail, _controller);
+                }
+
+                mailObject.SetActive(true);
+            }
         }
     }
 
     /// <summary>
     /// DB 데이터를 팝업에 실시간 연동 활성화/비활성화 하는 메서드
     /// </summary>
-    /// <param name="enable">
-    /// true: 실시간 연동 구독 시작
-    /// false: 실시간 연동 구독 해제
-    /// </param>
     public void EnableDataBind(bool enable)
     {
+        if (_controller == null) return;
         if (_isDataBind == enable) return;
+        
         _isDataBind = enable;
 
         if (_isDataBind)
@@ -106,7 +160,8 @@ public class MailBoxPopup : MonoBehaviour
 
     private void CheckEmptyMailBox(List<MailData> mails)
     {
-        if (mails == null || mails.Count == 0)
+        if (mails == null || mails.Count == 0 || 
+            mails.TrueForAll(m => m.IsReceived)) 
         {
             _emptyMailViewPanel.SetActive(true);
             _receiveAllButton.interactable = false;
@@ -125,6 +180,7 @@ public class MailBoxPopup : MonoBehaviour
     private async void OnClickReceiveAll()
     {
         if (_isReceivingAll) return;
+        if (_controller == null) return;
 
         _isReceivingAll = true;
         _receiveAllButton.interactable = false;
@@ -151,5 +207,24 @@ public class MailBoxPopup : MonoBehaviour
         _isReceivingAll = false;
         _currentMails.Clear();
         CheckEmptyMailBox(_currentMails);
+    }
+
+    private void OnDestroy()
+    {
+        // 클린업
+        if (_receiveAllButton != null)
+        {
+            _receiveAllButton.onClick.RemoveListener(OnClickReceiveAll);
+        }
+        
+        if (_controller != null)
+        {
+            _controller.OnMailboxUpdated -= Apply;
+        }
+        
+        if (_playerDataController != null)
+        {
+            _playerDataController.OnUpdateUI -= OnPlayerDataUpdated;
+        }
     }
 }

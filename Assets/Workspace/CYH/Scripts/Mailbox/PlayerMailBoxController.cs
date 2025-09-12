@@ -104,11 +104,10 @@ public class PlayerMailBoxController : MonoBehaviour
             await Task.WhenAll(goldTask, diaTask);
         }
 
-       // TODO: [CYH] 해당 메일 IsReceived == true 업데이트 (DeleteMail 삭제)
-       // await Manager.DB.SetMailIsReceivedAsync(mailId, true);
+        await Manager.DB.SetMailIsReceivedAsync(mailId, true);
         
         // 메일 삭제
-        await DeleteMail(mailId);
+        //await DeleteMail(mailId);
     }
 
     /// <summary>

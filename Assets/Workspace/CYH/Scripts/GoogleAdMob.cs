@@ -7,7 +7,7 @@ using UnityEngine;
 public class GoogleAdMob : MonoBehaviour
 {
     public string AdId = "ca-app-pub-3940256099942544/1033173712";
-    
+
     public InterstitialAd LoadedAd;
     private bool _isLoading;
 
@@ -19,7 +19,7 @@ public class GoogleAdMob : MonoBehaviour
         MobileAds.Initialize(initStatus =>
         {
             Debug.Log("광고 초기화 성공");
-            Preload();            
+            Preload();
         });
     }
 
@@ -40,7 +40,7 @@ public class GoogleAdMob : MonoBehaviour
             }
 
             Debug.Log("광고 로드 성공");
-           
+
             LoadedAd = ad;
 
             LoadedAd.OnAdFullScreenContentClosed += () =>
@@ -63,11 +63,13 @@ public class GoogleAdMob : MonoBehaviour
 
     public async void ShowAd()
     {
-        if(IsReady)
+        if (IsReady)
         {
             LoadedAd.Show();
             // 광고 시청 보상: Diamond 20 증가
             await Manager.DB.AddDiamondAsync(20);
+            //TODO: [CYH] 광고 퀘스트(광고 시청 끝난 후로 수정 예정)
+            QuestManager.Instance.OnAdWatched(QuestManager.Instance.adWatchQuest, true);
         }
         else
         {
