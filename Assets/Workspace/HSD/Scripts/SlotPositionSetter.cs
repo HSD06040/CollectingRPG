@@ -6,6 +6,10 @@ public class SlotPositionSetter : MonoBehaviour
 {
     [SerializeField] BattleCameraController _battleCameraController;
 
+    [Header("Center")]
+    [SerializeField] Transform _center;
+    [Space]
+
     [Header("Slots")]
     [SerializeField] GameObject _battleSlot;
     [SerializeField] GameObject _planSlot;
@@ -34,10 +38,12 @@ public class SlotPositionSetter : MonoBehaviour
         Vector3 planWorld = Camera.main.ScreenToWorldPoint(planScreen);
         Vector3 battleWorld = Camera.main.ScreenToWorldPoint(battleScreen);
         Vector3 enemyWorld = battleWorld + Vector3.right * _distance;
+        Vector3 centerWorld = battleWorld + Vector3.right * (_distance / 2);
 
         _planSlot.transform.position = planWorld;
         _battleSlot.transform.position = battleWorld;
         _enemySlot.transform.position = enemyWorld;
+        _center.position = centerWorld;
 
         _battleCameraController.XLimit = _distance;
     }

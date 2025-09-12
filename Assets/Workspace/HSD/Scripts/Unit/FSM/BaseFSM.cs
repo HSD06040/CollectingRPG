@@ -58,6 +58,16 @@ public class BaseFSM : MonoBehaviour
         StateMachine.Update();
     }
 
+    public void Move()
+    {
+        Owner.Anim.SetTrigger(_moveHash);
+    }
+
+    public void Idle()
+    {
+        Owner.Anim.SetTrigger(_idleHash);
+    }
+
     public void Fight()
     {
         _fightRoutine = StartCoroutine(FightRoutine());

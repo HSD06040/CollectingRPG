@@ -24,9 +24,7 @@ public class UnitUIManager : MonoBehaviour
 
     public void BattleUISetting()
     {
-        _battleUI.SetActive(true);
-        _notBattleUI.SetActive(false);
-        _fightButton.gameObject.SetActive(false);
+        _battleUI.SetActive(true);        
     }
 
     public void StandbyUISetting()
@@ -34,5 +32,11 @@ public class UnitUIManager : MonoBehaviour
         _battleUI.SetActive(false);
         _notBattleUI.SetActive(true);
         _fightButton.gameObject.SetActive(true);
+    }
+
+    public void StandbyUIDeActive()
+    {
+        _notBattleUI.SetActive(false);
+        _fightButton.gameObject.SetActive(false);
     }
 }

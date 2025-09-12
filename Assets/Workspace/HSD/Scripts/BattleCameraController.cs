@@ -5,7 +5,20 @@ using UnityEngine;
 
 public class BattleCameraController : MonoBehaviour
 {
-    public float XLimit = 10f;
+    private float _xLimit;
+    public float XLimit
+    {
+        get 
+        {
+            return _xLimit;
+        }
+        set 
+        {
+            _xLimit = value;
+            SetEnemyPosition();
+        }
+    }
+
     [SerializeField] float _sensitivity = 2f;
     [SerializeField] float _smoothSpeed = 5f;
 
@@ -13,15 +26,25 @@ public class BattleCameraController : MonoBehaviour
     private Vector3 _targetPosition;
     private bool _isDragging = false;
 
+    private Vector3 _battlePosition;
+    private Vector3 _enemyPosition;
+
     private void Awake()
     {
         _initialPosition = transform.position;
         _targetPosition = _initialPosition;
+
+        _battlePosition = _initialPosition;
     }
 
     private void Update()
     {
         //MoveCamera();
+    }
+
+    private void SetEnemyPosition()
+    {
+        _enemyPosition = _battlePosition + new Vector3(XLimit, 0, 0);
     }
 
     public void StartDrag()
@@ -66,11 +89,11 @@ public class BattleCameraController : MonoBehaviour
 
     public void MoveToEnemy()
     {
-        transform.DOMoveX(transform.position.x + XLimit, .3f);
+        transform.DOMove(_enemyPosition, .3f);
     }
 
     public void MoveToBattle()
     {
-        transform.DOMoveX(transform.position.x - XLimit, .3f);
+        transform.DOMove(_battlePosition, .3f);
     }
 }

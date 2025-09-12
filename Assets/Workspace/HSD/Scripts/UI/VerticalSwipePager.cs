@@ -33,17 +33,19 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler
 
     private void OnEnable()
     {
+        BattleManager.OnGameStanby += _slotPositionSetter.SetPositions;
         BattleManager.OnBattleStarted += MoveToBattlePage;
     }
 
     private void OnDisable()
     {
+        BattleManager.OnGameStanby -= _slotPositionSetter.SetPositions;
         BattleManager.OnBattleStarted -= MoveToBattlePage;
     }
     #endregion    
 
     private void Init()
-    {
+    {        
         _totalPages = _pages.Length;
 
         _originalPagePositions = new Vector3[_pages.Length];

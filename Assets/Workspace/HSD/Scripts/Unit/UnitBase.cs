@@ -91,6 +91,16 @@ public class UnitBase : MonoBehaviour, IAttacker
     #endregion
 
     #region FSM
+    public void Move()
+    {
+        _fsm.Move();
+    }
+
+    public void Idle()
+    {
+        _fsm.Idle();
+    }
+
     public void Fight()
     {
         Init();
