@@ -56,15 +56,10 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void OnEnable()
     {
-        if (_manager != null) _manager.OnCharacterDataChanged += UIUpdate;
-
-        if (_isCollected)
+        if (_manager != null)
         {
-            GetComponent<Button>().interactable = true;
-        }
-        else
-        {
-            GetComponent<Button>().interactable = false;
+            _manager.OnCharacterDataChanged += UIUpdate;
+            UIUpdate();
         }
     }
 
