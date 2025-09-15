@@ -47,15 +47,15 @@ public class PresetSelectUnit : MonoBehaviour
 
     private void Init()
     {
-        if (TempDataManager.Instance == null) return;
+        if (Manager.Data == null) return;
 
         _controller.SetSelectedPresetIndex(-1);
 
         // 프리셋이 활성화가 안 되어 있으면 잠겨 있다고 표시하는 UI 출력
-        if(TempDataManager.Instance.PresetData.Count < _index + 1)
+        if(Manager.Data.PresetDB.PresetData.Count < _index + 1)
         {
             SetactiveGameobject("LockedPartyButton");
-            if(TempDataManager.Instance.PresetData.Count < _index)
+            if(Manager.Data.PresetDB.PresetData.Count < _index)
             {
                 _lockedPartyButton.GetComponent<Button>().interactable = false;
             }
@@ -63,7 +63,7 @@ public class PresetSelectUnit : MonoBehaviour
         }
 
         // 프리셋이 세팅되어 있지 않으면(리더가 없는 상태이면) 프리셋 추가 UI 출력
-        if (TempDataManager.Instance.PresetData[_index].Statuses[0].Data == null)
+        if (Manager.Data.PresetDB.PresetData[_index].Statuses[0].Data == null)
         {
             SetactiveGameobject("DisabledPartyButton");
             return;
@@ -79,7 +79,7 @@ public class PresetSelectUnit : MonoBehaviour
 
     private void UpdateUI()
     {
-        UnitStatus[] preset = TempDataManager.Instance.PresetData[_index].Statuses;
+        UnitStatus[] preset = Manager.Data.PresetDB.PresetData[_index].Statuses;
         int damage = 0;
 
         bool activePresetExists = false;
@@ -120,7 +120,7 @@ public class PresetSelectUnit : MonoBehaviour
 
     public void ActiveHighlight()
     {
-        if (_index == TempDataManager.Instance.SelectedPresetIndex)
+        if (_index == Manager.Data.PresetDB.SelectedPresetIndex)
         {
             _highlightPanel.SetActive(true);
         }
@@ -146,7 +146,7 @@ public class PresetSelectUnit : MonoBehaviour
 
     private void UnlockPreset()
     {
-        if (TempDataManager.Instance.PresetData.Count < _index + 1)
+        if (Manager.Data.PresetDB.PresetData.Count < _index + 1)
         {
             if (PopupManager.Instance != null)
             {
@@ -160,7 +160,7 @@ public class PresetSelectUnit : MonoBehaviour
         // TODO : 금액이 부족할 시에 조건 추가
 
         Debug.Log("Used 500 Gold");
-        TempDataManager.Instance.CreatePreset(5);
+        Manager.Data.PresetDB.CreatePreset(5);
         SetactiveGameobject("DisabledPartyButton");
     }
 
