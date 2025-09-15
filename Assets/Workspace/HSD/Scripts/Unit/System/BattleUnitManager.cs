@@ -35,7 +35,7 @@ public class BattleUnitManager : MonoBehaviour
     public void AddUnit(UnitSlot slot, UnitBase unit)
     {
         UnitSlot newSlot = _unitSlotManager.GetUnitSlot(slot.GetPos());
-        UnitBase newUnit = ComponentProvider.Get<UnitBase>(Instantiate(unit.Status.Data.UnitPrefab, slot.transform));
+        UnitBase newUnit = ComponentProvider.Get<UnitBase>(Instantiate(unit.Status.Data.UnitPrefab));
         newUnit.Status = unit.Status;
         AddToCachedArray(newUnit);
         newUnit.SetBattleUnit();

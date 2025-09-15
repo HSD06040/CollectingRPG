@@ -2,11 +2,12 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using static UnitAnimatorData;
 
 public class DataManager : Singleton<DataManager>
 {
     public Dictionary<string, UnitData> UnitDataDic;
-    public Dictionary<string, RuntimeAnimatorController> Animators;
+    public Dictionary<AnimatorData, RuntimeAnimatorController> AnimatorDic;
     public UnitData[] EnemyUnitDatas;
     public SynergyDatabase SynergyDB;
 
@@ -17,7 +18,7 @@ public class DataManager : Singleton<DataManager>
 
     public async UniTask InitData()
     {
-        AnimatorSetting().Forget();
+        await AnimatorSetting();
         await PreLoadData();
         await CsvDownload();
     }
@@ -64,16 +65,26 @@ public class DataManager : Singleton<DataManager>
 
     private async UniTask AnimatorSetting()
     {
-        UnitAnimatorData animatorData = await Addressables.LoadAssetAsync<UnitAnimatorData>("UnitAnimatorData");
+        UnitAnimatorData animatorData = await Addressables.LoadAssetAsync<UnitAnimatorData>("Data/UnitAnimatorData");
+
+        AnimatorDic = new Dictionary<AnimatorData, RuntimeAnimatorController>(animatorData.Animators.Length);
+
+        animatorData.SettingAnimationClip();
 
         foreach (var data in animatorData.Animators)
         {
             AnimatorOverrideController newAnimator = new AnimatorOverrideController(animatorData.BaseController);
 
-            newAnimator["Melee_Attack"] = data.AttackAnimationClip;
-            newAnimator["Melee_Skill"] = data.SkillAnimationClip;
+            foreach (var pair in newAnimator.animationClips)
+            {
+                if (pair.name == "Melee_Attack")
+                    newAnimator[pair.name] = animatorData.GetAnimationClip(data.AttackAnimationType);
+                else if (pair.name == "Melee_Skill")
+                    newAnimator[pair.name] = animatorData.GetAnimationClip(data.SkillAnimationType);
+            }
 
-            Animators.Add(data.AnimatorName, newAnimator.runtimeAnimatorController);
+            if (!AnimatorDic.ContainsKey(data))
+                AnimatorDic.Add(data, newAnimator.runtimeAnimatorController);
         }
     }
 

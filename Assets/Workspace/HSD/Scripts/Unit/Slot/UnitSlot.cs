@@ -33,7 +33,7 @@ public class UnitSlot : MonoBehaviour
         unit.Idle();
         unit.CurrentSlot = _pos;
         unit.gameObject.transform.position = transform.position;
-        unit.gameObject.transform.SetParent(transform);
+        unit.gameObject.transform.SetParent(transform, true);
         Unit = unit;
     }
 
