@@ -22,6 +22,8 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] private Image _roleSynergyImg;
     [SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
+    [SerializeField] private Image _pieceGauge;
+    [SerializeField] private TMP_Text _pieceNum;
 
     [Header("Reference")]
     [SerializeField] ImageSO _costImages;
@@ -119,6 +121,22 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
         _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
+        // 캐릭터 데이터 업데이트 되면 사용 예정
+        //GaugeUpdate();
+    }
+
+    private void GaugeUpdate()
+    {
+        int requirePiece = _status.Data.UpgradeData.GetRequiredPiece();
+        if (_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
+        {
+            _pieceGauge.fillAmount = 0;
+        }
+        else
+        {
+            _pieceGauge.fillAmount = (float)_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
+        }
+        _pieceNum.text = $"{_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
     }
 
     #endregion
