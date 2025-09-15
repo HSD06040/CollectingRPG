@@ -38,6 +38,7 @@ public class UnitManager : MonoBehaviour
         else
             InitAsync();
     }
+
     private void OnDestroy()
     {
         UnSubscrube();        

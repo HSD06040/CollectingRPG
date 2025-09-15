@@ -101,6 +101,11 @@ public class UnitBase : MonoBehaviour, IAttacker
         _fsm.Idle();
     }
 
+    public void Drag()
+    {
+        _fsm.Drag();
+    }
+
     public void Fight()
     {
         Init();

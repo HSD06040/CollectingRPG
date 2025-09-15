@@ -1,10 +1,12 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 public class DataManager : Singleton<DataManager>
 {
     public Dictionary<string, UnitData> UnitDataDic;
+    public Dictionary<string, RuntimeAnimatorController> Animators;
     public UnitData[] EnemyUnitDatas;
     public SynergyDatabase SynergyDB;
 
@@ -15,6 +17,7 @@ public class DataManager : Singleton<DataManager>
 
     public async UniTask InitData()
     {
+        AnimatorSetting().Forget();
         await PreLoadData();
         await CsvDownload();
     }
@@ -51,12 +54,27 @@ public class DataManager : Singleton<DataManager>
 
             unitData.Init();
         }
-    }    
+    }
 
     private async UniTask PreLoadSynergyDB()
     {
         SynergyDB = await Addressables.LoadAssetAsync<SynergyDatabase>("Database/SynergyDatabase");
         SynergyDB.Init();
+    }
+
+    private async UniTask AnimatorSetting()
+    {
+        UnitAnimatorData animatorData = await Addressables.LoadAssetAsync<UnitAnimatorData>("UnitAnimatorData");
+
+        foreach (var data in animatorData.Animators)
+        {
+            AnimatorOverrideController newAnimator = new AnimatorOverrideController(animatorData.BaseController);
+
+            newAnimator["Melee_Attack"] = data.AttackAnimationClip;
+            newAnimator["Melee_Skill"] = data.SkillAnimationClip;
+
+            Animators.Add(data.AnimatorName, newAnimator.runtimeAnimatorController);
+        }
     }
 
     public UnitData GetUnitData(string unitName)

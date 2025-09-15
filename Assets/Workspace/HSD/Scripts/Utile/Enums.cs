@@ -24,6 +24,10 @@ public enum Grade
 }
 
 #region Type
+public enum AnimatorType
+{
+
+}
 
 public enum SpawnPositionType
 {
