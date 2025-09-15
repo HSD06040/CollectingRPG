@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -52,7 +49,7 @@ public abstract class UnitSkill : ScriptableObject
                 prefab.transform.rotation,
                 true
             );
-            Debug.Log(prefab.transform.rotation.x);
+
             int attackerDir = attacker.GetTransform().GetFacingDir();
             int objDir = obj.transform.GetRotFacingDir();
 
@@ -218,9 +215,11 @@ public abstract class UnitSkill : ScriptableObject
     }
     #endregion
 
+    #if  UNITY_EDITOR
     public virtual void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기
     {
         Handles.color = Color.blue;
         Handles.DrawSolidDisc(GetSpawnPoint(attacker), Vector3.forward, 0.05f);
     }
+    #endif
 }

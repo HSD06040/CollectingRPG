@@ -51,7 +51,7 @@ public class DataManager : Singleton<DataManager>
 
             unitData.Init();
         }
-    }
+    }    
 
     private async UniTask PreLoadSynergyDB()
     {

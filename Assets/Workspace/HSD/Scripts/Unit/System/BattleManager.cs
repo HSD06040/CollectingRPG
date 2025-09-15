@@ -10,6 +10,7 @@ public class BattleManager : MonoBehaviour
 
     public static event Action OnBattleStarted;
     public static event Action OnBattleEnded;
+    public static event Action OnGameStanby;
     public static Action<UnitBase> OnSpawnUnit;
 
     [SerializeField] LayerMask _playerLayer;
@@ -23,6 +24,9 @@ public class BattleManager : MonoBehaviour
         OnBattleStarted = null;
         OnBattleEnded = null;
         OnSpawnUnit = null;
+        OnPlayerVictory = null;
+        OnPlayerDefeat = null;
+        OnGameStanby = null;
     }
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
@@ -48,6 +52,11 @@ public class BattleManager : MonoBehaviour
     public void BattleStart()
     {
         OnBattleStarted?.Invoke();
+    }
+
+    public void GameStanby()
+    {
+        OnGameStanby?.Invoke();
     }
 
     private void CheckBattleEnded(UnitStatusController statusCon)

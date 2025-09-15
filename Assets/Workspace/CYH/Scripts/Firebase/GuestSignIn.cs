@@ -88,7 +88,7 @@ public class GuestSignIn : MonoBehaviour
         if (isTutorialCompleted)
         {
             SceneManager.LoadScene("USW_LobbyScene");
-            //SceneManager.LoadScene("USW_LobbyScene_Copy2");
+            //SceneManager.LoadScene("USW_LobbyScene_Copy");
         }
         else
         {

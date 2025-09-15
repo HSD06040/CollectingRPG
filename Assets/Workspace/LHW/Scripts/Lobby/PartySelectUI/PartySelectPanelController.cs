@@ -60,7 +60,7 @@ public class PartySelectPanelController : MonoBehaviour
         Debug.Log("게임 시작");
     }
 
-    private void ArrangePreset()
+    public void ArrangePreset()
     {
         _bottomPanelCtrl.SelectButton(3);
         _stageSelectPanel.SetActive(false);

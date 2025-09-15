@@ -26,6 +26,5 @@ public static class Manager
         AuthManager.CreateInstance();
         DBManager.CreateInstance();
         PopupManager.CreateInstance();
-       
     }
 }

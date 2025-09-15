@@ -21,6 +21,14 @@ public class LobbySynergySlot : MonoBehaviour
     public void UpdateUI(int activeCount)
     {
         ActiveCount = activeCount;
+        if(ActiveCount < _synergyCountArray[0])
+        {
+            _icon.color = Color.clear;
+        }
+        else
+        {
+            _icon.color = Color.white;
+        }
     }
 
     public void SetSynergyCount()

@@ -1,5 +1,5 @@
 using TMPro;
-using TMPro.EditorUtilities;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,9 +7,6 @@ public class PresetSelectUnit : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private Sprite _xImage;
-    [SerializeField] private GameObject _stageSelectPanel;
-    [SerializeField] private GameObject _partyPanel;
-    [SerializeField] private BottomPanelController _bottomPanelController;
 
     [Header("Index")]
     [SerializeField] private int _index;
@@ -144,9 +141,7 @@ public class PresetSelectUnit : MonoBehaviour
 
     private void RearrangePreset()
     {
-        _bottomPanelController.SelectButton(3);
-        _stageSelectPanel.SetActive(false);
-        _partyPanel.SetActive(false);
+        _controller.ArrangePreset();
     }
 
     private void UnlockPreset()

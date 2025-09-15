@@ -1,4 +1,6 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,6 +10,9 @@ public class UnitManager : MonoBehaviour
 {
     [Header("Test")]
     public bool IsTest;
+
+    [Header("Center")]
+    [SerializeField] Transform _center;
 
     [Header("BattleManager")]
     [SerializeField] BattleManager _battleManager;
@@ -40,7 +45,8 @@ public class UnitManager : MonoBehaviour
 
     private async void InitAsync()
     {
-        await Manager.Resources.LoadLabel("Stage");
+        if(IsTest)
+            await Manager.Resources.LoadLabel("Stage");
 
         Manager.Data.SynergyDB.ResetSynergys();
 
@@ -144,12 +150,41 @@ public class UnitManager : MonoBehaviour
         if(UnitController.GetUnitsCount() == 0)
             return;
 
+        _unitUIManager.StandbyUIDeActive();
+
+        FightRoutine().Forget();        
+    }
+
+    private async UniTask FightRoutine()
+    {
+        await Camera.main.DOFieldOfView(120, 0.5f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
+        SlotsDeActive();
+
+        await UniTask.Delay(TimeSpan.FromSeconds(.1f));
+        UnitsMove();
+
+        UnitController.BattleParent.DOMoveX(_center.position.x - 5, 2).SetEase(Ease.Linear);
+        Camera.main.transform.DOMoveX(_center.position.x, 2.2f);
+        await UniTask.Delay(TimeSpan.FromSeconds(1));
+        EnemyController.BattleParent.DOMoveX(-(_center.position.x - 5), 1).SetEase(Ease.Linear);
+        await UniTask.Delay(TimeSpan.FromSeconds(1));
+
+        UnitsIdle();
+
+        await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
+
         UnitController.UnitFight();
         EnemyController.EnemyFight();
-        
+
         FightUISetup();
         _battleManager.BattleStart();
         _battleManager.Init(UnitController.GetUnits(), EnemyController.GetUnits());
+    }
+
+    private void SlotsDeActive()
+    {
+        UnitController.SlotsDeActive();
+        EnemyController.SlotsDeActive();
     }
 
     private void FightUISetup()
@@ -159,6 +194,7 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
         _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
         _unitUIManager.HpMeterController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
+        _unitUIManager.UnitHealthBarManager.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
     #endregion
     public void GameEndedUnitStandby()
@@ -174,8 +210,23 @@ public class UnitManager : MonoBehaviour
         EnemyController.ResetEnemy();
         UnitController.UnitStandbyAndSetSlotPosition();
         _unitUIManager.StandbyUISetting();
+
+        _battleManager.GameStanby();
     }
 
+    private void UnitsIdle()
+    {
+        UnitController.UnitIdle();
+        EnemyController.EnemyIdle();
+    }
+
+    private void UnitsMove()
+    {
+        UnitController.UnitMove();
+        EnemyController.EnemyMove();
+    }
+
+    #region Unit
     public void RandomSpawn()
     {
         int slotIdx = _unitSlotController.GetEmptySlot();
@@ -191,13 +242,12 @@ public class UnitManager : MonoBehaviour
             Debug.Log("골드가 부족합니다.");
             return;
         }
-        UnitData unit = _unitDatas[Random.Range(0, _unitDatas.Length)];
+        UnitData unit = _unitDatas[UnityEngine.Random.Range(0, _unitDatas.Length)];
         UnitStatus unitStatus = new UnitStatus(unit);
 
         AddSlotUnit(unitStatus, slotIdx);
     }
 
-    #region Unit
     public void AddSlotUnit(UnitStatus unit, int slotIdx)
     {
         SetSlot(unit, slotIdx);
