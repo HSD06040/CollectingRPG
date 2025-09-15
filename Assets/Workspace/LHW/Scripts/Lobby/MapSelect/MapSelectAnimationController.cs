@@ -58,7 +58,7 @@ public class MapSelectAnimationController : MonoBehaviour, IBeginDragHandler, ID
 
     private void Start()
     {
-        _mapData = TempDataManager.Instance.ReturnAllMapData();
+        _mapData = Manager.Data.MapDB.ReturnAllMapData();
 
         _distance = 1f / (SIZE - 1);
         for (int i = 0; i < SIZE; i++)
