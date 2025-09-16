@@ -25,7 +25,6 @@ public class UnitData : MetaData
     public Synergy Synergy;
 
     [Header("Upgrade")]
-    public int UpgradeCount;
     public UpgradeUnitData UpgradeData;
     public LevelUpData LevelUpData;
 

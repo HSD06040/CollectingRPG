@@ -142,6 +142,7 @@ public class DBManager : Singleton<DBManager>
             LastStaminaRecoveryTime = newRecoveryTime
         };
 
+        await charDB.InitializeCharacterData();
         await charDB.LoadAllCharacterDatas();
         charDB.EventHandler();
 

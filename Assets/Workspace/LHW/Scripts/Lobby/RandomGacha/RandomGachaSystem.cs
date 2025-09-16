@@ -217,7 +217,7 @@ public class RandomGachaSystem : MonoBehaviour
             _resultUI.HeroGachaUpdate(data, 0, pieceNum.ToString());
         }
 
-        await DBManager.Instance.charDB.SaveCharacterData(_testData);
+        await DBManager.Instance.charDB.SaveCharacterUpgradeData(_testData);
 
         _resultUI.gameObject.SetActive(true);
     }
