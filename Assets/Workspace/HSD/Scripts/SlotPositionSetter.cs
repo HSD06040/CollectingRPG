@@ -20,7 +20,8 @@ public class SlotPositionSetter : MonoBehaviour
     [SerializeField] float _distance = 3;
     [SerializeField] float _battleSlotRatio = 0.65f;
     [SerializeField] float _unitSlotRatio = 0.75f;
-    
+
+    [ContextMenu("Setting_Position")]
     public void SetPositions()
     {
         Rect safe = Screen.safeArea;
