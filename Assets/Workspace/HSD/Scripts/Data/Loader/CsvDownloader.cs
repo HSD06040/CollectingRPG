@@ -22,7 +22,8 @@ public class CsvDownloader
     private UnitSkill[] _unitSkills;
     private UnitData[] _monsterUnitDatas;
     private UnitAttackData[] _attackDatas;
-
+    private Sprite[] _sprites;
+    
     public CsvDownloader(CsvLoadData csvLoadData)
     {
         _csvLoadData = csvLoadData;
@@ -36,6 +37,7 @@ public class CsvDownloader
         _unitSkills = await Manager.Resources.LoadAll<UnitSkill>("SkillData");
         _monsterUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");
         _attackDatas = await Manager.Resources.LoadAll<UnitAttackData>("AttackData");
+        _sprites = await Manager.Resources.LoadAll<Sprite>("MonsterIcon");
 
         List<UniTask> tasks = new List<UniTask>(10);
 
@@ -182,7 +184,7 @@ public class CsvDownloader
             unitData.PerferredLine = Mathf.RoundToInt(stat.AttackRange / 1.5f);
             unitData.AddressableAddress = $"Monster_{unitData.ID}";
 
-            unitData.Icon = Manager.Resources.Get<Sprite>($"{unitData.AddressableAddress}_Icon");
+            unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
 
             unitData.UnitStats[0] = stat;
             unitData.UnitStats[1] = stat;
