@@ -180,8 +180,9 @@ public class CsvDownloader
 
             unitData.UnitStats = new UnitStats[4];
             unitData.PerferredLine = Mathf.RoundToInt(stat.AttackRange / 1.5f);
-
             unitData.AddressableAddress = $"Monster_{unitData.ID}";
+
+            unitData.Icon = Manager.Resources.Get<Sprite>($"{unitData.AddressableAddress}_Icon");
 
             unitData.UnitStats[0] = stat;
             unitData.UnitStats[1] = stat;
