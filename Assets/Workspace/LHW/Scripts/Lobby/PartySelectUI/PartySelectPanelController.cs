@@ -31,16 +31,16 @@ public class PartySelectPanelController : MonoBehaviour
 
     public void SetSelectedPresetIndex(int presetIndex)
     {
-        if (TempDataManager.Instance != null)
+        if (Manager.Data != null)
         {
-            TempDataManager.Instance.SelectPresetIndex(presetIndex);
+            Manager.Data.PresetDB.SelectPresetIndex(presetIndex);
             OnSelectedIndexChanged?.Invoke();
         }
     }
 
     private void ActivateGameStartButton()
     { 
-        if(TempDataManager.Instance != null && TempDataManager.Instance.SelectedPresetIndex != -1)
+        if(Manager.Data != null && Manager.Data.PresetDB.SelectedPresetIndex != -1)
         {
             _gameStartButton.interactable = true;
         }

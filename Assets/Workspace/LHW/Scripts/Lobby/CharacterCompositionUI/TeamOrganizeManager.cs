@@ -55,23 +55,9 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private Dictionary<Synergy, int> synergyCounts = new();
 
-    private void Awake()
-    {
-        // TempDataManager 반영 이전
-        /*
-        if(_presetData.Count == 0)
-        {
-            for(int i = 0; i < 2; i++)
-            {
-                _presetData.Add(new TeamPresetData(5));
-            }
-        }
-        _currentPreset = _presetData[0].Statuses;
-        */
-    }
     private void Start()
     {
-        if (TempDataManager.Instance != null) _currentPreset = TempDataManager.Instance.PresetData[0].Statuses;
+        if (Manager.Data != null) _currentPreset = Manager.Data.PresetDB.PresetData[0].Statuses;
         LoadData();
     }
 
@@ -297,9 +283,9 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowButtonPreset()
     {
-        if (TempDataManager.Instance == null) return;
+        if (Manager.Data.PresetDB.PresetData == null) return;
 
-        for (int i = 0; i < TempDataManager.Instance.PresetData.Count - 2; i++)
+        for (int i = 0; i < Manager.Data.PresetDB.PresetData.Count - 2; i++)
         {
             _presetAddButton[i].buttonText = $"{(i + 3)}";
             _presetAddButton[i].UpdateUI();
@@ -307,7 +293,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
         for (int i = 0; i < _presetAddButton.Length; i++)
         {
-            if (i <= TempDataManager.Instance.PresetData.Count - 2)
+            if (i <= Manager.Data.PresetDB.PresetData.Count - 2)
             {
                 _presetAddButton[i].GetComponent<Button>().interactable = true;
             }
@@ -338,7 +324,7 @@ public class TeamOrganizeManager : MonoBehaviour
         // 해당 프리셋이 생성되지 않은 프리셋일 시 확장 가능한지 확인하고, 확장을 진행      
         // TempDataManager 반영 이전
         //if (_presetData.Count < index + 1)
-        if (TempDataManager.Instance.PresetData.Count < index + 1)
+        if (Manager.Data.PresetDB.PresetData.Count < index + 1)
         {
             if (PopupManager.Instance != null)
             {
@@ -357,9 +343,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
         Debug.Log("Used 500 Gold");
 
-        // TempDataManager 반영 이전
-        //_presetData.Add(new TeamPresetData(5));
-        TempDataManager.Instance.CreatePreset(5);
+        Manager.Data.PresetDB.CreatePreset(5);
 
         // 이 부분은 UI 디자인 변경 시 변경 필요
         _presetAddButton[index - 2].buttonText = $"{(index + 1)}";
@@ -370,9 +354,7 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void LoadPreset(int index)
     {
-        // TempDataManager 반영 이전
-        //_currentPreset = _presetData[index].Statuses;
-        _currentPreset = TempDataManager.Instance.PresetData[index].Statuses;
+        _currentPreset = Manager.Data.PresetDB.PresetData[index].Statuses;
 
         _currentCost = 0;
         _currentOverallPower = 0;

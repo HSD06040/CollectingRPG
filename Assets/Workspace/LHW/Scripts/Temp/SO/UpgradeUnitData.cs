@@ -49,14 +49,11 @@ public class UpgradeUnitData : ScriptableObject
     {
         if (CurrentUpgradeData.UpgradeLevel == 0) CurrentUpgradeData.UpgradeLevel += 1;
 
-        // TODO : DB에 [레벨] 업데이트
     }
 
     public void AddPiece(int piece)
     {
         CurrentUpgradeData.CurrentPieces += piece;
-
-        // TODO : DB에 [조각] 업데이트
     }
 
     public void LevelUp()
@@ -70,8 +67,6 @@ public class UpgradeUnitData : ScriptableObject
         {
             CurrentUpgradeData.CurrentPieces -= requiredPiece;
             CurrentUpgradeData.UpgradeLevel += 1;
-
-            // TODO : DB에 [레벨]과 [조각] 업데이트
         }
     }    
 }
