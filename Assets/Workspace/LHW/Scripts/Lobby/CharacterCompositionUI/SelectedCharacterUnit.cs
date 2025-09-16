@@ -71,17 +71,6 @@ public class SelectedCharacterUnit : MonoBehaviour
             {
                 _crownImage.SetActive(false);
             }
-
-            if (_manager.CurrentCost == _manager.TotalCost)
-            {
-                //_charImage.color = Color.black;
-                //_charImage.sprite = _xImage;
-            }
-            else
-            {
-                //_charImage.color = Color.clear;
-                //_charImage.sprite = null;
-            }
         }
         else
         {
@@ -94,7 +83,27 @@ public class SelectedCharacterUnit : MonoBehaviour
 
                 if (_obj == null)
                 {
-                    _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(-0.8f + (_index * 1.4f), 0, 0), Quaternion.identity);
+                    switch(_index)
+                    {
+                        case 0: 
+                            _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(-0.5f, -0.3f, 0), Quaternion.Euler(0f, 0f, 0f));
+                            break;
+                        case 1:
+                            _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(0.6f, 1f, 0), Quaternion.Euler(0f, 0f, 0f));
+                            break;
+                        case 2:
+                            _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(2.1f, 1.6f, 0), Quaternion.Euler(0f, 180f, 0f));
+                            break;
+                        case 3:
+                            _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(3.7f, 0.8f, 0), Quaternion.Euler(0f, 180f, 0f));
+                            break;
+                        case 4:
+                            _obj = Manager.Pool.Get(_status.Data.UnitPrefab, new Vector3(5f, -0.4f, 0), Quaternion.Euler(0f, 180f, 0f));
+                            break;
+                        default:
+                            break;
+
+                    }
                 }
             }
         }
