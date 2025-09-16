@@ -31,7 +31,7 @@ public class StageUIController : MonoBehaviour
     public void MapUIUpdate(int index)
     {
         _mapIndex = index + 1;
-        MapData data = TempDataManager.Instance.ReturnMapData(index);
+        MapData data = Manager.Data.MapDB.ReturnMapData(index);
         _mapImage.sprite = data.MapImage;
         _mapNameText.text = data.MapName;
     }

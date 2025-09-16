@@ -1,56 +1,21 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-
-// TempDataManager의 기능은 DataManager와의 통합 과정에서 전부 옮겨졌으며
-// 해당 스크립트는 더 이상 쓰이지 않는 스크립트 입니다.
-public class TempDataManager : MonoBehaviour
+public class PresetDatabase
 {
-    /*
-    #region Singleton
-
-    public static TempDataManager Instance { get; private set; }
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        Init();
-    }
-
-    #endregion
-
-    #region Data
-
     // 프리셋 관련
     private int _selectedPresetIndex = 0;
     public int SelectedPresetIndex => _selectedPresetIndex;
     private List<TeamPresetData> _presetData = new List<TeamPresetData>();
     public List<TeamPresetData> PresetData => _presetData;
 
-    [SerializeField] private MapDatabaseSO _mapDatabase;
-
-    #endregion    
-
-    private void Init()
-    {
-        PresetDataInit();
-    }
-
-    #region Preset
+    #region PresetData
 
     /// <summary>
     /// 프리셋 데이터 초기화
     /// 신규 유저여서 프리셋 데이터가 없는 경우와
     /// 이미 있는 데이터를 로드해야 하는 경우를 나눠야 함
     /// </summary>
-    private void PresetDataInit()
+    public void InitPresetData()
     {
         // 신규 유저일 경우(프리셋 데이터가 없을 경우)
         if (_presetData.Count == 0)
@@ -95,19 +60,4 @@ public class TempDataManager : MonoBehaviour
     }
 
     #endregion
-
-    #region
-
-    public List<MapData> ReturnAllMapData()
-    {
-        return _mapDatabase.Maps;
-    }
-
-    public MapData ReturnMapData(int index)
-    {
-        return _mapDatabase.Maps[index];
-    }
-
-    #endregion
-    */
 }

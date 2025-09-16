@@ -6,15 +6,26 @@ using static UnitAnimatorData;
 
 public class DataManager : Singleton<DataManager>
 {
+    // 유닛 데이터 관련
     public Dictionary<string, UnitData> UnitDataDic;
     public Dictionary<AnimatorData, RuntimeAnimatorController> AnimatorDic;
     public UnitData[] EnemyUnitDatas;
     public SynergyDatabase SynergyDB;
 
+    // 프리셋 데이터 관련
+    public PresetDatabase PresetDB { get; private set; } = new PresetDatabase();
+
+    // 맵 데이터 관련
+    public MapDatabase MapDB { get; private set; } = new MapDatabase();
+
     private void Awake()
     {
         InitData().Forget();
+        PresetDB.InitPresetData();
+        MapDB.InitMapData();
     }
+
+    #region UniData
 
     public async UniTask InitData()
     {
@@ -92,4 +103,6 @@ public class DataManager : Singleton<DataManager>
     {
         return UnitDataDic.TryGetValue(unitName, out var unitData) ? unitData : null;
     }
+
+    #endregion
 }

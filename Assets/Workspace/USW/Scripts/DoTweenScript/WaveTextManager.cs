@@ -114,7 +114,7 @@ public class WaveTextManager : MonoBehaviour
         textDisplay.ForceMeshUpdate();
         var textInfo = textDisplay.textInfo;
         
-        // 원본 버텍스 정보 저장 (첫 번째 호출 시)
+        
         if (originalVertices == null || originalVertices.Length != textInfo.meshInfo[0].vertices.Length)
         {
             originalVertices = new Vector3[textInfo.meshInfo[0].vertices.Length];
@@ -148,7 +148,7 @@ public class WaveTextManager : MonoBehaviour
             }
         }
         
-        // 메쉬 업데이트
+      
         for (int i = 0; i < textInfo.meshInfo.Length; i++)
         {
             var meshInfo = textInfo.meshInfo[i];
@@ -188,10 +188,10 @@ public class WaveTextManager : MonoBehaviour
         
         Sequence completeSequence = DOTween.Sequence();
         
-        // 완료 시 특별한 효과 - 모든 글자가 동시에 펀치
+    
         completeSequence.Append(textDisplay.transform.DOPunchScale(Vector3.one * 0.3f, 0.8f, 8));
         
-        // 이후 더 빠른 순차 웨이브
+ 
         completeSequence.AppendCallback(() => {
             waveTween = DOTween.To(() => 0f, x => UpdateSequentialWave(x), 360f, waveSpeed * 1.5f)
                 .SetLoops(-1, LoopType.Incremental)
@@ -266,7 +266,7 @@ public class WaveTextManager : MonoBehaviour
     {
         StopWaveEffect();
         textDisplay.text = "웨이브 테스트!";
-        originalVertices = null; // 원본 버텍스 초기화
+        originalVertices = null;
         StartSequentialWaveEffect();
     }
     

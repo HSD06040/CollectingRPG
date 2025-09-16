@@ -22,6 +22,9 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] private Image _roleSynergyImg;
     [SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
+    [SerializeField] private Image _pieceGauge;
+    [SerializeField] private TMP_Text _pieceNum;
+    [SerializeField] private Image _selectedImage;
 
     [Header("Reference")]
     [SerializeField] ImageSO _costImages;
@@ -119,6 +122,44 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         }
         _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
+        // 캐릭터 데이터 업데이트 되면 사용 예정
+        //GaugeUpdate();
+
+        SelectedUpdate();
+    }
+
+    private void GaugeUpdate()
+    {
+        int requirePiece = _status.Data.UpgradeData.GetRequiredPiece();
+        if (_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
+        {
+            _pieceGauge.fillAmount = 0;
+        }
+        else
+        {
+            _pieceGauge.fillAmount = (float)_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
+        }
+        _pieceNum.text = $"{_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
+    }
+
+    private void SelectedUpdate()
+    {
+        // 캐릭터 편성 칸이 5칸에서 다른 크기로 변경될 가능성이 적다는 전제로
+        // 직접 5를 집어넣음, 유동성을 주고 싶다면 _currentUnit의 길이를 직접 가져올 것
+        for(int i = 0; i < 5; i++)
+        {
+            UnitStatus data = _manager.GetCurrentPresetData(i);
+
+            if (data != null && data.Data != null && data.Data.ID == _status.Data.ID)
+            {
+                _selectedImage.gameObject.SetActive(true);
+                Debug.Log("실행됨");
+                break;
+            }
+            
+            if(i == 4) _selectedImage.gameObject.SetActive(false);
+        }
+        
     }
 
     #endregion

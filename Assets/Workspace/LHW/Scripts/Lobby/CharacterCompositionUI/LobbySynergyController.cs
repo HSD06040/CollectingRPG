@@ -59,7 +59,6 @@ public class LobbySynergyController : MonoBehaviour
 
         SetHiararchy();
     }
-   
 
     private void SetHiararchy()
     {
