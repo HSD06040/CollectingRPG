@@ -260,7 +260,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
     public Vector2 GetBarPosition()
     {
-        return GetCenter() + new Vector2(0, (transform.localScale.y / 2) + .3f);
+        return GetCenter() + new Vector2(0, ((transform.localScale.y + .3f) / 2));
     }
     public UnitStatusController GetStatusController()
     {
