@@ -1,9 +1,7 @@
-using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,10 +25,6 @@ public class TeamOrganizeManager : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private CollectedCharacterData _collectedCharacterData;
-
-    [Header("Data")]
-    // TempDataManager 반영 이전
-    //[SerializeField] private List<TeamPresetData> _presetData = new List<TeamPresetData>();
 
     private UnitStatus _selectedUnit;
     private UnitStatus[] _currentPreset;
@@ -156,8 +150,8 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             _currentCost -= _currentPreset[index].Data.Cost;
             _currentOverallPower -= _currentPreset[index].CombatPower;
-            _currentPreset[index].Data = null;
             _currentPreset[index].Level = 0;
+            _currentPreset[index].Data = null;
 
             OnCharacterDataChanged?.Invoke();
         }
@@ -260,12 +254,12 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowCostInfo()
     {
-        _costInfoText.text = $"충성도 {_currentCost} / {_totalCost}";
+        //_costInfoText.text = $"충성도 {_currentCost} / {_totalCost}";
     }
 
     private void ShowTotalOverallPowerInfo()
     {
-        _totalOverallPowerText.text = $"{_currentOverallPower}";
+        //_totalOverallPowerText.text = $"{_currentOverallPower}";
     }
 
 
