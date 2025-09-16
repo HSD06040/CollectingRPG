@@ -56,7 +56,6 @@ public class ShieldSlider : MonoBehaviour
             float size = (FullWidth - hpWidth) + overflow;
 
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, size);
-
             rt.anchoredPosition = new Vector2(FullWidth, rt.anchoredPosition.y);
         }
     }
