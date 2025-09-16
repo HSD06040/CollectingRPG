@@ -13,13 +13,3 @@ public class UnitAnimatorType : MonoBehaviour
         anim.runtimeAnimatorController = controller;
     }
 }
-
-public enum AnimatorType
-{
-    Melee,
-    Bow,
-    Magic,
-    Spear,
-    ShortMelee,
-    HorseMelee
-}

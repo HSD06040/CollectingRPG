@@ -92,6 +92,7 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
         UnitBase unitBase = ComponentProvider.Get<UnitBase>(unit);
         unitBase.Status = _unit;
         unitBase.Init();
+        unitBase.Drag();
 
         _dragDropSystem.SetUnit(unit, UnitSetting, _slotIdx);
         _chachedUnit = _unit;

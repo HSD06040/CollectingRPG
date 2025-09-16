@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 
 public class BaseFSM : MonoBehaviour
@@ -12,6 +13,7 @@ public class BaseFSM : MonoBehaviour
     private static readonly int _skillHash = Animator.StringToHash("Skill");
     private static readonly int _deadHash = Animator.StringToHash("Dead");
     private static readonly int _stunHash = Animator.StringToHash("Stun");
+    private static readonly int _dragHash = Animator.StringToHash("Drag");
     #endregion
 
     #region State
@@ -60,12 +62,20 @@ public class BaseFSM : MonoBehaviour
 
     public void Move()
     {
+        Owner.Anim.ResetTrigger(_idleHash);
         Owner.Anim.SetTrigger(_moveHash);
     }
 
     public void Idle()
     {
+        Owner.Anim.ResetTrigger(_dragHash);
         Owner.Anim.SetTrigger(_idleHash);
+    }
+
+    public void Drag()
+    {
+        Owner.Anim.ResetTrigger(_idleHash);
+        Owner.Anim.SetTrigger(_dragHash);
     }
 
     public void Fight()
@@ -97,7 +107,17 @@ public class BaseFSM : MonoBehaviour
         }
     }
 
-    private void Attack() => Owner.Attack();
-    private void UseSkill() => Owner.UseSkill();
+    private void OnActionEvent()
+    {
+        if (StateMachine._currentState == AttackState)
+        {
+            Owner.Attack();
+        }
+        else if (StateMachine._currentState == SkillState)
+        {
+            Owner.UseSkill();
+        }
+    }
+
     private void AnimationFinished() => StateMachine._currentState.AnimationFinished();
 }

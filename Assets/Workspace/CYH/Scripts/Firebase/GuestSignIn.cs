@@ -77,7 +77,7 @@ public class GuestSignIn : MonoBehaviour
                 // 튜토리얼 isTutorialComplete = true Data 변경
                 SetTutorialCompleteAsync();
                 _isClicked = false;
-                SceneManager.LoadScene("USW_LoadingScene");
+                SceneManager.LoadScene("USW_LobbyScene");
             }
         });
     }
@@ -92,7 +92,7 @@ public class GuestSignIn : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene("USW_LoadingScene");
+            SceneManager.LoadScene("USW_LobbyScene");
             //SceneManager.LoadScene("USW_LoadingScene_Copy2");
             // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
             //tutorialPanel.SetActive(true);

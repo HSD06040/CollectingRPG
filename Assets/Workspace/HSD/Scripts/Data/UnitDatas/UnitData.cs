@@ -13,6 +13,10 @@ public class UnitData : MetaData
     public int PerferredLine;
     public int Cost;
 
+    [Header("AnimationData")]
+    public bool isNotChange;
+    public AnimatorData AnimatiorData;
+
     [Header("Attack_Data")]
     public UnitSkill Skill;
     public UnitAttackData AttackData; // Melee, Ranged 등 공격 타입에 따라 다름
