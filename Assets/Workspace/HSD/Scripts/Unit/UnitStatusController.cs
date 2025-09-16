@@ -248,7 +248,21 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public void TakeDamage(int amount, bool isCrit = false)
     {
         if(IsDead)
-            return;
+            return;        
+
+        if(Shield.Value > 0)
+        {
+            if(amount > Shield.Value)
+            {
+                amount -= Shield.Value;
+                Shield.Value = 0;
+            }
+            else
+            {
+                Shield.Value -= amount;
+                return;
+            }
+        }
 
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
         UnitFXController.Flash();

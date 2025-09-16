@@ -60,13 +60,11 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
     private void OnEnable()
     {
         BattleManager.OnGameStanby += _slotPositionSetter.SetPositions;
-        BattleManager.OnBattleStarted += MoveToBattlePage;
     }
 
     private void OnDisable()
     {
         BattleManager.OnGameStanby -= _slotPositionSetter.SetPositions;
-        BattleManager.OnBattleStarted -= MoveToBattlePage;
     }
     #endregion    
 
@@ -184,6 +182,8 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
 
     public void MoveToPage(int pageIndex, bool instant = false)
     {
+        _currentPage = pageIndex;
+
         float height = Screen.height;
         Vector2 targetPos = new Vector2(0, -pageIndex * height);
 
@@ -234,11 +234,6 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
             RectTransform panel = _content.GetChild(i).GetComponent<RectTransform>();
             panel.anchoredPosition = new Vector2(0, i * panel.rect.height);
         }
-    }
-
-    private void MoveToBattlePage()
-    {
-        MoveToPage(1);
     }
 
     public void MoveToEnemy()

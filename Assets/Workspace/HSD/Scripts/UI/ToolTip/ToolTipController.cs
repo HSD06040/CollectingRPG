@@ -6,4 +6,10 @@ public class ToolTipController : MonoBehaviour
 {
     public UnitToolTip UnitToolTip;
     public SynergyToolTip SynergyToolTip;
+
+    public void CloseAll()
+    {
+        UnitToolTip.Close();
+        SynergyToolTip.Close();
+    }
 }

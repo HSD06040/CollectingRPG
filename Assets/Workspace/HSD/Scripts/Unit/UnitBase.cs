@@ -2,9 +2,20 @@ using UnityEngine;
 
 public class UnitBase : MonoBehaviour, IAttacker
 {
+    private UnitStatus _status;
+    [SerializeField]
+    public UnitStatus Status
+    {
+        get => _status;
+        set
+        {
+            _status = value;
+            SetAnimator(value);
+        }
+    }
+
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
-    [field: SerializeField] public UnitStatus Status { get; set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
     [field: SerializeField] public BoxCollider2D TriggerCol { get; private set; }
     [field: SerializeField] public Transform Target { get; set; }
@@ -70,6 +81,14 @@ public class UnitBase : MonoBehaviour, IAttacker
         transform.localScale = scale;
     }
 
+    private void SetAnimator(UnitStatus unitStatus)
+    {
+        if (unitStatus.Data.isNotChange)
+            return;
+
+        Anim.runtimeAnimatorController = Manager.Data.AnimatorDic[Status.Data.AnimatiorData];
+    }
+
     public void SetBattleUnit()
     {
         if(TriggerCol != null)
@@ -99,6 +118,11 @@ public class UnitBase : MonoBehaviour, IAttacker
     public void Idle()
     {
         _fsm.Idle();
+    }
+
+    public void Drag()
+    {
+        _fsm.Drag();
     }
 
     public void Fight()

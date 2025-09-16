@@ -76,17 +76,22 @@ public class UnitDragDropSystem : MonoBehaviour
         if (hits.Length == 0)
             return;
 
-        bool isInterfactable = false;
+        bool isInteractable = false;
+        bool isSetUnit = false;
+
         for (int i = 0; i < hits.Length; i++)
         {
             if (hits[i].collider != null && hits[i].collider.CompareTag("UnitTrigger"))
             {
-                isInterfactable = true;
-                SetUnit(hits[i].collider.gameObject);
+                if (isSetUnit) return;
+
+                isInteractable = true;
+                isSetUnit = true;
+                SetUnit(hits[i].collider.gameObject);  
             }
             else if (hits[i].collider != null && hits[i].collider.CompareTag("BattleUnit"))
             {
-                isInterfactable = true;
+                isInteractable = true;
                 ToolTipController.UnitToolTip.Show(
                     ComponentProvider.Get<UnitBase>(hits[i].collider.gameObject).Status
                     , false, false);
@@ -95,7 +100,7 @@ public class UnitDragDropSystem : MonoBehaviour
             }
         }
 
-        if (!isInterfactable)
+        if (!isInteractable)
         {
             ToolTipController.UnitToolTip.Close();
             ToolTipController.SynergyToolTip.Close();
@@ -178,6 +183,8 @@ public class UnitDragDropSystem : MonoBehaviour
                     Destroy(_currentUnitBase.gameObject);
                 else
                     _currentUnitBase.transform.position = _pos; // 원래 위치로 되돌리기
+
+                _currentUnitBase.Idle();
             }
         }
     }
@@ -195,6 +202,7 @@ public class UnitDragDropSystem : MonoBehaviour
         IsDragging = true;
         _currentUnit = unit;
         _currentUnitBase = _currentUnit.GetComponentInParent<UnitBase>();
+        _currentUnitBase.Drag();
         _offset = Vector2.zero;
         _pos = _currentUnitBase.transform.position;
     }
@@ -207,6 +215,7 @@ public class UnitDragDropSystem : MonoBehaviour
         IsDragging = true;
         _currentUnit = unit;
         _currentUnitBase = _currentUnit.GetComponentInParent<UnitBase>();
+        _currentUnitBase.Drag();
 
         _offset = Vector2.zero;
         _pos = _currentUnitBase.transform.position;
