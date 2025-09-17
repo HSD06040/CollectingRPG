@@ -8,13 +8,14 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
-    private static Dictionary<string, Object> _resources = new Dictionary<string, Object>();
+    private static Dictionary<string, Object> _resources = new Dictionary<string, Object>();    
+    private static Dictionary<string, Sprite> _sprites = new Dictionary<string, Sprite>();
 
     #region Get
     public async UniTask<T> Get<T>(AssetReference reference) where T : Object
     {
         string primaryKey = await GetPrimaryKey(reference);
-
+        
         if (!_resources.ContainsKey(primaryKey))
             return null;
 
@@ -28,6 +29,46 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         return _resources[address] as T;
     }
+    #endregion
+
+    #region Sprite
+
+    public Sprite SpriteGet(string address)
+    {
+        if(!_sprites.ContainsKey(address))
+            return null;
+
+        return _sprites[address];
+    }
+
+    public async UniTask SpriteLoadLable(string label)
+    {
+        var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
+        var locations = await locationsHandle.Task;
+
+        List<UniTask> tasks = new List<UniTask>(100);
+
+        foreach (var location in locations)
+        {
+            tasks.Add(SpriteLoadAndCache(location));
+        }
+
+        await UniTask.WhenAll(tasks);
+
+        Addressables.Release(locationsHandle);
+    }
+
+    private async UniTask SpriteLoadAndCache(IResourceLocation location)
+    {
+        var handle = Addressables.LoadAssetAsync<Sprite>(location);
+        var asset = await handle.Task;
+
+        if (!_sprites.ContainsKey(location.PrimaryKey))
+        {
+            _sprites.Add(location.PrimaryKey, asset);
+        }
+    }
+
     #endregion
 
     #region Load&Unload Label
