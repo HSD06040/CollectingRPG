@@ -30,7 +30,7 @@ public class DataManager : Singleton<DataManager>
 
     public async UniTask InitData()
     {
-        await Manager.Resources.LoadLabel("MonsterIcon");
+        await Manager.Resources.SpriteLoadLable("MonsterIcon");
         await AnimatorSetting();
         await PreLoadData();
         await CsvDownload();
