@@ -10,6 +10,7 @@ public class DataManager : Singleton<DataManager>
     public Dictionary<string, UnitData> UnitDataDic;
     public Dictionary<AnimatorData, RuntimeAnimatorController> AnimatorDic;
     public UnitData[] EnemyUnitDatas;
+    public UnitData[] UnitDatas;
     public SynergyDatabase SynergyDB;
 
     // 프리셋 데이터 관련
@@ -55,8 +56,8 @@ public class DataManager : Singleton<DataManager>
 
     private async UniTask PreLoadUnitDatas()
     {
-        EnemyUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");
-        UnitData[] UnitDatas = await Manager.Resources.LoadAll<UnitData>("UnitData");
+        EnemyUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");        
+        UnitDatas = await Manager.Resources.LoadAll<UnitData>("UnitData");
 
         UnitDataDic = new Dictionary<string, UnitData>(UnitDatas.Length);
 
@@ -67,7 +68,15 @@ public class DataManager : Singleton<DataManager>
 
             unitData.Init();
         }
-    }
+
+        foreach (var unitData in EnemyUnitDatas)
+        {
+            if (!UnitDataDic.ContainsKey(unitData.Name))
+                UnitDataDic.Add(unitData.Name, unitData);
+
+            unitData.Init();
+        }
+    }    
 
     private async UniTask PreLoadSynergyDB()
     {

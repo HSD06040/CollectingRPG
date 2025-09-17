@@ -1,6 +1,7 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Rendering.Universal; // URP 관련 네임스페이스
+ // URP 관련 네임스페이스
 
 public class ParticleMaterialReplacer : MonoBehaviour
 {
@@ -53,3 +54,4 @@ public class ParticleMaterialReplacer : MonoBehaviour
         Debug.Log($"교체 완료! 총 {changedCount}개의 프리팹에서 Shader가 수정되었습니다.");
     }
 }
+#endif

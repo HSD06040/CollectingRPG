@@ -97,7 +97,7 @@ public class UnitDataEditorWindow : EditorWindow
             currentUnitData.Name = EditorGUILayout.TextField("Name", currentUnitData.Name);
             currentUnitData.Description = EditorGUILayout.TextArea(currentUnitData.Description, GUILayout.Height(60));
             currentUnitData.Cost = EditorGUILayout.IntField("Cost", currentUnitData.Cost);
-            currentUnitData.UpgradeCount = EditorGUILayout.IntField("Upgrade Count", currentUnitData.UpgradeCount);
+            currentUnitData.UpgradeData.CurrentUpgradeData.UpgradeLevel = EditorGUILayout.IntField("Upgrade Count", currentUnitData.UpgradeData.CurrentUpgradeData.UpgradeLevel);
             EditorGUI.indentLevel--;
             EditorGUILayout.Space(5);
         }
@@ -487,7 +487,7 @@ public class UnitDataEditorWindow : EditorWindow
         target.Name = source.Name;
         target.Description = source.Description;
         target.Cost = source.Cost;
-        target.UpgradeCount = source.UpgradeCount;
+        target.UpgradeData.CurrentUpgradeData.UpgradeLevel = source.UpgradeData.CurrentUpgradeData.UpgradeLevel;
         target.Skill = source.Skill;
         target.AttackData = source.AttackData;
 
