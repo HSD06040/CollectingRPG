@@ -10,6 +10,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 {
     private static Dictionary<string, Object> _resources = new Dictionary<string, Object>();    
     private static Dictionary<string, Sprite> _sprites = new Dictionary<string, Sprite>();
+    public Sprite sprite;
 
     #region Get
     public async UniTask<T> Get<T>(AssetReference reference) where T : Object
@@ -32,7 +33,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
     #endregion
 
     #region Sprite
-
     public Sprite SpriteGet(string address)
     {
         if(!_sprites.ContainsKey(address))
@@ -40,6 +40,8 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         return _sprites[address];
     }
+
+
 
     public async UniTask SpriteLoadLable(string label)
     {
@@ -60,7 +62,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     private async UniTask SpriteLoadAndCache(IResourceLocation location)
     {
-        var handle = Addressables.LoadAssetAsync<Sprite>(location);
+        var handle = Addressables.LoadAssetAsync<Sprite>(location.PrimaryKey);
         var asset = await handle.Task;
 
         if (!_sprites.ContainsKey(location.PrimaryKey))
@@ -68,7 +70,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
             _sprites.Add(location.PrimaryKey, asset);
         }
     }
-
     #endregion
 
     #region Load&Unload Label
@@ -131,7 +132,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     private async UniTask LoadAndCache(IResourceLocation location)
     {
-        var handle = Addressables.LoadAssetAsync<Object>(location);
+        var handle = Addressables.LoadAssetAsync<Object>(location.PrimaryKey);
         var asset = await handle.Task;
 
         if (!_resources.ContainsKey(location.PrimaryKey))
