@@ -20,13 +20,11 @@ public class WaveTextManager : MonoBehaviour
     [Header("웨이브 효과 설정")]
     [SerializeField] private float waveSpeed = 2f;
     [SerializeField] private float waveHeight = 15f;
-    [SerializeField] private float waveLength = 0.5f; // 글자 간 웨이브 간격
+    [SerializeField] private float waveLength = 0.5f;
     [SerializeField] private AnimationCurve wavePattern = AnimationCurve.EaseInOut(0, 0, 1, 1);
     
     [Header("대사 출력 설정")]
     [SerializeField] private float dialogueInterval = 2f;
-    [SerializeField] private float fadeInDuration = 0.5f;
-    [SerializeField] private float fadeOutDuration = 0.3f;
     
     [Header("웨이브 방향")]
     [SerializeField] private WaveDirection waveDirection = WaveDirection.LeftToRight;
@@ -43,6 +41,7 @@ public class WaveTextManager : MonoBehaviour
     private Tween waveTween;
     private Vector3[] originalVertices;
     private int currentDialogueIndex = 0;
+    private bool isWaveActive = false;
     
     void Start()
     {
@@ -61,48 +60,67 @@ public class WaveTextManager : MonoBehaviour
         dialogueSequence = DOTween.Sequence();
         currentDialogueIndex = 0;
         
-        for (int i = 0; i < dialogues.Length; i++)
+        // 첫 번째 대사 시작과 함께 웨이브 효과 시작
+        dialogueSequence.AppendCallback(() => {
+            currentDialogueIndex = 0;
+            ShowDialogue(dialogues[0], true); // 첫 번째 대사에서 웨이브 시작
+        });
+        
+        dialogueSequence.AppendInterval(dialogueInterval);
+        
+        // 나머지 대사들 순서대로 표시
+        for (int i = 1; i < dialogues.Length; i++)
         {
             int index = i;
             
             dialogueSequence.AppendCallback(() => {
                 currentDialogueIndex = index;
-                ShowDialogue(dialogues[index]);
+                ShowDialogue(dialogues[index], false); // 웨이브 유지
             });
             
             dialogueSequence.AppendInterval(dialogueInterval);
         }
         
-        dialogueSequence.AppendCallback(() => {
-            ShowDialogue("로딩 완료!", true);
-        });
+        // 시퀀스를 무한 반복하도록 설정
+        dialogueSequence.SetLoops(-1, LoopType.Restart);
     }
     
-    private void ShowDialogue(string text, bool isComplete = false)
+    private void ShowDialogue(string text, bool startWave = false)
     {
-        StopWaveEffect();
+        // 페이드 없이 바로 텍스트 변경
+        textDisplay.text = text;
         
-        // 페이드 아웃
-        textDisplay.DOFade(0f, fadeOutDuration).OnComplete(() => {
-            textDisplay.text = text;
+        // 텍스트가 변경되었으므로 originalVertices 재설정 필요
+        ResetOriginalVertices();
+        
+        if (startWave && !isWaveActive)
+        {
+            StartSequentialWaveEffect();
+        }
+    }
+    
+    private void ResetOriginalVertices()
+    {
+        if (isWaveActive)
+        {
+            // 웨이브가 활성화된 상태에서 텍스트가 변경될 때
+            // 새로운 텍스트의 원본 버텍스 정보를 저장
+            textDisplay.ForceMeshUpdate();
+            var textInfo = textDisplay.textInfo;
             
-            // 페이드 인
-            textDisplay.DOFade(1f, fadeInDuration).OnComplete(() => {
-                if (isComplete)
-                {
-                    StartCompleteWaveEffect();
-                }
-                else
-                {
-                    StartSequentialWaveEffect();
-                }
-            });
-        });
+            if (textInfo.meshInfo.Length > 0)
+            {
+                originalVertices = new Vector3[textInfo.meshInfo[0].vertices.Length];
+                System.Array.Copy(textInfo.meshInfo[0].vertices, originalVertices, originalVertices.Length);
+            }
+        }
     }
     
     public void StartSequentialWaveEffect()
     {
-        StopWaveEffect();
+        if (isWaveActive) return; // 이미 웨이브가 활성화되어 있으면 중복 실행 방지
+        
+        isWaveActive = true;
         
         waveTween = DOTween.To(() => 0f, x => UpdateSequentialWave(x), 360f, waveSpeed)
             .SetLoops(-1, LoopType.Incremental)
@@ -113,7 +131,6 @@ public class WaveTextManager : MonoBehaviour
     {
         textDisplay.ForceMeshUpdate();
         var textInfo = textDisplay.textInfo;
-        
         
         if (originalVertices == null || originalVertices.Length != textInfo.meshInfo[0].vertices.Length)
         {
@@ -148,7 +165,7 @@ public class WaveTextManager : MonoBehaviour
             }
         }
         
-      
+        // 메시 업데이트
         for (int i = 0; i < textInfo.meshInfo.Length; i++)
         {
             var meshInfo = textInfo.meshInfo[i];
@@ -184,23 +201,22 @@ public class WaveTextManager : MonoBehaviour
     
     public void StartCompleteWaveEffect()
     {
-        StopWaveEffect();
+        // 펀치 효과 제거, 웨이브 속도만 증가
+        if (waveTween != null)
+        {
+            waveTween.Kill();
+        }
         
-        Sequence completeSequence = DOTween.Sequence();
-        
-    
-        completeSequence.Append(textDisplay.transform.DOPunchScale(Vector3.one * 0.3f, 0.8f, 8));
-        
- 
-        completeSequence.AppendCallback(() => {
-            waveTween = DOTween.To(() => 0f, x => UpdateSequentialWave(x), 360f, waveSpeed * 1.5f)
-                .SetLoops(-1, LoopType.Incremental)
-                .SetEase(Ease.Linear);
-        });
+        // 더 빠른 웨이브 효과로 변경
+        waveTween = DOTween.To(() => 0f, x => UpdateSequentialWave(x), 360f, waveSpeed * 1.5f)
+            .SetLoops(-1, LoopType.Incremental)
+            .SetEase(Ease.Linear);
     }
     
     public void StopWaveEffect()
     {
+        isWaveActive = false;
+        
         if (waveTween != null)
         {
             waveTween.Kill();
@@ -231,45 +247,7 @@ public class WaveTextManager : MonoBehaviour
     {
         waveDirection = newDirection;
     }
-    
-    // 에디터에서 테스트용
-    [ContextMenu("다음 대사")]
-    public void NextDialogue()
-    {
-        if (currentDialogueIndex < dialogues.Length - 1)
-        {
-            ShowDialogue(dialogues[currentDialogueIndex + 1]);
-        }
-    }
-    
-    [ContextMenu("대사 초기화")]
-    public void ResetDialogue()
-    {
-        StopWaveEffect();
-        if (dialogueSequence != null)
-            dialogueSequence.Kill();
-        originalVertices = null;
-        StartDialogueSequence();
-    }
-    
-    [ContextMenu("즉시 완료")]
-    public void CompleteLoading()
-    {
-        if (dialogueSequence != null)
-            dialogueSequence.Kill();
-        StopWaveEffect();
-        ShowDialogue("로딩 완료!", true);
-    }
-    
-    [ContextMenu("웨이브 테스트")]
-    public void TestWave()
-    {
-        StopWaveEffect();
-        textDisplay.text = "웨이브 테스트!";
-        originalVertices = null;
-        StartSequentialWaveEffect();
-    }
-    
+
     void OnDestroy()
     {
         if (dialogueSequence != null)
