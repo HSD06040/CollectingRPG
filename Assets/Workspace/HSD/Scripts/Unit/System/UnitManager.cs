@@ -38,6 +38,7 @@ public class UnitManager : MonoBehaviour
         else
             InitAsync();
     }
+
     private void OnDestroy()
     {
         UnSubscrube();        
@@ -157,6 +158,11 @@ public class UnitManager : MonoBehaviour
 
     private async UniTask FightRoutine()
     {
+        await Camera.main.transform.DOLocalMoveX(0, 50f)
+        .SetSpeedBased()
+        .SetEase(Ease.OutQuad)
+        .AsyncWaitForCompletion();
+
         await Camera.main.DOFieldOfView(120, 0.5f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
         SlotsDeActive();
 

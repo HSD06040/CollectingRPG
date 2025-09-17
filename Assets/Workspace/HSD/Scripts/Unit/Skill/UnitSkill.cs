@@ -12,6 +12,7 @@ public abstract class UnitSkill : ScriptableObject
     public string SkillName;
     [TextArea] public string Description;
     public int MaxCount;
+    public float[] Powers; // 추후 기능 추가를 위한 데이터
     public float Power = 1;
     public int ManaCost;
 

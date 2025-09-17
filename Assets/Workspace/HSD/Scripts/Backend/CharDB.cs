@@ -2,6 +2,8 @@ using Cysharp.Threading.Tasks;
 using Firebase.Database;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.IO.LowLevel.Unsafe;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharDB
@@ -16,17 +18,32 @@ public class CharDB
         Debug.Log("캐릭터 데이터 연동됨");
     }
 
+    public async UniTask InitializeCharacterData()
+    {
+        _characterReference = FirebaseManager.DataReference.Child("InitCharacterData");
+        
+        foreach (var charData in Manager.Data.UnitDataDic.Values)
+        {
+            await SaveCharacterInitialData(charData);
+        }
+    }
+
     public async UniTask SaveAllCharacterDatas()
     {
         _characterReference = FirebaseManager.DataReference.Child("UserData").Child(_uid).Child("CharacterData");
 
         foreach (var charData in Manager.Data.UnitDataDic.Values)
         {
-            await SaveCharacterData(charData);
+            await SaveCharacterUpgradeData(charData);
         }
     }
 
-    public async UniTask SaveCharacterData(UnitData charData)
+    public async UniTask SaveCharacterInitialData(UnitData charData)
+    {
+        await _characterReference.Child(charData.Name).SetRawJsonValueAsync(JsonUtility.ToJson(charData));
+    }
+
+    public async UniTask SaveCharacterUpgradeData(UnitData charData)
     {
         await _characterReference.Child(charData.Name).
                 SetRawJsonValueAsync(JsonUtility.ToJson(charData.UpgradeData.CurrentUpgradeData));

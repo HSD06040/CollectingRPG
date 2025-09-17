@@ -77,7 +77,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
         }
         _currentCharUnit.Status.Data.UpgradeData.LevelUp();
 
-        await DBManager.Instance.charDB.SaveCharacterData(_currentCharUnit.Status.Data);
+        await DBManager.Instance.charDB.SaveCharacterUpgradeData(_currentCharUnit.Status.Data);
 
         OnCharacterStatusChanged?.Invoke();
     }

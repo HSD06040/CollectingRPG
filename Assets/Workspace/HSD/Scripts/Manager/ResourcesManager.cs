@@ -14,7 +14,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     public async UniTask<T> Get<T>(AssetReference reference) where T : Object
     {
         string primaryKey = await GetPrimaryKey(reference);
-
+        
         if (!_resources.ContainsKey(primaryKey))
             return null;
 
