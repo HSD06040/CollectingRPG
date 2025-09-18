@@ -89,24 +89,12 @@ public class BezierProjectile : Projectile
         _start = (Vector2)transform.position + new Vector2(Random.Range(-0.3f, 0.3f), Random.Range(-1f, 1f));
         _end = (Vector2)_target.position;
 
-        // 발사 방향
         Vector2 dir = (_end - _start).normalized;
 
-        // 진행 방향의 법선 (왼쪽 / 오른쪽으로 수직)
         Vector2 normal = new Vector2(-dir.y, dir.x) * _randomDirection;
 
         _control = (_start + _end) / 2f
                  + dir * _randomOffsetX
                  + normal * _randomOffsetY;
-
-        //float distance = Vector2.Distance(_start, _end);
-        //float factor = Mathf.Clamp01(distance / 5f); // 5f는 최대 사거리 정도로 조정
-
-        //Vector2 dir = (_end - _start).normalized;
-        //Vector2 normal = new Vector2(-dir.y, dir.x) * _randomDirection;
-
-        //_control = (_start + _end) / 2f
-        //         + dir * (_randomOffsetX * factor)
-        //         + normal * (_randomOffsetY * factor);
     }
 }

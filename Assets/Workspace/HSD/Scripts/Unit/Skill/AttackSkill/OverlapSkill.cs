@@ -1,10 +1,12 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "OverlapSkill", menuName = "Data/Unit/Skill/Overlap")]
+[CreateAssetMenu(fileName = "AttackSkill", menuName = "Data/Unit/Skill/Attack")]
 public class OverlapSkill : AttackSkill
 {
+    [Header("TargetType")]
+    public TargetType TargetType;
+
     [Header("Overlap")]
     public SearchType SearchType;
     public Vector2 AttackPointOffset;
@@ -13,7 +15,6 @@ public class OverlapSkill : AttackSkill
     public float Angle;
 
     public int SearchCount;
-    public float Fov;
 
     public override void Active(IAttacker attacker)
     {
@@ -39,7 +40,7 @@ public class OverlapSkill : AttackSkill
                 ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController
                 );
         }
-        else
+        else if (Priority == Priority.None)
         {
             foreach (var target in GetTargets(attacker))
             {
@@ -49,6 +50,14 @@ public class OverlapSkill : AttackSkill
                 ComponentProvider.Get<UnitBase>(target.gameObject).StatusController
                 );
             }
+        }
+        else
+        {
+            attacker.GetStatusController().CalculateDamage(
+            Power,
+            DamageType,
+            ComponentProvider.Get<UnitBase>(GetTargetSingle(attacker).gameObject).StatusController
+            );
         }
     }
 
@@ -70,23 +79,6 @@ public class OverlapSkill : AttackSkill
     {
         var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, SizeOrRadius, BoxSize, Angle, attacker.TargetLayer, GetPriorityFilter());
         return target;
-    }
-
-    protected GameObject[] GetConeTargets(IAttacker attacker, GameObject[] targets, int searchCount)
-    {
-        Transform transform = attacker.GetTransform();
-
-        List<GameObject> searchTargets = new List<GameObject>(searchCount);
-
-        foreach (var target in targets)
-        {
-            if (Vector2.Dot(transform.up, attacker.GetTargetDir()) >= Mathf.Cos(Fov / 2 * Mathf.Deg2Rad))
-            {
-                searchTargets.Add(target);
-            }
-        }
-
-        return searchTargets.ToArray();
     }
 
     private Vector2 GetAttackPoint(IAttacker attacker)
@@ -144,6 +136,7 @@ public class OverlapSkill : AttackSkill
                 Vector3 rightDir = Quaternion.Euler(0, 0, -Angle / 2) * targetDir;
                 Vector3 leftDir = Quaternion.Euler(0, 0, Angle / 2) * targetDir;
 
+                Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(transform.position, transform.position + rightDir * SizeOrRadius);
                 Gizmos.DrawLine(transform.position, transform.position + leftDir * SizeOrRadius);
                 break;
