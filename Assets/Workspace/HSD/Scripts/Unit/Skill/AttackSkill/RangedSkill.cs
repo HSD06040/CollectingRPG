@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "RangedSkill", menuName = "Data/Unit/Skill/Ranged")]
 public class RangedSkill : AttackSkill
 {
-    [SerializeField] float _projectileSpeed = 10f;
+    [SerializeField] protected float _projectileSpeed = 10f;
     [SerializeField] float _distance = 5f;
 
     public override void Active(IAttacker attacker)

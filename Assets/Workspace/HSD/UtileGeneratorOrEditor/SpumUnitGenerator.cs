@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 
 public class SpumUnitGenerator : MonoBehaviour
 {
+    [SerializeField] Transform _pivot;
     [SerializeField] GameObject[] objs;
     [SerializeField] Vector2Int size;
     [SerializeField] Vector2 spacing;
@@ -53,7 +54,7 @@ public class SpumUnitGenerator : MonoBehaviour
                     return;
 
                 Vector2 pos = new Vector2(j * spacing.x, -i * spacing.y);
-                objs[index].transform.position = pos;
+                objs[index].transform.position = (Vector2)_pivot.position + pos;
 
                 index++;
             }

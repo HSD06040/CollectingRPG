@@ -39,7 +39,12 @@ public class Projectile : MonoBehaviour
         _speed = speed;
         _distance = distance;
 
-        MoveAndDestroyAsync(_lifeTime).Forget(); // 발사체 이동 및 파괴 비동기 작업 시작
+        MoveAsync().Forget();
+    }
+    private async UniTask MoveAsync()
+    {
+        await UniTask.Yield();
+        await MoveAndDestroyAsync(_lifeTime);
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
@@ -54,7 +59,7 @@ public class Projectile : MonoBehaviour
 
                 if (_pireceCount <= 0)
                 {
-                    Destroy(gameObject);
+                    ProjectileDestroy();
                 }
             }            
         }
@@ -62,7 +67,7 @@ public class Projectile : MonoBehaviour
 
     protected virtual async UniTask MoveAndDestroyAsync(float duration)
     {
-        await UniTask.Delay(1);
+        await UniTask.Yield();
     }
 
     protected Vector2 GetTargetDir()
@@ -71,5 +76,10 @@ public class Projectile : MonoBehaviour
             return new Vector2(_status.transform.GetFacingDir(), 0);
 
         return (_target.position - transform.position).normalized;
+    }
+
+    protected void ProjectileDestroy()
+    {
+        Manager.Resources.Destroy(gameObject);
     }
 }

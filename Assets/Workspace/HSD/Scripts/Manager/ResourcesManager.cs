@@ -41,8 +41,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
         return _sprites[address];
     }
 
-
-
     public async UniTask SpriteLoadLable(string label)
     {
         var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
