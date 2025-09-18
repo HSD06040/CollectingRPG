@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BezierProjectile : Projectile
@@ -19,7 +20,7 @@ public class BezierProjectile : Projectile
     private float _randomOffsetY;
 
     public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-    LayerMask targetLayer, float speed, float distance)
+    LayerMask targetLayer, float speed, GameObject effect, float distance)
     {
         _randomDirection = Random.value > 0.5f ? 1f : -1f;
         _randomOffsetY = Random.Range(randomY.x, randomY.y);
@@ -37,13 +38,11 @@ public class BezierProjectile : Projectile
     {
         SetPoints();
 
-        CancellationToken token = this.GetCancellationTokenOnDestroy();
-
         float destroyElapsed = 0f;
         float elapsed = 0f;
         float totalDuration = _time / _speed;
 
-        while (elapsed < totalDuration && !token.IsCancellationRequested)
+        while (elapsed < totalDuration)
         {
             if(_target != null)
                 _end = _target.position;
@@ -63,7 +62,7 @@ public class BezierProjectile : Projectile
             euler.z += _zRotateOffset;
             transform.rotation = Quaternion.Euler(euler);
 
-            await UniTask.Yield(PlayerLoopTiming.Update, token);
+            await UniTask.Yield(PlayerLoopTiming.Update, _source.Token);
         }
 
         Vector2 dir = (_end - _control).normalized;
@@ -73,11 +72,11 @@ public class BezierProjectile : Projectile
         lastEuler.z += _zRotateOffset;
         transform.rotation = Quaternion.Euler(lastEuler);
 
-        while (destroyElapsed < _lifeTime && !token.IsCancellationRequested)
+        while (destroyElapsed < _lifeTime)
         {
             destroyElapsed += Time.deltaTime;
             transform.position += (Vector3)(dir * _speed * Time.deltaTime);
-            await UniTask.Yield(PlayerLoopTiming.Update, token);
+            await UniTask.Yield(PlayerLoopTiming.Update, _source.Token);
         }
 
         ProjectileDestroy();

@@ -70,9 +70,11 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
 
+    public UnitAttackData CurrentAttackData;    
+
     [HideInInspector] public float StatMultiplier = 0;
 
-    public bool IsDead { get; set; }
+    public bool IsDead { get; set; }    
 
     private void OnDestroy()
     {
@@ -94,6 +96,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             );
 
         Status = status;
+        CurrentAttackData = Status.Data.AttackData;
         IsDead = false;
         IsStund.Value = false;
 
@@ -104,7 +107,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         else
         {
             SetBaseStat(status.GetCurrentStat(), plusUnitStat);
-        }
+        }        
     }
 
     #region SetStat
@@ -344,7 +347,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsStund.Value = true;
 
-        await UniTask.Delay(TimeSpan.FromSeconds(stunTime));
+        await UniTask.Delay(TimeSpan.FromSeconds(stunTime), cancellationToken: this.GetCancellationTokenOnDestroy());
 
         if (IsDead)
             return;
@@ -357,6 +360,20 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsDead = true;
         OnDied?.Invoke();
+    }
+
+    public void AttackDataChange(UnitAttackData attackData, float _duration)
+    {
+        ChangeAttackData(attackData, _duration).Forget();
+    }
+
+    private async UniTask ChangeAttackData(UnitAttackData attackData, float _duration)
+    {
+        CurrentAttackData = attackData;
+
+        await UniTask.Delay(TimeSpan.FromSeconds(_duration), cancellationToken: this.GetCancellationTokenOnDestroy());
+
+        CurrentAttackData = Status.Data.AttackData;         
     }
 
     #region Effect

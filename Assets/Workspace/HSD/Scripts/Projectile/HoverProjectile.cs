@@ -9,7 +9,7 @@ public class HoverProjectile : Projectile
     private bool isHovering = true;
 
     public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-        LayerMask targetLayer, float speed, float distancez)
+        LayerMask targetLayer, float speed, GameObject effect, float distancez)
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
 

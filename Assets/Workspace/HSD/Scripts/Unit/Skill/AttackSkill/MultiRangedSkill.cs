@@ -1,10 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 [CreateAssetMenu(fileName = "MultiRangedSkill", menuName = "Data/Unit/Skill/MultiRanged")]
 public class MultiRangedSkill : RangedSkill
@@ -23,7 +19,7 @@ public class MultiRangedSkill : RangedSkill
         for (int i = 0; i < _count; i++)
         {
             await UniTask.Delay(TimeSpan.FromSeconds(_interval));
-            GameObject obj = Manager.Resources.Instantiate<GameObject>(_address, GetSpawnPoint(attacker));
+            GameObject obj = Manager.Resources.Instantiate<GameObject>(_address, GetSpawnPoint(attacker), true);
             Projectile projectile = ComponentProvider.Get<Projectile>(obj);
             projectile.Init(attacker.GetTarget(), attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, _projectileSpeed);
         }

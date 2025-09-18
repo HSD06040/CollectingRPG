@@ -20,7 +20,7 @@ public class StraightProjectile : Projectile
             .SetEase(Ease.Linear)
             .AsyncWaitForCompletion();
 
-        Manager.Resources.Destroy(gameObject);
+        ProjectileDestroy();
     }
 
     private void SetDirection()

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 [RequireComponent(typeof(CircleCollider2D))]
@@ -16,19 +17,35 @@ public class Projectile : MonoBehaviour
     protected float _distance;
     protected Vector2 _targetDir => GetTargetDir();
     protected Vector2 _dir;
+    protected GameObject _effect;
 
-    private void Awake()
+    protected CancellationTokenSource _source = new();
+
+    protected virtual void Awake()
     {
         ComponentProvider.Add(gameObject, this);
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         ComponentProvider.Remove<Projectile>(gameObject);
     }
 
+    private void OnEnable()
+    {
+        if (_source != null)
+            _source.Dispose();
+
+        _source = new();
+    }
+
+    private void OnDisable()
+    {        
+        _source.Cancel();
+    }    
+
     public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-        LayerMask targetLayer, float speed, float distance = 0)
+        LayerMask targetLayer, float speed, GameObject effect = null, float distance = 0)
     {        
         _status = status;
         _target = target;
@@ -38,6 +55,7 @@ public class Projectile : MonoBehaviour
         _attackPower = attackPower;
         _speed = speed;
         _distance = distance;
+        _effect = effect;
 
         MoveAsync().Forget();
     }
@@ -53,7 +71,7 @@ public class Projectile : MonoBehaviour
         {
             _status.CalculateDamage(_attackPower, _damageType, ComponentProvider.Get<UnitBase>(collision.gameObject).StatusController);
 
-            if(!_isPirece)
+            if (!_isPirece)
             {
                 _pireceCount--;
 
@@ -70,6 +88,13 @@ public class Projectile : MonoBehaviour
         await UniTask.Yield();
     }
 
+    protected void SpawnEffect()
+    {
+        if (_effect == null) return;
+
+        Manager.Resources.Instantiate(_effect, transform.position, true);
+    }
+
     protected Vector2 GetTargetDir()
     {
         if (_target == null) 
@@ -80,6 +105,7 @@ public class Projectile : MonoBehaviour
 
     protected void ProjectileDestroy()
     {
+        SpawnEffect();
         Manager.Resources.Destroy(gameObject);
     }
 }

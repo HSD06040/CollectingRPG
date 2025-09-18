@@ -40,6 +40,24 @@ public class OverlapSkill : AttackSkill
                 ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController
                 );
         }
+        else if (Priority == Priority.TargetRadius)
+        {
+            foreach (var target in Utils.GetTargetsNonAlloc(attacker,
+            attacker.GetTarget().position,
+            SearchType,
+            SizeOrRadius,
+            BoxSize,
+            Angle,
+            MaxCount,
+            attacker.TargetLayer))
+            {
+                attacker.GetStatusController().CalculateDamage(
+                    Power,
+                    DamageType,
+                    ComponentProvider.Get<UnitBase>(target).StatusController
+                    );
+            }
+        }
         else if (Priority == Priority.None)
         {
             foreach (var target in GetTargets(attacker))
@@ -108,7 +126,7 @@ public class OverlapSkill : AttackSkill
 
         if (attacker == null) return;
 
-        Vector2 attackPoint = GetAttackPoint(attacker);
+        Vector2 attackPoint = Priority == Priority.TargetRadius ? attacker.GetTarget().position : GetAttackPoint(attacker);
         Vector2 targetDir = attacker.GetTargetDir();
         Transform transform = attacker.GetTransform();
 
@@ -116,7 +134,7 @@ public class OverlapSkill : AttackSkill
 
         switch (SearchType)
         {
-            case SearchType.Circle:
+            case SearchType.Circle:                
                 Handles.DrawWireDisc(attackPoint, Vector3.forward, SizeOrRadius);
                 break;
 

@@ -130,6 +130,10 @@ public class UnitBase : MonoBehaviour, IAttacker
         Init();
         _fsm.Fight();
     }
+    public void Standby()
+    {
+        _fsm.Standby();
+    }
 
     public void GameEndedStanby()
     {
@@ -139,14 +143,9 @@ public class UnitBase : MonoBehaviour, IAttacker
         Standby();
     }
 
-    public void Standby()
-    {
-        _fsm.Standby();
-    }
-
     public void Attack()
     {
-        Status.Data.AttackData.Attack(this);
+        StatusController.CurrentAttackData.Attack(this);        
     }
 
     public bool SkillCheck()
@@ -269,6 +268,10 @@ public class UnitBase : MonoBehaviour, IAttacker
     public Vector2 GetTargetDir()
     {
         return TargetDir;
+    }
+    public LayerMask GetLayerMask()
+    {
+        return gameObject.layer;
     }
     #endregion
 
