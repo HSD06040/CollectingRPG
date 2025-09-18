@@ -16,11 +16,53 @@ public class CharDB
 
     public async UniTask InitializeCharacterData()
     {
-        _characterReference = FirebaseManager.DataReference.Child("InitCharacterData");
+        var initRef = FirebaseManager.DataReference.Child("InitCharacterData");
 
         foreach (var charData in Manager.Data.UnitDataDic.Values)
         {
-            await SaveCharacterInitialData(charData);
+            UnitDataDTO dto = charData.ToDTO(charData);
+            await initRef.Child(charData.Name).
+                SetRawJsonValueAsync(JsonUtility.ToJson(dto));
+            Debug.Log($"{charData.Name}");
+        }
+    }
+
+    public async UniTask InitializeCharacterUpgradeData()
+    {
+        _characterReference = FirebaseManager.DataReference
+        .Child("UserData").Child(_uid).Child("CharacterData");
+
+        Debug.Log("업그레이드 데이터 Initial 시작");
+        await UniTask.Yield();
+        Debug.Log("쉬기");
+        var snapshot = await _characterReference.GetValueAsync();
+
+        Debug.Log("ddd");
+
+        if (!snapshot.Exists || snapshot.ChildrenCount == 0)
+        {
+            foreach (var charData in Manager.Data.UnitDataDic.Values)
+            {
+                if (charData.UpgradeData == null) continue;
+
+                charData.UpgradeData.CurrentUpgradeData = new CurrentUpgradeData
+                {
+                    CurrentPieces = 0,
+                    UpgradeLevel = 0
+                };
+
+                Debug.Log($"{charData.Name}");
+
+                await SaveCharacterUpgradeData(charData);
+
+                Debug.Log("업그레이드 데이터 저장 완료");
+            }
+
+            Debug.Log("최초 계정 → UpgradeData 초기화 완료");
+        }
+        else
+        {
+            Debug.Log("UpgradeData 이미 존재 → 초기화 생략");
         }
     }
 
@@ -34,17 +76,18 @@ public class CharDB
         }
     }
 
-    public async UniTask SaveCharacterInitialData(UnitData charData)
-    {
-        UnitDataDTO dto = charData.ToDTO(charData);
-        await _characterReference.Child(charData.Name).
-            SetRawJsonValueAsync(JsonUtility.ToJson(dto));
-    }
-
     public async UniTask SaveCharacterUpgradeData(UnitData charData)
     {
+        if (_characterReference == null)
+        {
+            _characterReference = FirebaseManager.DataReference
+        .Child("UserData").Child(_uid).Child("CharacterData");
+        }
+
         await _characterReference.Child(charData.Name).
                 SetRawJsonValueAsync(JsonUtility.ToJson(charData.UpgradeData.CurrentUpgradeData));
+
+        Debug.Log($"[SaveCharacterUpgradeData] 저장 완료 → {charData.Name}");
     }
 
     public async UniTask LoadAllCharacterDatas()
@@ -61,8 +104,8 @@ public class CharDB
 
                 if (data != null)
                 {
-                    data.UpgradeData.CurrentUpgradeData =
-                        JsonUtility.FromJson<CurrentUpgradeData>(child.GetRawJsonValue());
+                    var loaded = JsonUtility.FromJson<CurrentUpgradeData>(child.GetRawJsonValue());
+                    data.UpgradeData.CurrentUpgradeData = loaded ?? new CurrentUpgradeData { CurrentPieces = 0, UpgradeLevel = 0 };
                 }
             }
         }

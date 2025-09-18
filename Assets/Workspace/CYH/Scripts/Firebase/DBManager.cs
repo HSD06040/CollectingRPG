@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Database;
 using System;
@@ -9,7 +10,6 @@ public class DBManager : Singleton<DBManager>
 {
     public CharDB charDB = new CharDB();
     public QuestDB questDB = new QuestDB();
-
 
     #region Nickname/LobbyData
 
@@ -142,7 +142,9 @@ public class DBManager : Singleton<DBManager>
             LastStaminaRecoveryTime = newRecoveryTime
         };
 
-        await charDB.InitializeCharacterData();
+        //await charDB.InitializeCharacterData();
+        Debug.Log("Initial 완료");
+        await charDB.InitializeCharacterUpgradeData();
         await charDB.LoadAllCharacterDatas();
         charDB.EventHandler();
 
