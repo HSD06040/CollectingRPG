@@ -4,6 +4,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "AttackSkill", menuName = "Data/Unit/Skill/Attack")]
 public class OverlapSkill : AttackSkill
 {
+    [Header("Stun")]
+    public bool IsStun;
+    public float StunDuration;
+
     [Header("TargetType")]
     public TargetType TargetType;
 
@@ -34,48 +38,62 @@ public class OverlapSkill : AttackSkill
                 return;
             }
 
+            UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController;
+
             attacker.GetStatusController().CalculateDamage(
                 Power,
                 DamageType,
-                ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController
+                targetStatus
                 );
+
+            if (IsStun)
+                targetStatus.Stun(StunDuration);
         }
         else if (Priority == Priority.TargetRadius)
         {
             foreach (var target in Utils.GetTargetsNonAlloc(attacker,
-            attacker.GetTarget().position,
-            SearchType,
-            SizeOrRadius,
-            BoxSize,
-            Angle,
-            MaxCount,
-            attacker.TargetLayer))
+            attacker.GetTarget().position, SearchType, SizeOrRadius, BoxSize, Angle, MaxCount, attacker.TargetLayer))
             {
+                UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(target).StatusController;
+
                 attacker.GetStatusController().CalculateDamage(
                     Power,
                     DamageType,
-                    ComponentProvider.Get<UnitBase>(target).StatusController
+                    targetStatus
                     );
+
+                if (IsStun)
+                    targetStatus.Stun(StunDuration);
             }
         }
         else if (Priority == Priority.None)
         {
             foreach (var target in GetTargets(attacker))
             {
+                UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(target.gameObject).StatusController;
+
                 attacker.GetStatusController().CalculateDamage(
                 Power,
                 DamageType,
-                ComponentProvider.Get<UnitBase>(target.gameObject).StatusController
+                targetStatus
                 );
+
+                if (IsStun)
+                    targetStatus.Stun(StunDuration);
             }
         }
         else
         {
+            UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(GetTargetSingle(attacker).gameObject).StatusController;
+
             attacker.GetStatusController().CalculateDamage(
             Power,
             DamageType,
-            ComponentProvider.Get<UnitBase>(GetTargetSingle(attacker).gameObject).StatusController
+            targetStatus
             );
+
+            if (IsStun)
+                targetStatus.Stun(StunDuration);
         }
     }
 

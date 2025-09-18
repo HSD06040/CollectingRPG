@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class BuffRangeSkill : RangedSkill
-{
+public class BuffRangedSkill : RangedSkill
+{    
     [Header("Buff")]
     [SerializeField] bool _isAlly;
     [SerializeField] float _buffRadius;
@@ -12,7 +12,7 @@ public class BuffRangeSkill : RangedSkill
 
     public override void Active(IAttacker attacker)
     {
-        BuffProjectile projectile = ComponentProvider.Get<BuffProjectile>(
+        SplashProjectile projectile = ComponentProvider.Get<SplashProjectile>(
             Manager.Resources.Instantiate<GameObject>(
                 EffectAddress,
                 GetSpawnPoint(attacker),

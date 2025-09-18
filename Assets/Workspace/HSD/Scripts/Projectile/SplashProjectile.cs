@@ -2,12 +2,12 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
-public class BuffProjectile : Projectile
+public class SplashProjectile : Projectile
 {
     [Header("Stat")]
     [SerializeField] StatEffectModifier _statEffectModifier;
     [SerializeField] float _rotSpeed;
-    float _radius;
+    private float _radius;
 
     protected override void Awake()
     {
@@ -15,7 +15,7 @@ public class BuffProjectile : Projectile
     }
     protected override void OnDestroy()
     {
-        ComponentProvider.Remove<BuffProjectile>(gameObject);
+        ComponentProvider.Remove<SplashProjectile>(gameObject);
     }
 
     public void Init(StatEffectModifier statEffectModifier, float radius,

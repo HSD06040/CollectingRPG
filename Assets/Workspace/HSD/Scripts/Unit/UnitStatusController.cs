@@ -373,13 +373,18 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
         await UniTask.Delay(TimeSpan.FromSeconds(_duration), cancellationToken: this.GetCancellationTokenOnDestroy());
 
-        CurrentAttackData = Status.Data.AttackData;         
+        CurrentAttackData = Status.Data.AttackData;
     }
 
     #region Effect
     public void ApplyEffect(BuffEffectData buffEffectData, float value, string source)
     {
         var key = new SourceKey(buffEffectData.StatType, source);
+
+        if(buffEffectData.IsTicking)
+        {
+            TickEffect(buffEffectData, value, source).Forget();
+        }
 
         if (_activeBuffs.TryGetValue(key, out var cts))
         {
@@ -410,6 +415,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         catch (OperationCanceledException)
         {
             // 갱신으로 취소된 경우 RemoveStat 안 함
+        }
+    }
+
+    private async UniTask TickEffect(BuffEffectData buffEffectData, float value, string source)
+    {
+        int count = (int)(buffEffectData.Duration / buffEffectData.TickInterval);
+
+        for(int i = 0; i < count; i++)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.TickInterval));
         }
     }
     #endregion
