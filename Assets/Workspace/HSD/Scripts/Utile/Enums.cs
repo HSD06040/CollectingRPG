@@ -134,7 +134,7 @@ public enum DamageType
 
 public enum SearchType
 {
-    Circle, Box, Capsule
+    Circle, Box, Capsule, Sector
 }
 
 public enum EffectSpawnType

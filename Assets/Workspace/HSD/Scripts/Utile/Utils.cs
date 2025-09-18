@@ -105,6 +105,27 @@ public static class Utils
             case SearchType.Capsule:
                 hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, angle, _hitBuffer, layerMask);
                 break;
+            case SearchType.Sector:
+                List<Collider2D> results = new List<Collider2D>();
+
+                Physics2D.OverlapCircleNonAlloc(attacker.GetTransform().position, sizeOrRadius, _hitBuffer, layerMask);
+
+                foreach (var hit in _hitBuffer)
+                {
+                    Vector2 dirToTarget = (hit.transform.position - attacker.GetTransform().position).normalized;
+                    float dot = Vector2.Dot(attacker.GetTargetDir(), dirToTarget);
+
+                    float theta = Mathf.Acos(dot) * Mathf.Rad2Deg;
+
+                    if (theta <= angle / 2f)
+                    {
+                        results.Add(hit);
+                    }
+                }
+
+                hitCount = results.Count;
+                _hitBuffer = results.ToArray();
+                break;
         }
 
         for (int i = 0; i < hitCount && _cachedTargets.Count < maxCount; i++)
@@ -160,6 +181,27 @@ public static class Utils
                 break;
             case SearchType.Capsule:
                 hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, angle, _hitBuffer, layerMask);
+                break;
+            case SearchType.Sector:
+                List<Collider2D> results = new List<Collider2D>();
+
+                Physics2D.OverlapCircleNonAlloc(attacker.GetTransform().position, sizeOrRadius, _hitBuffer, layerMask);
+
+                foreach (var hit in _hitBuffer)
+                {
+                    Vector2 dirToTarget = (hit.transform.position - attacker.GetTransform().position).normalized;
+                    float dot = Vector2.Dot(attacker.GetTargetDir(), dirToTarget);
+
+                    float theta = Mathf.Acos(dot) * Mathf.Rad2Deg;
+
+                    if (theta <= angle / 2f)
+                    {
+                        results.Add(hit);
+                    }
+                }
+
+                hitCount = results.Count;
+                _hitBuffer = results.ToArray();
                 break;
         }
 

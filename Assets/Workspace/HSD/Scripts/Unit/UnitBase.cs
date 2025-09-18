@@ -278,14 +278,6 @@ public class UnitBase : MonoBehaviour, IAttacker
     {        
         if (Status == null || StatusController == null) return;
 
-        // 찾는 거리
-        //Gizmos.color = Color.cyan;
-        //Gizmos.DrawWireSphere(transform.position, StatusController.DetectionRange);
-
-        // 공격 사거리
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
-
         if (Status.Data == null) return;
 
         if (Status.Data.AttackData == null) return;

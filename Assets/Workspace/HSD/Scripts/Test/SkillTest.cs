@@ -14,4 +14,12 @@ public class SkillTest : MonoBehaviour
         unit.Status = unitStatus;
         skill.Active(unit);
     }
+
+    private void OnDrawGizmos()
+    {
+        if(skill is OverlapSkill overlapSKill)
+        {
+            overlapSKill.DrawGizmos(unit);
+        }
+    }
 }

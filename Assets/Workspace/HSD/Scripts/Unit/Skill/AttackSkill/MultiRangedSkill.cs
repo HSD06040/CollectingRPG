@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 [CreateAssetMenu(fileName = "MultiRangedSkill", menuName = "Data/Unit/Skill/MultiRanged")]
 public class MultiRangedSkill : RangedSkill

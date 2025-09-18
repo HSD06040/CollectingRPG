@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 38de408e6e872d64da4ea15c56763669, type: 3}
-  m_Name: MultiRangedSkill
+  m_Script: {fileID: 11500000, guid: 574f62840d1dcfb47bfc7f07b0b9c147, type: 3}
+  m_Name: AttackSkill
   m_EditorClassIdentifier: 
   ID: 0
   Icon: {fileID: 0}
@@ -20,13 +20,15 @@ MonoBehaviour:
   Powers: []
   Power: 1
   ManaCost: 0
-  Priority: 1
+  Priority: 0
   EffectAddress: 
   EffectSpawnType: 0
   SpawnPointOffset: {x: 0, y: 0}
   DamageType: 0
-  _projectileSpeed: 10
-  _distance: 5
-  _interval: 0.01
-  _count: 1000
-  _address: Test
+  SearchType: 0
+  AttackPointOffset: {x: 0, y: 0}
+  SizeOrRadius: 0
+  BoxSize: {x: 0, y: 0}
+  Angle: 0
+  SearchCount: 0
+  Fov: 0
