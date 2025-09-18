@@ -18,7 +18,9 @@ public class BuffSkill : UnitSkill
     {
         base.Active(attacker);
 
-        if(TargetType == TargetType.Self)
+        SpawnEffect(attacker);
+
+        if (TargetType == TargetType.Self)
         {
             attacker.GetStatusController().ApplyEffect(BuffEffectData, (int)Power, name);
         }
@@ -37,11 +39,11 @@ public class BuffSkill : UnitSkill
         {            
             case TargetType.Ally:
                 return Utils.GetTargetsNonAlloc(
-                    attacker, attacker.GetTransform().position, SearchType.Circle, range,
+                    attacker, attacker.GetCenter(), SearchType.Circle, range,
                     Vector2.zero, 0, MaxCount, GetAllyLayerMask(attacker));
             case TargetType.Enemy:
                 return Utils.GetTargetsNonAlloc(
-                    attacker, attacker.GetTransform().position, SearchType.Circle, range,
+                    attacker, attacker.GetCenter(), SearchType.Circle, range,
                     Vector2.zero, 0, MaxCount, attacker.TargetLayer);
             default:
                 return null;
@@ -56,10 +58,13 @@ public class BuffSkill : UnitSkill
         return attacker.TargetLayer == LayerMask.GetMask("Enemy") ? LayerMask.GetMask("Player") : LayerMask.GetMask("Enemy");
     }
 
+#if UNITY_EDITOR
     public override void DrawGizmos(IAttacker attacker)
     {
-        Gizmos.color = Color.yellow;
+        base.DrawGizmos(attacker);
 
-        Gizmos.DrawWireSphere(attacker.GetTransform().position, _range);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(attacker.GetCenter(), _range);
     }
+#endif
 }

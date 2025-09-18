@@ -40,7 +40,7 @@ public class SplashProjectile : Projectile
         }
     }
 
-    protected override async UniTask MoveAndDestroyAsync(float duration)
+    protected override async UniTask MoveAndDestroy(float duration)
     {
         await transform.DOMove(_target.position, 5 / _speed).SetEase(Ease.Linear).AsyncWaitForCompletion();
 

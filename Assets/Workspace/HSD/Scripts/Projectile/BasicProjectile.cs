@@ -14,7 +14,7 @@ public class BasicProjectile : Projectile
         transform.right = _targetDir;
     }
 
-    protected override async UniTask MoveAndDestroyAsync(float duration)
+    protected override async UniTask MoveAndDestroy(float duration)
     {
         float elapsed = 0f;
 

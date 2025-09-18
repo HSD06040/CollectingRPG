@@ -34,7 +34,7 @@ public class BezierProjectile : Projectile
         base.OnTriggerEnter2D(collision);
     }
 
-    protected override async UniTask MoveAndDestroyAsync(float duration)
+    protected override async UniTask MoveAndDestroy(float duration)
     {
         SetPoints();
 

@@ -31,6 +31,9 @@ public abstract class UnitSkill : ScriptableObject
 
     protected void SpawnEffect(IAttacker attacker)
     {
+        if (string.IsNullOrEmpty(EffectAddress))
+            return;
+
         if (EffectSpawnType == EffectSpawnType.Target)
         {
             Manager.Resources.Destroy(

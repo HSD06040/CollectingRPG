@@ -11,7 +11,7 @@ public class StraightProjectile : Projectile
     [Header("Straight")]
     [SerializeField] StraightType _straightType;
 
-    protected override async UniTask MoveAndDestroyAsync(float duration)
+    protected override async UniTask MoveAndDestroy(float duration)
     {
         SetDirection();
         duration = _distance / _speed;

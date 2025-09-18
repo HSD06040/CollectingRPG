@@ -45,6 +45,8 @@ public static class Utils
 
         status.TotalDamage.Value += totalDamage;
         enemy.TakeDamage(totalDamage, isCrit);
+
+        Debug.Log($"[데미지 시스템] 적{enemy.name}이 {totalDamage} 만큼의 피해를 입음!");
     }
     #endregion
 
@@ -52,7 +54,8 @@ public static class Utils
     private static Collider2D[] _hitBuffer = new Collider2D[50];
     private static readonly List<GameObject> _cachedTargets = new List<GameObject>(50);
 
-    public static Transform GetClosestTargetNonAlloc(Vector3 origin, float radius, LayerMask enemyMask)
+    public static Transform GetClosestTargetNonAlloc(Vector3 origin, float radius, LayerMask enemyMask, 
+        System.Func<Transform, bool> filter = null)
     {
         int count = Physics2D.OverlapCircleNonAlloc(origin, radius, _hitBuffer, enemyMask);
 
@@ -64,6 +67,8 @@ public static class Utils
             var hit = _hitBuffer[i];
             if (hit == null) continue;
 
+            if (filter(hit.transform)) continue;
+
             float distSq = (hit.transform.position - origin).sqrMagnitude;
             if (distSq < bestDistSq)
             {
@@ -73,7 +78,7 @@ public static class Utils
         }
 
         return closest;
-    }
+    }    
     #endregion
 
     #region GetTargetsNonAlloc

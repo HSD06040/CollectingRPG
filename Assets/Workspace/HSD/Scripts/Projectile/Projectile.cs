@@ -62,7 +62,7 @@ public class Projectile : MonoBehaviour
     private async UniTask MoveAsync()
     {
         await UniTask.Yield();
-        await MoveAndDestroyAsync(_lifeTime);
+        await MoveAndDestroy(_lifeTime);
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
@@ -83,7 +83,7 @@ public class Projectile : MonoBehaviour
         }
     }
 
-    protected virtual async UniTask MoveAndDestroyAsync(float duration)
+    protected virtual async UniTask MoveAndDestroy(float duration)
     {
         await UniTask.Yield();
     }

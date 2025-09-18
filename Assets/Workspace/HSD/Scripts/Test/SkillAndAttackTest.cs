@@ -30,10 +30,7 @@ public class SkillAndAttackTest : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if(skill is OverlapSkill overlapSKill)
-        {
-            overlapSKill.DrawGizmos(unit);
-        }
+        skill.DrawGizmos(unit);               
 
         if(attackData is SplashAttack splash)
         {
