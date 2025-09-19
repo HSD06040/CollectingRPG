@@ -58,7 +58,7 @@ public static class Utils
         System.Func<Transform, bool> filter = null)
     {
         int count = Physics2D.OverlapCircleNonAlloc(origin, radius, _hitBuffer, enemyMask);
-
+        
         Transform closest = null;
         float bestDistSq = float.PositiveInfinity;
 
