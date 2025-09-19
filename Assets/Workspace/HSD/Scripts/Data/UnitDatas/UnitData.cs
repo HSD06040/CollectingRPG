@@ -41,4 +41,34 @@ public class UnitData : MetaData
     {
         UpgradeData?.Init(Grade, LevelUpData);
     }
+
+    public UnitDataDTO ToDTO(UnitData data)
+    {
+        return new UnitDataDTO
+        {
+            ClassSynergy = (int)data.ClassSynergy,
+            Cost = data.Cost,
+            Description = data.Description,
+            Grade = data.Grade,
+            ID = data.ID,
+            Name = data.name,
+            PrefferedLine = data.PerferredLine,
+            Synergy = (int)data.Synergy,
+            UnitStats = data.UnitStats
+        };
+    }
+}
+
+[System.Serializable]
+public class UnitDataDTO
+{
+    public int ClassSynergy;
+    public int Cost;
+    public string Description;
+    public Grade Grade;
+    public int ID;
+    public string Name;
+    public int PrefferedLine;
+    public int Synergy;
+    public UnitStats[] UnitStats;
 }
