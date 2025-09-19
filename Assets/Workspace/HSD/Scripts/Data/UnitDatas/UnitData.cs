@@ -23,6 +23,7 @@ public class UnitData : MetaData
 
     [Header("Unit_Stat")]    
     public UnitStats[] UnitStats;
+    public UnitStats[] AugmentStats;
 
     [Header("Synergy")]
     public ClassType ClassSynergy;
@@ -40,6 +41,14 @@ public class UnitData : MetaData
     public void Init()
     {
         UpgradeData?.Init(Grade, LevelUpData);
+    }
+
+    public void ApplyAUGStatus()
+    {
+        for(int i = 0; i < UnitStats.Length; i++)
+        {
+            AugmentStats[i] = UnitStats[i];
+        }
     }
 
     public UnitDataDTO ToDTO(UnitData data)
