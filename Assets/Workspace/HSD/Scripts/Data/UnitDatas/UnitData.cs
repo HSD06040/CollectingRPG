@@ -22,7 +22,8 @@ public class UnitData : MetaData
     public UnitAttackData AttackData; // Melee, Ranged 등 공격 타입에 따라 다름
 
     [Header("Unit_Stat")]    
-    public UnitStats[] UnitStats;
+    public UnitStats[] UnitStats; // 3개 1,2,3 성
+    public UnitStats AugmentStat = new();
 
     [Header("Synergy")]
     public ClassType ClassSynergy;
@@ -56,6 +57,11 @@ public class UnitData : MetaData
             Synergy = (int)data.Synergy,
             UnitStats = data.UnitStats
         };
+    }
+
+    public void AddStat(StatEffectModifier modifier, bool persent = false)
+    {
+        AugmentStat.AddStat(UnitStats[0], modifier, persent);
     }
 }
 
