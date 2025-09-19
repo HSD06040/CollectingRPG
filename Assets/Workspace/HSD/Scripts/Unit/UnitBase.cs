@@ -269,7 +269,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return TargetDir;
     }
-    public LayerMask GetLayerMask()
+    public LayerMask GetAllyLayerMask()
     {
         return gameObject.layer;
     }

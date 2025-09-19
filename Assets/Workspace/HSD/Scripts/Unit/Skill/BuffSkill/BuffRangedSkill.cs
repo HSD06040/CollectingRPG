@@ -43,7 +43,7 @@ public class BuffRangedSkill : RangedSkill
     {
         if (_isAlly)
         {
-            return attacker.GetLayerMask();
+            return attacker.GetAllyLayerMask();
         }
         else
             return attacker.TargetLayer;

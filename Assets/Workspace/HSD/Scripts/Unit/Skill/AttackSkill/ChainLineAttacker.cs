@@ -84,7 +84,7 @@ public class ChainLineAttacker : MonoBehaviour
     private void ChangeTarget()
     {        
         _targetList.Add(_target);
-        _currentPos = _target.position;
+        _currentPos = ComponentProvider.Get<UnitBase>(_target.gameObject).GetCenter();
         _target = Utils.GetClosestTargetNonAlloc(_currentPos, 100, _targetLayer, Filter);        
     }
 

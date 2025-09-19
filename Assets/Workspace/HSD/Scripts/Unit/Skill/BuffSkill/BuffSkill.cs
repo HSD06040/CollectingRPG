@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
@@ -25,22 +26,29 @@ public class BuffSkill : UnitSkill
             attacker.GetStatusController().ApplyEffect(BuffEffectData, (int)Power, name);
         }
 
-        foreach (GameObject target in GetTargetFromTargetType(attacker))
+        if (Priority == Priority.None)
         {
-            ComponentProvider.Get<UnitBase>(target).StatusController.ApplyEffect(BuffEffectData, (int)Power, name);
+            foreach (GameObject target in GetTargetFromTargetType(attacker))
+            {
+                ComponentProvider.Get<UnitBase>(target).StatusController.ApplyEffect(BuffEffectData, Power, name);
+            }
+        }
+        else
+        {
+            ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController.ApplyEffect(BuffEffectData, Power, name);
         }
     }
 
     protected GameObject[] GetTargetFromTargetType(IAttacker attacker)
     {
         float range = _isRange ? _range : 100;
-
+        
         switch (TargetType)
         {            
             case TargetType.Ally:
                 return Utils.GetTargetsNonAlloc(
                     attacker, attacker.GetCenter(), SearchType.Circle, range,
-                    Vector2.zero, 0, MaxCount, GetAllyLayerMask(attacker));
+                    Vector2.zero, 0, MaxCount, attacker.GetAllyLayerMask());
             case TargetType.Enemy:
                 return Utils.GetTargetsNonAlloc(
                     attacker, attacker.GetCenter(), SearchType.Circle, range,
@@ -50,12 +58,16 @@ public class BuffSkill : UnitSkill
         }
     }
 
-    /// <summary>
-    /// Attacker의 아군 LayerMask를 반환
-    /// </summary>    
-    private LayerMask GetAllyLayerMask(IAttacker attacker)
+    private GameObject GetTargetPrioty(IAttacker attacker)
     {
-        return attacker.TargetLayer == LayerMask.GetMask("Enemy") ? LayerMask.GetMask("Player") : LayerMask.GetMask("Enemy");
+        LayerMask targetLayer;
+
+        if (TargetType == TargetType.Ally)
+            targetLayer = attacker.GetAllyLayerMask();
+        else if (TargetType == TargetType.Enemy)
+            targetLayer = attacker.TargetLayer;
+            
+        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());        
     }
 
 #if UNITY_EDITOR
