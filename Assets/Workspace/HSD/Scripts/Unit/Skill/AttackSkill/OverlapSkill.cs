@@ -1,10 +1,16 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "AttackSkill", menuName = "Data/Unit/Skill/Attack")]
 public class OverlapSkill : AttackSkill
-{    
+{
+    [Header("Stun")]
+    public bool IsStun;
+    public float StunDuration;
+
+    [Header("TargetType")]
+    public TargetType TargetType;
+
     [Header("Overlap")]
     public SearchType SearchType;
     public Vector2 AttackPointOffset;
@@ -13,7 +19,6 @@ public class OverlapSkill : AttackSkill
     public float Angle;
 
     public int SearchCount;
-    public float Fov;
 
     public override void Active(IAttacker attacker)
     {
@@ -33,22 +38,62 @@ public class OverlapSkill : AttackSkill
                 return;
             }
 
+            UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController;
+
             attacker.GetStatusController().CalculateDamage(
                 Power,
                 DamageType,
-                ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController
+                targetStatus
                 );
+
+            if (IsStun)
+                targetStatus.Stun(StunDuration);
         }
-        else
+        else if (Priority == Priority.TargetRadius)
+        {
+            foreach (var target in Utils.GetTargetsNonAlloc(attacker,
+            attacker.GetTarget().position, SearchType, SizeOrRadius, BoxSize, Angle, MaxCount, attacker.TargetLayer))
+            {
+                UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(target).StatusController;
+
+                attacker.GetStatusController().CalculateDamage(
+                    Power,
+                    DamageType,
+                    targetStatus
+                    );
+
+                if (IsStun)
+                    targetStatus.Stun(StunDuration);
+            }
+        }
+        else if (Priority == Priority.None)
         {
             foreach (var target in GetTargets(attacker))
             {
+                UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(target.gameObject).StatusController;
+
                 attacker.GetStatusController().CalculateDamage(
                 Power,
                 DamageType,
-                ComponentProvider.Get<UnitBase>(target.gameObject).StatusController
+                targetStatus
                 );
+
+                if (IsStun)
+                    targetStatus.Stun(StunDuration);
             }
+        }
+        else
+        {
+            UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(GetTargetSingle(attacker).gameObject).StatusController;
+
+            attacker.GetStatusController().CalculateDamage(
+            Power,
+            DamageType,
+            targetStatus
+            );
+
+            if (IsStun)
+                targetStatus.Stun(StunDuration);
         }
     }
 
@@ -72,35 +117,18 @@ public class OverlapSkill : AttackSkill
         return target;
     }
 
-    protected GameObject[] GetConeTargets(IAttacker attacker, GameObject[] targets, int searchCount)
-    {
-        Transform transform = attacker.GetTransform();
-
-        List<GameObject> searchTargets = new List<GameObject>(searchCount);
-
-        foreach (var target in targets)
-        {
-            if (Vector2.Dot(transform.up, attacker.GetTargetDir()) >= Mathf.Cos(Fov / 2 * Mathf.Deg2Rad))
-            {
-                searchTargets.Add(target);
-            }
-        }
-
-        return searchTargets.ToArray();
-    }
-
     private Vector2 GetAttackPoint(IAttacker attacker)
     {
         return attacker.GetCenter()
             + new Vector2(
-            attacker.GetTransform().GetFacingDir() * AttackPointOffset.x * ((1 + Mathf.Abs(attacker.GetTransform().localScale.x))/2),
+            attacker.GetTransform().GetFacingDir() * AttackPointOffset.x * ((1 + Mathf.Abs(attacker.GetTransform().localScale.x)) / 2),
             AttackPointOffset.y * Mathf.Abs(attacker.GetTransform().localScale.y
             )
         );
     }
 
 #if UNITY_EDITOR
-    public override void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기
+    public override void DrawGizmos(IAttacker attacker)
     {
         /*
         //Transform transform = attacker.GetTransform();
@@ -116,13 +144,15 @@ public class OverlapSkill : AttackSkill
 
         if (attacker == null) return;
 
-        Vector2 attackPoint = GetAttackPoint(attacker);
+        Vector2 attackPoint = Priority == Priority.TargetRadius ? attacker.GetTarget().position : GetAttackPoint(attacker);
+        Vector2 targetDir = attacker.GetTargetDir();
+        Transform transform = attacker.GetTransform();
 
         Handles.color = Color.yellow;
 
         switch (SearchType)
         {
-            case SearchType.Circle:
+            case SearchType.Circle:                
                 Handles.DrawWireDisc(attackPoint, Vector3.forward, SizeOrRadius);
                 break;
 
@@ -134,8 +164,19 @@ public class OverlapSkill : AttackSkill
                 Handles.DrawWireCube(Vector3.zero, BoxSize);
                 Handles.matrix = Matrix4x4.identity;
                 break;
-        }
 
+            case SearchType.Sector:
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(attacker.GetTransform().position, SizeOrRadius);
+
+                Vector3 rightDir = Quaternion.Euler(0, 0, -Angle / 2) * targetDir;
+                Vector3 leftDir = Quaternion.Euler(0, 0, Angle / 2) * targetDir;
+
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawLine(transform.position, transform.position + rightDir * SizeOrRadius);
+                Gizmos.DrawLine(transform.position, transform.position + leftDir * SizeOrRadius);
+                break;
+        }
         // 공격 포인트 위치 표시
         Handles.color = Color.red;
         Handles.DrawSolidDisc(attackPoint, Vector3.forward, 0.05f);

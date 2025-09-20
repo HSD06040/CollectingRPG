@@ -9,5 +9,4 @@ public abstract class MetaData : ScriptableObject
     public string Name;
     [TextArea]
     public string Description;
-    public Grade Grade;
 }
