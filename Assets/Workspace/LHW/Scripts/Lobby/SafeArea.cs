@@ -1,16 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class SafeArea : MonoBehaviour
 {
     private Vector2 _minAnchor;
     private Vector2 _maxAnchor;
-
-    private void Start()
+    private RectTransform _rectTransform;
+    
+    private void Awake()
     {
-        var myRect = this.GetComponent<RectTransform>();
+        _rectTransform = GetComponent<RectTransform>();
+        ApplySafeArea();
+    }
 
+    private void OnEnable()
+    {
+        ApplySafeArea();
+    }
+
+    private void Update()
+    {
+        ApplySafeArea();
+    }
+
+    void ApplySafeArea()
+    {
         _minAnchor = Screen.safeArea.min;
         _maxAnchor = Screen.safeArea.max;
 
@@ -19,7 +33,7 @@ public class SafeArea : MonoBehaviour
         _maxAnchor.x /= Screen.width;
         _maxAnchor.y /= Screen.height;
 
-        myRect.anchorMin = _minAnchor;
-        myRect.anchorMax = _maxAnchor;
+        _rectTransform.anchorMin = _minAnchor;
+        _rectTransform.anchorMax = _maxAnchor;
     }
 }
