@@ -5,7 +5,6 @@ using UnityEngine;
 [CustomEditor(typeof(SynergyEffect))]
 public class SynergyEffectEditor : Editor
 {
-    private SerializedProperty keyProp;
     private SerializedProperty descriptionProp;
     private SerializedProperty isActivationsClearProp;
     private SerializedProperty isAttackProp;
@@ -14,18 +13,23 @@ public class SynergyEffectEditor : Editor
     private SerializedProperty isDelayProp;
     private SerializedProperty isFirstOnlyProp;
 
-    private SerializedProperty DelayTimeProp;
+    private SerializedProperty delayTimeProp;
+
+    private SerializedProperty synergyEffectAddressProps;
+    private SerializedProperty effectDuration;
 
     private SerializedProperty isUnitPositionProp;
     private SerializedProperty IsMultiplierProp;
-    private SerializedProperty SpawnTypeProp;
-    private SerializedProperty SpawnUnitStatsProp;
+    private SerializedProperty spawnTypeProp;
+    private SerializedProperty spawnUnitStatsProp;
     private SerializedProperty spawnSynergyProp;
     private SerializedProperty spawnAddressProp;
+    private SerializedProperty spawnEffectAddressProp;
 
     private SerializedProperty effectAttackTypeProp;
     private SerializedProperty spawnPositionTypeProp;
     private SerializedProperty powerProp;
+    private SerializedProperty attackDealyProp;
     private SerializedProperty addressProp;
 
     private SerializedProperty effectTypeProp;
@@ -42,7 +46,6 @@ public class SynergyEffectEditor : Editor
 
     private void OnEnable()
     {
-        keyProp = serializedObject.FindProperty("Key");
         descriptionProp = serializedObject.FindProperty("Description");
         isActivationsClearProp = serializedObject.FindProperty("IsActivationsClear");
         isAttackProp = serializedObject.FindProperty("IsAttack");
@@ -51,18 +54,23 @@ public class SynergyEffectEditor : Editor
         isDelayProp = serializedObject.FindProperty("IsDelay");
         isFirstOnlyProp = serializedObject.FindProperty("IsFirstOnly");
 
-        DelayTimeProp = serializedObject.FindProperty("DelayTime");
+        delayTimeProp = serializedObject.FindProperty("DelayTime");
+
+        synergyEffectAddressProps = serializedObject.FindProperty("SynergyEffectAddress");
+        effectDuration = serializedObject.FindProperty("EffectDuration");
 
         isUnitPositionProp = serializedObject.FindProperty("IsUnitPosition");
         IsMultiplierProp = serializedObject.FindProperty("IsMultiplier");
-        SpawnTypeProp = serializedObject.FindProperty("SpawnType");
-        SpawnUnitStatsProp = serializedObject.FindProperty("SpawnUnitStats");
+        spawnTypeProp = serializedObject.FindProperty("SpawnType");
+        spawnUnitStatsProp = serializedObject.FindProperty("SpawnUnitStats");
         spawnSynergyProp = serializedObject.FindProperty("SpawnSynergy");
         spawnAddressProp = serializedObject.FindProperty("SpawnAddress");
+        spawnEffectAddressProp = serializedObject.FindProperty("SpawnEffectAddress");
 
-        effectAttackTypeProp = serializedObject.FindProperty("EffectAttackType");
+        effectAttackTypeProp = serializedObject.FindProperty("EffectApplyType");
         spawnPositionTypeProp = serializedObject.FindProperty("SpawnPositionType");
         powerProp = serializedObject.FindProperty("Power");
+        attackDealyProp = serializedObject.FindProperty("AttackDealy");
         addressProp = serializedObject.FindProperty("AttackAddress");
 
         effectTypeProp = serializedObject.FindProperty("EffectType");
@@ -83,7 +91,6 @@ public class SynergyEffectEditor : Editor
         serializedObject.Update();
 
         DrawHeader("기본");
-        EditorGUILayout.PropertyField(keyProp);
         EditorGUILayout.PropertyField(descriptionProp);
 
         EditorGUILayout.Space(5);
@@ -98,13 +105,16 @@ public class SynergyEffectEditor : Editor
         EditorGUILayout.Space(10);
         EditorGUILayout.PropertyField(effectAttackTypeProp, new GUIContent("적용타입", "각자패시브 or 전체공용 패시브"));
         EditorGUILayout.Space(10);
+        EditorGUILayout.PropertyField(synergyEffectAddressProps, new GUIContent("시너지 이펙트"));
+        EditorGUILayout.PropertyField(effectDuration, new GUIContent("이펙트 지속시간"));
+        EditorGUILayout.Space(10);
 
         if (isDelayProp.boolValue)
         {
             DrawHeader("딜레이 설정");
             DrawColoredSection(() =>
             {
-                EditorGUILayout.PropertyField(DelayTimeProp, new GUIContent("딜레이 시간 (초)", "다음 효과까지의 딜레이(초)"));
+                EditorGUILayout.PropertyField(delayTimeProp, new GUIContent("딜레이 시간 (초)", "다음 효과까지의 딜레이(초)"));
             }, new Color(0.9f, 0.9f, 1f, 0.3f));
             EditorGUILayout.Space(10);
         }
@@ -118,11 +128,12 @@ public class SynergyEffectEditor : Editor
                 EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("가중치 적용여부"));
                 if (IsMultiplierProp.boolValue)
                 {
-                    EditorGUILayout.PropertyField(SpawnTypeProp, new GUIContent("스폰할 유닛 스텟 타입", "시너지 유닛의 Level에 따른 or 한단계 낮은 레벨로 소환"));
-                    EditorGUILayout.PropertyField(SpawnUnitStatsProp, new GUIContent("가중치"));
+                    EditorGUILayout.PropertyField(spawnTypeProp, new GUIContent("스폰할 유닛 스텟 타입", "시너지 유닛의 Level에 따른 or 한단계 낮은 레벨로 소환"));
+                    EditorGUILayout.PropertyField(spawnUnitStatsProp, new GUIContent("가중치"));
                 }
                 EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("스폰 시너지"));
                 EditorGUILayout.PropertyField(spawnAddressProp, new GUIContent("주소"));
+                EditorGUILayout.PropertyField(spawnEffectAddressProp, new GUIContent("스폰 이펙트"));
 
             }, new Color(1f, 1f, 0.9f, 0.3f));
 
@@ -137,6 +148,7 @@ public class SynergyEffectEditor : Editor
             {           
                 EditorGUILayout.PropertyField(spawnPositionTypeProp, new GUIContent("공격 위치", "자신기준 or 타겟기준"));
                 DrawColoredField("계수", powerProp, Color.red);
+                DrawColoredField("공격 딜레이", attackDealyProp, Color.yellow);
                 EditorGUILayout.PropertyField(addressProp, new GUIContent("주소"));
             }, new Color(1f, 0.9f, 0.9f, 0.3f));
 

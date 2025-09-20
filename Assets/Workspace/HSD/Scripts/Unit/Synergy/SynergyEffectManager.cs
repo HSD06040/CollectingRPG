@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class SynergyEffectManager : InGameSingleton<SynergyEffectManager>
 {
-    [SerializeField] Transform _center;
+    public Vector3 Center;
 
     protected override void Awake()
     {
@@ -17,6 +17,11 @@ public class SynergyEffectManager : InGameSingleton<SynergyEffectManager>
 
     private void Init()
     {
-        GlobalPassiveController = new GlobalPassiveController(_center);
-    }    
+        GlobalPassiveController = new GlobalPassiveController(Center);
+    }
+
+    public void SetCenter(Vector3 center)
+    {
+        Center = center;
+    }
 }

@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class GlobalPassiveController
 {
-    private Transform _center;
+    private Vector3 _center;
     private Dictionary<string, GlobalPassive> _passives = new Dictionary<string, GlobalPassive>(128);
 
-    public GlobalPassiveController(Transform center)
+    public GlobalPassiveController(Vector3 center)
     {
         _center = center;
     }
 
-    public void AddPassiveEffect(SynergyEffect effect, UnitBase[] units, int multiplier = 1, bool isChange = false)
+    public void AddPassiveEffect(SynergyEffect effect, UnitBase[] units, int multiplier = 1, bool isChange = false, float delay = 0)
     {
         if (isChange)
         {
@@ -21,7 +21,7 @@ public class GlobalPassiveController
 
         if (!_passives.ContainsKey(effect.Key))
         {
-            _passives.Add(effect.Key, new GlobalPassive(effect, units, _center, multiplier));          
+            _passives.Add(effect.Key, new GlobalPassive(effect, units, _center, multiplier, delay));
             _passives[effect.Key].Active();
         }
     }
@@ -32,6 +32,22 @@ public class GlobalPassiveController
         {
             _passives[effect.Key].Deactive();
             _passives.Remove(effect.Key);
+        }
+    }
+
+    public void PassiveAllDeActive()
+    {
+        foreach (var passive in _passives.Values)
+        {
+            passive.Deactive();
+        }
+    }
+
+    public void PassiveAllReActive()
+    {
+        foreach (var passive in _passives.Values)
+        {
+            passive.Active();
         }
     }
 }

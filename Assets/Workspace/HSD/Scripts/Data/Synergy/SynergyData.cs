@@ -29,7 +29,7 @@ public abstract class SynergyData : ScriptableObject
 
     public void Check(int newCount, UnitBase[] units)
     {
-        SynergyEffect[] newEffects = new SynergyEffect[SynergyLevelData[0].Effects.Length];
+        SynergyEffect[] newEffects = null;
 
         CurrentUpgradeIdx = -1;
 
@@ -46,7 +46,9 @@ public abstract class SynergyData : ScriptableObject
             }
         }
 
-        
+        if (newEffects == null)
+            return;
+
         foreach (var effect in _currentEffects)
         {
             effect?.RemoveEffect(units, _synergy);
@@ -54,8 +56,9 @@ public abstract class SynergyData : ScriptableObject
 
         foreach (var effect in newEffects)
         {
+            Debug.Log($"[적용 될 이펙트 들] : {effect?.name}");
             effect?.ApplyEffect(units, _synergy);
-        }        
+        }
 
         _currentEffects = newEffects;
     }

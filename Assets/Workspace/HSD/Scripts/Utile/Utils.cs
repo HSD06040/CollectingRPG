@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 public static class Utils
@@ -67,7 +65,7 @@ public static class Utils
             var hit = _hitBuffer[i];
             if (hit == null) continue;
 
-            if (filter(hit.transform)) continue;
+            if (filter != null && filter(hit.transform)) continue;
 
             float distSq = (hit.transform.position - origin).sqrMagnitude;
             if (distSq < bestDistSq)
@@ -82,17 +80,8 @@ public static class Utils
     #endregion
 
     #region GetTargetsNonAlloc
-    public static GameObject[] GetTargetsNonAlloc(
-        IAttacker attacker,
-        Vector2 origin,
-        SearchType shape,
-        float sizeOrRadius,
-        Vector2 boxSize,
-        float angle,
-        int maxCount,
-        LayerMask layerMask,
-        System.Func<IAttacker, List<GameObject>, int, GameObject[]> filter = null,
-        int maxTargets = 50,
+    public static GameObject[] GetTargetsNonAlloc(IAttacker attacker, Vector2 origin, SearchType shape, float sizeOrRadius, Vector2 boxSize,
+        float angle, int maxCount, LayerMask layerMask, System.Func<IAttacker, List<GameObject>, int, GameObject[]> filter = null, int maxTargets = 50, 
         bool sortByDistance = true)
     {
         _cachedTargets.Clear(); // 재사용
@@ -161,19 +150,36 @@ public static class Utils
         return result;
     }
 
-    public static GameObject GetTargetsNonAllocSingle(
-        IAttacker attacker,
-        SearchType shape,
-        float sizeOrRadius,
-        Vector2 boxSize,
-        float angle,
-        LayerMask layerMask,
-        System.Func<IAttacker, List<GameObject>, GameObject> filter = null)
+    public static GameObject[] GetTargetsNonAlloc(Vector2 origin, SearchType searchType, float sizeOrRadius, Vector2 boxSize, LayerMask layerMask)
     {
-        _cachedTargets.Clear(); // 재사용
-
         int hitCount = 0;
 
+        switch (searchType)
+        {
+            case SearchType.Circle:
+                hitCount = Physics2D.OverlapCircleNonAlloc(origin, sizeOrRadius, _hitBuffer, layerMask);
+                break;
+            case SearchType.Box:
+                hitCount = Physics2D.OverlapBoxNonAlloc(origin, boxSize, 0, _hitBuffer, layerMask);
+                break;
+            case SearchType.Capsule:
+                hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, 0, _hitBuffer, layerMask);
+                break;
+        }
+
+        var result = new GameObject[hitCount];
+        for (int i = 0; i < hitCount; i++)
+        {
+            result[i] = _hitBuffer[i].gameObject;
+        }
+        return result;
+    }
+
+    public static GameObject GetTargetsNonAllocSingle(IAttacker attacker, SearchType shape, float sizeOrRadius, Vector2 boxSize, float angle,
+        LayerMask layerMask, System.Func<IAttacker, List<GameObject>, GameObject> filter = null)
+    {
+        _cachedTargets.Clear();
+        int hitCount = 0;
         Vector2 origin = attacker.GetTransform().position;
 
         switch (shape)
@@ -188,45 +194,44 @@ public static class Utils
                 hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, angle, _hitBuffer, layerMask);
                 break;
             case SearchType.Sector:
-                List<Collider2D> results = new List<Collider2D>();
-
-                Physics2D.OverlapCircleNonAlloc(attacker.GetTransform().position, sizeOrRadius, _hitBuffer, layerMask);
-
-                foreach (var hit in _hitBuffer)
+                int total = Physics2D.OverlapCircleNonAlloc(origin, sizeOrRadius, _hitBuffer, layerMask);
+                for (int i = 0; i < total; i++)
                 {
+                    var hit = _hitBuffer[i];
+                    if (hit == null) continue;
+
                     Vector2 dirToTarget = (hit.transform.position - attacker.GetTransform().position).normalized;
                     float dot = Vector2.Dot(attacker.GetTargetDir(), dirToTarget);
-
                     float theta = Mathf.Acos(dot) * Mathf.Rad2Deg;
 
                     if (theta <= angle / 2f)
                     {
-                        results.Add(hit);
+                        _cachedTargets.Add(hit.gameObject);
                     }
                 }
-
-                hitCount = results.Count;
-                _hitBuffer = results.ToArray();
+                hitCount = _cachedTargets.Count;
                 break;
         }
 
-        for (int i = 0; i < hitCount; i++)
+        if (shape != SearchType.Sector)
         {
-            if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
-                _cachedTargets.Add(_hitBuffer[i].gameObject);
+            for (int i = 0; i < hitCount; i++)
+            {
+                if (_hitBuffer[i] != null)
+                    _cachedTargets.Add(_hitBuffer[i].gameObject);
+            }
         }
 
-        GameObject result;
+        if (_cachedTargets.Count == 0)
+            return null;
 
-        if (filter != null)
-            result = filter.Invoke(attacker, _cachedTargets);
-        else
-            result = _cachedTargets[0];
-
-        return result;
+        return filter != null
+            ? filter.Invoke(attacker, _cachedTargets)
+            : _cachedTargets[0];
     }
+
     #endregion
-   
+
     #region String
     public static string ToAbbreviation(long value)
     {

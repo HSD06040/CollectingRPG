@@ -145,7 +145,8 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Attack()
     {
-        StatusController.CurrentAttackData.Attack(this);        
+        StatusController.CurrentAttackData.Attack(this);
+        StatusController.OnAttack?.Invoke();
     }
 
     public bool SkillCheck()

@@ -13,17 +13,19 @@ public class GlobalPassive
     private int _mulriplier;
 
     private CancellationTokenSource _cts;
-    private Transform _center;
+    private Vector3 _center;
     private UnitBase[] _units;
     private bool _isActive;
+    private float _delay;
 
-    public GlobalPassive(SynergyEffect effect, UnitBase[] units, Transform center, int mulriplier = 1)
+    public GlobalPassive(SynergyEffect effect, UnitBase[] units, Vector3 center, int mulriplier = 1, float delay = 0)
     {
         _currentActivations = 0;
         _effect = effect;
         _units = units;
         _center = center;
         _mulriplier = mulriplier;
+        _delay = delay;
 
         _cts = new CancellationTokenSource();
     }
@@ -100,6 +102,8 @@ public class GlobalPassive
 
     private async UniTask OnIntervalEffectAsync(CancellationToken token)
     {
+        await UniTask.Delay(TimeSpan.FromSeconds(_delay));
+
         while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
         {
             EffectActives();
@@ -310,7 +314,7 @@ public class GlobalPassive
             return;
         }
 
-        Vector3 pos = _center != null ? _center.position : Vector3.zero;
+        Vector3 pos = _center != null ? _center : Vector3.zero;
         GameObject.Instantiate(_effect.NextEffect.AttackPrefab, pos, Quaternion.identity);
     }
     #endregion
@@ -334,6 +338,7 @@ public class GlobalPassive
         }
         Debug.Log($"[시너지 스폰 시스템] {_effect.SpawnPrefab.name} 소환");
 
+        Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(_effect.SpawnEffectPrefab, pos, true), 2);
         GameObject obj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
         obj.name = "SpawnUnit";
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);

@@ -15,6 +15,6 @@ public abstract class UnitAttackData : ScriptableObject
 
     public virtual void Attack(IAttacker attacker)
     {
-        attacker.GetStatusController().OnAttack?.Invoke();
+        
     }
 }

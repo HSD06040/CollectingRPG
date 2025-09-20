@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91b9fe931ac8cf5418a6a4a2316ea86a, type: 3}
   m_Name: SacredOrder2-2
   m_EditorClassIdentifier: 
-  Key: 3b6d7a31-4f57-46f1-b113-8df3862db01e
   Description: 
   IsActivationsClear: 0
   IsAttack: 1
@@ -21,6 +20,8 @@ MonoBehaviour:
   IsDelay: 0
   IsFirstOnly: 1
   DelayTime: 0
+  SynergyEffectAddress: 
+  EffectDuration: 2
   IsUnitPosition: 0
   SpawnUnitStats:
     MaxHealth: 0
@@ -39,10 +40,12 @@ MonoBehaviour:
   SpawnType: 0
   SpawnSynergy: 0
   SpawnAddress: 
-  EffectAttackType: 1
+  SpawnEffectAddress: 
+  EffectApplyType: 0
   SpawnPositionType: 0
   Power: 20
-  AttackAddress: Effect/SacredSpawnEffect
+  AttackDealy: 1
+  AttackAddress: JustAllAttacker
   EffectType: 0
   SynergyBuffDatas: []
   StatModifiers: []

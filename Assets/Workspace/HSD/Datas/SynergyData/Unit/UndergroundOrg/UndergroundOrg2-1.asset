@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91b9fe931ac8cf5418a6a4a2316ea86a, type: 3}
   m_Name: UndergroundOrg2-1
   m_EditorClassIdentifier: 
-  Key: 315487a1-6709-4827-aa50-f459bb2df43f
   Description: "\uCE58\uBA85\uD0C0 \uD655\uB960 15%"
   IsActivationsClear: 0
   IsAttack: 0
@@ -21,6 +20,8 @@ MonoBehaviour:
   IsDelay: 0
   IsFirstOnly: 0
   DelayTime: 0
+  SynergyEffectAddress: 
+  EffectDuration: 2
   IsUnitPosition: 0
   SpawnUnitStats:
     MaxHealth: 0
@@ -37,11 +38,13 @@ MonoBehaviour:
     AttackCount: 0
   IsMultiplier: 1
   SpawnType: 1
-  SpawnSynergy: 9
-  SpawnAddress: TestUnit
-  EffectAttackType: 0
+  SpawnSynergy: 8
+  SpawnAddress: Underground_2
+  SpawnEffectAddress: Shadow_Summon
+  EffectApplyType: 0
   SpawnPositionType: 0
   Power: 0
+  AttackDealy: 1
   AttackAddress: 
   EffectType: 0
   SynergyBuffDatas: []
@@ -49,5 +52,5 @@ MonoBehaviour:
   TriggerType: 2
   Interval: 0
   MaxActivations: 1
-  TargetType: 1
+  TargetType: 2
   NextEffect: {fileID: 0}

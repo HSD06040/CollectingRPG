@@ -9,7 +9,9 @@ using UnityEngine.AddressableAssets;
 public class SynergyEffect : ScriptableObject
 {
     //[Header("MetaData")]
-    public string Key = Guid.NewGuid().ToString();
+    private string GuidKey = Guid.NewGuid().ToString();
+    public string Key => name;
+
     [TextArea]
     public string Description;
     public bool IsActivationsClear;
@@ -22,6 +24,10 @@ public class SynergyEffect : ScriptableObject
     //[Header("Delay")]
     public float DelayTime;
 
+    //[Header("SpawnEffect")]
+    public string SynergyEffectAddress;
+    public float EffectDuration = 2;
+
     //[Header("SpawnType (유닛 소환)")]
     public bool IsUnitPosition;         // 소환 위치 정의 (유닛위치 or 전장 중앙)
     public int UnitStatMultiplier { get; private set; }
@@ -31,12 +37,16 @@ public class SynergyEffect : ScriptableObject
     public SpawnStatType SpawnType;     // 유닛소환 시 스텟 타입 설정
     public Synergy SpawnSynergy;        // 유닛을 소환하는 시너지
     public GameObject SpawnPrefab => Manager.Resources.Get<GameObject>(SpawnAddress);
+    public GameObject SpawnEffectPrefab => Manager.Resources.Get<GameObject>(SpawnEffectAddress);
     public string SpawnAddress;
+    public string SpawnEffectAddress;
+
+    public EffectApplyType EffectApplyType;
 
     //[Header("AttackType (공격)")]
-    public EffectApplyType EffectAttackType;
     public SpawnPositionType SpawnPositionType;
     public float Power;
+    public float AttackDealy = 1;
     public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);
     public string AttackAddress;
 
@@ -67,7 +77,7 @@ public class SynergyEffect : ScriptableObject
             return;
         }
 
-        if (EffectAttackType == EffectApplyType.Self)
+        if (EffectApplyType == EffectApplyType.Self)
         {
             foreach (var unit in GetTarget(units, synergy))
             {
@@ -75,15 +85,19 @@ public class SynergyEffect : ScriptableObject
             }
         }
         else
-        {
-            Debug.Log($"글로벌 패시브 이펙트 적용");
+        {            
             SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, GetTarget(units, synergy), isChange: true);
+        }
+
+        if(NextEffect != null && NextEffect.EffectApplyType == EffectApplyType.All)
+        {
+            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(NextEffect, GetTarget(units, synergy), isChange: true);
         }
     }
 
     public void RemoveEffect(UnitBase[] units, int synergy)
     {
-        if (EffectAttackType == EffectApplyType.Self)
+        if (EffectApplyType == EffectApplyType.Self)
         {
             foreach (var unit in GetTarget(units, synergy))
             {
@@ -93,6 +107,11 @@ public class SynergyEffect : ScriptableObject
         else
         {
             SynergyEffectManager.Instance.GlobalPassiveController.RemovePassiveEffect(this);
+        }
+
+        if (NextEffect != null && NextEffect.EffectApplyType == EffectApplyType.All)
+        {
+            SynergyEffectManager.Instance.GlobalPassiveController.RemovePassiveEffect(NextEffect);
         }
     }
 
