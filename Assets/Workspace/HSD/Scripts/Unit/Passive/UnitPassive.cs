@@ -301,7 +301,7 @@ public class UnitPassive
                     else if (stat.StatType == StatType.Shield)
                         _owner.StatusController.IncreaseShield(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else
-                        _owner.StatusController.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.Key);
+                        _owner.StatusController.AddStat(stat.StatType, stat.Value * _mulriplier, $"{_effect.Key}__{_currentActivations}");
                 }
                 break;
         }

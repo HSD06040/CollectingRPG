@@ -24,6 +24,18 @@ public enum Grade
 }
 
 #region Type
+public enum BuffEffect
+{
+    Shield,
+    Stun,
+    Buff,
+    Debuff,
+    Heal,
+    Damage,
+    AttackSpeed,
+    Defense
+}
+
 public enum AnimatorType
 {
 

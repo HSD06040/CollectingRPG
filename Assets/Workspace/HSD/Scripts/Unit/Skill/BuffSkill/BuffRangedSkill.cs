@@ -30,8 +30,6 @@ public class BuffRangedSkill : RangedSkill
                 )
             );
 
-        projectile.transform.localScale = attacker.GetTransform().localScale;
-
         Transform target = GetTarget(attacker);
 
         if (target == null)

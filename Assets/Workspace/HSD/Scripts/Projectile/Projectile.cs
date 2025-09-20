@@ -88,11 +88,11 @@ public class Projectile : MonoBehaviour
         await UniTask.Yield();
     }
 
-    protected void SpawnEffect()
+    protected GameObject SpawnEffect()
     {
-        if (_effect == null) return;
+        if (_effect == null) return null;
 
-        Manager.Resources.Instantiate(_effect, transform.position, true);
+        return Manager.Resources.Instantiate(_effect, transform.position, true);
     }
 
     protected Vector2 GetTargetDir()
@@ -105,7 +105,6 @@ public class Projectile : MonoBehaviour
 
     protected void ProjectileDestroy()
     {
-        SpawnEffect();
         Manager.Resources.Destroy(gameObject);
     }
 }

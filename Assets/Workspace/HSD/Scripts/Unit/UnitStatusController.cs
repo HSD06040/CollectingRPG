@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -9,15 +8,15 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 {
     private struct StatStruct
     {
-        public int MaxHealth;        
+        public int MaxHealth;
         public float AttackSpeed;
-        
+
         public int PhysicalDamage;
-        public int MagicDamage;        
+        public int MagicDamage;
 
         public int PhysicalDefense;
         public int MagicDefense;
-        
+
         public int CritChance;
     }
 
@@ -52,9 +51,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public Property<int> CurMana = new Property<int>();
     public Property<int> Shield = new Property<int>();
     public Property<int> TotalDamage = new Property<int>();
-    public Property<bool> IsStund = new Property<bool>();
+    public Property<bool> IsStunned = new Property<bool>();
 
     #region Controller
+    public EffectController EffectController { get; set; }
     public UnitPassiveController PassiveController { get; set; }
     public UnitFXController UnitFXController { get; set; }
     #endregion
@@ -62,34 +62,38 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Events
     public Action<UnitStatusController> OnUnitDied;
     public Action<UnitStatus> OnUseSkill;
-    
+
     public event Action OnDied;
     public Action OnSkill;
     public Action OnAttack;
     #endregion
 
-    private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
+    private CancellationTokenSource _cts = new();
 
-    public UnitAttackData CurrentAttackData;    
+    public UnitAttackData CurrentAttackData;
 
     [HideInInspector] public float StatMultiplier = 0;
 
-    public bool IsDead { get; set; }    
+    public bool IsDead { get; set; }
 
     private void OnDestroy()
     {
         PassiveController?.DeActiveAllPassive();
+
+        _cts.Cancel();
+        _cts.Dispose();
     }
 
     #region Init&Clear
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
-        Transform root = transform.GetChild(0);    
+        Transform root = transform.GetChild(0);
 
-        if(root.childCount > 0)
+        if (root.childCount > 0)
             root = root.GetChild(0);
 
         PassiveController = new UnitPassiveController(gameObject);
+        EffectController = new EffectController(transform, _cts);
         UnitFXController = new UnitFXController(
             root.
             GetComponentsInChildren<SpriteRenderer>()
@@ -98,16 +102,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         Status = status;
         CurrentAttackData = Status.Data.AttackData;
         IsDead = false;
-        IsStund.Value = false;
+        IsStunned.Value = false;
 
         if (plusUnitStat == null)
         {
             SetBaseStat(status.GetCurrentStat());
-        }        
+        }
         else
         {
             SetBaseStat(status.GetCurrentStat(), plusUnitStat);
-        }        
+        }
     }
 
     #region SetStat
@@ -238,24 +242,21 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         AttackRange.ClearModifiers();
         AttackCount.ClearModifiers();
 
-        foreach (var cts in _activeBuffs.Values)
-        {
-            cts.Cancel();
-            cts.Dispose();
-        }
-        _activeBuffs.Clear();
+        _cts.Cancel();
+        _cts.Dispose();
+        _cts = new CancellationTokenSource();
     }
     #endregion
 
     #region TakeDamage
     public void TakeDamage(int amount, bool isCrit = false)
     {
-        if(IsDead)
-            return;        
+        if (IsDead)
+            return;
 
-        if(Shield.Value > 0)
+        if (Shield.Value > 0)
         {
-            if(amount > Shield.Value)
+            if (amount > Shield.Value)
             {
                 amount -= Shield.Value;
                 Shield.Value = 0;
@@ -275,7 +276,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             Die();
         }
     }
-        
+
     public void TakeTickDamage(int amount, float tickCount, float tickInterval)
     {
         TickDamage(amount, tickCount, tickInterval).Forget();
@@ -301,7 +302,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             catch (OperationCanceledException)
             {
                 return;
-            }            
+            }
         }
     }
     #endregion
@@ -309,7 +310,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Increase
     public void IncreaseHealth(int amount)
     {
-        if(amount < 0)
+        if (amount < 0)
         {
             Debug.Log($"{amount} 만큼 피해를 입음");
             TakeDamage(amount);
@@ -317,9 +318,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
 
         CurHp.Value += amount;
+        EffectController.AddBuffEffect(BuffEffect.Heal);
 
         Debug.Log($"[체력회복] {amount} 만큼 체력 회복");
-        if(CurHp.Value > MaxHealth.Value)
+        if (CurHp.Value > MaxHealth.Value)
         {
             CurHp.Value = MaxHealth.Value;
         }
@@ -327,15 +329,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void IncreaseMana(int amount)
     {
-        CurMana.Value += amount;
+        CurMana.Value += amount;        
 
         if (CurMana.Value > MaxMana.Value)
         {
             CurMana.Value = MaxMana.Value;
         }
     }
+
     public void GetMana()
-    {
+    {        
         IncreaseMana(ManaGain.Value);
     }
 
@@ -343,6 +346,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         Debug.Log($"[쉴드추가] {amount} 만큼 쉴드추가");
         Shield.Value += amount;
+        EffectController.AddBuffEffect(BuffEffect.Shield);
     }
     #endregion
 
@@ -354,14 +358,14 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     private async UniTask StunDelay(float stunTime)
     {
-        IsStund.Value = true;
+        IsStunned.Value = true;
 
         await UniTask.Delay(TimeSpan.FromSeconds(stunTime), cancellationToken: this.GetCancellationTokenOnDestroy());
 
         if (IsDead)
             return;
 
-        IsStund.Value = false;
+        IsStunned.Value = false;
     }
     #endregion
 
@@ -373,6 +377,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void AttackDataChange(UnitAttackData attackData, float _duration)
     {
+        EffectController.AddBuffEffect(BuffEffect.Buff);
+
         ChangeAttackData(attackData, _duration).Forget();
     }
 
@@ -387,10 +393,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     #region Effect
     public void ApplyEffect(BuffEffectData buffEffectData, float value, string source)
-    {        
+    {
         var key = new SourceKey(buffEffectData.StatType, source);
 
-        if(buffEffectData.IsTicking)
+        if (buffEffectData.IsTicking)
         {
             TickEffect(buffEffectData, value, source).Forget();
             Debug.Log($"[스텟 이펙트] {buffEffectData.StatType.ToString()}이 {buffEffectData.Duration} 동안 {buffEffectData.TickInterval} 마다 발동");
@@ -398,21 +404,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
 
         Debug.Log($"[스텟 이펙트] {buffEffectData.StatType.ToString()}이 {buffEffectData.Duration} 동안 발동");
-        if (_activeBuffs.TryGetValue(key, out var cts))
-        {
-            cts.Cancel();
-            cts.Dispose();
-            _activeBuffs.Remove(key);
-        }
-        else
-        {
-            AddStat(buffEffectData.StatType, value, source);
-        }
 
-        var newCts = new CancellationTokenSource();
-        _activeBuffs[key] = newCts;
-
-        ClearEffectAsync(buffEffectData, source, newCts.Token).Forget();
+        AddStat(buffEffectData.StatType, value, source);
+        ClearEffectAsync(buffEffectData, source, _cts.Token).Forget();
     }
 
     private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, string source, CancellationToken token)
@@ -422,7 +416,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.Duration), cancellationToken: token);
 
             RemoveStat(buffEffectData.StatType, source);
-            _activeBuffs.Remove(new SourceKey(buffEffectData.StatType, source));
         }
         catch (OperationCanceledException)
         {
@@ -434,10 +427,25 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         int count = (int)(buffEffectData.Duration / buffEffectData.TickInterval);
 
-        for(int i = 0; i < count; i++)
+        switch(buffEffectData.StatType)
+        {
+            case StatType.PhysicalDamage:
+            case StatType.MagicDamage:
+                EffectController.AddBuffEffect(BuffEffect.Damage, buffEffectData.Duration);
+                break;
+            case StatType.PhysicalDefense:
+            case StatType.MagicDefense:
+                EffectController.AddBuffEffect(BuffEffect.Damage, buffEffectData.Duration);
+                break;
+            case StatType.AttackSpeed:
+                EffectController.AddBuffEffect(BuffEffect.AttackSpeed, buffEffectData.Duration);
+                break;
+        }
+
+        for (int i = 0; i < count; i++)
         {
             AddStat(buffEffectData.StatType, value, source);
-            await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.TickInterval));
+            await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.TickInterval), cancellationToken: _cts.Token);
         }
     }
     #endregion
@@ -445,6 +453,11 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Stat Management
     public void AddStat(StatType statType, float value, string source)
     {
+        if (value > 0)
+            EffectController.AddBuffEffect(BuffEffect.Buff);
+        else
+            EffectController.AddBuffEffect(BuffEffect.Debuff);
+
         switch (statType)
         {
             case StatType.MaxHealth:
@@ -457,7 +470,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             case StatType.ManaGain:
                 ManaGain.AddModifier((int)value, source);
                 break;
-            case StatType.PhysicalDamage:
+            case StatType.PhysicalDamage:                
                 PhysicalDamage.AddModifier((int)value, source);
                 break;
             case StatType.MagicDamage:
@@ -517,7 +530,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
                 break;
             case StatType.AttackSpeed:
                 AttackSpeed.RemoveModifier(source);
-                break;                
+                break;
         }
     }
     #endregion

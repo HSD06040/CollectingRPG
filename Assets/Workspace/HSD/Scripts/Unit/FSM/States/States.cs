@@ -163,7 +163,7 @@ public class StunState : BaseState
 
     public StunState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
-        _status.IsStund.AddEvent(fsm.ChangeStunState);
+        _status.IsStunned.AddEvent(fsm.ChangeStunState);
     }
 
     public override void Enter()

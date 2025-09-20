@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using static UnityEditorInternal.ReorderableList;
 using static UnityEngine.GraphicsBuffer;
 
 public class SplashBuffProjectile : Projectile
@@ -15,6 +16,7 @@ public class SplashBuffProjectile : Projectile
     private bool _isModifier;
     private bool _isBuff;
     private bool _isAttck;
+    private float _defaultZ;
     private ActivationCondition _activationCondition;
 
     private UnitStatusController _targetStatus;
@@ -31,6 +33,7 @@ public class SplashBuffProjectile : Projectile
 
     protected override void Awake()
     {
+        _defaultZ = transform.rotation.eulerAngles.z;
         ComponentProvider.Add(gameObject, this);
     }
 
@@ -99,32 +102,13 @@ public class SplashBuffProjectile : Projectile
             }
         }        
     }
-
-    private void ApplyEffect(GameObject obj)
-    {
-        _targetStatus = ComponentProvider.Get<UnitBase>(obj.gameObject).StatusController;
-
-        if (_isAttck)
-        {
-            _status.CalculateDamage(_attackPower, _damageType, _targetStatus);
-        }
-
-        if(_isModifier)
-        {
-            if (_isBuff)
-            {
-                _targetStatus.ApplyEffect(_buffEffectData, _attackPower, name);
-            }
-            else
-            {
-                _targetStatus.AddStat(_statEffectModifier.StatType, _attackPower, name);
-            }
-        }        
-    }
-
     protected override async UniTask MoveAndDestroy(float duration)
     {
         await UniTask.Yield();
+
+        Vector2 dir = (_target.position - transform.position).normalized;
+        transform.right = dir;
+        transform.Rotate(0, 0, _defaultZ);
 
         if (_throwType == ThrowType.Straight)
         {
@@ -132,12 +116,15 @@ public class SplashBuffProjectile : Projectile
                 .SetEase(Ease.Linear).SetSpeedBased()
                 .AsyncWaitForCompletion();
 
-            if(_activationCondition == ActivationCondition.Target)
+            if (_activationCondition == ActivationCondition.Target)
             {
                 foreach (var target in Physics2D.OverlapCircleAll(transform.position, _radius, _targetLayer))
                 {
                     ApplyEffect(target.gameObject);
                 }
+
+                GameObject effect = SpawnEffect();
+                effect.transform.right = dir;
             }
         }
         else if (_throwType == ThrowType.Parabola)
@@ -172,5 +159,27 @@ public class SplashBuffProjectile : Projectile
         }
 
         ProjectileDestroy();
+    }
+
+    private void ApplyEffect(GameObject obj)
+    {
+        _targetStatus = ComponentProvider.Get<UnitBase>(obj.gameObject).StatusController;
+
+        if (_isAttck)
+        {
+            _status.CalculateDamage(_attackPower, _damageType, _targetStatus);
+        }
+
+        if(_isModifier)
+        {
+            if (_isBuff)
+            {
+                _targetStatus.ApplyEffect(_buffEffectData, _attackPower, name);
+            }
+            else
+            {
+                _targetStatus.AddStat(_statEffectModifier.StatType, _attackPower, name);
+            }
+        }        
     }
 }
