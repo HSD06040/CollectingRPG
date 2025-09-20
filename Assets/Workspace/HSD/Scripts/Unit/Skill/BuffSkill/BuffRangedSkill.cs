@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "BuffRangedSkill", menuName = "Data/Unit/Skill/BuffThrow")]
 public class BuffRangedSkill : RangedSkill
-{    
+{
+    [Header("Type")]
+    [SerializeField] ActivationCondition _activationCondition;
+    [SerializeField] ThrowType _throwType;    
+    [SerializeField] float _parabolaYOffset;
+    [SerializeField] bool _isAttack;
+
     [Header("Buff")]
+    [SerializeField] bool _isModifier;
+    [SerializeField] bool _isBuff;
     [SerializeField] bool _isAlly;
-    [SerializeField] float _buffRadius;
-    [SerializeField] StatEffectModifier _statEffectModifier;
+    [SerializeField] float _radius;
+    [SerializeField] BuffEffectData _buffEffectData;
+    [SerializeField] StatEffectModifier _statModifier;
 
     public override void Active(IAttacker attacker)
     {
-        SplashProjectile projectile = ComponentProvider.Get<SplashProjectile>(
+        SplashBuffProjectile projectile = ComponentProvider.Get<SplashBuffProjectile>(
             Manager.Resources.Instantiate<GameObject>(
                 EffectAddress,
                 GetSpawnPoint(attacker),
@@ -26,14 +36,24 @@ public class BuffRangedSkill : RangedSkill
 
         if (target == null)
         {
-            target = Utils.GetClosestTargetNonAlloc(GetSpawnPoint(attacker), 100f, GetLayerMask(attacker));
+            target = Utils.GetClosestTargetNonAlloc(GetSpawnPoint(attacker), 10f, GetLayerMask(attacker));
         }
 
-        projectile.Init(_statEffectModifier, _buffRadius,
-            target, attacker.GetStatusController(), Power, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect());
+        if (_isBuff)
+        {
+            projectile.Init(_buffEffectData, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
+            target, attacker.GetStatusController(), Power, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            _parabolaYOffset);
+        }
+        else if (!_isBuff)
+        {
+            projectile.Init(_statModifier, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
+            target, attacker.GetStatusController(), Power, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            _parabolaYOffset);
+        }
     }
 
-    private GameObject GetTargetSingle(IAttacker attacker)
+    protected override GameObject GetTargetSingle(IAttacker attacker)
     {
         var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, GetLayerMask(attacker), GetPriorityFilter());
         return target;
@@ -68,5 +88,14 @@ public class BuffRangedSkill : RangedSkill
         {
             return GetTargetSingle(attacker)?.transform;
         }
+    }
+
+    public override void DrawGizmos(IAttacker attacker)
+    {
+        base.DrawGizmos(attacker);
+
+        Gizmos.color = Color.yellow;
+
+        Gizmos.DrawWireSphere(attacker.GetCenter(), _radius);
     }
 }

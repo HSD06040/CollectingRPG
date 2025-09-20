@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d53dcdbdc033b1d48b36f371ff4077df, type: 3}
-  m_Name: Shadow6
+  m_Script: {fileID: 11500000, guid: 60160ac6ddf3fb941bef03363d3df63e, type: 3}
+  m_Name: Shadow4
   m_EditorClassIdentifier: 
   ID: 0
   Icon: {fileID: 0}
@@ -18,17 +18,12 @@ MonoBehaviour:
   Description: 
   MaxCount: 1
   Powers: []
-  Power: 10
+  Power: 1
   ManaCost: 0
-  Priority: 5
-  EffectAddress: Effect
-  EffectSpawnType: 1
-  SpawnPointOffset: {x: 0, y: 0}
-  _isRange: 0
-  _range: 0
-  TargetType: 0
-  BuffEffectData:
-    StatType: 14
-    Duration: 0
-    IsTicking: 0
-    TickInterval: 0
+  Priority: 0
+  EffectAddress: Arrow
+  EffectSpawnType: 0
+  SpawnPointOffset: {x: 2.15, y: 2.95}
+  DamageType: 0
+  _explosionEffect: Shadow_ArrowExplosion
+  _speed: 15

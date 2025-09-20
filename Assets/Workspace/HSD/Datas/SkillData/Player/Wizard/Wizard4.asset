@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d53dcdbdc033b1d48b36f371ff4077df, type: 3}
-  m_Name: Shadow6
+  m_Script: {fileID: 11500000, guid: 0e0f65ebd5830d045872b490d8f8f42b, type: 3}
+  m_Name: Wizard4
   m_EditorClassIdentifier: 
   ID: 0
   Icon: {fileID: 0}
@@ -18,17 +18,29 @@ MonoBehaviour:
   Description: 
   MaxCount: 1
   Powers: []
-  Power: 10
+  Power: 1
   ManaCost: 0
-  Priority: 5
-  EffectAddress: Effect
-  EffectSpawnType: 1
+  Priority: 1
+  EffectAddress: Projectile
+  EffectSpawnType: 0
   SpawnPointOffset: {x: 0, y: 0}
-  _isRange: 0
-  _range: 0
-  TargetType: 0
-  BuffEffectData:
-    StatType: 14
+  DamageType: 1
+  _projectileSpeed: 10
+  _explosionEffect: Effect
+  _distance: 5
+  _activationCondition: 2
+  _throwType: 1
+  _parabolaYOffset: 0
+  _isAttack: 1
+  _isModifier: 0
+  _isBuff: 0
+  _isAlly: 0
+  _radius: 2
+  _buffEffectData:
+    StatType: 0
     Duration: 0
     IsTicking: 0
     TickInterval: 0
+  _statModifier:
+    StatType: 0
+    Value: 0

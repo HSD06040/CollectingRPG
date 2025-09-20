@@ -29,6 +29,18 @@ public enum AnimatorType
 
 }
 
+public enum ActivationCondition
+{    
+    AnyCollision,  // 도중에 맞은 모든 충돌 대상 발동
+    TargetOnly,    // 목표(Target)에 도달했을 때만 발동
+    Target         // 처음 타겟 위치에서 발동
+}
+public enum ThrowType
+{
+    Parabola,
+    Straight
+}
+
 public enum SpawnPositionType
 {
     Self,
@@ -197,5 +209,7 @@ public enum StatType
     CurMana,
 
     // Currency
-    GoldBonus
+    GoldBonus,
+
+    TakeDamage,
 }

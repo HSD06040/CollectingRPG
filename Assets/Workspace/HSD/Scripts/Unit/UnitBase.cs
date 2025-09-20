@@ -271,7 +271,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
     public LayerMask GetAllyLayerMask()
     {
-        return gameObject.layer;
+        return 1 << gameObject.layer;
     }
     #endregion
 

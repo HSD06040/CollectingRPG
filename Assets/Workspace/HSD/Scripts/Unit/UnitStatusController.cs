@@ -309,7 +309,15 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Increase
     public void IncreaseHealth(int amount)
     {
+        if(amount < 0)
+        {
+            Debug.Log($"{amount} 만큼 피해를 입음");
+            TakeDamage(amount);
+            return;
+        }
+
         CurHp.Value += amount;
+
         Debug.Log($"[체력회복] {amount} 만큼 체력 회복");
         if(CurHp.Value > MaxHealth.Value)
         {

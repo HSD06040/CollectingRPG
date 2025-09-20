@@ -29,14 +29,14 @@ public class ChainLineAttacker : MonoBehaviour
     }
 
     public void Setup(IAttacker attacker, GameObject effect, Transform target, int count, float interval, 
-        LayerMask targetLayer, float Power, DamageType damageType, float attackThickness, int ratio)
+        LayerMask targetLayer, float power, DamageType damageType, float attackThickness, int ratio)
     {
         _count = count;
         _target = target;
         _effect = effect;
         _interval = interval;
         _damageType = damageType;
-        _power = Power;
+        _power = power;
         _targetLayer = targetLayer;
         _attacker = attacker;
         _ratio = ratio;

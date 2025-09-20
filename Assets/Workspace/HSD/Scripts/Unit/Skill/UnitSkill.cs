@@ -11,6 +11,8 @@ public abstract class UnitSkill : ScriptableObject
     public Sprite Icon;
     public string SkillName;
     [TextArea] public string Description;
+
+    [Header("Stat")]
     public int MaxCount = 1;
     public float[] Powers; // 추후 기능 추가를 위한 데이터
     public float Power = 1;
@@ -22,7 +24,7 @@ public abstract class UnitSkill : ScriptableObject
     [Header("Effect")]
     public string EffectAddress;
     public EffectSpawnType EffectSpawnType;
-    public Vector2 SpawnPointOffset;
+    public Vector2 SpawnPointOffset;    
 
     public virtual void Active(IAttacker attacker)
     {
@@ -138,8 +140,8 @@ public abstract class UnitSkill : ScriptableObject
         List<GameObject> validTargets = new List<GameObject>();
 
         foreach (var target in targets)
-        {
-            var statusController = ComponentProvider.Get<UnitBase>(target).StatusController;
+        {            
+            var statusController = ComponentProvider.Get<UnitBase>(target)?.StatusController;
             if (statusController != null && !statusController.IsDead)
             {
                 validTargets.Add(target);
