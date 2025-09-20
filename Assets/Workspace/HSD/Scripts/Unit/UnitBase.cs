@@ -130,6 +130,10 @@ public class UnitBase : MonoBehaviour, IAttacker
         Init();
         _fsm.Fight();
     }
+    public void Standby()
+    {
+        _fsm.Standby();
+    }
 
     public void GameEndedStanby()
     {
@@ -139,14 +143,9 @@ public class UnitBase : MonoBehaviour, IAttacker
         Standby();
     }
 
-    public void Standby()
-    {
-        _fsm.Standby();
-    }
-
     public void Attack()
     {
-        Status.Data.AttackData.Attack(this);
+        StatusController.CurrentAttackData.Attack(this);        
     }
 
     public bool SkillCheck()
@@ -270,6 +269,10 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         return TargetDir;
     }
+    public LayerMask GetAllyLayerMask()
+    {
+        return 1 << gameObject.layer;
+    }
     #endregion
 
     #region Gizmos
@@ -277,14 +280,6 @@ public class UnitBase : MonoBehaviour, IAttacker
     private void OnDrawGizmos()
     {        
         if (Status == null || StatusController == null) return;
-
-        // 찾는 거리
-        //Gizmos.color = Color.cyan;
-        //Gizmos.DrawWireSphere(transform.position, StatusController.DetectionRange);
-
-        // 공격 사거리
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, StatusController.AttackRange.Value);
 
         if (Status.Data == null) return;
 

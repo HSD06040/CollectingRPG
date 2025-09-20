@@ -3,8 +3,9 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "RangedSkill", menuName = "Data/Unit/Skill/Ranged")]
 public class RangedSkill : AttackSkill
-{
-    [SerializeField] float _projectileSpeed = 10f;
+{   
+    [SerializeField] protected float _projectileSpeed = 10f;
+    [SerializeField] protected string _explosionEffect;
     [SerializeField] float _distance = 5f;
 
     public override void Active(IAttacker attacker)
@@ -21,18 +22,24 @@ public class RangedSkill : AttackSkill
 
         Transform target = GetTarget(attacker);
 
-        // 타겟이 없다면 가까이 있는 적을 타겟으로 지정
         if (target == null)
         {
             target = Utils.GetClosestTargetNonAlloc(GetSpawnPoint(attacker), 100f, attacker.TargetLayer);
         }
 
-        projectile.Init(target, attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, _projectileSpeed, _distance);
+        projectile.Init(target, attacker.GetStatusController(), 
+            Power, DamageType, attacker.TargetLayer, _projectileSpeed,
+            GetExplosionEffect(), _distance);
     }
 
-    protected GameObject GetTargetSingle(IAttacker attacker)
+    protected GameObject GetExplosionEffect()
     {
-        var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, new Vector2(1,1), 1, attacker.TargetLayer, GetPriorityFilter());
+        return Manager.Resources.Get<GameObject>(_explosionEffect);
+    }
+
+    private GameObject GetTargetSingle(IAttacker attacker)
+    {
+        var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());
         return target;
     }
 
@@ -55,5 +62,5 @@ public class RangedSkill : AttackSkill
         {
             return GetTargetSingle(attacker)?.transform;
         }       
-    }
+    }    
 }
