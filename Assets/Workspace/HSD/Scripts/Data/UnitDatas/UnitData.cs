@@ -6,7 +6,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Unit_Data", menuName = "Data/Unit/Unit_Data")]
 public class UnitData : MetaData
 {
-    [Header("MetaData")]    
+    [Header("MetaData")]
+    public Grade Grade;
     public string AddressableAddress;
     public GameObject UnitPrefab => Manager.Resources.Get<GameObject>(AddressableAddress);
     public int ID;
