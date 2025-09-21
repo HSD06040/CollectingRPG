@@ -180,7 +180,7 @@ public class PoolManager : Singleton<PoolManager>
 
         var pool = GetOrCreatePool(name, go);
 
-        go = pool.Get();
+        go = pool.Get();        
 
         if (parent != null)
             go.transform.SetParent(parent, false);

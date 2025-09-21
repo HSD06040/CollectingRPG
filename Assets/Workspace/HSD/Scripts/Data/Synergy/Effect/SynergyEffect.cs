@@ -85,13 +85,13 @@ public class SynergyEffect : ScriptableObject
             }
         }
         else
-        {            
-            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, GetTarget(units, synergy), isChange: true);
+        {
+            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(this, GetTarget(units, synergy), isChange: true, delay: DelayTime);
         }
 
         if(NextEffect != null && NextEffect.EffectApplyType == EffectApplyType.All)
         {
-            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(NextEffect, GetTarget(units, synergy), isChange: true);
+            SynergyEffectManager.Instance.GlobalPassiveController.AddPassiveEffect(NextEffect, GetTarget(units, synergy), isChange: true, delay: DelayTime);
         }
     }
 

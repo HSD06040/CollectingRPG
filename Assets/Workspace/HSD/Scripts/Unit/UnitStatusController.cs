@@ -308,7 +308,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #endregion
 
     #region Increase
-    public void IncreaseHealth(int amount)
+    public void IncreaseHealth(int amount, bool isEffect = true)
     {
         if (amount < 0)
         {
@@ -318,7 +318,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
 
         CurHp.Value += amount;
-        EffectController.AddBuffEffect(BuffEffect.Heal);
+
+        if(isEffect)
+            EffectController.AddBuffEffect(BuffEffect.Heal);
 
         Debug.Log($"[체력회복] {amount} 만큼 체력 회복");
         if (CurHp.Value > MaxHealth.Value)
@@ -462,7 +464,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         {
             case StatType.MaxHealth:
                 MaxHealth.AddModifier((int)value, source);
-                IncreaseHealth((int)value);
+                IncreaseHealth((int)value, false);
                 break;
             case StatType.MaxMana:
                 MaxMana.AddModifier((int)value, source);

@@ -7,11 +7,6 @@ using UnityEngine;
 public class SynergyEffectManager : InGameSingleton<SynergyEffectManager>
 {
     public Vector3 Center;
-
-    protected override void Awake()
-    {
-        Init();
-    }   
     
     public GlobalPassiveController GlobalPassiveController { get; private set; }
 
@@ -23,5 +18,7 @@ public class SynergyEffectManager : InGameSingleton<SynergyEffectManager>
     public void SetCenter(Vector3 center)
     {
         Center = center;
+        Center -= new Vector3(0, 25, 0);
+        Init();
     }
 }

@@ -14,6 +14,7 @@ public class GlobalPassiveController
 
     public void AddPassiveEffect(SynergyEffect effect, UnitBase[] units, int multiplier = 1, bool isChange = false, float delay = 0)
     {
+        Debug.Log($"[AddPassiveEffect] Effect: {effect.Key}, DelayTime: {effect.DelayTime}, Passed Delay: {delay}, TriggerType: {effect.TriggerType}");
         if (isChange)
         {
             RemovePassiveEffect(effect);

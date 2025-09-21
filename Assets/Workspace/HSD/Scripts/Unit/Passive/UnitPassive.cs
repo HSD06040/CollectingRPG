@@ -28,7 +28,6 @@ public class UnitPassive
     /// </summary>
     public void Active()
     {
-        Debug.Log(Effect.name);
         switch (Effect.TriggerType)
         {
             case TriggerType.Base:
@@ -121,7 +120,6 @@ public class UnitPassive
         while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
         {
             EffectActives();
-            _currentActivations++;
 
             try
             {
@@ -146,9 +144,6 @@ public class UnitPassive
     {
         while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
         {
-            EffectActives();
-            _currentActivations++;
-
             try
             {
                 await UniTask.WaitForSeconds(Effect.Interval, cancellationToken: token);
@@ -157,6 +152,8 @@ public class UnitPassive
             {
                 return;
             }
+
+            EffectActives();
         }
 
         // Delay 대기
@@ -212,12 +209,11 @@ public class UnitPassive
             return;
 
         _isActive = true;
-
-        _currentActivations++;
-        Debug.Log($"{_currentActivations}로 설정");
-
+        
         if (_currentActivations < Effect.MaxActivations)
         {
+            _currentActivations++;
+
             SpawnActive();
             BuffEffectActive();
             AttackActive();
@@ -233,8 +229,8 @@ public class UnitPassive
             NextEffectActives();
 
             if(Effect.IsActivationsClear)
-                _currentActivations = 0;
-        }
+                _currentActivations = 0;            
+        }        
     }
 
     private void RemoveStat()

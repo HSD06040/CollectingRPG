@@ -56,7 +56,7 @@ public static class Utils
         status.TotalDamage.Value += totalDamage;
         enemy.TakeDamage(totalDamage, isCrit);
 
-        Debug.Log($"[데미지 시스템] 적{enemy.name}이 {totalDamage} 만큼의 피해를 입음!");
+        //Debug.Log($"[데미지 시스템] 적{enemy.name}이 {totalDamage} 만큼의 피해를 입음!");
     }
     #endregion
 

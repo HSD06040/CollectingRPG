@@ -32,11 +32,11 @@ public class EffectController : IDisposable
     private async UniTask SpawnEffect(string address, float duration, Vector3 spawnPos,CancellationToken token)
     {
         GameObject effectPrefab = Manager.Resources.Get<GameObject>(address);
-        GameObject effect = Manager.Resources.Instantiate(effectPrefab, spawnPos, effectPrefab.transform.rotation, _transform, true);        
+        GameObject effect = Manager.Resources.Instantiate(effectPrefab, spawnPos, effectPrefab.transform.rotation, _transform, true);
 
         try
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token);
+            await UniTask.WaitForSeconds(duration, cancellationToken: token);
         }
         catch (OperationCanceledException)
         {

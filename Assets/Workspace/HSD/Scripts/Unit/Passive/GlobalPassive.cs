@@ -26,7 +26,6 @@ public class GlobalPassive
         _center = center;
         _mulriplier = mulriplier;
         _delay = delay;
-
         _cts = new CancellationTokenSource();
     }
     #region Active & Deactive
@@ -102,7 +101,10 @@ public class GlobalPassive
 
     private async UniTask OnIntervalEffectAsync(CancellationToken token)
     {
-        await UniTask.Delay(TimeSpan.FromSeconds(_delay));
+        Debug.Log($"[OnIntervalEffectAsync] 시작 - Delay: {_delay}초 대기");
+        await UniTask.Yield();
+
+        await UniTask.WaitForSeconds(_delay);
 
         while (_currentActivations < _effect.MaxActivations && !token.IsCancellationRequested)
         {
@@ -295,7 +297,7 @@ public class GlobalPassive
             return;
 
         // 글로벌 공격은 전장 중앙이나 특정 지점에 소환하는 식으로 처리
-        AttackSpawn();
+        AttackSpawn(_effect);
     }
 
     private void NextAttackActive()
@@ -303,19 +305,18 @@ public class GlobalPassive
         if (_effect.NextEffect == null || !_effect.NextEffect.IsAttack)
             return;
 
-        AttackSpawn();
+        AttackSpawn(_effect.NextEffect);
     }
 
-    private void AttackSpawn()
+    private void AttackSpawn(SynergyEffect synergyEffect)
     {
         if (_effect.AttackPrefab == null)
         {
             Debug.LogWarning($"[글로벌 시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {_effect.AttackAddress}");
             return;
         }
-
-        Vector3 pos = _center != null ? _center : Vector3.zero;
-        GameObject.Instantiate(_effect.NextEffect.AttackPrefab, pos, Quaternion.identity);
+        Debug.Log($"[글로벌 패시브] 센터 : {_center}");
+        Manager.Resources.Destroy(Manager.Resources.Instantiate(synergyEffect.AttackPrefab, _center, true), 2);
     }
     #endregion
 
