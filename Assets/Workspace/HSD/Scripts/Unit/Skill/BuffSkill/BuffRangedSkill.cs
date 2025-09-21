@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -19,18 +20,23 @@ public class BuffRangedSkill : RangedSkill
     [SerializeField] float _radius;
     [SerializeField] BuffEffectData _buffEffectData;
     [SerializeField] StatEffectModifier _statModifier;
-
+    
     public override void Active(IAttacker attacker)
     {
+        GameObject spawnObject = Manager.Resources.Get<GameObject>(EffectAddress);
+
         SplashBuffProjectile projectile = ComponentProvider.Get<SplashBuffProjectile>(
             Manager.Resources.Instantiate<GameObject>(
-                EffectAddress,
+                spawnObject,
                 GetSpawnPoint(attacker),
                 true
                 )
             );
 
         Transform target = GetTarget(attacker);
+
+        projectile.transform.right = (target.position - projectile.transform.position).normalized;
+        projectile.transform.Rotate(0, 0, spawnObject.transform.rotation.eulerAngles.z);
 
         if (target == null)
         {

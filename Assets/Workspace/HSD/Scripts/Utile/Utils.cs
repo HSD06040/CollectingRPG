@@ -17,9 +17,21 @@ public static class Utils
     {        
         return transform.rotation.y == 0 ? 1 : -1;
     }
-    public static Vector2 GetCenter(this GameObject obj)
+    public static Vector2 GetTopPosition(this GameObject obj)
+    {
+        return GetCenterPosition(obj) + new Vector2(0, obj.transform.localScale.y / 2);
+    }
+    public static Vector2 GetTopPosition(this Transform transform)
+    {
+        return GetTopPosition(transform.gameObject);
+    }
+    public static Vector2 GetCenterPosition(this GameObject obj)
     {
         return ComponentProvider.Get<UnitBase>(obj).GetCenter();
+    }
+    public static Vector2 GetCenterPosition(this Transform transform)
+    {
+        return GetCenterPosition(transform.gameObject);
     }
 
     #region Damage Calculation

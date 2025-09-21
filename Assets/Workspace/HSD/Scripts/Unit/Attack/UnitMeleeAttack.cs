@@ -24,7 +24,7 @@ public class UnitMeleeAttack : UnitAttackData
             );
 
         GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
-        GameObject obj = Manager.Resources.Instantiate(prefab, attacker.GetTarget().gameObject.GetCenter(), true);
+        GameObject obj = Manager.Resources.Instantiate(prefab, attacker.GetTarget().gameObject.GetCenterPosition(), true);
 
         // 항상 프리팹 기준 스케일로 초기화
         obj.transform.localScale = prefab.transform.localScale;

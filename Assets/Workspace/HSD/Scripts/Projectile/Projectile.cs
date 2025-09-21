@@ -92,7 +92,10 @@ public class Projectile : MonoBehaviour
     {
         if (_effect == null) return null;
 
-        return Manager.Resources.Instantiate(_effect, transform.position, true);
+        GameObject obj = Manager.Resources.Instantiate(_effect, transform.position, true);
+        Manager.Resources.Destroy(obj, 2);
+
+        return obj;
     }
 
     protected Vector2 GetTargetDir()

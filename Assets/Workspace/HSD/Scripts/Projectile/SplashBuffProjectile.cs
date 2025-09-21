@@ -1,8 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using static UnityEditorInternal.ReorderableList;
-using static UnityEngine.GraphicsBuffer;
 
 public class SplashBuffProjectile : Projectile
 {
@@ -16,7 +14,6 @@ public class SplashBuffProjectile : Projectile
     private bool _isModifier;
     private bool _isBuff;
     private bool _isAttck;
-    private float _defaultZ;
     private ActivationCondition _activationCondition;
 
     private UnitStatusController _targetStatus;
@@ -33,7 +30,6 @@ public class SplashBuffProjectile : Projectile
 
     protected override void Awake()
     {
-        _defaultZ = transform.rotation.eulerAngles.z;
         ComponentProvider.Add(gameObject, this);
     }
 
@@ -107,8 +103,6 @@ public class SplashBuffProjectile : Projectile
         await UniTask.Yield();
 
         Vector2 dir = (_target.position - transform.position).normalized;
-        transform.right = dir;
-        transform.Rotate(0, 0, _defaultZ);
 
         if (_throwType == ThrowType.Straight)
         {

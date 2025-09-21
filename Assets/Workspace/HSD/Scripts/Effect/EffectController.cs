@@ -19,18 +19,20 @@ public class EffectController : IDisposable
     public void AddBuffEffect(BuffEffect buffEffect, float duration = 2)
     {
         string address = _addressData.GetBuffAddress(buffEffect);
+
         if (string.IsNullOrEmpty(address))
         {
             Debug.LogError($"BuffEffect {buffEffect}에 대한 주소가 없음!");
             return;
         }
 
-        SpawnEffect(address, duration, _cts.Token).Forget();
+        SpawnEffect(address, duration, GetSpawnPos(buffEffect), _cts.Token).Forget();
     }
 
-    private async UniTask SpawnEffect(string address, float duration, CancellationToken token)
+    private async UniTask SpawnEffect(string address, float duration, Vector3 spawnPos,CancellationToken token)
     {
-        GameObject effect = Manager.Resources.Instantiate<GameObject>(address, _transform.position, true);
+        GameObject effectPrefab = Manager.Resources.Get<GameObject>(address);
+        GameObject effect = Manager.Resources.Instantiate(effectPrefab, spawnPos, effectPrefab.transform.rotation, _transform, true);        
 
         try
         {
@@ -47,6 +49,21 @@ public class EffectController : IDisposable
         }
 
         Manager.Resources.Destroy(effect);
+    }
+
+    private Vector3 GetSpawnPos(BuffEffect buffEffect)
+    {
+        return (buffEffect) switch
+        {
+            BuffEffect.Buff => _transform.position,
+            BuffEffect.Stun => _transform.GetTopPosition(),
+            BuffEffect.Debuff => _transform.GetTopPosition(),
+            BuffEffect.Damage => _transform.GetCenterPosition(),
+            BuffEffect.Heal => _transform.GetCenterPosition(),
+            BuffEffect.Shield => _transform.GetCenterPosition(),
+            BuffEffect.AttackSpeed => _transform.GetCenterPosition(),
+            BuffEffect.Defense => _transform.GetCenterPosition(),
+        };
     }
 
     public void Dispose()

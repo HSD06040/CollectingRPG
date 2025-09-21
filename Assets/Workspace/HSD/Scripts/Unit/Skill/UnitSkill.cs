@@ -41,7 +41,7 @@ public abstract class UnitSkill : ScriptableObject
             Manager.Resources.Destroy(
                 Manager.Resources.Instantiate<GameObject>(
                     EffectAddress,
-                    attacker.GetTarget().gameObject.GetCenter(),
+                    attacker.GetTarget().gameObject.GetCenterPosition(),
                     true
                 ),
              2f);

@@ -7,6 +7,10 @@ public class SkillAndAttackTest : MonoBehaviour
     [SerializeField] UnitBase unit;
     [SerializeField] UnitStatus unitStatus;
 
+    [Header("Buff_Effect")]
+    [SerializeField] BuffEffect _buffEffect;
+    [SerializeField] float _duration = 2;
+
     [Header("Skill")]
     [SerializeField] UnitSkill skill;
     [Space]
@@ -14,18 +18,30 @@ public class SkillAndAttackTest : MonoBehaviour
     [Header("Attack")]
     [SerializeField] UnitAttackData attackData;
 
-    [ContextMenu("UseSkill")]
-    public void UseSkill()
+    private void Awake()
     {
         unit.Status = unitStatus;
+    }
+
+    [ContextMenu("UseSkill")]   
+    public void UseSkill()
+    {
         skill.Active(unit);
     }
 
     [ContextMenu("UseAttack")]
     public void UseAttack()
     {
-        unit.Status = unitStatus;
         attackData.Attack(unit);
+    }
+
+    [ContextMenu("BuffEffect_Test")]
+    public void EffectTest()
+    {
+        if (unit.StatusController.EffectController == null)
+            unit.StatusController.EffectController = new EffectController(unit.transform, new System.Threading.CancellationTokenSource());
+
+        unit.StatusController.EffectController.AddBuffEffect(_buffEffect, _duration);
     }
 
     private void OnDrawGizmos()

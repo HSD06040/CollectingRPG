@@ -256,6 +256,10 @@ public class ResourcesManager : Singleton<ResourcesManager>
     {
         return Instantiate(original, position, Quaternion.identity, null, isPool);
     }
+    public T Instantiate<T>(T original, Transform parent, bool isPool = false) where T : Object
+    {
+        return Instantiate(original, Vector3.zero, Quaternion.identity, parent, isPool);
+    }
 
     public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
@@ -271,6 +275,10 @@ public class ResourcesManager : Singleton<ResourcesManager>
     public T Instantiate<T>(string path, Vector3 postion, bool isPool = false) where T : Object
     {
         return Instantiate<T>(path, postion, Quaternion.identity, null, isPool);
+    }
+    public T Instantiate<T>(string path, Transform parent, bool isPool = false) where T : Object
+    {
+        return Instantiate<T>(path, Vector3.zero, Quaternion.identity, parent, isPool);
     }
 
     public void Destroy(GameObject obj)

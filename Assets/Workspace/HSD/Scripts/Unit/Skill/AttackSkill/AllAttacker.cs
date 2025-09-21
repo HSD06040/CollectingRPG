@@ -43,7 +43,7 @@ public class AllAttacker : MonoBehaviour
     private async UniTask MoveToEnemy(GameObject target)
     {
         await UniTask.Yield();
-        Vector3 targetPos = target.GetCenter();
+        Vector3 targetPos = target.GetCenterPosition();
 
         GameObject attack = Manager.Resources.Instantiate(_attackEffect, transform.position, true);
         Vector2 dir = (targetPos - attack.transform.position).normalized;
@@ -51,7 +51,7 @@ public class AllAttacker : MonoBehaviour
         attack.transform.Rotate(0f, 0f, _attackEffect.transform.rotation.eulerAngles.z);
 
         await UniTask.Yield();
-        await attack.transform.DOMove(target.GetCenter(), _speed)
+        await attack.transform.DOMove(target.GetCenterPosition(), _speed)
             .SetSpeedBased()
             .SetEase(Ease.Linear)
             .AsyncWaitForCompletion();

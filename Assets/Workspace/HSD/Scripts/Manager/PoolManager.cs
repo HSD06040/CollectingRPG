@@ -185,7 +185,7 @@ public class PoolManager : Singleton<PoolManager>
         if (parent != null)
             go.transform.SetParent(parent, false);
 
-        go.transform.localPosition = position;
+        go.transform.position = position;
         go.transform.rotation = rotation;
 
         go.SetActive(true);
