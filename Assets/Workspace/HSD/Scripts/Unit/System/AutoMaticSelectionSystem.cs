@@ -9,6 +9,7 @@ public class AutoMaticSelectionSystem : MonoBehaviour
     public class AutoUnitInfo
     {
         public UnitStatus Status;
+
         public UI_UnitSlot UI_UnitSlot;
         public AutoUnitType AutoUnitType;
 
@@ -28,6 +29,9 @@ public class AutoMaticSelectionSystem : MonoBehaviour
 
     public void AutoSelectCharacters()
     {
+#if UNITY_EDITOR
+        TestUtils.TimerStart();
+#endif
         units.Clear();
         sortedUnits.Clear();
 
@@ -67,6 +71,10 @@ public class AutoMaticSelectionSystem : MonoBehaviour
         }       
 
         Set(sortedUnits);
+
+#if UNITY_EDITOR
+        TestUtils.TimerStop();
+#endif
     }
 
     private void Set(List<UnitStatus> units)
