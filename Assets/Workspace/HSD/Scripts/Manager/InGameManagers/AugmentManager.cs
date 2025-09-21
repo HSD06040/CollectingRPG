@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AugmentManager : InGameSingleton<AugmentManager>
@@ -22,7 +20,43 @@ public class AugmentManager : InGameSingleton<AugmentManager>
 
     [Header("Currency")]
     public Stat<float> GoldBonus;
+
+    public AUGData currentAugment;
+
+    // 테스트용
+    [SerializeField] private AUGData AUGData;
     #endregion
+
+    private void Start()
+    {
+        SelectAugment(AUGData);
+    }
+
+    public void SelectAugment(AUGData data)
+    {
+        currentAugment = data;
+    }
+
+    public void ApplyAugment(UnitBase unit)
+    {
+        if (IsAugmentTarget(unit))
+        {
+            currentAugment.ApplyEffect(unit);
+            Debug.Log("반영됨");
+        }
+    }
+
+    public bool IsAugmentTarget(UnitBase unit)
+    {
+        if (currentAugment.TargetType == EffectTargetType.Ally) return true;
+        else if (currentAugment.TargetType == EffectTargetType.SameClassType && unit.Status.Data.ClassSynergy == currentAugment.Class)
+        {
+            return true;
+        }
+        // 리더일 경우 추가 필요
+
+        return false;
+    }
 
     #region Augument Management
     public void AddAugment(StatType statType, float value, string source)

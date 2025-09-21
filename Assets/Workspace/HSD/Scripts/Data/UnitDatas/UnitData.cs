@@ -44,14 +44,6 @@ public class UnitData : MetaData
         UpgradeData?.Init(Grade, LevelUpData);
     }
 
-    public void ApplyAUGStatus()
-    {
-        for(int i = 0; i < UnitStats.Length; i++)
-        {
-            AugmentStats[i] = UnitStats[i];
-        }
-    }
-
     public UnitDataDTO ToDTO(UnitData data)
     {
         return new UnitDataDTO
@@ -66,11 +58,6 @@ public class UnitData : MetaData
             Synergy = (int)data.Synergy,
             UnitStats = data.UnitStats
         };
-    }
-
-    public void AddStat(StatEffectModifier modifier, bool persent = false)
-    {
-        AugmentStat.AddStat(UnitStats[0], modifier, persent);
     }
 }
 

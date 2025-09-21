@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks.Triggers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,6 +41,8 @@ public class BattleUnitManager : MonoBehaviour
         AddToCachedArray(newUnit);
         newUnit.SetBattleUnit();
         newUnit.Init();
+
+        AugmentManager.Instance.ApplyAugment(newUnit);
 
         SetSlot(newSlot, newUnit);
     }
