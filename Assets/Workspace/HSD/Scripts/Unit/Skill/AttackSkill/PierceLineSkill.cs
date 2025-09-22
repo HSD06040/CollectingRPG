@@ -17,7 +17,10 @@ public class PierceLineSkill : AttackSkill
     {
         base.Active(attacker);
 
-        Transform target = Priority == Priority.Target ? attacker.GetTarget() : GetTargetSingle(attacker).transform;
+        Transform target = Priority == Priority.Target ? attacker.GetTarget() : GetTargetSingle(attacker)?.transform;
+
+        if (target == null)
+            return;
 
         GameObject effect = Manager.Resources.Load<GameObject>(EffectAddress);
         ChainLineAttacker chainLineAttacker = Manager.Resources.Instantiate<GameObject>(CHAIN_LINE_ATTACKER, attacker.GetCenter())

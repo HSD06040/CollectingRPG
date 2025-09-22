@@ -253,6 +253,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         if (IsDead)
             return;
+        Debug.Log($"[데미지 시스템] {name}이 {amount} 만큼의 피해를 입음");
 
         if (Shield.Value > 0)
         {
@@ -348,6 +349,10 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         Debug.Log($"[쉴드추가] {amount} 만큼 쉴드추가");
         Shield.Value += amount;
+
+        if(Shield.Value < 0)
+            Shield.Value = 0;
+
         EffectController.AddBuffEffect(BuffEffect.Shield);
     }
     #endregion
@@ -408,16 +413,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         Debug.Log($"[스텟 이펙트] {buffEffectData.StatType.ToString()}이 {buffEffectData.Duration} 동안 발동");
 
         AddStat(buffEffectData.StatType, value, source);
-        ClearEffectAsync(buffEffectData, source, _cts.Token).Forget();
+        ClearEffectAsync(buffEffectData, value, source, _cts.Token).Forget();
     }
 
-    private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, string source, CancellationToken token)
+    private async UniTaskVoid ClearEffectAsync(BuffEffectData buffEffectData, float value, string source, CancellationToken token)
     {
         try
         {
             await UniTask.WaitForSeconds(buffEffectData.Duration, cancellationToken: token);
 
-            RemoveStat(buffEffectData.StatType, source);
+            RemoveStat(buffEffectData.StatType, source, value);
         }
         catch (OperationCanceledException)
         {
@@ -502,7 +507,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
     }
 
-    public void RemoveStat(StatType statType, string source)
+    public void RemoveStat(StatType statType, string source, float value = 0)
     {
         switch (statType)
         {
@@ -533,6 +538,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             case StatType.AttackSpeed:
                 AttackSpeed.RemoveModifier(source);
                 break;
+            case StatType.Shield:
+                IncreaseShield(-(int)value);
+                break;                
         }
     }
     #endregion

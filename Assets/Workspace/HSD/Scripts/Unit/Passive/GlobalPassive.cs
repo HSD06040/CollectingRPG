@@ -339,7 +339,10 @@ public class GlobalPassive
         }
         Debug.Log($"[시너지 스폰 시스템] {_effect.SpawnPrefab.name} 소환");
 
-        Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(_effect.SpawnEffectPrefab, pos, true), 2);
+        GameObject spawnEffect = Manager.Resources.Instantiate<GameObject>(_effect.SpawnEffectPrefab, pos, true);
+        spawnEffect.transform.localScale = new Vector3(_effect.UnitLevel, _effect.UnitLevel, _effect.UnitLevel);
+        Manager.Resources.Destroy(spawnEffect, 2);
+
         GameObject unitObj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
         unitObj.name = "SpawnUnit";
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(unitObj);

@@ -113,7 +113,7 @@ public class ChainLineAttacker : MonoBehaviour
 
     private bool Filter(Transform target)
     {
-        return _targetList.Contains(target);
+        return !ComponentProvider.Get<UnitBase>(target.gameObject).StatusController.IsDead && _targetList.Contains(target);
     }
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()

@@ -33,7 +33,7 @@ public class RangedSkill : AttackSkill
     }
 
     protected GameObject GetExplosionEffect()
-    {
+    {        
         return Manager.Resources.Load<GameObject>(_explosionEffect);
     }
 

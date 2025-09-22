@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public static class Utils
 {
@@ -72,11 +73,17 @@ public static class Utils
         Transform closest = null;
         float bestDistSq = float.PositiveInfinity;
 
+        var result = new GameObject[count];
         for (int i = 0; i < count; i++)
         {
-            var hit = _hitBuffer[i];
-            if (hit == null) continue;
+            result[i] = _hitBuffer[i].gameObject;
+        }
 
+        for (int i = 0; i < result.Length; i++)
+        {
+            var hit = result[i];
+            if (hit == null) continue;
+            if (ComponentProvider.Get<UnitBase>(hit).StatusController.IsDead) continue;            
             if (filter != null && filter(hit.transform)) continue;
 
             float distSq = (hit.transform.position - origin).sqrMagnitude;
@@ -140,6 +147,12 @@ public static class Utils
                 _cachedTargets.Add(_hitBuffer[i].gameObject);
         }
 
+        foreach (var target in _cachedTargets)
+        {
+            if (ComponentProvider.Get<UnitBase>(target).StatusController.IsDead)
+                _cachedTargets.Remove(target);
+        }
+
         if (sortByDistance && _cachedTargets.Count > 1)
         {
             _cachedTargets.Sort((a, b) =>
@@ -182,8 +195,12 @@ public static class Utils
         var result = new GameObject[hitCount];
         for (int i = 0; i < hitCount; i++)
         {
+            if (ComponentProvider.Get<UnitBase>(result[i]).StatusController.IsDead)
+                continue;
+
             result[i] = _hitBuffer[i].gameObject;
         }
+
         return result;
     }
 
@@ -237,11 +254,16 @@ public static class Utils
         if (_cachedTargets.Count == 0)
             return null;
 
+        _cachedTargets.RemoveAll(target =>
+            ComponentProvider.Get<UnitBase>(target).StatusController.IsDead);
+
+        if (_cachedTargets.Count == 0)
+            return null;
+
         return filter != null
             ? filter.Invoke(attacker, _cachedTargets)
             : _cachedTargets[0];
     }
-
     #endregion
 
     #region String

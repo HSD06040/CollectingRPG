@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 982e89bf473cf30439e6ae14c18babb9, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e0f65ebd5830d045872b490d8f8f42b, type: 3}
   m_Name: Bandit4
   m_EditorClassIdentifier: 
   ID: 0
@@ -21,10 +21,26 @@ MonoBehaviour:
   Power: 1
   ManaCost: 0
   Priority: 4
-  EffectAddress: 
+  EffectAddress: Bandit4_Projectile
   EffectSpawnType: 0
   SpawnPointOffset: {x: 0, y: 0}
   DamageType: 0
   _projectileSpeed: 10
-  _explosionEffect: Effect
+  _explosionEffect: 
   _distance: 5
+  _activationCondition: 0
+  _throwType: 1
+  _parabolaYOffset: 0
+  _isAttack: 1
+  _isModifier: 0
+  _isBuff: 0
+  _isAlly: 0
+  _radius: 0
+  _buffEffectData:
+    StatType: 14
+    Duration: 3
+    IsTicking: 1
+    TickInterval: 0.5
+  _statModifier:
+    StatType: 0
+    Value: 0
