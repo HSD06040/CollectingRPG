@@ -55,7 +55,7 @@ public class ChainLineAttacker : MonoBehaviour
             SpawnEffect();
             ChangeTarget();
 
-            await UniTask.Delay(TimeSpan.FromSeconds(_interval), cancellationToken: _source.Token);
+            await UniTask.WaitForSeconds(_interval, cancellationToken: _source.Token);
         }        
     }
 

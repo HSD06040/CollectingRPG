@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 [CreateAssetMenu(fileName = "SynergyEffect", menuName = "Data/Synergy/Effect")]
 public class SynergyEffect : ScriptableObject
@@ -31,13 +29,15 @@ public class SynergyEffect : ScriptableObject
     //[Header("SpawnType (유닛 소환)")]
     public bool IsUnitPosition;         // 소환 위치 정의 (유닛위치 or 전장 중앙)
     public int UnitStatMultiplier { get; private set; }
+    public string UnitDataAddress;
+    [Range(0, 2)] public int UnitLevel;
     public UnitStats SpawnUnitStats;    // 가중치
     public bool IsMultiplier;           // 시너지 유닛의 Level에 따른 배수 적용 여부
 
     public SpawnStatType SpawnType;     // 유닛소환 시 스텟 타입 설정
     public Synergy SpawnSynergy;        // 유닛을 소환하는 시너지
-    public GameObject SpawnPrefab => Manager.Resources.Get<GameObject>(SpawnAddress);
-    public GameObject SpawnEffectPrefab => Manager.Resources.Get<GameObject>(SpawnEffectAddress);
+    public GameObject SpawnPrefab => Manager.Resources.Load<GameObject>(SpawnAddress);
+    public GameObject SpawnEffectPrefab => Manager.Resources.Load<GameObject>(SpawnEffectAddress);
     public string SpawnAddress;
     public string SpawnEffectAddress;
 
@@ -47,7 +47,7 @@ public class SynergyEffect : ScriptableObject
     public SpawnPositionType SpawnPositionType;
     public float Power;
     public float AttackDealy = 1;
-    public GameObject AttackPrefab => Manager.Resources.Get<GameObject>(AttackAddress);
+    public GameObject AttackPrefab => Manager.Resources.Load<GameObject>(AttackAddress);
     public string AttackAddress;
 
     //[Header("EffectType")]

@@ -297,7 +297,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
             try
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(tickInterval), cancellationToken: destroyToken);
+                await UniTask.WaitForSeconds(tickInterval, cancellationToken: destroyToken);
             }
             catch (OperationCanceledException)
             {
@@ -362,7 +362,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsStunned.Value = true;
 
-        await UniTask.Delay(TimeSpan.FromSeconds(stunTime), cancellationToken: this.GetCancellationTokenOnDestroy());
+        await UniTask.WaitForSeconds(stunTime, cancellationToken: this.GetCancellationTokenOnDestroy());
 
         if (IsDead)
             return;
@@ -388,7 +388,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         CurrentAttackData = attackData;
 
-        await UniTask.Delay(TimeSpan.FromSeconds(_duration), cancellationToken: this.GetCancellationTokenOnDestroy());
+        await UniTask.WaitForSeconds(_duration, cancellationToken: this.GetCancellationTokenOnDestroy());
 
         CurrentAttackData = Status.Data.AttackData;
     }
@@ -415,7 +415,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         try
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.Duration), cancellationToken: token);
+            await UniTask.WaitForSeconds(buffEffectData.Duration, cancellationToken: token);
 
             RemoveStat(buffEffectData.StatType, source);
         }
@@ -447,7 +447,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         for (int i = 0; i < count; i++)
         {
             AddStat(buffEffectData.StatType, value, source);
-            await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.TickInterval), cancellationToken: _cts.Token);
+            await UniTask.WaitForSeconds(buffEffectData.TickInterval, cancellationToken: _cts.Token);
         }
     }
     #endregion

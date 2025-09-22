@@ -23,7 +23,7 @@ public class BuffRangedSkill : RangedSkill
     
     public override void Active(IAttacker attacker)
     {
-        GameObject spawnObject = Manager.Resources.Get<GameObject>(EffectAddress);
+        GameObject spawnObject = Manager.Resources.Load<GameObject>(EffectAddress);
 
         SplashBuffProjectile projectile = ComponentProvider.Get<SplashBuffProjectile>(
             Manager.Resources.Instantiate<GameObject>(
@@ -93,7 +93,7 @@ public class BuffRangedSkill : RangedSkill
             return GetTargetSingle(attacker)?.transform;
         }
     }
-
+#if UNITY_EDITOR
     public override void DrawGizmos(IAttacker attacker)
     {
         base.DrawGizmos(attacker);
@@ -102,4 +102,5 @@ public class BuffRangedSkill : RangedSkill
 
         Gizmos.DrawWireSphere(attacker.GetCenter(), _radius);
     }
+#endif
 }

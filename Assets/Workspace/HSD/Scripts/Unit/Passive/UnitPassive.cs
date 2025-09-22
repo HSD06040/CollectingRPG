@@ -363,7 +363,8 @@ public class UnitPassive
         GameObject unitObj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
         unitObj.name = "SpawnUnit";
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(unitObj);
-        
+        UnitData data = Manager.Resources.Load<UnitData>(Effect.UnitDataAddress);
+
         if (Effect.IsMultiplier)
         {
             if (spawnUnit == null)
@@ -374,6 +375,7 @@ public class UnitPassive
                 if (Effect.IsMultiplier)
                 {
                     spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;
+                    spawnUnit.Status = new UnitStatus(data, Effect.UnitLevel);
                     spawnUnit.Init(Effect.SpawnUnitStats);
                     spawnUnit.Fight();
                 }
@@ -384,7 +386,8 @@ public class UnitPassive
             }
             else if (Effect.SpawnType == SpawnStatType.LowUpgrade)
             {
-                spawnUnit.Status.Level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
+                int level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
+                spawnUnit.Status = new UnitStatus(data, level);
                 spawnUnit.Init();
             }
         }

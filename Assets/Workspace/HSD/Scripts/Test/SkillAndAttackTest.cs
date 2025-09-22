@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,12 @@ public class SkillAndAttackTest : MonoBehaviour
         unit.Status = unitStatus;
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+            UseSkill();
+    }
+
     [ContextMenu("UseSkill")]   
     public void UseSkill()
     {
@@ -46,7 +53,7 @@ public class SkillAndAttackTest : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        skill.DrawGizmos(unit);               
+        skill.DrawGizmos(unit);
 
         if(attackData is SplashAttack splash)
         {
@@ -54,3 +61,4 @@ public class SkillAndAttackTest : MonoBehaviour
         }
     }
 }
+#endif

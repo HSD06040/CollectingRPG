@@ -21,6 +21,8 @@ public class SynergyEffectEditor : Editor
     private SerializedProperty isUnitPositionProp;
     private SerializedProperty IsMultiplierProp;
     private SerializedProperty spawnTypeProp;
+    private SerializedProperty unitDataAddressProp;
+    private SerializedProperty unitLevelProp;
     private SerializedProperty spawnUnitStatsProp;
     private SerializedProperty spawnSynergyProp;
     private SerializedProperty spawnAddressProp;
@@ -62,6 +64,8 @@ public class SynergyEffectEditor : Editor
         isUnitPositionProp = serializedObject.FindProperty("IsUnitPosition");
         IsMultiplierProp = serializedObject.FindProperty("IsMultiplier");
         spawnTypeProp = serializedObject.FindProperty("SpawnType");
+        unitDataAddressProp = serializedObject.FindProperty("UnitDataAddress");
+        unitLevelProp = serializedObject.FindProperty("UnitLevel");
         spawnUnitStatsProp = serializedObject.FindProperty("SpawnUnitStats");
         spawnSynergyProp = serializedObject.FindProperty("SpawnSynergy");
         spawnAddressProp = serializedObject.FindProperty("SpawnAddress");
@@ -125,10 +129,16 @@ public class SynergyEffectEditor : Editor
             DrawColoredSection(() =>
             {
                 EditorGUILayout.PropertyField(isUnitPositionProp, new GUIContent("스폰위치 설정", "유닛위치 or 전장중앙"));
-                EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("가중치 적용여부"));
+                EditorGUILayout.PropertyField(IsMultiplierProp, new GUIContent("가중치 적용여부")); 
+                EditorGUILayout.PropertyField(spawnTypeProp, new GUIContent("스폰할 유닛 스텟 타입", "시너지 유닛의 Level에 따른 or 한단계 낮은 레벨로 소환"));
+                EditorGUILayout.PropertyField(unitDataAddressProp, new GUIContent("유닛 데이터 주소"));
+
+                if ((SpawnStatType)spawnTypeProp.intValue == SpawnStatType.Level)
+                {
+                    EditorGUILayout.PropertyField(unitLevelProp, new GUIContent("레벨 설정"));
+                }
                 if (IsMultiplierProp.boolValue)
                 {
-                    EditorGUILayout.PropertyField(spawnTypeProp, new GUIContent("스폰할 유닛 스텟 타입", "시너지 유닛의 Level에 따른 or 한단계 낮은 레벨로 소환"));
                     EditorGUILayout.PropertyField(spawnUnitStatsProp, new GUIContent("가중치"));
                 }
                 EditorGUILayout.PropertyField(spawnSynergyProp, new GUIContent("스폰 시너지"));

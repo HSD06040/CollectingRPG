@@ -44,12 +44,12 @@ public class PrefabLayerSetter : MonoBehaviour
             Transform child = prefab.transform.GetChild(0);
             child.tag = "UnitTrigger";
 
-            if(child.TryGetComponent<BaseFSM>(out var fsm))
+            if(!child.TryGetComponent<BaseFSM>(out var fsm))
                 fsm = child.AddComponent<BaseFSM>();
 
             fsm.Owner = prefab.GetComponent<UnitBase>();
 
-            if(child.TryGetComponent<BoxCollider2D>(out var boxCol))
+            if(!child.TryGetComponent<BoxCollider2D>(out var boxCol))
                 boxCol = child.AddComponent<BoxCollider2D>();
 
             boxCol.isTrigger = true;

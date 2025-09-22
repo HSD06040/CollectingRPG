@@ -17,7 +17,7 @@ MonoBehaviour:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_OptimizeCatalogSize: 0
-  m_BuildRemoteCatalog: 0
+  m_BuildRemoteCatalog: 1
   m_BundleLocalCatalog: 0
   m_CatalogRequestsTimeout: 0
   m_DisableCatalogUpdateOnStart: 0
@@ -59,6 +59,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4d9769c7d7c014246864db2b74b54c77, type: 2}
   - {fileID: 11400000, guid: b22a49f8ef73f7b47b4fc865f944aa31, type: 2}
   - {fileID: 11400000, guid: 5887ff97a1076e745afd61494511493c, type: 2}
+  - {fileID: 11400000, guid: c7d9e88cdfe70c24cb1195d3a2b688b0, type: 2}
   - {fileID: 11400000, guid: c40cbe70f096406458a0bd0323aa4b0c, type: 2}
   - {fileID: 11400000, guid: ffe3c21e66a769a4989d5c81f7b4410e, type: 2}
   m_BuildSettings:
@@ -81,7 +82,7 @@ MonoBehaviour:
       - m_Id: f0b29cefe23d49048b36e671cedbf841
         m_Value: ServerData/[BuildTarget]
       - m_Id: fce38b4c6a90b924cb31883180d55c9b
-        m_Value: http://[PrivateIpAddress]:[HostingServicePort]
+        m_Value: https://storage.googleapis.com/collectingrpg_addressable/[BuildTarget]
     m_ProfileEntryNames:
     - m_Id: 647b378318717d2418d52b5c13b7e178
       m_Name: BuildTarget

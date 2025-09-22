@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine;
+    using UnityEngine;
 
 [CreateAssetMenu(fileName = "SplashAttack", menuName = "Data/Unit/Attack/Splash")]
 public class SplashAttack : UnitAttackData

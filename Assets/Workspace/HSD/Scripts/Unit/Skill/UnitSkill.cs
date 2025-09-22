@@ -38,17 +38,16 @@ public abstract class UnitSkill : ScriptableObject
         
         if (EffectSpawnType == EffectSpawnType.Target)
         {
-            Manager.Resources.Destroy(
-                Manager.Resources.Instantiate<GameObject>(
+            Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(
                     EffectAddress,
                     attacker.GetTarget().gameObject.GetCenterPosition(),
                     true
-                ),
-             2f);
+                ), 
+            2f);
         }
         else
         {
-            GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
+            GameObject prefab = Manager.Resources.Load<GameObject>(EffectAddress);
             GameObject obj = Manager.Resources.Instantiate(
                 prefab,
                 GetSpawnPoint(attacker),

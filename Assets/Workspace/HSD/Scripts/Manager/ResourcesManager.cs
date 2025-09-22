@@ -13,7 +13,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     public Sprite sprite;
 
     #region Get
-    public async UniTask<T> Get<T>(AssetReference reference) where T : Object
+    public async UniTask<T> LoadRefAsync<T>(AssetReference reference) where T : Object
     {
         string primaryKey = await GetPrimaryKey(reference);
         
@@ -23,10 +23,26 @@ public class ResourcesManager : Singleton<ResourcesManager>
         return _resources[primaryKey] as T;
     }
 
-    public T Get<T>(string address) where T : Object
+    public T Load<T>(string address) where T : Object
     {
         if (!_resources.ContainsKey(address))
+        {
+            Debug.Log($"[AddressableSystem] {address} 주소의 에셋이 로드되지 않았습니다.");
             return null;
+        }
+
+        return _resources[address] as T;
+    }
+
+    public async UniTask<T> LoadAsync<T>(string address) where T : Object
+    {
+        if (!_resources.ContainsKey(address))
+        {
+            var handle = Addressables.LoadAssetAsync<T>(address);
+            var asset = await handle.Task;
+
+            _resources.Add(address, asset);
+        }
 
         return _resources[address] as T;
     }
@@ -147,19 +163,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
         return result.ToArray();
     }
 
-    public async UniTask<T> Load<T>(string path) where T : Object
-    {
-        if (!_resources.ContainsKey(path))
-        {
-            var handle = Addressables.LoadAssetAsync<T>(path);
-            var asset = await handle.Task;
-
-            _resources.Add(path, asset);
-        }
-
-        return _resources[path] as T;
-    }
-
     public async UniTask<T> Load<T>(AssetReference reference) where T : Object
     {
         string primaryKey = await GetPrimaryKey(reference);
@@ -263,7 +266,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public T Instantiate<T>(string path, Vector3 position, Quaternion rotation, Transform parent, bool isPool = false) where T : Object
     {
-        T obj = Get<T>(path);
+        T obj = Load<T>(path);
         return Instantiate(obj, position, rotation, parent, isPool);
     }
 

@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
@@ -24,6 +21,7 @@ public class BuffSkill : UnitSkill
         if (TargetType == TargetType.Self)
         {
             attacker.GetStatusController().ApplyEffect(BuffEffectData, (int)Power, name);
+            return;
         }
 
         if (Priority == Priority.None)

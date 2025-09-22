@@ -13,7 +13,7 @@ public class EffectController : IDisposable
     {
         _cts = cts;
         _transform = transform;
-        _addressData = Manager.Resources.Get<EffectAddressData>("Data/EffectAddressData");
+        _addressData = Manager.Resources.Load<EffectAddressData>("Data/EffectAddressData");
     }
 
     public void AddBuffEffect(BuffEffect buffEffect, float duration = 2)
@@ -31,7 +31,7 @@ public class EffectController : IDisposable
 
     private async UniTask SpawnEffect(string address, float duration, Vector3 spawnPos,CancellationToken token)
     {
-        GameObject effectPrefab = Manager.Resources.Get<GameObject>(address);
+        GameObject effectPrefab = Manager.Resources.Load<GameObject>(address);
         GameObject effect = Manager.Resources.Instantiate(effectPrefab, spawnPos, effectPrefab.transform.rotation, _transform, true);
 
         try

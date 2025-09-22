@@ -13,7 +13,6 @@ public class UnitBase : MonoBehaviour, IAttacker
             SetAnimator(value);
         }
     }
-
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
@@ -60,7 +59,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     #endregion
 
     public void Init(UnitStats plusUnitStat = null)
-    {  
+    {
         Col.enabled = true;
         _fsm.Init(this);
         StatusController.Init(Status, plusUnitStat);

@@ -34,7 +34,7 @@ public class RangedSkill : AttackSkill
 
     protected GameObject GetExplosionEffect()
     {
-        return Manager.Resources.Get<GameObject>(_explosionEffect);
+        return Manager.Resources.Load<GameObject>(_explosionEffect);
     }
 
     private GameObject GetTargetSingle(IAttacker attacker)

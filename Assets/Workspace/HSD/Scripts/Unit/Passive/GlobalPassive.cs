@@ -340,9 +340,10 @@ public class GlobalPassive
         Debug.Log($"[시너지 스폰 시스템] {_effect.SpawnPrefab.name} 소환");
 
         Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(_effect.SpawnEffectPrefab, pos, true), 2);
-        GameObject obj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
-        obj.name = "SpawnUnit";
-        UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
+        GameObject unitObj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
+        unitObj.name = "SpawnUnit";
+        UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(unitObj);
+        UnitData data = Manager.Resources.Load<UnitData>(_effect.UnitDataAddress);
 
         if (_effect.IsMultiplier)
         {
@@ -352,9 +353,9 @@ public class GlobalPassive
             if (_effect.SpawnType == SpawnStatType.Level)
             {
                 if (_effect.IsMultiplier)
-                {
+                {                    
                     spawnUnit.StatusController.StatMultiplier = _effect.UnitStatMultiplier;
-                    spawnUnit.Status.Data = Manager.Data.UnitDataDic["10001"];
+                    spawnUnit.Status = new UnitStatus(data, _effect.UnitLevel);
                     spawnUnit.Init(_effect.SpawnUnitStats);
                     spawnUnit.Fight();
                 }
@@ -365,7 +366,8 @@ public class GlobalPassive
             }
             else if (_effect.SpawnType == SpawnStatType.LowUpgrade)
             {
-                spawnUnit.Status.Level = unit.Status.Level - 1 >= 0 ? unit.Status.Level - 1 : 0;
+                int level = unit.Status.Level - 1 >= 0 ? unit.Status.Level - 1 : 0;
+                spawnUnit.Status = new UnitStatus(data, level);
                 spawnUnit.Init();
             }
         }

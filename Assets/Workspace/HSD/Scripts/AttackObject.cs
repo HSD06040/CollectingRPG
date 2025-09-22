@@ -33,8 +33,8 @@ public class AttackObject : MonoBehaviour
 
     private async UniTask Attack()
     {
-        await UniTask.Delay(TimeSpan.FromSeconds(_delay));
-        Debug.Log("공격");
+        await UniTask.WaitForSeconds(_delay);
+        
         foreach (var target in Utils.GetTargetsNonAlloc(GetAttackPoint(transform), _searchType, _sizeOrRadius, _boxSize, _targetLayer))
         {
             ComponentProvider.Get<UnitBase>(target.gameObject).StatusController.TakeDamage((int)_power);
