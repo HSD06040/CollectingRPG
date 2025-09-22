@@ -8,9 +8,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 public enum CsvType
 {
-    UnitStat,
-    Skill,
-    Monster
+    PlayerUnit,
+    MonsterSkillData,
+    Monster,
+    PlayerSkillData,    
 }
 
 public class CsvDownloader
@@ -87,9 +88,9 @@ public class CsvDownloader
     {
         switch(csvType)
         {
-            case CsvType.UnitStat:
+            case CsvType.PlayerUnit:
                 return UnitStatSetup;
-            case CsvType.Skill:
+            case CsvType.MonsterSkillData:
                 return UnitSkillSetup;
             case CsvType.Monster: 
                 return MonsterSetup;
