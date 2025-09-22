@@ -23,6 +23,11 @@ public enum Grade
     NORMAL, RARE, UNIQUE, LEGENDARY
 }
 
+public enum SubGrade
+{
+    SILVER, GOLD, PRISM
+}
+
 #region Type
 public enum AnimatorType
 {
@@ -88,6 +93,7 @@ public enum TriggerType
     Base,
     OnBattleStart,
     OnDied,
+    OnEnemyDied,
     OnAttack,
     OnUseSkill,
     OnInterval,
@@ -102,10 +108,12 @@ public enum EffectTargetType
     Enemy,
     Ally,
     SameSynergy,
+    SameClassType,
     Column,
     Row,
     ColumnAndRow,
-    Cross
+    Cross,
+    Leader
 }
 
 /// <summary>
@@ -114,7 +122,9 @@ public enum EffectTargetType
 public enum EffectType
 {
     Buff_Debuff,
-    Increase,    
+    Increase,
+    Recover,
+    Currency
 }
 
 /// <summary>
@@ -132,6 +142,12 @@ public enum TargetType
     Ally,
     Self,
     Boss
+}
+
+public enum EffectTime
+{
+    Permanent,
+    Temporary
 }
 
 public enum AttackAreaType

@@ -59,11 +59,6 @@ public class UnitData : MetaData
             UnitStats = data.UnitStats
         };
     }
-
-    public void AddStat(StatEffectModifier modifier, bool persent = false)
-    {
-        AugmentStat.AddStat(UnitStats[0], modifier, persent);
-    }
 }
 
 [System.Serializable]
