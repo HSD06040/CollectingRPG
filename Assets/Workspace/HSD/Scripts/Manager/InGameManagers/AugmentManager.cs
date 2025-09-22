@@ -46,6 +46,11 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         }
     }
 
+    public void ReleaseAugment(UnitBase unit)
+    {
+        currentAugment.RemoveEffect(unit);
+    }
+
     public bool IsAugmentTarget(UnitBase unit)
     {
         if (currentAugment.TargetType == EffectTargetType.Ally) return true;

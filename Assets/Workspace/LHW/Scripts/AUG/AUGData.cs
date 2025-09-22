@@ -35,7 +35,16 @@ public class AUGData : MetaData
         ApplyRate(Grade);
         for (int i = 0; i < StatTypes.Length; i++)
         {
-            unit.Status.Data.UnitStats[0].AddAugments(StatTypes[i], currentRate, Name);
+            unit.Status.Data.UnitStats[0].AddAugments(StatTypes[i], currentRate, unit.Status.Data.Name);
+        }
+    }
+
+    public void RemoveEffect(UnitBase unit)
+    {
+        for (int i = 0;i < StatTypes.Length;i++)
+        {
+            unit.Status.Data.UnitStats[0].RemoveAugments(StatTypes[i], unit.Status.Data.Name);
+            Debug.Log("삭제");
         }
     }
 }

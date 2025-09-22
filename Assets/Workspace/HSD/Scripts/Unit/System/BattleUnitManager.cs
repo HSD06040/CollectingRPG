@@ -54,6 +54,8 @@ public class BattleUnitManager : MonoBehaviour
 
         RemoveFromCachedArray(unitBase);
 
+        AugmentManager.Instance.ReleaseAugment(unitBase);
+
         ClearSlot(newSlot, unitBase);
     }
 

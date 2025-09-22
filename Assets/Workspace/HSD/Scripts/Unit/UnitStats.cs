@@ -93,4 +93,9 @@ public class UnitStats
 
         return modifier;
     }
+
+    public void RemoveAugments(StatType status, string name)
+    {
+        AugmentManager.Instance.RemoveAugment(status, name);
+    }
 }
