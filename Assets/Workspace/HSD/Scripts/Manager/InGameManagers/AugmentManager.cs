@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AugmentManager : InGameSingleton<AugmentManager>
@@ -21,10 +22,12 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     [Header("Currency")]
     public Stat<float> GoldBonus;
 
+    [Header("CurrentAugment")]
     public AUGData currentAugment;
-
     // 테스트용
     [SerializeField] private AUGData AUGData;
+
+    private Dictionary<UnitBase, HashSet<string>> _appliedAugments = new();
     #endregion
 
     private void Start()
@@ -39,16 +42,41 @@ public class AugmentManager : InGameSingleton<AugmentManager>
 
     public void ApplyAugment(UnitBase unit)
     {
-        if (IsAugmentTarget(unit))
+        if(currentAugment == null) return;
+        if(!IsAugmentTarget(unit)) return;
+
+        if(!_appliedAugments.ContainsKey(unit))
+            _appliedAugments[unit] = new HashSet<string>();
+
+        if (_appliedAugments[unit].Contains(currentAugment.AUGID))
         {
-            currentAugment.ApplyEffect(unit);
-            Debug.Log("반영됨");
+            Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 이미 적용됨.");
+            return;
         }
+
+        _appliedAugments[unit].Add(currentAugment.AUGID);
+        currentAugment.ApplyEffect(unit);
     }
 
     public void ReleaseAugment(UnitBase unit)
     {
-        currentAugment.RemoveEffect(unit);
+        if (currentAugment == null) return;
+
+        if (_appliedAugments.TryGetValue(unit, out var augments))
+        {
+            if (augments.Contains(currentAugment.AUGID))
+            {
+                currentAugment.RemoveEffect(unit);
+                augments.Remove(currentAugment.AUGID);
+
+                if (augments.Count == 0)
+                    _appliedAugments.Remove(unit);
+            }
+            else
+            {
+                Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 적용되지 않아 해제할 수 없음.");
+            }
+        }
     }
 
     public bool IsAugmentTarget(UnitBase unit)
@@ -56,6 +84,7 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         if (currentAugment.TargetType == EffectTargetType.Ally) return true;
         else if (currentAugment.TargetType == EffectTargetType.SameClassType && unit.Status.Data.ClassSynergy == currentAugment.Class)
         {
+            Debug.Log("클래스가 같음");
             return true;
         }
         // 리더일 경우 추가 필요

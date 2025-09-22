@@ -79,14 +79,14 @@ public class UnitStats
             case StatType.MaxHealth: modifier.Value = Mathf.RoundToInt(MaxHealth * (rate / 100)); break;
             case StatType.MaxMana: modifier.Value = Mathf.RoundToInt(MaxMana * (rate / 100)); break;
             case StatType.ManaGain: modifier.Value = Mathf.RoundToInt(ManaGain * (rate / 100)); break;
-            case StatType.AttackSpeed: modifier.Value = Mathf.RoundToInt(AttackSpeed * (rate / 100)); break;
-            case StatType.MoveSpeed: modifier.Value = Mathf.RoundToInt(MoveSpeed * (rate / 100)); break;
+            case StatType.AttackSpeed: modifier.Value = AttackSpeed * (rate / 100); break;
+            case StatType.MoveSpeed: modifier.Value = MoveSpeed * (rate / 100); break;
             case StatType.PhysicalDamage: modifier.Value = Mathf.RoundToInt(PhysicalDamage * (rate / 100)); break;
             case StatType.MagicDamage: modifier.Value = Mathf.RoundToInt(MagicDamage * (rate / 100)); break;
             case StatType.CritChance: modifier.Value = Mathf.RoundToInt(CritChance * (rate / 100)); break;
             case StatType.PhysicalDefense: modifier.Value = Mathf.RoundToInt(PhysicalDefense * (rate / 100)); break;
             case StatType.MagicDefense: modifier.Value = Mathf.RoundToInt(MagicDefense * (rate / 100)); break;
-            case StatType.AttackRange: modifier.Value = Mathf.RoundToInt(AttackRange * (rate / 100)); break;
+            case StatType.AttackRange: modifier.Value = AttackRange * (rate / 100); break;
             case StatType.AttackCount: modifier.Value = Mathf.RoundToInt(AttackCount * (rate / 100)); break;
             default: modifier.Value = 0; break;
         }
