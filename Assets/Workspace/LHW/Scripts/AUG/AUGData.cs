@@ -77,13 +77,11 @@ public class AUGData : MetaData
         {
             int increaseRate = (int)(unit.Status.Data.UnitStats[0].MaxHealth * (1 + currentRate / 100));
             unit.StatusController.IncreaseHealth(increaseRate);
-            Debug.Log($"체력 회복됨 : {increaseRate}");
         }
         else if (StatTypes[0] == StatType.MaxMana)
         {
             int increaseRate = (int)(unit.Status.Data.UnitStats[0].MaxMana * (1 + currentRate / 100));
             unit.StatusController.IncreaseMana(increaseRate);
-            Debug.Log($"마나 회복됨 : {increaseRate}");
         }
     }
 
