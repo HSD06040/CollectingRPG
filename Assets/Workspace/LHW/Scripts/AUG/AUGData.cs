@@ -1,0 +1,81 @@
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "AUGEffect", menuName = "Data/AUG/AUGEffect")]
+public class AUGData : MetaData
+{
+    public string AUGID;
+    public SubGrade Grade;
+
+    public EffectTargetType TargetType;
+    public ClassType Class;
+
+    public TriggerType Trigger;
+    public EffectType EffectType;
+    public EffectTime ApplyTime;
+
+    public StatType[] StatTypes;
+
+    public float[] Rate = new float[3];
+
+    public float currentRate;
+
+    public void ApplyRate(SubGrade grade)
+    {
+        switch (grade)
+        {
+            case SubGrade.SILVER: currentRate = Rate[0]; break;
+            case SubGrade.GOLD: currentRate = Rate[1]; break;
+            case SubGrade.PRISM: currentRate = Rate[2]; break;
+            default: currentRate = 0; break;
+        }
+    }
+
+    /// <summary>
+    /// 캐릭터 스테이터스 증강 적용
+    /// </summary>
+    /// <param name="unit"></param>
+    public void ApplyEffect(UnitBase unit)
+    {
+        ApplyRate(Grade);
+        for (int i = 0; i < StatTypes.Length; i++)
+        {
+            unit.Status.Data.UnitStats[0].AddAugments(StatTypes[i], currentRate, unit.Status.Data.Name);
+        }
+    }
+
+    /// <summary>
+    /// 재화 증강 적용
+    /// </summary>
+    public void ApplyEffect()
+    {
+        ApplyRate(Grade);
+        if (EffectType == EffectType.Currency)
+        {
+            for (int i = 0; i < StatTypes.Length; i++)
+            {
+                AugmentManager.Instance.AddAugment(StatTypes[i], currentRate, Name);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 캐릭터 스테이터스 증강 삭제
+    /// </summary>
+    /// <param name="unit"></param>
+    public void RemoveEffect(UnitBase unit)
+    {
+        for (int i = 0; i < StatTypes.Length; i++)
+        {
+            unit.Status.Data.UnitStats[0].RemoveAugments(StatTypes[i], unit.Status.Data.Name);
+            Debug.Log("삭제");
+        }
+    }
+
+    /// <summary>
+    /// 재화 증강 삭제
+    /// </summary>
+    public void RemoveEffect()
+    {
+
+    }
+}

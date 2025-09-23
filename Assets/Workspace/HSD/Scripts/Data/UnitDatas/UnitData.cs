@@ -6,7 +6,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Unit_Data", menuName = "Data/Unit/Unit_Data")]
 public class UnitData : MetaData
 {
-    [Header("MetaData")]    
+    [Header("MetaData")]
+    public Grade Grade;
     public string AddressableAddress;
     public GameObject UnitPrefab => Manager.Resources.Get<GameObject>(AddressableAddress);
     public int ID;
@@ -22,7 +23,8 @@ public class UnitData : MetaData
     public UnitAttackData AttackData; // Melee, Ranged 등 공격 타입에 따라 다름
 
     [Header("Unit_Stat")]    
-    public UnitStats[] UnitStats;
+    public UnitStats[] UnitStats; // 3개 1,2,3 성
+    public UnitStats AugmentStat = new();
 
     [Header("Synergy")]
     public ClassType ClassSynergy;
@@ -41,4 +43,34 @@ public class UnitData : MetaData
     {
         UpgradeData?.Init(Grade, LevelUpData);
     }
+
+    public UnitDataDTO ToDTO(UnitData data)
+    {
+        return new UnitDataDTO
+        {
+            ClassSynergy = (int)data.ClassSynergy,
+            Cost = data.Cost,
+            Description = data.Description,
+            Grade = data.Grade,
+            ID = data.ID,
+            Name = data.name,
+            PrefferedLine = data.PerferredLine,
+            Synergy = (int)data.Synergy,
+            UnitStats = data.UnitStats
+        };
+    }
+}
+
+[System.Serializable]
+public class UnitDataDTO
+{
+    public int ClassSynergy;
+    public int Cost;
+    public string Description;
+    public Grade Grade;
+    public int ID;
+    public string Name;
+    public int PrefferedLine;
+    public int Synergy;
+    public UnitStats[] UnitStats;
 }

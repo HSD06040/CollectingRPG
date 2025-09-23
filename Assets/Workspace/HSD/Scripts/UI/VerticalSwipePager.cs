@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -47,12 +48,14 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
 
     private float _lastDragDeltaX;
     private bool _isBattle => InGameManager.Instance.IsBattle;
-    private Camera cam;
+    private Canvas _canvas;
+    private Camera _cam;
 
     #region LifeCycle
     private void Start()
     {
-        cam = Camera.main;
+        _canvas = GetComponentInParent<Canvas>();
+        _cam = Camera.main;
         _slotPositionSetter.SetPositions();
         Init();
     }
@@ -85,7 +88,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
             _originalPagePositions[i] = _pages[i].position;
         }
 
-        _initialCameraX = cam.transform.position.x;
+        _initialCameraX = _cam.transform.position.x;
 
         SetAnchorPos();
         MoveToPage(_currentPage, instant: true);
@@ -115,14 +118,14 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
             _lastDragDeltaX = deltaX;
 
             _targetCameraX = Mathf.Clamp(
-                cam.transform.position.x + deltaX,
+                _cam.transform.position.x + deltaX,
                 _initialCameraX,
                 _initialCameraX + XLimit
             );
 
-            Vector3 camPos = cam.transform.position;
+            Vector3 camPos = _cam.transform.position;
             camPos.x = _targetCameraX;
-            cam.transform.position = camPos;
+            _cam.transform.position = camPos;
             return;
         }
 
@@ -148,11 +151,11 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
         {
             float flingDistance = _lastDragDeltaX * _xDragSensitivity;
 
-            float targetX = cam.transform.position.x + flingDistance;
+            float targetX = _cam.transform.position.x + flingDistance;
 
             _targetCameraX = Mathf.Clamp(targetX, _initialCameraX, _initialCameraX + XLimit);
 
-            cam.transform.DOMoveX(_targetCameraX, _xTweenDuration)
+            _cam.transform.DOMoveX(_targetCameraX, _xTweenDuration)
             .OnComplete(OnCameraMoved);
 
             _lastDragDeltaX = 0;
@@ -184,7 +187,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
     {
         _currentPage = pageIndex;
 
-        float height = Screen.height;
+        float height = ((RectTransform)_canvas.transform).rect.height;
         Vector2 targetPos = new Vector2(0, -pageIndex * height);
 
         if (instant)
@@ -204,11 +207,13 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
     {
         Vector2 uiOffset = _content.anchoredPosition - _originalUIPosition;
 
-        Vector3 screenOffset = new Vector3(0, uiOffset.y, 0);
+        RectTransform canvasRect = (RectTransform)_canvas.transform;
 
-        Vector3 worldOffset = cam.ScreenToWorldPoint(
-            cam.WorldToScreenPoint(Vector3.zero) + screenOffset
-        ) - cam.ScreenToWorldPoint(Camera.main.WorldToScreenPoint(Vector3.zero));
+        float distance = Mathf.Abs(_cam.transform.position.z - _pages[0].position.z);
+        float worldCanvasHeight = 2f * distance * Mathf.Tan(_cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
+
+        float worldPerPixel = worldCanvasHeight / canvasRect.rect.height;
+        float worldOffsetY = uiOffset.y * worldPerPixel;
 
         for (int i = 0; i < _pages.Length; i++)
         {
@@ -216,14 +221,14 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
 
             if (i == 1)
             {
-                basePos = cam.transform.position + (Vector3)_cameraOffset;
+                basePos = _cam.transform.position + (Vector3)_cameraOffset;
             }
             else
             {
                 basePos = _originalPagePositions[i];
             }
 
-            _pages[i].position = basePos + worldOffset;
+            _pages[i].position = basePos + new Vector3(0, worldOffsetY, 0);
         }
     }
 
@@ -231,27 +236,28 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
     {
         for (int i = 0; i < _content.childCount; i++)
         {
+            RectTransform rt = (RectTransform)_canvas.transform;
             RectTransform panel = _content.GetChild(i).GetComponent<RectTransform>();
-            panel.anchoredPosition = new Vector2(0, i * panel.rect.height);
+            panel.anchoredPosition = new Vector2(0, i * rt.rect.height);
         }
     }
 
     public void MoveToEnemy()
     {
         float targetX = _initialCameraX + XLimit;
-        cam.transform.DOMoveX(targetX, 0.3f)
+        _cam.transform.DOMoveX(targetX, 0.3f)
             .OnComplete(OnCameraMoved);
     }
 
     public void MoveToBattle()
     {
-        cam.transform.DOMoveX(_initialCameraX, 0.3f)
+        _cam.transform.DOMoveX(_initialCameraX, 0.3f)
             .OnComplete(OnCameraMoved);
     }
 
     private void OnCameraMoved()
     {
-        if (cam.transform.position.x > XLimit / 2)
+        if (_cam.transform.position.x > XLimit / 2)
         {
             _switchButtonController.EnemySlotButtonSetting();
         }

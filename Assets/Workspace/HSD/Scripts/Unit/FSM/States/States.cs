@@ -192,6 +192,7 @@ public class SkillState : AnimationFinishedState
     {
         base.Enter();
         _status.OnUseSkill?.Invoke(_status.Status);
+        _status.OnSkill?.Invoke();
     }
 
     public override void Exit()

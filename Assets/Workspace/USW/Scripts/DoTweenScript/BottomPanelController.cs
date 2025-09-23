@@ -13,6 +13,10 @@ public class BottomPanelController : MonoBehaviour
         public Image _light;
         public Image _innerShadow;
         public GameObject _panel;
+        public Image _buttonImage;
+
+        [Header("Sprite")] public Sprite _activeSprite;
+        public Sprite _inactiveSprite;
     }
 
     [Header("Panel Buttons (5개)")] public PanelButton[] panelButtons = new PanelButton[5];
@@ -78,6 +82,8 @@ public class BottomPanelController : MonoBehaviour
 
         btn._light.DOColor(selectedLight, 0.05f).SetEase(Ease.Linear);
         btn._innerShadow.DOColor(selectedAdditional, 0.05f).SetEase(Ease.Linear);
+        
+        btn._buttonImage.sprite = btn._activeSprite;
     }
 
     void AnimateDeselect(int index)
@@ -91,6 +97,8 @@ public class BottomPanelController : MonoBehaviour
         btn._background.DOColor(deselectedBg, 0.05f).SetEase(Ease.Linear);
         btn._light.DOColor(deselectedLight, 0.05f).SetEase(Ease.Linear);
         btn._innerShadow.DOColor(deselectedAdditional, 0.05f).SetEase(Ease.Linear);
+        
+        btn._buttonImage.sprite = btn._inactiveSprite;
     }
 
     void SetSelected(int index, bool selected)
@@ -103,6 +111,7 @@ public class BottomPanelController : MonoBehaviour
             btn._background.color = selectedBg;
             btn._light.color = selectedLight;
             btn._innerShadow.color = selectedAdditional;
+            btn._buttonImage.sprite = btn._activeSprite;
         }
         else
         {
@@ -110,6 +119,7 @@ public class BottomPanelController : MonoBehaviour
             btn._background.color = deselectedBg;
             btn._light.color = deselectedLight;
             btn._innerShadow.color = deselectedAdditional;
+            btn._buttonImage.sprite = btn._inactiveSprite;
         }
     }
 }

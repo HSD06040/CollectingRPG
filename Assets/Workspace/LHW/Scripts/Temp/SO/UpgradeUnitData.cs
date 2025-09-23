@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Unit_TempUpgradeUnitData", menuName = "Data/Temp/Unit_TempUpgradeUnitData")]
+[CreateAssetMenu(fileName = "Unit_UpgradeUnitData", menuName = "Data/Upgrade/Unit_UpgradeUnitData")]
 public class UpgradeUnitData : ScriptableObject
 {
     // 캐릭터의 업그레이드 레벨 - 레벨이 0일 때는 획득하지 않은 상태

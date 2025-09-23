@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
@@ -70,9 +71,11 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     private readonly Dictionary<SourceKey, CancellationTokenSource> _activeBuffs = new Dictionary<SourceKey, CancellationTokenSource>(10);
 
+    public UnitAttackData CurrentAttackData;    
+
     [HideInInspector] public float StatMultiplier = 0;
 
-    public bool IsDead { get; set; }
+    public bool IsDead { get; set; }    
 
     private void OnDestroy()
     {
@@ -94,6 +97,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             );
 
         Status = status;
+        CurrentAttackData = Status.Data.AttackData;
         IsDead = false;
         IsStund.Value = false;
 
@@ -104,7 +108,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         else
         {
             SetBaseStat(status.GetCurrentStat(), plusUnitStat);
-        }
+        }        
     }
 
     #region SetStat
@@ -265,7 +269,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         }
 
         CurHp.Value = Mathf.Clamp(CurHp.Value - amount, 0, int.MaxValue);
-        UnitFXController.Flash();
+        UnitFXController?.Flash();
 
         if (CurHp.Value <= 0)
         {
@@ -306,8 +310,16 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region Increase
     public void IncreaseHealth(int amount)
     {
+        if(amount < 0)
+        {
+            Debug.Log($"{amount} 만큼 피해를 입음");
+            TakeDamage(amount);
+            return;
+        }
+
         CurHp.Value += amount;
 
+        Debug.Log($"[체력회복] {amount} 만큼 체력 회복");
         if(CurHp.Value > MaxHealth.Value)
         {
             CurHp.Value = MaxHealth.Value;
@@ -329,7 +341,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     }
 
     public void IncreaseShield(int amount)
-    {        
+    {
+        Debug.Log($"[쉴드추가] {amount} 만큼 쉴드추가");
         Shield.Value += amount;
     }
     #endregion
@@ -344,7 +357,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsStund.Value = true;
 
-        await UniTask.Delay(TimeSpan.FromSeconds(stunTime));
+        await UniTask.Delay(TimeSpan.FromSeconds(stunTime), cancellationToken: this.GetCancellationTokenOnDestroy());
 
         if (IsDead)
             return;
@@ -359,11 +372,33 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         OnDied?.Invoke();
     }
 
+    public void AttackDataChange(UnitAttackData attackData, float _duration)
+    {
+        ChangeAttackData(attackData, _duration).Forget();
+    }
+
+    private async UniTask ChangeAttackData(UnitAttackData attackData, float _duration)
+    {
+        CurrentAttackData = attackData;
+
+        await UniTask.Delay(TimeSpan.FromSeconds(_duration), cancellationToken: this.GetCancellationTokenOnDestroy());
+
+        CurrentAttackData = Status.Data.AttackData;
+    }
+
     #region Effect
     public void ApplyEffect(BuffEffectData buffEffectData, float value, string source)
-    {
+    {        
         var key = new SourceKey(buffEffectData.StatType, source);
 
+        if(buffEffectData.IsTicking)
+        {
+            TickEffect(buffEffectData, value, source).Forget();
+            Debug.Log($"[스텟 이펙트] {buffEffectData.StatType.ToString()}이 {buffEffectData.Duration} 동안 {buffEffectData.TickInterval} 마다 발동");
+            return;
+        }
+
+        Debug.Log($"[스텟 이펙트] {buffEffectData.StatType.ToString()}이 {buffEffectData.Duration} 동안 발동");
         if (_activeBuffs.TryGetValue(key, out var cts))
         {
             cts.Cancel();
@@ -395,9 +430,21 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             // 갱신으로 취소된 경우 RemoveStat 안 함
         }
     }
+
+    private async UniTask TickEffect(BuffEffectData buffEffectData, float value, string source)
+    {
+        int count = (int)(buffEffectData.Duration / buffEffectData.TickInterval);
+
+        for(int i = 0; i < count; i++)
+        {
+            AddStat(buffEffectData.StatType, value, source);
+            await UniTask.Delay(TimeSpan.FromSeconds(buffEffectData.TickInterval));
+        }
+    }
     #endregion
 
     #region Stat Management
+
     public void AddStat(StatType statType, float value, string source)
     {
         switch (statType)
