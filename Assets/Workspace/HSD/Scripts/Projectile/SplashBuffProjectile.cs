@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class SplashBuffProjectile : Projectile
 {
@@ -25,7 +24,7 @@ public class SplashBuffProjectile : Projectile
         {
             float power = _damageType == DamageType.Magic ? _status.MagicDamage.Value : _status.PhysicalDamage.Value;
 
-            return power * _attackPower;
+            return power * _physicalPower;
         }
     }
 
@@ -47,7 +46,7 @@ public class SplashBuffProjectile : Projectile
     }
 
     public void Init(StatEffectModifier statEffectModifier, float radius, ThrowType _throwType, ActivationCondition activationCondition, bool isAttck,
-        bool isModifier, Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed, 
+        bool isModifier, Transform target, UnitStatusController status, float attackPower, float abilityPower, DamageType damageType, LayerMask targetLayer, float speed, 
         GameObject effect, float distance = 0)
     {
         _statEffectModifier = statEffectModifier;
@@ -57,11 +56,11 @@ public class SplashBuffProjectile : Projectile
         _isModifier = isModifier;
         _isBuff = false;
 
-        base.Init(target, status, attackPower, damageType, targetLayer, speed, effect, distance);
+        base.Init(target, status, attackPower, abilityPower, damageType, targetLayer, speed, effect, distance);
     }
 
     public void Init(BuffEffectData buffEffectData, float radius, ThrowType _throwType, ActivationCondition activationCondition, bool isAttck,
-        bool isModifier, Transform target, UnitStatusController status, float attackPower, DamageType damageType, LayerMask targetLayer, float speed,
+        bool isModifier, Transform target, UnitStatusController status, float attackPower, float abilityPower, DamageType damageType, LayerMask targetLayer, float speed,
         GameObject effect, float distance = 0)
     {
         _buffEffectData = buffEffectData;
@@ -71,7 +70,7 @@ public class SplashBuffProjectile : Projectile
         _isModifier = isModifier;
         _isBuff = true;
 
-        base.Init(target, status, attackPower, damageType, targetLayer, speed, effect, distance);
+        base.Init(target, status, attackPower, abilityPower, damageType, targetLayer, speed, effect, distance);
     }
 
     protected override void OnTriggerEnter2D(Collider2D collision)
@@ -99,32 +98,11 @@ public class SplashBuffProjectile : Projectile
             }
         }        
     }
-
-    private void ApplyEffect(GameObject obj)
-    {
-        _targetStatus = ComponentProvider.Get<UnitBase>(obj.gameObject).StatusController;
-
-        if (_isAttck)
-        {
-            _status.CalculateDamage(_attackPower, _damageType, _targetStatus);
-        }
-
-        if(_isModifier)
-        {
-            if (_isBuff)
-            {
-                _targetStatus.ApplyEffect(_buffEffectData, _attackPower, name);
-            }
-            else
-            {
-                _targetStatus.AddStat(_statEffectModifier.StatType, _attackPower, name);
-            }
-        }        
-    }
-
     protected override async UniTask MoveAndDestroy(float duration)
     {
         await UniTask.Yield();
+
+        Vector2 dir = (_target.position - transform.position).normalized;
 
         if (_throwType == ThrowType.Straight)
         {
@@ -132,12 +110,15 @@ public class SplashBuffProjectile : Projectile
                 .SetEase(Ease.Linear).SetSpeedBased()
                 .AsyncWaitForCompletion();
 
-            if(_activationCondition == ActivationCondition.Target)
+            if (_activationCondition == ActivationCondition.Target)
             {
                 foreach (var target in Physics2D.OverlapCircleAll(transform.position, _radius, _targetLayer))
                 {
                     ApplyEffect(target.gameObject);
                 }
+
+                GameObject effect = SpawnEffect();
+                effect.transform.right = dir;
             }
         }
         else if (_throwType == ThrowType.Parabola)
@@ -172,5 +153,27 @@ public class SplashBuffProjectile : Projectile
         }
 
         ProjectileDestroy();
+    }
+
+    private void ApplyEffect(GameObject obj)
+    {
+        _targetStatus = ComponentProvider.Get<UnitBase>(obj.gameObject).StatusController;
+
+        if (_isAttck)
+        {
+            _status.CalculateDamage(_physicalPower, _abilityPower, _damageType, _targetStatus);
+        }
+
+        if(_isModifier)
+        {
+            if (_isBuff)
+            {
+                _status.ProvideEffect(_buffEffectData, _abilityPower, name, _targetStatus);
+            }
+            else
+            {
+                _status.ProvideStat(_statEffectModifier, _abilityPower, name, _targetStatus);
+            }
+        }        
     }
 }

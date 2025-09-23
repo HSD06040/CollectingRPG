@@ -17,14 +17,12 @@ public class UnitMeleeAttack : UnitAttackData
             return;
         }
 
-        status.CalculateDamage(
-            AttackPower,
-            DamageType,
+        status.CalculateDamage(            
             ComponentProvider.Get<UnitBase>(attacker.GetTarget()?.gameObject).StatusController
             );
 
-        GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
-        GameObject obj = Manager.Resources.Instantiate(prefab, attacker.GetTarget().gameObject.GetCenter(), true);
+        GameObject prefab = Manager.Resources.Load<GameObject>(EffectAddress);
+        GameObject obj = Manager.Resources.Instantiate(prefab, attacker.GetTarget().gameObject.GetCenterPosition(), true);
 
         // 항상 프리팹 기준 스케일로 초기화
         obj.transform.localScale = prefab.transform.localScale;

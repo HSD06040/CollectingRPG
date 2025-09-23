@@ -12,21 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e0f65ebd5830d045872b490d8f8f42b, type: 3}
   m_Name: Forest3
   m_EditorClassIdentifier: 
-  ID: 0
+  ID: 202003
   Icon: {fileID: 0}
   SkillName: 
   Description: 
   MaxCount: 1
   Powers: []
-  Power: 1
+  Power: 350
   ManaCost: 0
   Priority: 1
-  EffectAddress: 
+  EffectAddress: ForestArrow_Projectile
   EffectSpawnType: 0
-  SpawnPointOffset: {x: 0, y: 0}
+  SpawnPointOffset: {x: 0.43, y: 0.04}
   DamageType: 0
-  _projectileSpeed: 10
-  _explosionEffect: 
+  _projectileSpeed: 15
+  _explosionEffect: ForestArrowExplosion_Skill
   _distance: 5
   _activationCondition: 2
   _throwType: 1
@@ -35,7 +35,7 @@ MonoBehaviour:
   _isModifier: 0
   _isBuff: 0
   _isAlly: 0
-  _radius: 2
+  _radius: 1.7
   _buffEffectData:
     StatType: 0
     Duration: 0

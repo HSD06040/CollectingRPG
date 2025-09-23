@@ -10,7 +10,7 @@ public class MagicStoneData : ScriptableObject
     public string Name;
     [TextArea]
     public string Description;
-    public GameObject Prefab => Manager.Resources.Get<GameObject>(Address);
+    public GameObject Prefab => Manager.Resources.Load<GameObject>(Address);
     public string Address;
 
     public bool IsBuff;

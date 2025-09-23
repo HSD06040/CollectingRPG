@@ -1,7 +1,4 @@
-using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,8 +16,16 @@ public class DamageMeterSlot : MonoBehaviour, IDamageMeterView
 
     public static event Action OnDamaged;
 
+    private void Awake()
+    {
+        _damageSlider.value = 1;
+
+        // 항상 비율 기반으로 쓸 거니까 maxValue = 1 고정
+        _damageSlider.maxValue = 1f;
+    }
+
     public void Init(UnitStatusController status)
-    {        
+    {
         if (_presenter != null)
             _presenter.Dispose();
 
@@ -30,8 +35,7 @@ public class DamageMeterSlot : MonoBehaviour, IDamageMeterView
     public void SetDamage(int damage)
     {
         _totalDamage = damage;
-        _damageText.text = Utils.ToAbbreviation(damage);
-        _damageSlider.value = damage;
+        _damageText.LerpText(damage);
         OnDamaged?.Invoke();
     }
 
@@ -40,17 +44,14 @@ public class DamageMeterSlot : MonoBehaviour, IDamageMeterView
         _icon.sprite = icon;
     }
 
-    public void SetSliderMaxValue(int _maxDamage)
-    {
-        _damageSlider.maxValue = _maxDamage;        
-    }
-
     public void SetNumber(int num)
     {
         _numberText.text = num.ToString();
     }
-    public void RefreshValue()
+
+    public void RefreshValue(int maxDamage)
     {
-        _damageSlider.value = _totalDamage;
+        float ratio = maxDamage > 0 ? (float)_totalDamage / maxDamage : 0f;
+        _damageSlider.Lerp(ratio);
     }
 }

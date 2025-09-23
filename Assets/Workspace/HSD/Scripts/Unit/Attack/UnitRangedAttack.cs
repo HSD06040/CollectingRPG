@@ -25,13 +25,13 @@ public class UnitRangedAttack : UnitAttackData
 
         attacker.GetStatusController().GetMana();
 
-        projectile.Init(
-            attacker.GetTarget(),
-            attacker.GetStatusController(),
-            AttackPower,
-            DamageType,
-            attacker.TargetLayer,
-            _projectileSpeed
-            );
+        //projectile.Init(
+        //    attacker.GetTarget(),
+        //    attacker.GetStatusController(),
+        //    AttackPower,            
+        //    DamageType,
+        //    attacker.TargetLayer,
+        //    _projectileSpeed
+        //    );
     }
 }
