@@ -2,10 +2,11 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using static UnitAnimatorData;
 
 public class DataManager : Singleton<DataManager>
 {
+    private UnitAnimatorData _animatorData;
+
     // 유닛 데이터 관련
     public Dictionary<string, UnitData> UnitDataDic;
     public Dictionary<AnimatorData, RuntimeAnimatorController> AnimatorDic;
@@ -87,27 +88,42 @@ public class DataManager : Singleton<DataManager>
 
     private async UniTask AnimatorSetting()
     {
-        UnitAnimatorData animatorData = await Addressables.LoadAssetAsync<UnitAnimatorData>("Data/UnitAnimatorData");
+        _animatorData = await Addressables.LoadAssetAsync<UnitAnimatorData>("Data/UnitAnimatorData");
 
-        AnimatorDic = new Dictionary<AnimatorData, RuntimeAnimatorController>(animatorData.Animators.Length);
+        AnimatorDic = new Dictionary<AnimatorData, RuntimeAnimatorController>(_animatorData.Animators.Length);
 
-        animatorData.SettingAnimationClip();
+        _animatorData.SettingAnimationClip();
 
-        foreach (var data in animatorData.Animators)
+        foreach (var data in _animatorData.Animators)
         {
-            AnimatorOverrideController newAnimator = new AnimatorOverrideController(animatorData.BaseController);
-
-            foreach (var pair in newAnimator.animationClips)
-            {
-                if (pair.name == "Melee_Attack")
-                    newAnimator[pair.name] = animatorData.GetAnimationClip(data.AttackAnimationType);
-                else if (pair.name == "Melee_Skill")
-                    newAnimator[pair.name] = animatorData.GetAnimationClip(data.SkillAnimationType);
-            }
-
-            if (!AnimatorDic.ContainsKey(data))
-                AnimatorDic.Add(data, newAnimator.runtimeAnimatorController);
+            CreateAnimator(data);
         }
+    }
+
+    private void CreateAnimator( AnimatorData data)
+    {
+        AnimatorOverrideController newAnimator = new AnimatorOverrideController(_animatorData.BaseController);
+
+        foreach (var pair in newAnimator.animationClips)
+        {
+            if (pair.name == "Melee_Attack")
+                newAnimator[pair.name] = _animatorData.GetAnimationClip(data.AttackAnimationType);
+            else if (pair.name == "Melee_Skill")
+                newAnimator[pair.name] = _animatorData.GetAnimationClip(data.SkillAnimationType);
+        }
+
+        if (!AnimatorDic.ContainsKey(data))
+            AnimatorDic.Add(data, newAnimator.runtimeAnimatorController);
+    }
+
+    public RuntimeAnimatorController GetAnimator(AnimatorData data)
+    {
+        if(!AnimatorDic.TryGetValue(data, out var animator))
+        {
+            CreateAnimator(data);
+        }
+
+        return AnimatorDic[data];
     }
 
     public UnitData GetUnitData(string unitName)

@@ -37,12 +37,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
         _enemyLayer = LayerMask.NameToLayer("Enemy");
 
-        Anim = GetComponentInChildren<Animator>();
-        Rb = GetComponent<Rigidbody2D>();
-        Col = GetComponent<Collider2D>();
-        StatusController = GetComponent<UnitStatusController>();
-        TriggerCol = GetComponentInChildren<BoxCollider2D>();
-        _fsm = GetComponentInChildren<BaseFSM>();
+        Inject();
 
         AddProviderComponents();
     }
@@ -57,6 +52,16 @@ public class UnitBase : MonoBehaviour, IAttacker
         RemoveProviderComponents();
     }
     #endregion
+
+    public void Inject()
+    {
+        Anim = GetComponentInChildren<Animator>();
+        Rb = GetComponent<Rigidbody2D>();
+        Col = GetComponent<Collider2D>();
+        StatusController = GetComponent<UnitStatusController>();
+        TriggerCol = GetComponentInChildren<BoxCollider2D>();
+        _fsm = GetComponentInChildren<BaseFSM>();
+    }
 
     public void Init(UnitStats plusUnitStat = null)
     {
@@ -85,7 +90,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         if (unitStatus.Data.isNotChange)
             return;
 
-        Anim.runtimeAnimatorController = Manager.Data.AnimatorDic[Status.Data.AnimatiorData];
+        Anim.runtimeAnimatorController = Manager.Data.GetAnimator(Status.Data.AnimatiorData);
     }
 
     public void SetBattleUnit()

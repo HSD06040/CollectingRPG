@@ -56,6 +56,7 @@ public class UnitManager : MonoBehaviour
 
         //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
         _unitDatas = Manager.Data.EnemyUnitDatas;
+        //_unitDatas = Manager.Data.PlayerUnitDatas;
 
         Subscribe();
 

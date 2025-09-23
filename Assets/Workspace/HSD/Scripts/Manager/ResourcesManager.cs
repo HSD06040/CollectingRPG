@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -25,6 +26,8 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public T Load<T>(string address) where T : Object
     {
+        if(string.IsNullOrEmpty(address)) return null;
+
         if (!_resources.ContainsKey(address))
         {
             Debug.Log($"[AddressableSystem] {address} 주소의 에셋이 로드되지 않았습니다.");
@@ -36,6 +39,8 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public async UniTask<T> LoadAsync<T>(string address) where T : Object
     {
+        if (string.IsNullOrEmpty(address)) return null;
+
         if (!_resources.ContainsKey(address))
         {
             var handle = Addressables.LoadAssetAsync<T>(address);
@@ -111,6 +116,8 @@ public class ResourcesManager : Singleton<ResourcesManager>
     #region Load
     public async UniTask LoadLabel(string label)
     {
+        if (string.IsNullOrEmpty(label)) return;
+
         var locationsHandle = Addressables.LoadResourceLocationsAsync(label);
         var locations = await locationsHandle.Task;
 
@@ -157,13 +164,15 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public async UniTask<T[]> LoadAll<T>(string label) where T : Object
     {
+        if (string.IsNullOrEmpty(label)) return null;
+
         var handle = Addressables.LoadAssetsAsync<T>(label, null);
         var result = await handle.Task;
 
         return result.ToArray();
     }
 
-    public async UniTask<T> Load<T>(AssetReference reference) where T : Object
+    public async UniTask<T> LoadAsync<T>(AssetReference reference) where T : Object
     {
         string primaryKey = await GetPrimaryKey(reference);
 

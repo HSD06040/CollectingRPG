@@ -120,22 +120,31 @@ public class CsvDownloader
 
             unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.NORMAL;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
-            unitData.PerferredLine = int.TryParse(row[3], out int line) ? line : 0;
-            unitData.ClassSynergy = Enum.TryParse(row[4], out ClassType classSynergy) ? classSynergy : ClassType.TANK;
-            unitData.Synergy = Enum.TryParse(row[5], out Synergy synergy) ? synergy : Synergy.KINGDOM;
+            unitData.Name = row[3];
+            unitData.Description = row[4];
+            unitData.PerferredLine = int.TryParse(row[5], out int line) ? line : 0;
+            unitData.ClassSynergy = Enum.TryParse(row[6], out ClassType classSynergy) ? classSynergy : ClassType.TANK;
+            unitData.Synergy = Enum.TryParse(row[7], out Synergy synergy) ? synergy : Synergy.KINGDOM;
+
+            AnimationType attackAnimation = Enum.TryParse(row[8], out AnimationType attackAnim) ? attackAnim : AnimationType.Magic_Attack;
+            AnimationType skillAnimation = Enum.TryParse(row[9], out AnimationType skillAnim) ? skillAnim : AnimationType.Magic_Attack;
+            unitData.AnimatiorData = new AnimatorData(attackAnimation, skillAnimation);
+
+            int attackID = int.TryParse(row[10], out int _attackID) ? _attackID : 0;
+            unitData.AttackData = Array.Find(_attackDatas, a => a.ID == attackID);
 
             UnitStats stat = new UnitStats
             {
-                AttackRange = int.TryParse(row[6], out int attackRange) ? attackRange * 1.5f : 1,
-                AttackSpeed = float.TryParse(row[8], out float attackSpeed) ? attackSpeed : 1f,
-                ManaGain = int.TryParse(row[9], out int manaGain) ? manaGain : 0,
-                PhysicalDamage = int.TryParse(row[10], out int physicalAttack) ? physicalAttack : 0,
-                MagicDamage = int.TryParse(row[11], out int magicAttack) ? magicAttack : 0,
-                PhysicalDefense = int.TryParse(row[12], out int physicalDefense) ? physicalDefense : 0,
-                MagicDefense = int.TryParse(row[13], out int magicDefense) ? magicDefense : 0,
-                CritChance = int.TryParse(row[14], out int critRate) ? critRate : 0,
-                MaxHealth = int.TryParse(row[15], out int hp) ? hp : 0,
-                MaxMana = int.TryParse(row[16], out int mp) ? mp : 0,
+                AttackRange = int.TryParse(row[11], out int attackRange) ? attackRange * 1.5f : 1,
+                AttackSpeed = float.TryParse(row[13], out float attackSpeed) ? attackSpeed : 1f,
+                ManaGain = int.TryParse(row[14], out int manaGain) ? manaGain : 0,
+                PhysicalDamage = int.TryParse(row[15], out int physicalAttack) ? physicalAttack : 0,
+                MagicDamage = int.TryParse(row[16], out int magicAttack) ? magicAttack : 0,
+                PhysicalDefense = int.TryParse(row[17], out int physicalDefense) ? physicalDefense : 0,
+                MagicDefense = int.TryParse(row[18], out int magicDefense) ? magicDefense : 0,
+                CritChance = int.TryParse(row[19], out int critRate) ? critRate : 0,
+                MaxHealth = int.TryParse(row[20], out int hp) ? hp : 0,
+                MaxMana = int.TryParse(row[21], out int mp) ? mp : 0,
                 MoveSpeed = 1.5f,
                 AttackCount = 1
             };
@@ -147,8 +156,11 @@ public class CsvDownloader
             unitData.UnitStats[2] = stat;
             unitData.UnitStats[3] = stat;
 
-            unitData.Name = $"{unitData.Synergy.ToString()}_{id}"; // 임시
+            string synergyText = unitData.Synergy.ToString();
+            string synergyName = $"{char.ToUpper(synergyText[0])}{synergyText.Substring(1).ToLower()}";
+            int lastDigit = Mathf.Abs(id % 10);
 
+            unitData.AddressableAddress = $"{synergyName}{lastDigit}";
 //#if UNITY_EDITOR
 //            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
 //            EditorUtility.SetDirty(unitData);
@@ -229,20 +241,23 @@ public class CsvDownloader
             if (int.TryParse(row[2], out int manaCost))
                 skillData.ManaCost = manaCost;
 
-            if (int.TryParse(row[6], out int power))
+            skillData.SkillName = row[3];
+            skillData.Description = row[4];
+
+            if (int.TryParse(row[8], out int power))
                 skillData.Power = power;
 
             if (skillData is AttackSkill attackSkillData)
             {
-                if (int.TryParse(row[4], out int damageType))
+                if (int.TryParse(row[6], out int damageType))
                     attackSkillData.DamageType = (DamageType)damageType;
             }
             else if (skillData is BuffSkill buffSkill)
             {
-                if (int.TryParse(row[11], out int duration))
+                if (int.TryParse(row[13], out int duration))
                     buffSkill.BuffEffectData.Duration = duration;
 
-                if (int.TryParse(row[12], out int tickInterval))
+                if (int.TryParse(row[14], out int tickInterval))
                     buffSkill.BuffEffectData.TickInterval = tickInterval;
             }
 
