@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class ShopUIController : MonoBehaviour
 {
@@ -14,6 +14,41 @@ public class ShopUIController : MonoBehaviour
     [SerializeField] TMP_Text _dailyResetText;
 
     Coroutine _dailyCooltimeTimer;
+
+    [Header("SlotData")]
+    [SerializeField] private ShopItemSO _itemDB;
+    [SerializeField] private ShopSlot _slotPrefab;
+    [SerializeField] private Transform _dailyList;
+    [SerializeField] private Transform _goldList;
+    [SerializeField] private Transform _diamondList;
+
+    private ShopSlotFactory _shopSlotFactory = new ShopSlotFactory();
+
+
+    private void Start()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+
+        // Gold 
+        foreach (var meta in _itemDB.Items)
+        {
+            if (meta.Type == ShopType.Gold)
+            {
+                ShopSlotData slot = _shopSlotFactory.FromGold(meta.ItemId, _itemDB);
+                Instantiate(_slotPrefab, _goldList).SetSlot(slot);
+            }
+        }
+
+        // Diamond
+        foreach (var meta in _itemDB.Items)
+        {
+            if (meta.Type == ShopType.Diamond)
+            {
+                var slot = _shopSlotFactory.FromDiamond(meta.ItemId, _itemDB);
+                Instantiate(_slotPrefab, _diamondList).SetSlot(slot);
+            }
+        }
+    }
 
     private void OnEnable()
     {
@@ -53,7 +88,7 @@ public class ShopUIController : MonoBehaviour
 
                 if (isResetTime)
                 {
-                    // 초기화 과정 넣기
+                    
                 }
 
                 DateTime now = DateTime.Now;
