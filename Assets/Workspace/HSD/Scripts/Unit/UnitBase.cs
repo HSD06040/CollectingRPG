@@ -131,7 +131,6 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Fight()
     {
-        Init();
         _fsm.Fight();
     }
     public void Standby()

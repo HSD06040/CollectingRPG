@@ -42,6 +42,7 @@ public class EnemyController : MonoBehaviour
             unit.SetBattleUnit();
 
             unit.gameObject.layer = LayerMask.NameToLayer("Enemy");
+            unit.Init();
 
             if (unit.transform.localScale.x < 0)
                 unit.transform.localScale = new Vector3(-unit.transform.localScale.x, unit.transform.localScale.y, unit.transform.localScale.z);

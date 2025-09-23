@@ -343,10 +343,11 @@ public class GlobalPassive
         spawnEffect.transform.localScale = new Vector3(_effect.UnitLevel, _effect.UnitLevel, _effect.UnitLevel);
         Manager.Resources.Destroy(spawnEffect, 2);
 
-        GameObject unitObj = GameObject.Instantiate(_effect.SpawnPrefab, pos, Quaternion.identity);
-        unitObj.name = "SpawnUnit";
+        GameObject unitObj = GameObject.Instantiate(_effect.SpawnPrefab, Vector3.zero, Quaternion.identity);
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(unitObj);
         UnitData data = Manager.Resources.Load<UnitData>(_effect.UnitDataAddress);
+
+        spawnUnit.StatusController.Invincible();
 
         if (_effect.IsMultiplier)
         {
@@ -372,9 +373,11 @@ public class GlobalPassive
                 int level = unit.Status.Level - 1 >= 0 ? unit.Status.Level - 1 : 0;
                 spawnUnit.Status = new UnitStatus(data, level);
                 spawnUnit.Init();
+                spawnUnit.Fight();
             }
         }
 
+        unitObj.transform.position = pos;
         BattleManager.OnSpawnUnit?.Invoke(spawnUnit);
     }
     #endregion

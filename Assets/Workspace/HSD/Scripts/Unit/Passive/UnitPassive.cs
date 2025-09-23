@@ -50,8 +50,8 @@ public class UnitPassive
 
             case TriggerType.OnBattleStart:
                 BattleManager.OnBattleStarted += EffectActives;
-                break;  
-                
+                break;
+
             case TriggerType.OnBattleEnded:
                 BattleManager.OnBattleEnded += EffectActives;
                 break;
@@ -209,7 +209,7 @@ public class UnitPassive
             return;
 
         _isActive = true;
-        
+
         if (_currentActivations < Effect.MaxActivations)
         {
             _currentActivations++;
@@ -228,9 +228,9 @@ public class UnitPassive
         {
             NextEffectActives();
 
-            if(Effect.IsActivationsClear)
-                _currentActivations = 0;            
-        }        
+            if (Effect.IsActivationsClear)
+                _currentActivations = 0;
+        }
     }
 
     private void RemoveStat()
@@ -246,7 +246,7 @@ public class UnitPassive
 
     private void NextEffectActives()
     {
-        if (Effect.NextEffect == null) 
+        if (Effect.NextEffect == null)
             return;
 
         if (Effect.NextEffect.EffectApplyType == EffectApplyType.All)
@@ -317,7 +317,7 @@ public class UnitPassive
     {
         if (!Effect.NextEffect.IsAttack)
             return;
-        
+
         AttackSpawn(Effect.NextEffect);
     }
 
@@ -328,8 +328,8 @@ public class UnitPassive
             Debug.LogWarning($"[시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {effect.AttackAddress}");
             return;
         }
-                 
-        GameObject attackObj = effect.SpawnPositionType == SpawnPositionType.Self ? 
+
+        GameObject attackObj = effect.SpawnPositionType == SpawnPositionType.Self ?
             Manager.Resources.Instantiate(effect.AttackPrefab, _owner.transform.position, Quaternion.identity, true) :
             Manager.Resources.Instantiate(effect.AttackPrefab, _owner.Target.position, Quaternion.identity, true);
 
@@ -363,40 +363,40 @@ public class UnitPassive
         spawnEffect.transform.localScale = new Vector3(Effect.UnitLevel, Effect.UnitLevel, Effect.UnitLevel);
         Manager.Resources.Destroy(spawnEffect, 2);
 
-        GameObject unitObj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
+        GameObject unitObj = GameObject.Instantiate(Effect.SpawnPrefab, Vector3.zero, Quaternion.identity);
         UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(unitObj);
         UnitData data = Manager.Resources.Load<UnitData>(Effect.UnitDataAddress);
 
-        if (Effect.IsMultiplier)
-        {
-            if (spawnUnit == null)
-                return;
+        spawnUnit.StatusController.Invincible();
 
-            if (Effect.SpawnType == SpawnStatType.Level)
+        if (spawnUnit == null)
+            return;
+
+        if (Effect.SpawnType == SpawnStatType.Level)
+        {
+            if (Effect.IsMultiplier)
             {
-                if (Effect.IsMultiplier)
-                {
-                    spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;
-                    spawnUnit.Status = new UnitStatus(data, Effect.UnitLevel);
-                    spawnUnit.Init(Effect.SpawnUnitStats);
-                    spawnUnit.Fight();
-                }
-                else
-                {
-                    spawnUnit.Init();
-                }
-            }
-            else if (Effect.SpawnType == SpawnStatType.LowUpgrade)
-            {
-                int level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
-                spawnUnit.Status = new UnitStatus(data, level);
-                spawnUnit.Init();
+                spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;
+                spawnUnit.Status = new UnitStatus(data, Effect.UnitLevel);
+                spawnUnit.Init(Effect.SpawnUnitStats);
                 spawnUnit.Fight();
             }
+            else
+            {
+                spawnUnit.Init();
+            }
+        }
+        else if (Effect.SpawnType == SpawnStatType.LowUpgrade)
+        {
+            int level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
+            spawnUnit.Status = new UnitStatus(data, level);
+            spawnUnit.Init();
+            spawnUnit.Fight();
         }
 
+        unitObj.transform.position = pos;
         BattleManager.OnSpawnUnit?.Invoke(spawnUnit);
     }
     #endregion
-#endregion
+    #endregion
 }
