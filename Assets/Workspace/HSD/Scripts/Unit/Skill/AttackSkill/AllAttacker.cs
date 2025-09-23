@@ -14,11 +14,12 @@ public class AllAttacker : MonoBehaviour
     private GameObject _explosionEffect;
     private DamageType _damageType;
     private LayerMask _targetLayer;
-    private float _power;
+    private float _physicalPower;
+    private float _abilityPower;
     private float _speed;
     private Collider2D[] _objs = new Collider2D[20];
     
-    public void Setup(IAttacker attacker, GameObject attackEffect, GameObject explosionEffect, float power, DamageType damageType, float speed)
+    public void Setup(IAttacker attacker, GameObject attackEffect, GameObject explosionEffect, float physicalPower, float abilityPower, DamageType damageType, float speed)
     {
         _attacker = attacker;
         _targetLayer = _attacker.TargetLayer;
@@ -26,7 +27,9 @@ public class AllAttacker : MonoBehaviour
         _status = _attacker.GetStatusController();
         _attackEffect = attackEffect;
         _explosionEffect = explosionEffect;
-        
+        _physicalPower = physicalPower;
+        _abilityPower = abilityPower;
+
         AttackAll();
     }
 
@@ -56,7 +59,7 @@ public class AllAttacker : MonoBehaviour
             .SetEase(Ease.Linear)
             .AsyncWaitForCompletion();
 
-        _status.CalculateDamage(_power, _damageType, ComponentProvider.Get<UnitBase>(target).StatusController);
+        _status.CalculateDamage(_physicalPower, _abilityPower, _damageType, ComponentProvider.Get<UnitBase>(target).StatusController);
         Manager.Resources.Destroy(attack);
 
         GameObject effect = Manager.Resources.Instantiate(_explosionEffect, targetPos, true);

@@ -17,9 +17,7 @@ public class UnitMeleeAttack : UnitAttackData
             return;
         }
 
-        status.CalculateDamage(
-            AttackPower,
-            DamageType,
+        status.CalculateDamage(            
             ComponentProvider.Get<UnitBase>(attacker.GetTarget()?.gameObject).StatusController
             );
 

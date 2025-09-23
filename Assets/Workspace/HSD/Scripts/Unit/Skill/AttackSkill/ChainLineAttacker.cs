@@ -10,7 +10,8 @@ public class ChainLineAttacker : MonoBehaviour
     private Transform _target;
     private GameObject _effect;
     private float _interval;
-    private float _power;
+    private float _physicalPower;
+    private float _abilityPower;
     private int _count;
     private int _ratio;
     private DamageType _damageType;
@@ -29,14 +30,15 @@ public class ChainLineAttacker : MonoBehaviour
     }
 
     public void Setup(IAttacker attacker, GameObject effect, Transform target, int count, float interval, 
-        LayerMask targetLayer, float power, DamageType damageType, float attackThickness, int ratio)
+        LayerMask targetLayer, float physicalPower, float abilityPower, DamageType damageType, float attackThickness, int ratio)
     {
         _count = count;
         _target = target;
         _effect = effect;
         _interval = interval;
         _damageType = damageType;
-        _power = power;
+        _physicalPower = physicalPower;
+        _abilityPower = abilityPower;
         _targetLayer = targetLayer;
         _attacker = attacker;
         _ratio = ratio;
@@ -109,7 +111,7 @@ public class ChainLineAttacker : MonoBehaviour
             var col = _overlapResults[i];
             if (col == null) continue;
 
-            _attacker.GetStatusController().CalculateDamage(_power, _damageType, ComponentProvider.Get<UnitBase>(col.gameObject).StatusController);
+            _attacker.GetStatusController().CalculateDamage(_physicalPower, _abilityPower, _damageType, ComponentProvider.Get<UnitBase>(col.gameObject).StatusController);
         }
 
         for (int i = hitCount; i < _overlapResults.Length; i++)

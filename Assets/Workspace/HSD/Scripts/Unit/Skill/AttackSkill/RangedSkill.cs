@@ -28,7 +28,7 @@ public class RangedSkill : AttackSkill
         }
 
         projectile.Init(target, attacker.GetStatusController(), 
-            Power, DamageType, attacker.TargetLayer, _projectileSpeed,
+            physicalPower, abilityPower, DamageType, attacker.TargetLayer, _projectileSpeed,
             GetExplosionEffect(), _distance);
     }
 
@@ -37,7 +37,7 @@ public class RangedSkill : AttackSkill
         return Manager.Resources.Load<GameObject>(_explosionEffect);
     }
 
-    private GameObject GetTargetSingle(IAttacker attacker)
+    protected override GameObject GetTargetSingle(IAttacker attacker)
     {
         var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());
         return target;

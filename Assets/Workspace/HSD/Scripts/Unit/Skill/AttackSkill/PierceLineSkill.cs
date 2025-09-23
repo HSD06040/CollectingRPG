@@ -28,7 +28,7 @@ public class PierceLineSkill : AttackSkill
 
         chainLineAttacker.Setup(
             attacker, effect, target, _count, _interval, attacker.TargetLayer,
-            Power, DamageType, _attackThickness, _ratio
+            physicalPower, abilityPower, DamageType, _attackThickness, _ratio
             );
     }
 

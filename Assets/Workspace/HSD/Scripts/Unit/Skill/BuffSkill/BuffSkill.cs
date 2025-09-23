@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 
 [CreateAssetMenu(fileName = "BuffSkill", menuName = "Data/Unit/Skill/BuffSkill")]
@@ -20,20 +21,22 @@ public class BuffSkill : UnitSkill
 
         if (TargetType == TargetType.Self)
         {
-            attacker.GetStatusController().ApplyEffect(BuffEffectData, (int)Power, name);
+            attacker.GetStatusController().ApplyEffect(BuffEffectData, abilityPower, name);
             return;
         }
-
+        
         if (Priority == Priority.None)
         {
             foreach (GameObject target in GetTargetFromTargetType(attacker))
             {
-                ComponentProvider.Get<UnitBase>(target).StatusController.ApplyEffect(BuffEffectData, Power, name);
+                attacker.GetStatusController().ProvideEffect(BuffEffectData, abilityPower, 
+                    name, ComponentProvider.Get<UnitBase>(target).StatusController);                
             }
         }
         else
         {
-            ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController.ApplyEffect(BuffEffectData, Power, name);
+            attacker.GetStatusController().ProvideEffect(BuffEffectData, abilityPower, 
+                name, ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController);            
         }
     }
 

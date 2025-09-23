@@ -8,7 +8,8 @@ public class Projectile : MonoBehaviour
     [SerializeField] protected float _lifeTime = 5f; // 발사체의 생명 시간
     [SerializeField] protected bool _isPirece = true;
     protected int _pireceCount;
-    protected float _attackPower;
+    protected float _physicalPower;
+    protected float _abilityPower;
     protected DamageType _damageType;
     protected LayerMask _targetLayer;
     protected Transform _target;
@@ -44,7 +45,7 @@ public class Projectile : MonoBehaviour
         _source.Cancel();
     }    
 
-    public virtual void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
+    public virtual void Init(Transform target, UnitStatusController status, float physicalPower, float abilityPower, DamageType damageType,
         LayerMask targetLayer, float speed, GameObject effect = null, float distance = 0)
     {        
         _status = status;
@@ -52,7 +53,8 @@ public class Projectile : MonoBehaviour
         _targetLayer = targetLayer;
         _damageType = damageType;
         _pireceCount = status.AttackCount.Value;
-        _attackPower = attackPower;
+        _physicalPower = physicalPower;
+        _abilityPower = abilityPower;
         _speed = speed;
         _distance = distance;
         _effect = effect;
@@ -69,7 +71,7 @@ public class Projectile : MonoBehaviour
     {
         if (_targetLayer.Contain(collision.gameObject.layer))
         {
-            _status.CalculateDamage(_attackPower, _damageType, ComponentProvider.Get<UnitBase>(collision.gameObject).StatusController);
+            _status.CalculateDamage(_physicalPower, _abilityPower, _damageType, ComponentProvider.Get<UnitBase>(collision.gameObject).StatusController);
 
             if (!_isPirece)
             {

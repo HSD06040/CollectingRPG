@@ -19,14 +19,14 @@ public class BezierProjectile : Projectile
     private float _randomOffsetX;
     private float _randomOffsetY;
 
-    public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
+    public override void Init(Transform target, UnitStatusController status, float attackPower, float abilityPower, DamageType damageType,
     LayerMask targetLayer, float speed, GameObject effect, float distance)
     {
         _randomDirection = Random.value > 0.5f ? 1f : -1f;
         _randomOffsetY = Random.Range(randomY.x, randomY.y);
         _randomOffsetX = Random.Range(randomX.x, randomX.y);
 
-        base.Init(target, status, attackPower, damageType, targetLayer, speed);
+        base.Init(target, status, attackPower, abilityPower, damageType, targetLayer, speed);
     }
 
     protected override void OnTriggerEnter2D(Collider2D collision)

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
@@ -36,11 +37,12 @@ public static class Utils
     }
 
     #region Damage Calculation
-    public static void CalculateDamage(this UnitStatusController status, float attackPower, DamageType damageType, UnitStatusController enemy)
+    public static void CalculateDamage(this UnitStatusController status, float physicalPower, float abilityPower, DamageType damageType, UnitStatusController enemy)
     {
-        int damage = damageType == DamageType.Physical ? status.PhysicalDamage.Value : status.MagicDamage.Value;
+        // 총 데미지 = 물리 계수 * 물리 공격력 + 마법 계수 * (마법 공격력 / 100)
+
         int defense = damageType == DamageType.Physical ? enemy.PhysicalDefense.Value : enemy.MagicDefense.Value;
-        float total = damage * attackPower;
+        float total = status.PhysicalDamage.Value * physicalPower + status.MagicDamage.Value * (status.MagicDamage.Value / 100);
 
         bool isCrit = false;
 
@@ -56,8 +58,37 @@ public static class Utils
 
         status.TotalDamage.Value += totalDamage;
         enemy.TakeDamage(totalDamage, isCrit);
+    }
+    public static void CalculateDamage(this UnitStatusController status, UnitStatusController enemy)
+    {
+        bool isCrit = false;
+        float totalDamage = status.PhysicalDamage.Value;
 
-        //Debug.Log($"[데미지 시스템] 적{enemy.name}이 {totalDamage} 만큼의 피해를 입음!");
+        if (status.CritChance.Value > Random.Range(0f, 100f))
+        {
+            isCrit = true;
+            totalDamage *= 1.5f;
+        }
+        float totalDefense = enemy.PhysicalDefense.Value / (enemy.PhysicalDefense.Value + 100f);        
+
+        enemy.TakeDamage(Mathf.RoundToInt(totalDamage * (1f - totalDefense)), isCrit);
+    }
+    #endregion
+
+    #region ApplyEffect
+    public static void ProvideEffect(this UnitStatusController status, BuffEffectData buffEffectData, float abilityPower,
+        string source, UnitStatusController enemy)
+    {
+        float value = abilityPower * (status.MagicDamage.Value / 100);
+
+        enemy.ApplyEffect(buffEffectData, value, source);
+    }
+    public static void ProvideStat(this UnitStatusController status, StatEffectModifier statEffectModifier, float abilityPower, 
+        string source, UnitStatusController enemy)
+    {
+        float value = abilityPower * (status.MagicDamage.Value / 100);
+
+        enemy.AddStat(statEffectModifier.StatType, value, source);
     }
     #endregion
 

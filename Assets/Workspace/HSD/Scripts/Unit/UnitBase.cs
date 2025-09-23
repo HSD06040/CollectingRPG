@@ -90,7 +90,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         if (unitStatus.Data.isNotChange)
             return;
 
-        Anim.runtimeAnimatorController = Manager.Data.GetAnimator(Status.Data.AnimatiorData);
+        Anim.runtimeAnimatorController = Manager.Data.AnimationManager.GetAnimator(unitStatus.Data.AnimatiorData);
     }
 
     public void SetBattleUnit()
@@ -247,6 +247,9 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         if (Target == null)
             FindTarget();
+
+        if (Target == null)
+            return Utils.GetClosestTargetNonAlloc(transform.position, 100, TargetLayer);
 
         return Target;
     }

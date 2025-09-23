@@ -175,6 +175,8 @@ public class PoolManager : Singleton<PoolManager>
     #region Get
     public T Get<T> (T original, Vector3 position, Quaternion rotation, Transform parent) where T : Object
     {
+        if (original == null) return null;
+
         GameObject go = original as GameObject;
         string name = go.name;
 

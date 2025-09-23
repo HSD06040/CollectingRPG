@@ -33,7 +33,7 @@ public class BuffRangedSkill : RangedSkill
                 )
             );
 
-        Transform target = GetTarget(attacker);
+        Transform target = GetTarget(attacker);               
 
         projectile.transform.right = (target.position - projectile.transform.position).normalized;
         projectile.transform.Rotate(0, 0, spawnObject.transform.rotation.eulerAngles.z);
@@ -46,13 +46,13 @@ public class BuffRangedSkill : RangedSkill
         if (_isBuff)
         {
             projectile.Init(_buffEffectData, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), Power, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
         else if (!_isBuff)
         {
             projectile.Init(_statModifier, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), Power, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
     }
@@ -83,7 +83,8 @@ public class BuffRangedSkill : RangedSkill
             if (attacker.GetTarget() == null)
             {
                 Debug.Log("[스킬] 타켓이 없습니다.");
-                return null;
+                
+                return Utils.GetClosestTargetNonAlloc(attacker.GetCenter(), 10, attacker.TargetLayer)?.transform;
             }
 
             return attacker.GetTarget();

@@ -13,6 +13,6 @@ public class AllAttackSkill : AttackSkill
     public override void Active(IAttacker attacker)
     {
         Manager.Resources.Instantiate<GameObject>(ALL_ATTACKER, GetSpawnPoint(attacker), true).GetComponent<AllAttacker>().
-            Setup(attacker, Manager.Resources.Load<GameObject>(EffectAddress), Manager.Resources.Load<GameObject>(_explosionEffect), Power, DamageType, _speed);
+            Setup(attacker, Manager.Resources.Load<GameObject>(EffectAddress), Manager.Resources.Load<GameObject>(_explosionEffect), physicalPower, abilityPower, DamageType, _speed);
     }
 }

@@ -245,7 +245,7 @@ public class CsvDownloader
             skillData.Description = row[4];
 
             if (int.TryParse(row[8], out int power))
-                skillData.Power = power;
+                skillData.physicalPower = power;
 
             if (skillData is AttackSkill attackSkillData)
             {

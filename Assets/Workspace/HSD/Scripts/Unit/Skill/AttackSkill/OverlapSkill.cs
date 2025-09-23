@@ -1,6 +1,5 @@
 using UnityEditor;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 [CreateAssetMenu(fileName = "AttackSkill", menuName = "Data/Unit/Skill/Attack")]
 public class OverlapSkill : AttackSkill
@@ -42,7 +41,8 @@ public class OverlapSkill : AttackSkill
             UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController;
 
             attacker.GetStatusController().CalculateDamage(
-                Power,
+                physicalPower,
+                abilityPower,
                 DamageType,
                 targetStatus
                 );
@@ -58,7 +58,8 @@ public class OverlapSkill : AttackSkill
                 UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(target).StatusController;
 
                 attacker.GetStatusController().CalculateDamage(
-                    Power,
+                    physicalPower,
+                    abilityPower,
                     DamageType,
                     targetStatus
                     );
@@ -85,7 +86,7 @@ public class OverlapSkill : AttackSkill
                 }
 
                 UnitStatusController targetStatus = ub.StatusController;
-                attacker.GetStatusController().CalculateDamage(Power, DamageType, targetStatus);
+                attacker.GetStatusController().CalculateDamage(physicalPower, abilityPower, DamageType, targetStatus);
 
                 if (IsStun)
                     targetStatus.Stun(StunDuration);
@@ -112,7 +113,7 @@ public class OverlapSkill : AttackSkill
             }
 
             UnitStatusController targetStatus = ub.StatusController;
-            attacker.GetStatusController().CalculateDamage(Power, DamageType, targetStatus);
+            attacker.GetStatusController().CalculateDamage(physicalPower, abilityPower, DamageType, targetStatus);
 
             if (IsStun)
                 targetStatus.Stun(StunDuration);

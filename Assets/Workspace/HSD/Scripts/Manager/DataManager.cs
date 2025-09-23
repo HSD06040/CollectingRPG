@@ -5,14 +5,13 @@ using UnityEngine.AddressableAssets;
 
 public class DataManager : Singleton<DataManager>
 {
-    private UnitAnimatorData _animatorData;
-
     // 유닛 데이터 관련
-    public Dictionary<string, UnitData> UnitDataDic;
-    public Dictionary<AnimatorData, RuntimeAnimatorController> AnimatorDic;
+    public Dictionary<string, UnitData> UnitDataDic;    
     public UnitData[] EnemyUnitDatas;
     public UnitData[] PlayerUnitDatas;
     public SynergyDatabase SynergyDB;
+
+    public AnimationManager AnimationManager = new();
 
     // 프리셋 데이터 관련
     public PresetDatabase PresetDB { get; private set; } = new PresetDatabase();
@@ -33,7 +32,7 @@ public class DataManager : Singleton<DataManager>
     public async UniTask InitData()
     {
         await Manager.Resources.SpriteLoadLable("MonsterIcon");        
-        await AnimatorSetting();
+        await AnimationManager.Init();
         await PreLoadData();
         await CsvDownload();
     }
@@ -84,46 +83,6 @@ public class DataManager : Singleton<DataManager>
     {
         SynergyDB = await Addressables.LoadAssetAsync<SynergyDatabase>("Database/SynergyDatabase");
         SynergyDB.Init();
-    }
-
-    private async UniTask AnimatorSetting()
-    {
-        _animatorData = await Addressables.LoadAssetAsync<UnitAnimatorData>("Data/UnitAnimatorData");
-
-        AnimatorDic = new Dictionary<AnimatorData, RuntimeAnimatorController>(_animatorData.Animators.Length);
-
-        _animatorData.SettingAnimationClip();
-
-        foreach (var data in _animatorData.Animators)
-        {
-            CreateAnimator(data);
-        }
-    }
-
-    private void CreateAnimator( AnimatorData data)
-    {
-        AnimatorOverrideController newAnimator = new AnimatorOverrideController(_animatorData.BaseController);
-
-        foreach (var pair in newAnimator.animationClips)
-        {
-            if (pair.name == "Melee_Attack")
-                newAnimator[pair.name] = _animatorData.GetAnimationClip(data.AttackAnimationType);
-            else if (pair.name == "Melee_Skill")
-                newAnimator[pair.name] = _animatorData.GetAnimationClip(data.SkillAnimationType);
-        }
-
-        if (!AnimatorDic.ContainsKey(data))
-            AnimatorDic.Add(data, newAnimator.runtimeAnimatorController);
-    }
-
-    public RuntimeAnimatorController GetAnimator(AnimatorData data)
-    {
-        if(!AnimatorDic.TryGetValue(data, out var animator))
-        {
-            CreateAnimator(data);
-        }
-
-        return AnimatorDic[data];
     }
 
     public UnitData GetUnitData(string unitName)

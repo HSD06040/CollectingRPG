@@ -13,7 +13,10 @@ public class SplashAttack : UnitAttackData
     {
         base.Attack(attacker);
 
-        GameObject effect = Manager.Resources.Instantiate<GameObject>(EffectAddress, attacker.GetTarget().position, true);
+        GameObject effectPrefab = Manager.Resources.Load<GameObject>(EffectAddress);
+        if (effectPrefab == null) return;
+
+        GameObject effect = Manager.Resources.Instantiate(effectPrefab, attacker.GetTarget().position, true);
         Manager.Resources.Destroy(effect, 2);
 
         effect.transform.right = attacker.GetTargetDir();
@@ -23,7 +26,7 @@ public class SplashAttack : UnitAttackData
 
         foreach (var target in targets)
         {
-            attacker.GetStatusController().CalculateDamage(AttackPower, DamageType, ComponentProvider.Get<UnitBase>(target).StatusController);
+            attacker.GetStatusController().CalculateDamage(ComponentProvider.Get<UnitBase>(target).StatusController);
         }
     }
 

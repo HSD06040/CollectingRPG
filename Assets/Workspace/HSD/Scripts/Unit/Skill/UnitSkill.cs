@@ -14,8 +14,8 @@ public abstract class UnitSkill : ScriptableObject
 
     [Header("Stat")]
     public int MaxCount = 1;
-    public float[] Powers; // 추후 기능 추가를 위한 데이터
-    public float Power = 1;
+    public float physicalPower;
+    public float abilityPower;
     public int ManaCost;
 
     [Header("Type")]
