@@ -12,7 +12,7 @@ public class AugmentData : MetaData
     {
         foreach (var modifier in _statEffectModifiers)
         {
-            AugmentManager.Instance.AddAugment(modifier.StatType, modifier.Value, _key);
+            //AugmentManager.Instance.AddAugment(modifier.StatType, modifier.Value, _key);
         }
     }
 }

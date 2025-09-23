@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "UpgradeStatData", menuName = "Data/Upgrade/UpgradeStatData")]
-public class UpgradStatData : ScriptableObject
+public class UpgradeStatData : ScriptableObject
 {
     public List<GradeGrowth> StatData;
 }

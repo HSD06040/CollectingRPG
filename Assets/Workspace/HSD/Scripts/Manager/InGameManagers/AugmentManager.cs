@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class AugmentManager : InGameSingleton<AugmentManager>
 {
@@ -80,9 +81,9 @@ public class AugmentManager : InGameSingleton<AugmentManager>
             {
                 currentAugment.RemoveBuffEffect(unit);
                 augments.Remove(currentAugment.AUGID);
-
                 if (augments.Count == 0)
                     _appliedStatusAugments.Remove(unit);
+
             }
             else
             {
@@ -207,33 +208,82 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     #endregion
 
     #region Augument Management
-    public void AddAugment(StatType statType, float value, string source)
+    public void AddAugment(StatType statType, float value, string source, UnitStatusController controller)
     {
         switch (statType)
         {
             case StatType.MaxHealth:
                 MaxHealth.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.PhysicalDamage:
                 PhysicalDamage.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.MagicDamage:
                 MagicDamage.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.CritChance:
                 CritChance.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.PhysicalDefense:
                 PhysicalDefense.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.MagicDefense:
                 MagicDefense.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.AttackSpeed:
                 AttackSpeed.AddModifier(value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
+        }
+    }
+
+    public void AddAugment(StatType statType, float value, string source)
+    {
+        switch (statType)
+        {
             case StatType.GoldBonus:
-                GoldBonus.AddModifier(value, source);
+                GoldBonus.AddModifier(value, source);                
+                break;
+        }
+    }
+
+    public void RemoveAugment(StatType statType, string source, UnitStatusController controller)
+    {
+        switch (statType)
+        {
+            case StatType.MaxHealth:
+                MaxHealth.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.PhysicalDamage:
+                PhysicalDamage.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.MagicDamage:
+                MagicDamage.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.CritChance:
+                CritChance.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.PhysicalDefense:
+                PhysicalDefense.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.MagicDefense:
+                MagicDefense.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.AttackSpeed:
+                AttackSpeed.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
                 break;
         }
     }
@@ -242,27 +292,6 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     {
         switch (statType)
         {
-            case StatType.MaxHealth:
-                MaxHealth.RemoveModifier(source);
-                break;
-            case StatType.PhysicalDamage:
-                PhysicalDamage.RemoveModifier(source);
-                break;
-            case StatType.MagicDamage:
-                MagicDamage.RemoveModifier(source);
-                break;
-            case StatType.CritChance:
-                CritChance.RemoveModifier(source);
-                break;
-            case StatType.PhysicalDefense:
-                PhysicalDefense.RemoveModifier(source);
-                break;
-            case StatType.MagicDefense:
-                MagicDefense.RemoveModifier(source);
-                break;
-            case StatType.AttackSpeed:
-                AttackSpeed.RemoveModifier(source);
-                break;
             case StatType.GoldBonus:
                 GoldBonus.RemoveModifier(source);
                 break;
