@@ -14,8 +14,8 @@ public abstract class UnitSkill : ScriptableObject
 
     [Header("Stat")]
     public int MaxCount = 1;
-    public float physicalPower;
-    public float abilityPower;
+    public float physicalPower = 1;
+    public float abilityPower = 1;
     public int ManaCost;
 
     [Header("Type")]

@@ -62,16 +62,19 @@ public static class Utils
     public static void CalculateDamage(this UnitStatusController status, UnitStatusController enemy)
     {
         bool isCrit = false;
-        float totalDamage = status.PhysicalDamage.Value;
+        float total = status.PhysicalDamage.Value;
 
         if (status.CritChance.Value > Random.Range(0f, 100f))
         {
             isCrit = true;
-            totalDamage *= 1.5f;
+            total *= 1.5f;
         }
-        float totalDefense = enemy.PhysicalDefense.Value / (enemy.PhysicalDefense.Value + 100f);        
+        float totalDefense = enemy.PhysicalDefense.Value / (enemy.PhysicalDefense.Value + 100f);
 
-        enemy.TakeDamage(Mathf.RoundToInt(totalDamage * (1f - totalDefense)), isCrit);
+        int totalDamage = Mathf.RoundToInt(total * (1f - totalDefense));
+        status.TotalDamage.Value += totalDamage;
+
+        enemy.TakeDamage(totalDamage, isCrit);
     }
     #endregion
 
