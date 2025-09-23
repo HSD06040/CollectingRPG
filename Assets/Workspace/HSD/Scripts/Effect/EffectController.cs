@@ -3,15 +3,13 @@ using System;
 using System.Threading;
 using UnityEngine;
 
-public class EffectController : IDisposable
+public class EffectController
 {
     private readonly EffectAddressData _addressData;
     private readonly Transform _transform;
-    private readonly CancellationTokenSource _cts;
 
-    public EffectController(Transform transform, CancellationTokenSource cts)
+    public EffectController(Transform transform)
     {
-        _cts = cts;
         _transform = transform;
         _addressData = Manager.Resources.Load<EffectAddressData>("Data/EffectAddressData");
     }
@@ -26,29 +24,17 @@ public class EffectController : IDisposable
             return;
         }
 
-        SpawnEffect(address, duration, GetSpawnPos(buffEffect), _cts.Token).Forget();
+        SpawnEffect(address, duration, GetSpawnPos(buffEffect));
     }
 
-    private async UniTask SpawnEffect(string address, float duration, Vector3 spawnPos,CancellationToken token)
+    private void SpawnEffect(string address, float duration, Vector3 spawnPos)
     {
-        GameObject effectPrefab = Manager.Resources.Load<GameObject>(address);
-        GameObject effect = Manager.Resources.Instantiate(effectPrefab, spawnPos, effectPrefab.transform.rotation, _transform, true);
-
-        try
-        {
-            await UniTask.WaitForSeconds(duration, cancellationToken: token);
-        }
-        catch (OperationCanceledException)
-        {
-            // 정상적인 취소 → 무시
-        }
-        finally
-        {
-            if (effect != null)
-                Manager.Resources.Destroy(effect);
-        }
-
-        Manager.Resources.Destroy(effect);
+        Manager.Resources.Destroy(
+            Manager.Resources.Instantiate<GameObject>(
+                address, spawnPos, Quaternion.identity, _transform, true
+                ),
+            duration
+            );
     }
 
     private Vector3 GetSpawnPos(BuffEffect buffEffect)
@@ -64,11 +50,5 @@ public class EffectController : IDisposable
             BuffEffect.AttackSpeed => _transform.GetCenterPosition(),
             BuffEffect.Defense => _transform.GetCenterPosition(),
         };
-    }
-
-    public void Dispose()
-    {
-        _cts.Cancel();
-        _cts.Dispose();
     }
 }

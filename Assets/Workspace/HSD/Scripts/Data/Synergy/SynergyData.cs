@@ -56,7 +56,6 @@ public abstract class SynergyData : ScriptableObject
 
         foreach (var effect in newEffects)
         {
-            Debug.Log($"[적용 될 이펙트 들] : {effect?.name}");
             effect?.ApplyEffect(units, _synergy);
         }
 

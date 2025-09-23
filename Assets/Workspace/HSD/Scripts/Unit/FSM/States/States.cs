@@ -219,6 +219,9 @@ public class DeadState : BaseState
         
         _owner.Col.enabled = false;
         _status.OnUnitDied?.Invoke(_status);
+
+        if (_owner.TargetLayer.Contain(LayerMask.NameToLayer("Player")))
+            Object.Destroy(_owner.gameObject, 1);
     }
 
     public override void Exit()

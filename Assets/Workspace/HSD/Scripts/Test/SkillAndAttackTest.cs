@@ -28,9 +28,12 @@ public class SkillAndAttackTest : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
             UseSkill();
+
+        if (Input.GetKeyDown(KeyCode.W))
+            EffectTest();
     }
 
-    [ContextMenu("UseSkill")]   
+    [ContextMenu("UseSkill")]
     public void UseSkill()
     {
         skill.Active(unit);
@@ -46,7 +49,7 @@ public class SkillAndAttackTest : MonoBehaviour
     public void EffectTest()
     {
         if (unit.StatusController.EffectController == null)
-            unit.StatusController.EffectController = new EffectController(unit.transform, new System.Threading.CancellationTokenSource());
+            unit.StatusController.EffectController = new EffectController(unit.transform);
 
         unit.StatusController.EffectController.AddBuffEffect(_buffEffect, _duration);
     }

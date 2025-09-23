@@ -58,10 +58,15 @@ public class ChainLineAttacker : MonoBehaviour
             await UniTask.WaitForSeconds(_interval, cancellationToken: _source.Token);
         }        
     }
-
-    [ContextMenu("SpawnEffect")]
+    
     private void SpawnEffect()
     {
+        if (_target == null)
+        {
+            Manager.Resources.Destroy(gameObject);
+            return;
+        }
+
         Vector2 spawnPos = GetSpawnPosition(_target.position);
 
         GameObject effect = Manager.Resources.Instantiate(_effect, spawnPos, true);
@@ -82,7 +87,12 @@ public class ChainLineAttacker : MonoBehaviour
     }
 
     private void ChangeTarget()
-    {        
+    {
+        if (_target == null)
+        {
+
+            return;
+        }
         _targetList.Add(_target);
         _currentPos = ComponentProvider.Get<UnitBase>(_target.gameObject).GetCenter();
         _target = Utils.GetClosestTargetNonAlloc(_currentPos, 100, _targetLayer, Filter);        

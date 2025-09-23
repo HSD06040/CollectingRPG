@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 [CreateAssetMenu(fileName = "AttackSkill", menuName = "Data/Unit/Skill/Attack")]
 public class OverlapSkill : AttackSkill
@@ -70,13 +71,21 @@ public class OverlapSkill : AttackSkill
         {
             foreach (var target in GetTargets(attacker))
             {
-                UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(target.gameObject).StatusController;
+                UnitBase ub = ComponentProvider.Get<UnitBase>(target);
+                if (ub == null)
+                {
+                    Debug.LogWarning($"[OverlapSkill] target {target.name} 에 UnitBase가 없습니다.");
+                    continue;
+                }
 
-                attacker.GetStatusController().CalculateDamage(
-                Power,
-                DamageType,
-                targetStatus
-                );
+                if (ub.StatusController == null)
+                {
+                    Debug.LogWarning($"[OverlapSkill] target {target.name} 의 StatusController가 null입니다.");
+                    continue;
+                }
+
+                UnitStatusController targetStatus = ub.StatusController;
+                attacker.GetStatusController().CalculateDamage(Power, DamageType, targetStatus);
 
                 if (IsStun)
                     targetStatus.Stun(StunDuration);
@@ -84,13 +93,26 @@ public class OverlapSkill : AttackSkill
         }
         else
         {
-            UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(GetTargetSingle(attacker).gameObject).StatusController;
+            GameObject target = GetTargetSingle(attacker);
 
-            attacker.GetStatusController().CalculateDamage(
-            Power,
-            DamageType,
-            targetStatus
-            );
+            if (target == null)
+                return;
+
+            UnitBase ub = ComponentProvider.Get<UnitBase>(GetTargetSingle(attacker));
+            if (ub == null)
+            {
+                Debug.LogWarning($"[OverlapSkill] target {target.name} 에 UnitBase가 없습니다.");
+                return;
+            }
+
+            if (ub.StatusController == null)
+            {
+                Debug.LogWarning($"[OverlapSkill] target {target.name} 의 StatusController가 null입니다.");
+                return;
+            }
+
+            UnitStatusController targetStatus = ub.StatusController;
+            attacker.GetStatusController().CalculateDamage(Power, DamageType, targetStatus);
 
             if (IsStun)
                 targetStatus.Stun(StunDuration);
@@ -111,7 +133,7 @@ public class OverlapSkill : AttackSkill
             attacker.TargetLayer);
     }
 
-    protected GameObject GetTargetSingle(IAttacker attacker)
+    protected override GameObject GetTargetSingle(IAttacker attacker)
     {
         var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, SizeOrRadius, BoxSize, Angle, attacker.TargetLayer, GetPriorityFilter());
         return target;
@@ -142,7 +164,7 @@ public class OverlapSkill : AttackSkill
         */
         base.DrawGizmos(attacker);
 
-        if (attacker == null) return;
+        if (attacker == null || attacker.GetTarget() == null) return;
 
         Vector2 attackPoint = Priority == Priority.TargetRadius ? attacker.GetTarget().position : GetAttackPoint(attacker);
         Vector2 targetDir = attacker.GetTargetDir();

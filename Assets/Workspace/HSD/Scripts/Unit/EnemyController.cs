@@ -41,8 +41,7 @@ public class EnemyController : MonoBehaviour
             unit.TargetLayer = _targetLayer;
             unit.SetBattleUnit();
 
-            // 레이어 변경 (자식 포함)
-            SetLayerRecursively(unit.gameObject, 6);
+            unit.gameObject.layer = LayerMask.NameToLayer("Enemy");
 
             if (unit.transform.localScale.x < 0)
                 unit.transform.localScale = new Vector3(-unit.transform.localScale.x, unit.transform.localScale.y, unit.transform.localScale.z);
@@ -122,16 +121,6 @@ public class EnemyController : MonoBehaviour
                 _slotManager.GetUnitSlot(unit).ClearSlot();
                 Destroy(unit.gameObject);
             }
-        }
-    }
-
-    private void SetLayerRecursively(GameObject obj, int layer)
-    {
-        obj.layer = layer;
-
-        foreach (Transform child in obj.transform)
-        {
-            SetLayerRecursively(child.gameObject, layer);
         }
     }
 

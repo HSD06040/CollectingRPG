@@ -72,7 +72,7 @@ public class BezierProjectile : Projectile
         lastEuler.z += _zRotateOffset;
         transform.rotation = Quaternion.Euler(lastEuler);
 
-        while (destroyElapsed < _lifeTime)
+        while (destroyElapsed < 2)
         {
             destroyElapsed += Time.deltaTime;
             transform.position += (Vector3)(dir * _speed * Time.deltaTime);
@@ -85,7 +85,14 @@ public class BezierProjectile : Projectile
 
     public void SetPoints()
     {
+        if (_target == null)
+        {
+            Manager.Resources.Destroy(gameObject);
+            return;
+        }
+
         _start = (Vector2)transform.position + new Vector2(Random.Range(-0.3f, 0.3f), Random.Range(-1f, 1f));
+
         _end = (Vector2)_target.position;
 
         Vector2 dir = (_end - _start).normalized;

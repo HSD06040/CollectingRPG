@@ -94,7 +94,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
             root = root.GetChild(0);
 
         PassiveController = new UnitPassiveController(gameObject);
-        EffectController = new EffectController(transform, _cts);
+        EffectController = new EffectController(transform);
         UnitFXController = new UnitFXController(
             root.
             GetComponentsInChildren<SpriteRenderer>()
@@ -314,7 +314,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         if (amount < 0)
         {
-            Debug.Log($"{amount} 만큼 피해를 입음");
             TakeDamage(amount);
             return;
         }
@@ -324,7 +323,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         if(isEffect)
             EffectController.AddBuffEffect(BuffEffect.Heal);
 
-        Debug.Log($"[체력회복] {amount} 만큼 체력 회복");
+        Debug.Log($"[체력회복] {name} {amount} 만큼 체력 회복");
         if (CurHp.Value > MaxHealth.Value)
         {
             CurHp.Value = MaxHealth.Value;
@@ -348,7 +347,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void IncreaseShield(int amount)
     {
-        Debug.Log($"[쉴드추가] {amount} 만큼 쉴드추가");
+        Debug.Log($"[쉴드추가] {name} : {amount} 만큼 쉴드추가");
         Shield.Value += amount;
 
         if(Shield.Value < 0)
@@ -380,7 +379,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     private void Die()
     {
         IsDead = true;
-        OnDied?.Invoke();
+        OnDied?.Invoke();        
     }
 
     public void AttackDataChange(UnitAttackData attackData, float _duration)
@@ -443,7 +442,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
                 break;
             case StatType.PhysicalDefense:
             case StatType.MagicDefense:
-                EffectController.AddBuffEffect(BuffEffect.Damage, buffEffectData.Duration);
+                EffectController.AddBuffEffect(BuffEffect.Defense, buffEffectData.Duration);
                 break;
             case StatType.AttackSpeed:
                 EffectController.AddBuffEffect(BuffEffect.AttackSpeed, buffEffectData.Duration);
@@ -462,41 +461,57 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void AddStat(StatType statType, float value, string source)
     {
-        if (value > 0)
-            EffectController.AddBuffEffect(BuffEffect.Buff);
-        else
-            EffectController.AddBuffEffect(BuffEffect.Debuff);
-
         switch (statType)
         {
             case StatType.MaxHealth:
-                MaxHealth.AddModifier((int)value, source);
-                IncreaseHealth((int)value, false);
-                break;
             case StatType.MaxMana:
-                MaxMana.AddModifier((int)value, source);
-                break;
             case StatType.ManaGain:
-                ManaGain.AddModifier((int)value, source);
-                break;
-            case StatType.PhysicalDamage:                
-                PhysicalDamage.AddModifier((int)value, source);
-                break;
+            case StatType.PhysicalDamage:
             case StatType.MagicDamage:
-                MagicDamage.AddModifier((int)value, source);
-                break;
             case StatType.CritChance:
-                CritChance.AddModifier((int)value, source);
-                break;
             case StatType.PhysicalDefense:
-                PhysicalDefense.AddModifier((int)value, source);
-                break;
             case StatType.MagicDefense:
-                MagicDefense.AddModifier((int)value, source);
-                break;
             case StatType.AttackSpeed:
-                AttackSpeed.AddModifier(value, source);
+                {
+                    if (value > 0)
+                        EffectController.AddBuffEffect(BuffEffect.Buff);
+                    else
+                        EffectController.AddBuffEffect(BuffEffect.Debuff);
+
+                    switch (statType)
+                    {
+                        case StatType.MaxHealth:
+                            MaxHealth.AddModifier((int)value, source);
+                            IncreaseHealth((int)value, false);
+                            break;
+                        case StatType.MaxMana:
+                            MaxMana.AddModifier((int)value, source);
+                            break;
+                        case StatType.ManaGain:
+                            ManaGain.AddModifier((int)value, source);
+                            break;
+                        case StatType.PhysicalDamage:
+                            PhysicalDamage.AddModifier((int)value, source);
+                            break;
+                        case StatType.MagicDamage:
+                            MagicDamage.AddModifier((int)value, source);
+                            break;
+                        case StatType.CritChance:
+                            CritChance.AddModifier((int)value, source);
+                            break;
+                        case StatType.PhysicalDefense:
+                            PhysicalDefense.AddModifier((int)value, source);
+                            break;
+                        case StatType.MagicDefense:
+                            MagicDefense.AddModifier((int)value, source);
+                            break;
+                        case StatType.AttackSpeed:
+                            AttackSpeed.AddModifier(value, source);
+                            break;
+                    }
+                }
                 break;
+
             case StatType.CurHp:
                 IncreaseHealth((int)value);
                 break;
@@ -508,6 +523,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
                 break;
         }
     }
+
 
     public void RemoveStat(StatType statType, string source, float value = 0)
     {

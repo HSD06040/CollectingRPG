@@ -125,6 +125,8 @@ public static class Utils
 
                 foreach (var hit in _hitBuffer)
                 {
+                    if (hit == null) continue;
+
                     Vector2 dirToTarget = (hit.transform.position - attacker.GetTransform().position).normalized;
                     float dot = Vector2.Dot(attacker.GetTargetDir(), dirToTarget);
 
@@ -147,11 +149,8 @@ public static class Utils
                 _cachedTargets.Add(_hitBuffer[i].gameObject);
         }
 
-        foreach (var target in _cachedTargets)
-        {
-            if (ComponentProvider.Get<UnitBase>(target).StatusController.IsDead)
-                _cachedTargets.Remove(target);
-        }
+        _cachedTargets.RemoveAll(target =>
+            ComponentProvider.Get<UnitBase>(target).StatusController.IsDead);
 
         if (sortByDistance && _cachedTargets.Count > 1)
         {

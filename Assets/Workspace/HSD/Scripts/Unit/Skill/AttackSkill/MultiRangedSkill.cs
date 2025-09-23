@@ -11,6 +11,8 @@ public class MultiRangedSkill : RangedSkill
 
     public override void Active(IAttacker attacker)
     {
+        SpawnEffect(attacker);
+
         MultiRangedAttack(attacker).Forget();
     }
 
