@@ -114,6 +114,7 @@ public class UnitManager : MonoBehaviour
     {
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
+        BattleManager.OnBattleStarted += ApplyHealAugment;
 
         UnitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
@@ -131,6 +132,7 @@ public class UnitManager : MonoBehaviour
     {
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
+        BattleManager.OnBattleStarted -= ApplyHealAugment;
 
         UnitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
@@ -144,6 +146,27 @@ public class UnitManager : MonoBehaviour
         }
     }
     #endregion
+
+    public void ApplyHealAugment()
+    {
+        UnitBase[] units = UnitController.GetUnits();
+        if (AugmentManager.Instance.currentAugment.Trigger == TriggerType.OnBattleStart)
+        {
+            for (int i = 0; i < units.Length; i++)
+            {
+                AugmentManager.Instance.ApplyHealAugment(units[i]);
+            }
+        }
+        else if (AugmentManager.Instance.currentAugment.Trigger == TriggerType.OnEnemyDied)
+        {
+            // TODO : 적이 죽었을 때 조건 추가 필요
+
+            for (int i = 0; i < units.Length; i++)
+            {
+                AugmentManager.Instance.ApplyHealAugment(units[i]);
+            }
+        }
+    }
 
     #region Fight
     public void Fight()

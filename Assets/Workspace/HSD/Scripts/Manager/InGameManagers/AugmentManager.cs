@@ -51,7 +51,7 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     /// <param name="unit"></param>
     public void ApplyAugment(UnitBase unit)
     {
-        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType == EffectType.Currency) return;
+        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType != EffectType.Buff_Debuff) return;
 
         if (!_appliedStatusAugments.ContainsKey(unit))
             _appliedStatusAugments[unit] = new HashSet<string>();
@@ -63,7 +63,7 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         }
 
         _appliedStatusAugments[unit].Add(currentAugment.AUGID);
-        currentAugment.ApplyEffect(unit);
+        currentAugment.ApplyBuffEffect(unit);
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         {
             if (augments.Contains(currentAugment.AUGID))
             {
-                currentAugment.RemoveEffect(unit);
+                currentAugment.RemoveBuffEffect(unit);
                 augments.Remove(currentAugment.AUGID);
 
                 if (augments.Count == 0)
@@ -107,6 +107,47 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         // 리더일 경우 추가 필요
 
         return false;
+    }
+
+    #endregion
+
+    #region Unit Increase
+
+    public void ApplyHealAugment(UnitBase unit)
+    {
+        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType != EffectType.Increase) return;
+
+        if (!_appliedStatusAugments.ContainsKey(unit))
+            _appliedStatusAugments[unit] = new HashSet<string>();
+
+        if (_appliedStatusAugments[unit].Contains(currentAugment.AUGID))
+        {
+            Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 이미 적용됨.");
+            return;
+        }
+
+        _appliedStatusAugments[unit].Add(currentAugment.AUGID);
+        currentAugment.ApplyIncreaseEffect(unit);
+    }
+
+    public void ReleaseHealAugment(UnitBase unit)
+    {
+        if (currentAugment == null) return;
+
+        if (_appliedStatusAugments.TryGetValue(unit, out var augments))
+        {
+            if (augments.Contains(currentAugment.AUGID))
+            {
+                augments.Remove(currentAugment.AUGID);
+
+                if (augments.Count == 0)
+                    _appliedStatusAugments.Remove(unit);
+            }
+            else
+            {
+                Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 적용되지 않아 해제할 수 없음.");
+            }
+        }
     }
 
     #endregion
