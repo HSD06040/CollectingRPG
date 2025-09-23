@@ -9,8 +9,8 @@ public class BuffSkill : UnitSkill
     [SerializeField] float _range;
 
     [Header("Buff")]
-    [SerializeField] private TargetType TargetType;
-    [SerializeField] private BuffEffectData BuffEffectData;
+    [SerializeField] TargetType TargetType;
+    public BuffEffectData BuffEffectData;
 
     public override void Active(IAttacker attacker)
     {

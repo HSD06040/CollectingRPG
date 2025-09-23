@@ -20,10 +20,10 @@ public class CsvDownloader
 
     public static event Action OnDataSetupCompleted;
 
-    private UnitSkill[] _unitSkills;
+    private UnitSkill[] _monsterSkills;
+    private UnitSkill[] _playerSkills;
     private UnitData[] _monsterUnitDatas;
     private UnitAttackData[] _attackDatas;
-    private Sprite[] _sprites;
     
     public CsvDownloader(CsvLoadData csvLoadData)
     {
@@ -35,19 +35,19 @@ public class CsvDownloader
     /// </summary>
     public async UniTask DownloadDataAsync()
     {
-        _unitSkills = await Manager.Resources.LoadAll<UnitSkill>("SkillData");
+        _monsterSkills = await Manager.Resources.LoadAll<UnitSkill>("SkillData");
+        _playerSkills = await Manager.Resources.LoadAll<UnitSkill>("SkillData_Player");
         _monsterUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");
         _attackDatas = await Manager.Resources.LoadAll<UnitAttackData>("AttackData");
-        _sprites = await Manager.Resources.LoadAll<Sprite>("MonsterIcon");
 
         List<UniTask> tasks = new List<UniTask>(10);
 
         foreach (var csvData in _csvLoadData.CsvDatas)
         {
-            //tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));
+            tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));
         }
 
-        await LoadCSV(_csvLoadData.CsvDatas[2].GetURL(), GetSetupMethod(CsvType.Monster));
+        //await LoadCSV(_csvLoadData.CsvDatas[2].GetURL(), GetSetupMethod(CsvType.Monster));
 
         await UniTask.WhenAll(tasks);
 
@@ -89,31 +89,34 @@ public class CsvDownloader
         switch(csvType)
         {
             case CsvType.PlayerUnit:
-                return UnitStatSetup;
-            case CsvType.MonsterSkillData:
-                return UnitSkillSetup;
+                return PlayerUnitStatSetup;
+            case CsvType.PlayerSkillData:
+                return PlayerSkillSetup;
             case CsvType.Monster: 
                 return MonsterSetup;
+            case CsvType.MonsterSkillData:
+                return MonsterSkillSetup;
             default:
                 Debug.LogError($"알 수 없는 CSV 이름: {csvType.ToString()}");
                 return null;
         }
     }
 
-    private void UnitStatSetup(string[][] data)
+    private void PlayerUnitStatSetup(string[][] data)
     {
-        UnitData[] unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
- 
+        UnitData[] unitDatas = Manager.Data.PlayerUnitDatas;
+
         foreach (var row in data)
         {
             int id = int.Parse(row[0]);
             UnitData unitData = Array.Find(unitDatas, u => u.ID == id);
-            Debug.Log($"Setting up UnitData ID: {id}");
+
             if (unitData == null)
             {
                 Debug.LogWarning($"UnitData with ID {id} not found.");
                 continue;
             }
+            Debug.Log($"Setting up UnitData ID: {id}");
 
             unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.NORMAL;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
@@ -144,7 +147,16 @@ public class CsvDownloader
             unitData.UnitStats[2] = stat;
             unitData.UnitStats[3] = stat;
 
-            unitData.Name = id.ToString(); // 임시
+            unitData.Name = $"{unitData.Synergy.ToString()}_{id}"; // 임시
+
+//#if UNITY_EDITOR
+//            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
+//            EditorUtility.SetDirty(unitData);
+
+//            string path = AssetDatabase.GetAssetPath(unitData);
+//            AssetDatabase.RenameAsset(path, unitData.Name);
+//            AssetDatabase.SaveAssets();
+//#endif
         }
     }
 
@@ -178,7 +190,7 @@ public class CsvDownloader
                 AttackCount = 1
             };
 
-            unitData.Skill = Array.Find(_unitSkills, u => u.ID == int.Parse(row[12]));
+            unitData.Skill = Array.Find(_monsterSkills, u => u.ID == int.Parse(row[12]));
             unitData.AttackData = Array.Find(_attackDatas, a => a.ID == int.Parse(row[14]));
 
             unitData.UnitStats = new UnitStats[4];
@@ -196,13 +208,52 @@ public class CsvDownloader
         }
     }
 
-    private void UnitSkillSetup(string[][] data)
+    private void MonsterSkillSetup(string[][] data)
     {
         foreach (var row in data)
         {
             
         }
     }
+
+    private void PlayerSkillSetup(string[][] data)
+    {
+        foreach (var row in data)
+        {
+            if (!int.TryParse(row[0], out int skillID)) continue;
+            if (!int.TryParse(row[1], out int charID)) continue;
+
+            UnitSkill skillData = Array.Find(_playerSkills, s => s.ID == skillID);
+            if (skillData == null) continue;
+
+            if (int.TryParse(row[2], out int manaCost))
+                skillData.ManaCost = manaCost;
+
+            if (int.TryParse(row[6], out int power))
+                skillData.Power = power;
+
+            if (skillData is AttackSkill attackSkillData)
+            {
+                if (int.TryParse(row[4], out int damageType))
+                    attackSkillData.DamageType = (DamageType)damageType;
+            }
+            else if (skillData is BuffSkill buffSkill)
+            {
+                if (int.TryParse(row[11], out int duration))
+                    buffSkill.BuffEffectData.Duration = duration;
+
+                if (int.TryParse(row[12], out int tickInterval))
+                    buffSkill.BuffEffectData.TickInterval = tickInterval;
+            }
+
+            UnitData unitData = Array.Find(Manager.Data.PlayerUnitDatas, p => p.ID == charID);
+            if (unitData != null)
+            {
+                unitData.Skill = skillData;
+            }
+        }
+    }
+
 
     //private void CreateMonsterUnitData(string[][] data)
     //{
