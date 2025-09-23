@@ -37,7 +37,6 @@ public class UnitPassive
                 _owner.StatusController.OnDied += EffectActives;
                 break;
             case TriggerType.OnAttack:
-                Debug.Log($"{_owner.name}에 AttackEvent 등록");
                 _owner.StatusController.OnAttack += EffectActives;
                 break;
             case TriggerType.OnUseSkill:
