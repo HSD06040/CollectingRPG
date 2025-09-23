@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks.Triggers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -41,6 +42,8 @@ public class BattleUnitManager : MonoBehaviour
         newUnit.SetBattleUnit();
         newUnit.Init();
 
+        AugmentManager.Instance.ApplyAugment(newUnit);
+
         SetSlot(newSlot, newUnit);
     }
 
@@ -50,6 +53,8 @@ public class BattleUnitManager : MonoBehaviour
         UnitBase unitBase = _unitGrid[unit.CurrentSlot.y - 1, unit.CurrentSlot.x - 1];
 
         RemoveFromCachedArray(unitBase);
+
+        AugmentManager.Instance.ReleaseAugment(unitBase);
 
         ClearSlot(newSlot, unitBase);
     }

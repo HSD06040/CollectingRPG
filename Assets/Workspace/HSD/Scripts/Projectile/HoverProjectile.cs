@@ -9,7 +9,7 @@ public class HoverProjectile : Projectile
     private bool isHovering = true;
 
     public override void Init(Transform target, UnitStatusController status, float attackPower, DamageType damageType,
-        LayerMask targetLayer, float speed, float distancez)
+        LayerMask targetLayer, float speed, GameObject effect, float distancez)
     {
         base.Init(target, status, attackPower, damageType, targetLayer, speed);
 
@@ -25,7 +25,7 @@ public class HoverProjectile : Projectile
         base.OnTriggerEnter2D(collision);
     }
 
-    protected override async UniTask MoveAndDestroyAsync(float duration)
+    protected override async UniTask MoveAndDestroy(float duration)
     {
         float elapsed = 0f;
 

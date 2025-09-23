@@ -1,9 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
+
+[CreateAssetMenu(fileName = "BuffSkill", menuName = "Data/Unit/Skill/BuffSkill")]
 public class BuffSkill : UnitSkill
 {
+    [Header("Range Setting")]
+    [SerializeField] bool _isRange;
+    [SerializeField] float _range;
+
     [Header("Buff")]
     [SerializeField] private TargetType TargetType;
     [SerializeField] private BuffEffectData BuffEffectData;
@@ -12,36 +19,64 @@ public class BuffSkill : UnitSkill
     {
         base.Active(attacker);
 
-        foreach (GameObject target in GetTargetFromTargetType(attacker))
+        SpawnEffect(attacker);
+
+        if (TargetType == TargetType.Self)
         {
-            ComponentProvider.Get<UnitBase>(target).StatusController.ApplyEffect(BuffEffectData, (int)Power, name);
+            attacker.GetStatusController().ApplyEffect(BuffEffectData, (int)Power, name);
+        }
+
+        if (Priority == Priority.None)
+        {
+            foreach (GameObject target in GetTargetFromTargetType(attacker))
+            {
+                ComponentProvider.Get<UnitBase>(target).StatusController.ApplyEffect(BuffEffectData, Power, name);
+            }
+        }
+        else
+        {
+            ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController.ApplyEffect(BuffEffectData, Power, name);
         }
     }
 
     protected GameObject[] GetTargetFromTargetType(IAttacker attacker)
     {
+        float range = _isRange ? _range : 100;
+        
         switch (TargetType)
-        {
-            case TargetType.Self:
-                return new GameObject[] { attacker.GetTransform().gameObject };
+        {            
             case TargetType.Ally:
                 return Utils.GetTargetsNonAlloc(
-                    attacker, attacker.GetTransform().position, SearchType.Circle, 100f,
-                    Vector2.zero, 0, MaxCount, GetAllyLayerMask(attacker));
+                    attacker, attacker.GetCenter(), SearchType.Circle, range,
+                    Vector2.zero, 0, MaxCount, attacker.GetAllyLayerMask());
             case TargetType.Enemy:
                 return Utils.GetTargetsNonAlloc(
-                    attacker, attacker.GetTransform().position, SearchType.Circle, 100f,
+                    attacker, attacker.GetCenter(), SearchType.Circle, range,
                     Vector2.zero, 0, MaxCount, attacker.TargetLayer);
             default:
                 return null;
         }
     }
 
-    /// <summary>
-    /// Attacker의 아군 LayerMask를 반환
-    /// </summary>    
-    private LayerMask GetAllyLayerMask(IAttacker attacker)
+    private GameObject GetTargetPrioty(IAttacker attacker)
     {
-        return attacker.TargetLayer == LayerMask.GetMask("Enemy") ? LayerMask.GetMask("Player") : LayerMask.GetMask("Enemy");
+        LayerMask targetLayer;
+
+        if (TargetType == TargetType.Ally)
+            targetLayer = attacker.GetAllyLayerMask();
+        else if (TargetType == TargetType.Enemy)
+            targetLayer = attacker.TargetLayer;
+            
+        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());        
     }
+
+#if UNITY_EDITOR
+    public override void DrawGizmos(IAttacker attacker)
+    {
+        base.DrawGizmos(attacker);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(attacker.GetCenter(), _range);
+    }
+#endif
 }

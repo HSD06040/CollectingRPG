@@ -23,10 +23,27 @@ public enum Grade
     NORMAL, RARE, UNIQUE, LEGENDARY
 }
 
+public enum SubGrade
+{
+    SILVER, GOLD, PRISM
+}
+
 #region Type
 public enum AnimatorType
 {
 
+}
+
+public enum ActivationCondition
+{    
+    AnyCollision,  // 도중에 맞은 모든 충돌 대상 발동
+    TargetOnly,    // 목표(Target)에 도달했을 때만 발동
+    Target         // 처음 타겟 위치에서 발동
+}
+public enum ThrowType
+{
+    Parabola,
+    Straight
 }
 
 public enum SpawnPositionType
@@ -76,6 +93,7 @@ public enum TriggerType
     Base,
     OnBattleStart,
     OnDied,
+    OnEnemyDied,
     OnAttack,
     OnUseSkill,
     OnInterval,
@@ -90,10 +108,12 @@ public enum EffectTargetType
     Enemy,
     Ally,
     SameSynergy,
+    SameClassType,
     Column,
     Row,
     ColumnAndRow,
-    Cross
+    Cross,
+    Leader
 }
 
 /// <summary>
@@ -102,7 +122,9 @@ public enum EffectTargetType
 public enum EffectType
 {
     Buff_Debuff,
-    Increase,    
+    Increase,
+    Recover,
+    Currency
 }
 
 /// <summary>
@@ -122,6 +144,12 @@ public enum TargetType
     Boss
 }
 
+public enum EffectTime
+{
+    Permanent,
+    Temporary
+}
+
 public enum AttackAreaType
 {
     Single, Radius, Pierce, Row
@@ -134,7 +162,7 @@ public enum DamageType
 
 public enum SearchType
 {
-    Circle, Box, Capsule
+    Circle, Box, Capsule, Sector
 }
 
 public enum EffectSpawnType
@@ -155,6 +183,7 @@ public enum Priority
 {
     None,
     Target,
+    TargetRadius,
     Close,
     Far,
     LowHp,
@@ -196,5 +225,7 @@ public enum StatType
     CurMana,
 
     // Currency
-    GoldBonus
+    GoldBonus,
+
+    TakeDamage,
 }
