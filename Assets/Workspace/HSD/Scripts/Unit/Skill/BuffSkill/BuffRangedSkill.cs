@@ -33,7 +33,10 @@ public class BuffRangedSkill : RangedSkill
                 )
             );
 
-        Transform target = GetTarget(attacker);               
+        Transform target = GetTarget(attacker);
+
+        if (target == null || projectile == null)
+            return;
 
         projectile.transform.right = (target.position - projectile.transform.position).normalized;
         projectile.transform.Rotate(0, 0, spawnObject.transform.rotation.eulerAngles.z);
