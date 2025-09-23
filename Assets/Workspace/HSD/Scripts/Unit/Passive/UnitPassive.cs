@@ -391,6 +391,7 @@ public class UnitPassive
                 int level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
                 spawnUnit.Status = new UnitStatus(data, level);
                 spawnUnit.Init();
+                spawnUnit.Fight();
             }
         }
 
