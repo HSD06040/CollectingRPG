@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System;
+using DG.Tweening;
 
 public class AddressablesDownloader : MonoBehaviour
 {
@@ -12,7 +13,10 @@ public class AddressablesDownloader : MonoBehaviour
 
     [Header("Progress Info")]
     public Property<float> DownloadProgress = new();
+    [SerializeField] float _speed = 10;
 
+    private Tween _progressTween;
+    private Tween _downloadSizeTween;
     public long TotalFileSize;
     public Property<long> DownloadedSize = new();
     public bool IsDownloading;
@@ -143,8 +147,28 @@ public class AddressablesDownloader : MonoBehaviour
                 if (downloadHandle.IsValid())
                 {
                     var status = downloadHandle.GetDownloadStatus();
-                    DownloadProgress.Value = downloadHandle.PercentComplete;
-                    DownloadedSize.Value = (long)(TotalFileSize * DownloadProgress.Value);
+                    float targetValue = downloadHandle.PercentComplete;
+
+                    if (_progressTween != null && _progressTween.IsActive())
+                        _progressTween.Kill();
+
+                    _progressTween = DOTween.To(
+                        () => DownloadProgress.Value,
+                        x => DownloadProgress.Value = x,
+                        targetValue,
+                        _speed
+                    ).SetEase(Ease.Linear)
+                    .SetSpeedBased();
+
+                    if (_downloadSizeTween != null && _downloadSizeTween.IsActive())
+                        _downloadSizeTween.Kill();
+
+                    _downloadSizeTween = DOTween.To(
+                        () => DownloadedSize.Value,
+                        x => DownloadedSize.Value = x,
+                        (long)(TotalFileSize * DownloadProgress.Value),
+                        .1f
+                    ).SetEase(Ease.Linear);                    
 
                     Debug.Log($"[어드레서블] 다운로드 중 {label}: {DownloadProgress.Value:P2} - {FormatBytes(DownloadedSize.Value)}/{FormatBytes(TotalFileSize)}");
                 }
