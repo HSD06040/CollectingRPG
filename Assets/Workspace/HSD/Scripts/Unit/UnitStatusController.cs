@@ -377,7 +377,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #endregion
 
     #region Invincible
-    public void Invincible(float duration = 0.5f)
+    public void Invincible(float duration = 0.2f)
     {
         InvincibleActive(duration).Forget();
     }

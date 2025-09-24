@@ -25,9 +25,19 @@ public class ChainLineAttacker : MonoBehaviour
 
     private void OnDisable()
     {
-        _source.Cancel();
-        _source.Dispose();
+        Dispose();
     }
+
+    private void Dispose()
+    {
+        if (_source != null)
+        {
+            _source.Cancel();
+            _source.Dispose();
+            _source = null;
+        }
+    }
+
 
     public void Setup(IAttacker attacker, GameObject effect, Transform target, int count, float interval, 
         LayerMask targetLayer, float physicalPower, float abilityPower, DamageType damageType, float attackThickness, int ratio)
@@ -47,28 +57,32 @@ public class ChainLineAttacker : MonoBehaviour
         _targetList.Clear();
         _currentPos = transform.position;
 
+        if (_source == null)
+            _source = new();
+
         ChainLineAttack().Forget();
     }
 
     private async UniTask ChainLineAttack()
     {
-        for(int i = 0; i < _count; i++)
+        for (int i = 0; i < _count; i++)
         {
+            if (_target == null)
+            {
+                Manager.Resources.Destroy(gameObject);
+                Dispose();
+                return;
+            }
+
             SpawnEffect();
             ChangeTarget();
 
             await UniTask.WaitForSeconds(_interval, cancellationToken: _source.Token);
-        }        
+        }
     }
     
     private void SpawnEffect()
     {
-        if (_target == null)
-        {
-            Manager.Resources.Destroy(gameObject);
-            return;
-        }
-
         Vector2 spawnPos = GetSpawnPosition(_target.position);
 
         GameObject effect = Manager.Resources.Instantiate(_effect, spawnPos, true);

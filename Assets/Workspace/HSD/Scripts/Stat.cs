@@ -40,28 +40,18 @@ public class Stat<T> where T : struct, IComparable, IEquatable<T>
             throw new NotSupportedException(typeof(T).Name);        
     }
 
-    //public T Value
-    //{
-    //    get
-    //    {
-    //        if (_isChanged)
-    //        {
-    //            _lastValue = _baseValue;
-    //            foreach (var modifier in _modifiers)
-    //                _lastValue = addFunc(_lastValue, modifier.Value);
-    //            _isChanged = false;
-    //        }
-    //        return _lastValue;
-    //    }        
-    //}
     public T Value
     {
         get
         {
-            T result = _baseValue;
-            foreach (var modifier in _modifiers)
-                result = addFunc(result, modifier.Value);
-            return result;
+            if (_isChanged)
+            {
+                _lastValue = _baseValue;
+                foreach (var modifier in _modifiers)
+                    _lastValue = addFunc(_lastValue, modifier.Value);
+                _isChanged = false;
+            }
+            return _lastValue;
         }
     }
 

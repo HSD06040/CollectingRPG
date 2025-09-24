@@ -358,8 +358,7 @@ public class UnitPassive
 
         Debug.Log($"[시너지 스폰 시스템] {Effect.SpawnPrefab.name} 소환");
 
-        GameObject spawnEffect = Manager.Resources.Instantiate<GameObject>(Effect.SpawnEffectPrefab, pos, true);
-        spawnEffect.transform.localScale = new Vector3(Effect.UnitLevel, Effect.UnitLevel, Effect.UnitLevel);
+        GameObject spawnEffect = Manager.Resources.Instantiate<GameObject>(Effect.SpawnEffectPrefab, pos, true);        
         Manager.Resources.Destroy(spawnEffect, 2);
 
         GameObject unitObj = GameObject.Instantiate(Effect.SpawnPrefab, Vector3.zero, Quaternion.identity);
@@ -373,6 +372,8 @@ public class UnitPassive
 
         if (Effect.SpawnType == SpawnStatType.Level)
         {
+            spawnEffect.transform.localScale = new Vector3(Effect.UnitLevel, Effect.UnitLevel, Effect.UnitLevel);
+
             if (Effect.IsMultiplier)
             {
                 spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;

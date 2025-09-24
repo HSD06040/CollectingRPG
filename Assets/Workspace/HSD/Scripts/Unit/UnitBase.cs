@@ -169,8 +169,10 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target == null || (Target != null && ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead))
-            Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
+        if (Target == null || ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead)
+        {
+            Target = Utils.GetClosestTargetNonAlloc(GetCenter(), StatusController.DetectionRange, TargetLayer);
+        }
     }
 
     public void FlipToTarget()
@@ -287,6 +289,8 @@ public class UnitBase : MonoBehaviour, IAttacker
     private void OnDrawGizmos()
     {        
         if (Status == null || StatusController == null) return;
+
+        Gizmos.DrawWireSphere(GetCenter(), StatusController.DetectionRange);
 
         if (Status.Data == null) return;
 
