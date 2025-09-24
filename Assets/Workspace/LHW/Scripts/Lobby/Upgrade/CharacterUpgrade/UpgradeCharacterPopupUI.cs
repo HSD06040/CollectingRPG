@@ -114,15 +114,15 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     private void CharacterStatusUpdate()
     {
         int level = _currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel;
-        _statuses[0].text = _currentCharUnit.Status.Data.UnitStats[level - 1].MaxHealth.ToString();
-        _statuses[1].text = _currentCharUnit.Status.Data.UnitStats[level - 1].MaxMana.ToString();
-        _statuses[2].text = _currentCharUnit.Status.Data.UnitStats[level - 1].PhysicalDamage.ToString();
-        _statuses[3].text = _currentCharUnit.Status.Data.UnitStats[level - 1].MagicDamage.ToString();
-        _statuses[4].text = _currentCharUnit.Status.Data.UnitStats[level - 1].PhysicalDefense.ToString();
-        _statuses[5].text = _currentCharUnit.Status.Data.UnitStats[level - 1].MagicDefense.ToString();
-        _statuses[6].text = _currentCharUnit.Status.Data.UnitStats[level - 1].AttackRange.ToString();
-        _statuses[7].text = _currentCharUnit.Status.Data.UnitStats[level - 1].AttackSpeed.ToString();
-        _statuses[8].text = _currentCharUnit.Status.Data.UnitStats[level - 1].CritChance.ToString();
+        _statuses[0].text = _currentCharUnit.Status.Data.UpgradeStats[0].MaxHealth.ToString();
+        _statuses[1].text = _currentCharUnit.Status.Data.UpgradeStats[0].MaxMana.ToString();
+        _statuses[2].text = _currentCharUnit.Status.Data.UpgradeStats[0].PhysicalDamage.ToString();
+        _statuses[3].text = _currentCharUnit.Status.Data.UpgradeStats[0].MagicDamage.ToString();
+        _statuses[4].text = _currentCharUnit.Status.Data.UpgradeStats[0].PhysicalDefense.ToString();
+        _statuses[5].text = _currentCharUnit.Status.Data.UpgradeStats[0].MagicDefense.ToString();
+        _statuses[6].text = _currentCharUnit.Status.Data.UpgradeStats[0].AttackRange.ToString();
+        _statuses[7].text = _currentCharUnit.Status.Data.UpgradeStats[0].AttackSpeed.ToString();
+        _statuses[8].text = _currentCharUnit.Status.Data.UpgradeStats[0].CritChance.ToString();
         _statuses[9].text = _currentCharUnit.Status.CombatPower.ToString();
     }
 

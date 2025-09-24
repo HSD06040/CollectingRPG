@@ -26,41 +26,64 @@ public class UnitStats
     public float AttackRange;
     public int AttackCount;
 
-    public void AddStat(UnitStats stats, StatEffectModifier modifier, bool persent)
+    public UnitStats Clone()
     {
-        switch (modifier.StatType)
+        return new UnitStats
+        {
+            MaxHealth = this.MaxHealth,
+            MaxMana = this.MaxMana,
+            ManaGain = this.ManaGain,
+            AttackSpeed = this.AttackSpeed,
+            MoveSpeed = this.MoveSpeed,
+            PhysicalDamage = this.PhysicalDamage,
+            MagicDamage = this.MagicDamage,
+            CritChance = this.CritChance,
+            PhysicalDefense = this.PhysicalDefense,
+            MagicDefense = this.MagicDefense,
+            AttackRange = this.AttackRange,
+            AttackCount = this.AttackCount
+        };
+    }
+
+    public void AddStat(StatType type, float value)
+    {
+        switch (type)
         {
             case StatType.MaxHealth:
+                MaxHealth += (int)value;
                 break;
             case StatType.MaxMana:
+                MaxMana += (int)value;
                 break;
             case StatType.ManaGain:
+                ManaGain += (int)value;
                 break;
             case StatType.AttackSpeed:
+                AttackSpeed += value;
                 break;
             case StatType.MoveSpeed:
+                MoveSpeed += value;
                 break;
             case StatType.PhysicalDamage:
+                PhysicalDamage += (int)value;
                 break;
             case StatType.MagicDamage:
+                MagicDamage += (int)value;
                 break;
             case StatType.CritChance:
-                break;
-            case StatType.CritDamage:
+                CritChance += (int)value;
                 break;
             case StatType.PhysicalDefense:
+                PhysicalDefense += (int)value;
                 break;
             case StatType.MagicDefense:
+                MagicDefense += (int)value;
                 break;
             case StatType.AttackRange:
+                AttackRange += (int)value;
                 break;
             case StatType.AttackCount:
-                break;
-            case StatType.CurHp:
-                break;
-            case StatType.CurMana:
-                break;
-            case StatType.GoldBonus:
+                AttackCount += (int)value;
                 break;
         }
     }
