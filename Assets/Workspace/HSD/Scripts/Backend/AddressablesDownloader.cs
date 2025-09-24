@@ -1,52 +1,46 @@
 using Cysharp.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.AddressableAssets.ResourceLocators;
 using System;
 
 public class AddressablesDownloader : MonoBehaviour
 {
     [Header("Download Settings")]
-    public List<AssetLabelReference> _labelsToDownload;
-    public bool _checkOnStart = true;
+    public List<AssetLabelReference> LabelsToDownload;
 
     [Header("Progress Info")]
-    public long _totalFileSize;
-    public long _downloadedSize;
-    public float _downloadProgress;
-    public bool _isDownloading;
-    public bool _isChecking;
+    public Property<float> DownloadProgress = new();
 
-    // 다운로드가 필요할 때 호출되는 이벤트 (크기 정보 포함)
+    public long TotalFileSize;
+    public Property<long> DownloadedSize = new();
+    public bool IsDownloading;
+    public bool IsChecking;
+
     public Action<long> OnNeedDownloading;
+    public Action OnDontNeedDownloading;
+    public Action OnDownloadEnded;
 
-    private async void Start()
+    public void Check()
     {
-        if (_labelsToDownload == null || _labelsToDownload.Count == 0)
+        if (LabelsToDownload == null || LabelsToDownload.Count == 0)
         {            
-            Debug.LogWarning("[어드레서블] 다운로드할 라벨이 설정되지 않았습니다. Inspector에서 라벨을 추가해주세요.");
+            Debug.LogWarning("[어드레서블] 다운로드할 라벨이 설정되지 않았습니다.");
             return;
         }
 
-        if (_checkOnStart)
-        {
-            await CheckForDownloads();
-        }
+        CheckForDownloads().Forget();
     }
-
-    /// <summary>
+    #region Download
+    /// <s$ummary>
     /// 어드레서블을 초기화하고 다운로드가 필요한지 체크만 함
     /// </summary>
     public async UniTask CheckForDownloads()
     {
-        if (_isChecking || _isDownloading) return;
+        if (IsChecking || IsDownloading) return;
 
-        _isChecking = true;
+        IsChecking = true;
 
         try
         {
@@ -55,6 +49,7 @@ public class AddressablesDownloader : MonoBehaviour
 
             // 다운로드 필요한지 체크
             long downloadSize = await GetTotalDownloadSize();
+            TotalFileSize = downloadSize;
 
             if (downloadSize > 0)
             {
@@ -64,6 +59,7 @@ public class AddressablesDownloader : MonoBehaviour
             else
             {
                 Debug.Log("[어드레서블] 다운로드할 파일이 없습니다. 모든 파일이 최신 상태입니다.");
+                OnDontNeedDownloading?.Invoke();
             }
         }
         catch (System.Exception e)
@@ -72,7 +68,7 @@ public class AddressablesDownloader : MonoBehaviour
         }
         finally
         {
-            _isChecking = false;
+            IsChecking = false;
         }
     }
 
@@ -81,7 +77,7 @@ public class AddressablesDownloader : MonoBehaviour
     /// </summary>
     public async UniTask StartDownload()
     {
-        if (_isDownloading || _isChecking) return;
+        if (IsDownloading || IsChecking) return;
 
         try
         {
@@ -92,7 +88,120 @@ public class AddressablesDownloader : MonoBehaviour
             Debug.LogError($"[어드레서블] 다운로드 실패: {e.Message}");
         }
     }
+    private async UniTask DownloadAllLabels()
+    {
+        IsDownloading = true;
 
+        try
+        {
+            // 모든 라벨에 대한 다운로드 사이즈 계산
+            await CalculateTotalDownloadSize();
+
+            if (TotalFileSize == 0)
+            {
+                Debug.Log("[어드레서블] 다운로드할 파일이 없습니다.");
+                return;
+            }
+
+            Debug.Log($"[어드레서블] 다운로드 시작 - 총 크기: {FormatBytes(TotalFileSize)}");
+
+            List<UniTask> tasks = new List<UniTask>();
+
+            // 각 라벨별로 다운로드
+            foreach (var label in LabelsToDownload)
+            {
+                tasks.Add(DownloadLabel(label));
+            }
+
+            await UniTask.WhenAll(tasks);
+
+            Debug.Log("[어드레서블] 모든 라벨 다운로드 완료");
+        }
+        finally
+        {
+            OnDownloadEnded?.Invoke();
+            IsDownloading = false;
+        }
+    }
+    private async UniTask DownloadLabel(AssetLabelReference label)
+    {
+        // 해당 라벨의 다운로드 사이즈 확인
+        var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);
+        long labelSize = await sizeHandle.ToUniTask();
+        Addressables.Release(sizeHandle);
+
+        if (labelSize > 0)
+        {
+            Debug.Log($"[어드레서블] {label} 다운로드 시작");
+
+            var downloadHandle = Addressables.DownloadDependenciesAsync(label.labelString, false);
+
+            // 진행률 모니터링
+            while (!downloadHandle.IsDone)
+            {
+                if (downloadHandle.IsValid())
+                {
+                    var status = downloadHandle.GetDownloadStatus();
+                    DownloadProgress.Value = downloadHandle.PercentComplete;
+                    DownloadedSize.Value = (long)(TotalFileSize * DownloadProgress.Value);
+
+                    Debug.Log($"[어드레서블] 다운로드 중 {label}: {DownloadProgress:P2} - {FormatBytes(DownloadedSize.Value)}/{FormatBytes(TotalFileSize)}");
+                }
+
+                await UniTask.Yield();
+            }
+
+            if (downloadHandle.Status == AsyncOperationStatus.Succeeded)
+            {
+                Debug.Log($"[어드레서블] {label} 다운로드 완료");
+            }
+            else
+            {
+                Debug.LogError($"[어드레서블] {label} 다운로드 실패: {downloadHandle.OperationException}");
+            }
+
+            Addressables.Release(downloadHandle);
+        }
+        else
+        {
+            Debug.Log($"[어드레서블] {label} 라벨은 이미 다운로드되어 있습니다.");
+        }
+    }
+    private async UniTask CalculateTotalDownloadSize()
+    {
+        TotalFileSize = 0;
+
+        foreach (var label in LabelsToDownload)
+        {
+            var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);
+            long labelSize = await sizeHandle.ToUniTask();
+            TotalFileSize += labelSize;
+
+            if (labelSize > 0)
+            {
+                Debug.Log($"[어드레서블] '{label}' 라벨 다운로드 크기: {FormatBytes(labelSize)}");
+            }
+
+            Addressables.Release(sizeHandle);
+        }
+
+        Debug.Log($"[어드레서블] 전체 다운로드 크기: {FormatBytes(TotalFileSize)}");
+    }
+    public async UniTask<long> GetTotalDownloadSize()
+    {
+        long totalSize = 0;
+
+        foreach (var label in LabelsToDownload)
+        {
+            var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);
+            long labelSize = await sizeHandle.ToUniTask();
+            totalSize += labelSize;
+            Addressables.Release(sizeHandle);
+        }
+
+        return totalSize;
+    }
+    #endregion
     private async UniTask InitializeAddressables()
     {
         var initHandle = Addressables.InitializeAsync();
@@ -133,103 +242,6 @@ public class AddressablesDownloader : MonoBehaviour
         Addressables.Release(checkHandle);
     }
 
-    private async UniTask DownloadAllLabels()
-    {
-        _isDownloading = true;
-
-        try
-        {
-            // 모든 라벨에 대한 다운로드 사이즈 계산
-            await CalculateTotalDownloadSize();
-
-            if (_totalFileSize == 0)
-            {
-                Debug.Log("[어드레서블] 다운로드할 파일이 없습니다.");
-                return;
-            }
-
-            Debug.Log($"[어드레서블] 다운로드 시작 - 총 크기: {FormatBytes(_totalFileSize)}");
-
-            // 각 라벨별로 다운로드
-            foreach (AssetLabelReference label in _labelsToDownload)
-            {
-                await DownloadLabel(label);
-            }
-
-            Debug.Log("[어드레서블] 모든 라벨 다운로드 완료");
-        }
-        finally
-        {
-            _isDownloading = false;
-        }
-    }
-
-    private async UniTask CalculateTotalDownloadSize()
-    {
-        _totalFileSize = 0;
-
-        foreach (AssetLabelReference label in _labelsToDownload)
-        {
-            var sizeHandle = Addressables.GetDownloadSizeAsync(label);
-            long labelSize = await sizeHandle.ToUniTask();
-            _totalFileSize += labelSize;
-
-            if (labelSize > 0)
-            {
-                Debug.Log($"[어드레서블] '{label}' 라벨 다운로드 크기: {FormatBytes(labelSize)}");
-            }
-
-            Addressables.Release(sizeHandle);
-        }
-
-        Debug.Log($"[어드레서블] 전체 다운로드 크기: {FormatBytes(_totalFileSize)}");
-    }
-
-    private async UniTask DownloadLabel(AssetLabelReference label)
-    {
-        // 해당 라벨의 다운로드 사이즈 확인
-        var sizeHandle = Addressables.GetDownloadSizeAsync(label);
-        long labelSize = await sizeHandle.ToUniTask();
-        Addressables.Release(sizeHandle);
-
-        if (labelSize > 0)
-        {
-            Debug.Log($"[어드레서블] {label} 다운로드 시작");
-
-            var downloadHandle = Addressables.DownloadDependenciesAsync(label, false);
-
-            // 진행률 모니터링
-            while (!downloadHandle.IsDone)
-            {
-                if (downloadHandle.IsValid())
-                {
-                    var status = downloadHandle.GetDownloadStatus();
-                    _downloadProgress = downloadHandle.PercentComplete;
-                    _downloadedSize = (long)(_totalFileSize * _downloadProgress);
-
-                    Debug.Log($"[어드레서블] 다운로드 중 {label}: {_downloadProgress:P2} - {FormatBytes(_downloadedSize)}/{FormatBytes(_totalFileSize)}");
-                }
-
-                await UniTask.Yield();
-            }
-
-            if (downloadHandle.Status == AsyncOperationStatus.Succeeded)
-            {
-                Debug.Log($"[어드레서블] {label} 다운로드 완료");
-            }
-            else
-            {
-                Debug.LogError($"[어드레서블] {label} 다운로드 실패: {downloadHandle.OperationException}");
-            }
-
-            Addressables.Release(downloadHandle);
-        }
-        else
-        {
-            Debug.Log($"[어드레서블] {label} 라벨은 이미 다운로드되어 있습니다.");
-        }
-    }
-
     public async UniTask<bool> CheckForUpdates()
     {
         var checkHandle = Addressables.CheckForCatalogUpdates(false);
@@ -240,22 +252,8 @@ public class AddressablesDownloader : MonoBehaviour
         return hasUpdates;
     }
 
-    public async UniTask<long> GetTotalDownloadSize()
-    {
-        long totalSize = 0;
 
-        foreach (AssetLabelReference label in _labelsToDownload)
-        {
-            var sizeHandle = Addressables.GetDownloadSizeAsync(label);
-            long labelSize = await sizeHandle.ToUniTask();
-            totalSize += labelSize;
-            Addressables.Release(sizeHandle);
-        }
-
-        return totalSize;
-    }
-
-    private string FormatBytes(long bytes)
+    public string FormatBytes(long bytes)
     {
         string[] suffixes = { "B", "KB", "MB", "GB", "TB" };
         int counter = 0;
@@ -270,7 +268,7 @@ public class AddressablesDownloader : MonoBehaviour
         return string.Format("{0:n1} {1}", number, suffixes[counter]);
     }
 
-    // Inspector에서 테스트용
+#region Test    
     [ContextMenu("Check for Downloads")]
     private async void TestCheckForDownloads()
     {
@@ -289,4 +287,5 @@ public class AddressablesDownloader : MonoBehaviour
         long size = await GetTotalDownloadSize();
         Debug.Log($"전체 다운로드 크기: {FormatBytes(size)}");
     }
+#endregion
 }
