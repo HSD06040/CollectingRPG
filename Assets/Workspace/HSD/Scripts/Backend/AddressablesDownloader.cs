@@ -119,6 +119,7 @@ public class AddressablesDownloader : MonoBehaviour
         }
         finally
         {
+            await UniTask.WaitForSeconds(1f);
             OnDownloadEnded?.Invoke();
             IsDownloading = false;
         }
@@ -145,7 +146,7 @@ public class AddressablesDownloader : MonoBehaviour
                     DownloadProgress.Value = downloadHandle.PercentComplete;
                     DownloadedSize.Value = (long)(TotalFileSize * DownloadProgress.Value);
 
-                    Debug.Log($"[어드레서블] 다운로드 중 {label}: {DownloadProgress:P2} - {FormatBytes(DownloadedSize.Value)}/{FormatBytes(TotalFileSize)}");
+                    Debug.Log($"[어드레서블] 다운로드 중 {label}: {DownloadProgress.Value:P2} - {FormatBytes(DownloadedSize.Value)}/{FormatBytes(TotalFileSize)}");
                 }
 
                 await UniTask.Yield();

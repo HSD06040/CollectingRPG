@@ -64,6 +64,6 @@ public class AddressableDownload_UI : UIBase
 
     private void DownloadProgressUpdate(float progress)
     {
-        _downloadSlider.value = progress / 100;
+        _downloadSlider.Lerp(progress, .3f, DG.Tweening.Ease.Linear);
     }
 }

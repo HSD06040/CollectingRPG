@@ -13,7 +13,7 @@ public class Download_Popup : UIBase
     [UIBind("DownloadText")] TMP_Text _downloadText;
     [UIBind("ConfirmButton")] Button _confirmButton;
     [UIBind("CancelButton")] Button _cancelButton;
-    [UIBind("Popup")] GameObject _popup;    
+    [SerializeField] GameObject _popup;    
 
     private void OnEnable()
     {

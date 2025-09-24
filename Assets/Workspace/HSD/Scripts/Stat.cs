@@ -28,9 +28,9 @@ public class Stat<T> where T : struct, IComparable, IEquatable<T>
     public Action<T> OnChanged;
 
     // 타입별 덧셈 연산 델리게이트
-    private static readonly Func<T, T, T> addFunc;
+    private readonly Func<T, T, T> addFunc;
 
-    static Stat()
+    public Stat()
     {
         if (typeof(T) == typeof(int))
             addFunc = (a, b) => (T)(object)((int)(object)a + (int)(object)b);
