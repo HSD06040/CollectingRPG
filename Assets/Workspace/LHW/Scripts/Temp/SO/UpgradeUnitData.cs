@@ -66,7 +66,7 @@ public class UpgradeUnitData : ScriptableObject
         if(CurrentUpgradeData.CurrentPieces >= requiredPiece)
         {
             CurrentUpgradeData.CurrentPieces -= requiredPiece;
-            CurrentUpgradeData.UpgradeLevel += 1;
+            CurrentUpgradeData.UpgradeLevel += 1;            
         }
     }    
 }
