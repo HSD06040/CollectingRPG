@@ -151,20 +151,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d0797a8750b93f4da5d60790ca93766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _labelsToDownload:
-  - m_LabelString: Stage
-  - m_LabelString: UnitData
-  - m_LabelString: SkillData
-  - m_LabelString: AttackData
-  - m_LabelString: EnemyUnitData
-  - m_LabelString: MonsterIcon
-  - m_LabelString: Test
-  _checkOnStart: 1
-  _totalFileSize: 0
-  _downloadedSize: 0
-  _downloadProgress: 0
-  _isDownloading: 0
-  _isChecking: 0
+  LabelsToDownload: []
+  TotalFileSize: 0
+  IsDownloading: 0
+  IsChecking: 0
 --- !u!4 &5259828
 Transform:
   m_ObjectHideFlags: 0
@@ -519,7 +509,7 @@ MonoBehaviour:
     Level: 1
   _buffEffect: 4
   _duration: 2
-  skill: {fileID: 11400000, guid: 01e17156d5d6ae6418e66a2d16a0a6bd, type: 2}
+  skill: {fileID: 11400000, guid: e15a8f589eb67f6449fb02d058f41989, type: 2}
   attackData: {fileID: 11400000, guid: 3988a8a56c3adca4f95db01f0d457790, type: 2}
 --- !u!4 &555633192
 Transform:

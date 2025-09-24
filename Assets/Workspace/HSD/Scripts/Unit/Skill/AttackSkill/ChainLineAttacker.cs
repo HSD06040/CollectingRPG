@@ -79,6 +79,8 @@ public class ChainLineAttacker : MonoBehaviour
 
             await UniTask.WaitForSeconds(_interval, cancellationToken: _source.Token);
         }
+
+        Manager.Resources.Destroy(gameObject);
     }
     
     private void SpawnEffect()
@@ -104,11 +106,6 @@ public class ChainLineAttacker : MonoBehaviour
 
     private void ChangeTarget()
     {
-        if (_target == null)
-        {
-
-            return;
-        }
         _targetList.Add(_target);
         _currentPos = ComponentProvider.Get<UnitBase>(_target.gameObject).GetCenter();
         _target = Utils.GetClosestTargetNonAlloc(_currentPos, 100, _targetLayer, Filter);        
