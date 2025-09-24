@@ -64,10 +64,10 @@ public class UnitStats
                 break;
         }
     }
-    public void AddAugments(StatType status, float rate, string name)
+    public void AddAugments(StatType status, float rate, string name, UnitStatusController controller)
     {
         StatEffectModifier modifier = CalculateAugment(status, rate);
-        AugmentManager.Instance.AddAugment(modifier.StatType, modifier.Value, name);
+        AugmentManager.Instance.AddAugment(modifier.StatType, modifier.Value, name, controller);
     }
 
     public StatEffectModifier CalculateAugment(StatType status, float rate)
@@ -94,8 +94,8 @@ public class UnitStats
         return modifier;
     }
 
-    public void RemoveAugments(StatType status, string name)
+    public void RemoveAugments(StatType status, string name, UnitStatusController controller)
     {
-        AugmentManager.Instance.RemoveAugment(status, name);
+        AugmentManager.Instance.RemoveAugment(status, name, controller);
     }
 }

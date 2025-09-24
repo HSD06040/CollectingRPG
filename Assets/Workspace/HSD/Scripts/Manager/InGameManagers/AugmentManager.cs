@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class AugmentManager : InGameSingleton<AugmentManager>
 {
@@ -51,7 +52,7 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     /// <param name="unit"></param>
     public void ApplyAugment(UnitBase unit)
     {
-        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType == EffectType.Currency) return;
+        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType != EffectType.Buff_Debuff) return;
 
         if (!_appliedStatusAugments.ContainsKey(unit))
             _appliedStatusAugments[unit] = new HashSet<string>();
@@ -63,7 +64,7 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         }
 
         _appliedStatusAugments[unit].Add(currentAugment.AUGID);
-        currentAugment.ApplyEffect(unit);
+        currentAugment.ApplyBuffEffect(unit);
     }
 
     /// <summary>
@@ -78,11 +79,11 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         {
             if (augments.Contains(currentAugment.AUGID))
             {
-                currentAugment.RemoveEffect(unit);
+                currentAugment.RemoveBuffEffect(unit);
                 augments.Remove(currentAugment.AUGID);
-
                 if (augments.Count == 0)
                     _appliedStatusAugments.Remove(unit);
+
             }
             else
             {
@@ -107,6 +108,47 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         // 리더일 경우 추가 필요
 
         return false;
+    }
+
+    #endregion
+
+    #region Unit Increase
+
+    public void ApplyHealAugment(UnitBase unit)
+    {
+        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType != EffectType.Increase) return;
+
+        if (!_appliedStatusAugments.ContainsKey(unit))
+            _appliedStatusAugments[unit] = new HashSet<string>();
+
+        if (_appliedStatusAugments[unit].Contains(currentAugment.AUGID))
+        {
+            Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 이미 적용됨.");
+            return;
+        }
+
+        _appliedStatusAugments[unit].Add(currentAugment.AUGID);
+        currentAugment.ApplyIncreaseEffect(unit);
+    }
+
+    public void ReleaseHealAugment(UnitBase unit)
+    {
+        if (currentAugment == null) return;
+
+        if (_appliedStatusAugments.TryGetValue(unit, out var augments))
+        {
+            if (augments.Contains(currentAugment.AUGID))
+            {
+                augments.Remove(currentAugment.AUGID);
+
+                if (augments.Count == 0)
+                    _appliedStatusAugments.Remove(unit);
+            }
+            else
+            {
+                Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 적용되지 않아 해제할 수 없음.");
+            }
+        }
     }
 
     #endregion
@@ -166,33 +208,82 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     #endregion
 
     #region Augument Management
-    public void AddAugment(StatType statType, float value, string source)
+    public void AddAugment(StatType statType, float value, string source, UnitStatusController controller)
     {
         switch (statType)
         {
             case StatType.MaxHealth:
                 MaxHealth.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.PhysicalDamage:
                 PhysicalDamage.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.MagicDamage:
                 MagicDamage.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.CritChance:
                 CritChance.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.PhysicalDefense:
                 PhysicalDefense.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.MagicDefense:
                 MagicDefense.AddModifier((int)value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
             case StatType.AttackSpeed:
                 AttackSpeed.AddModifier(value, source);
+                controller?.AddStat(statType, (int)value, source);
                 break;
+        }
+    }
+
+    public void AddAugment(StatType statType, float value, string source)
+    {
+        switch (statType)
+        {
             case StatType.GoldBonus:
-                GoldBonus.AddModifier(value, source);
+                GoldBonus.AddModifier(value, source);                
+                break;
+        }
+    }
+
+    public void RemoveAugment(StatType statType, string source, UnitStatusController controller)
+    {
+        switch (statType)
+        {
+            case StatType.MaxHealth:
+                MaxHealth.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.PhysicalDamage:
+                PhysicalDamage.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.MagicDamage:
+                MagicDamage.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.CritChance:
+                CritChance.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.PhysicalDefense:
+                PhysicalDefense.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.MagicDefense:
+                MagicDefense.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
+                break;
+            case StatType.AttackSpeed:
+                AttackSpeed.RemoveModifier(source);
+                controller?.RemoveStat(statType, source);
                 break;
         }
     }
@@ -201,27 +292,6 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     {
         switch (statType)
         {
-            case StatType.MaxHealth:
-                MaxHealth.RemoveModifier(source);
-                break;
-            case StatType.PhysicalDamage:
-                PhysicalDamage.RemoveModifier(source);
-                break;
-            case StatType.MagicDamage:
-                MagicDamage.RemoveModifier(source);
-                break;
-            case StatType.CritChance:
-                CritChance.RemoveModifier(source);
-                break;
-            case StatType.PhysicalDefense:
-                PhysicalDefense.RemoveModifier(source);
-                break;
-            case StatType.MagicDefense:
-                MagicDefense.RemoveModifier(source);
-                break;
-            case StatType.AttackSpeed:
-                AttackSpeed.RemoveModifier(source);
-                break;
             case StatType.GoldBonus:
                 GoldBonus.RemoveModifier(source);
                 break;
