@@ -152,10 +152,12 @@ public class CsvDownloader
             unitData.UnitStats = new UnitStats[4];
 
             unitData.UnitStats[0] = stat;
-            unitData.UnitStats[1] = stat;
-            unitData.UnitStats[2] = stat;
-            unitData.UnitStats[3] = stat;
 
+            for(int i = 1; i < unitData.UnitStats.Length; i++)
+            {
+                unitData.UnitStats[i] = unitData.UnitStats[i-1].StatMultiply(1.5f);
+            }
+            
             string synergyText = unitData.Synergy.ToString();
             string synergyName = $"{char.ToUpper(synergyText[0])}{synergyText.Substring(1).ToLower()}";
             int lastDigit = Mathf.Abs(id % 10);

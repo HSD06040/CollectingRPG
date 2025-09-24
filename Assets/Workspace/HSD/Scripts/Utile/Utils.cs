@@ -3,6 +3,7 @@ using System.Text;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
 public static class Utils
@@ -423,6 +424,22 @@ public static class Utils
 
             gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
         }
+    }
+    #endregion
+
+    #region Status
+    public static UnitStats StatMultiply(this UnitStats unitStats, float multiply)
+    {
+        return new UnitStats
+        {
+            MaxHealth = Mathf.RoundToInt(unitStats.MaxHealth * multiply),
+
+            PhysicalDamage = Mathf.RoundToInt(unitStats.PhysicalDamage * multiply),
+            MagicDamage = Mathf.RoundToInt(unitStats.MagicDamage * multiply),
+
+            PhysicalDefense = Mathf.RoundToInt(unitStats.PhysicalDefense * multiply),
+            MagicDefense = Mathf.RoundToInt(unitStats.MagicDefense * multiply)
+        };
     }
     #endregion
 

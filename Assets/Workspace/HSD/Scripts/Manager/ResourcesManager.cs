@@ -30,7 +30,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         if (!_resources.ContainsKey(address))
         {
-            Debug.Log($"[AddressableSystem] {address} 주소의 에셋이 로드되지 않았습니다.");
+            Debug.LogWarning($"[AddressableSystem] {address} 주소의 에셋이 로드되지 않았습니다.");
             return null;
         }
 
