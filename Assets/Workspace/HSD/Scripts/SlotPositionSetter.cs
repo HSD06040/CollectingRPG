@@ -47,5 +47,7 @@ public class SlotPositionSetter : MonoBehaviour
         _center.position = centerWorld;
 
         _swipePager.XLimit = _distance;
+
+        SynergyEffectManager.Instance.SetCenter(_center.position);
     }
 }

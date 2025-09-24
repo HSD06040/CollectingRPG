@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -19,20 +20,26 @@ public class BuffRangedSkill : RangedSkill
     [SerializeField] float _radius;
     [SerializeField] BuffEffectData _buffEffectData;
     [SerializeField] StatEffectModifier _statModifier;
-
+    
     public override void Active(IAttacker attacker)
     {
+        GameObject spawnObject = Manager.Resources.Load<GameObject>(EffectAddress);
+
         SplashBuffProjectile projectile = ComponentProvider.Get<SplashBuffProjectile>(
             Manager.Resources.Instantiate<GameObject>(
-                EffectAddress,
+                spawnObject,
                 GetSpawnPoint(attacker),
                 true
                 )
             );
 
-        projectile.transform.localScale = attacker.GetTransform().localScale;
-
         Transform target = GetTarget(attacker);
+
+        if (target == null || projectile == null)
+            return;
+
+        projectile.transform.right = (target.position - projectile.transform.position).normalized;
+        projectile.transform.Rotate(0, 0, spawnObject.transform.rotation.eulerAngles.z);
 
         if (target == null)
         {
@@ -42,13 +49,13 @@ public class BuffRangedSkill : RangedSkill
         if (_isBuff)
         {
             projectile.Init(_buffEffectData, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), Power, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
         else if (!_isBuff)
         {
             projectile.Init(_statModifier, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), Power, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
     }
@@ -79,7 +86,8 @@ public class BuffRangedSkill : RangedSkill
             if (attacker.GetTarget() == null)
             {
                 Debug.Log("[스킬] 타켓이 없습니다.");
-                return null;
+                
+                return Utils.GetClosestTargetNonAlloc(attacker.GetCenter(), 10, attacker.TargetLayer)?.transform;
             }
 
             return attacker.GetTarget();
@@ -89,7 +97,7 @@ public class BuffRangedSkill : RangedSkill
             return GetTargetSingle(attacker)?.transform;
         }
     }
-
+#if UNITY_EDITOR
     public override void DrawGizmos(IAttacker attacker)
     {
         base.DrawGizmos(attacker);
@@ -98,4 +106,5 @@ public class BuffRangedSkill : RangedSkill
 
         Gizmos.DrawWireSphere(attacker.GetCenter(), _radius);
     }
+#endif
 }

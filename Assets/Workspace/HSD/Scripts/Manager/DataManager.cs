@@ -2,16 +2,16 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using static UnitAnimatorData;
 
 public class DataManager : Singleton<DataManager>
 {
     // 유닛 데이터 관련
-    public Dictionary<string, UnitData> UnitDataDic;
-    public Dictionary<AnimatorData, RuntimeAnimatorController> AnimatorDic;
+    public Dictionary<string, UnitData> UnitDataDic;    
     public UnitData[] EnemyUnitDatas;
-    public UnitData[] UnitDatas;
+    public UnitData[] PlayerUnitDatas;
     public SynergyDatabase SynergyDB;
+
+    public AnimationManager AnimationManager = new();
 
     // 프리셋 데이터 관련
     public PresetDatabase PresetDB { get; private set; } = new PresetDatabase();
@@ -19,6 +19,7 @@ public class DataManager : Singleton<DataManager>
     // 맵 데이터 관련
     public MapDatabase MapDB { get; private set; } = new MapDatabase();
 
+    // 추후 Init으로 뺄 예정
     private void Awake()
     {
         InitData().Forget();
@@ -30,8 +31,8 @@ public class DataManager : Singleton<DataManager>
 
     public async UniTask InitData()
     {
-        await Manager.Resources.SpriteLoadLable("MonsterIcon");
-        await AnimatorSetting();
+        await Manager.Resources.SpriteLoadLable("MonsterIcon");        
+        await AnimationManager.Init();
         await PreLoadData();
         await CsvDownload();
     }
@@ -57,11 +58,11 @@ public class DataManager : Singleton<DataManager>
     private async UniTask PreLoadUnitDatas()
     {
         EnemyUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");        
-        UnitDatas = await Manager.Resources.LoadAll<UnitData>("UnitData");
+        PlayerUnitDatas = await Manager.Resources.LoadAll<UnitData>("UnitData");
 
-        UnitDataDic = new Dictionary<string, UnitData>(UnitDatas.Length);
+        UnitDataDic = new Dictionary<string, UnitData>(PlayerUnitDatas.Length);
 
-        foreach (var unitData in UnitDatas)
+        foreach (var unitData in PlayerUnitDatas)
         {
             if (!UnitDataDic.ContainsKey(unitData.Name))
                 UnitDataDic.Add(unitData.Name, unitData);
@@ -82,31 +83,6 @@ public class DataManager : Singleton<DataManager>
     {
         SynergyDB = await Addressables.LoadAssetAsync<SynergyDatabase>("Database/SynergyDatabase");
         SynergyDB.Init();
-    }
-
-    private async UniTask AnimatorSetting()
-    {
-        UnitAnimatorData animatorData = await Addressables.LoadAssetAsync<UnitAnimatorData>("Data/UnitAnimatorData");
-
-        AnimatorDic = new Dictionary<AnimatorData, RuntimeAnimatorController>(animatorData.Animators.Length);
-
-        animatorData.SettingAnimationClip();
-
-        foreach (var data in animatorData.Animators)
-        {
-            AnimatorOverrideController newAnimator = new AnimatorOverrideController(animatorData.BaseController);
-
-            foreach (var pair in newAnimator.animationClips)
-            {
-                if (pair.name == "Melee_Attack")
-                    newAnimator[pair.name] = animatorData.GetAnimationClip(data.AttackAnimationType);
-                else if (pair.name == "Melee_Skill")
-                    newAnimator[pair.name] = animatorData.GetAnimationClip(data.SkillAnimationType);
-            }
-
-            if (!AnimatorDic.ContainsKey(data))
-                AnimatorDic.Add(data, newAnimator.runtimeAnimatorController);
-        }
     }
 
     public UnitData GetUnitData(string unitName)
