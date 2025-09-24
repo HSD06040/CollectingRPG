@@ -14,11 +14,12 @@ public class AllAttacker : MonoBehaviour
     private GameObject _explosionEffect;
     private DamageType _damageType;
     private LayerMask _targetLayer;
-    private float _power;
+    private float _physicalPower;
+    private float _abilityPower;
     private float _speed;
     private Collider2D[] _objs = new Collider2D[20];
     
-    public void Setup(IAttacker attacker, GameObject attackEffect, GameObject explosionEffect, float power, DamageType damageType, float speed)
+    public void Setup(IAttacker attacker, GameObject attackEffect, GameObject explosionEffect, float physicalPower, float abilityPower, DamageType damageType, float speed)
     {
         _attacker = attacker;
         _targetLayer = _attacker.TargetLayer;
@@ -26,7 +27,9 @@ public class AllAttacker : MonoBehaviour
         _status = _attacker.GetStatusController();
         _attackEffect = attackEffect;
         _explosionEffect = explosionEffect;
-        
+        _physicalPower = physicalPower;
+        _abilityPower = abilityPower;
+
         AttackAll();
     }
 
@@ -43,7 +46,7 @@ public class AllAttacker : MonoBehaviour
     private async UniTask MoveToEnemy(GameObject target)
     {
         await UniTask.Yield();
-        Vector3 targetPos = target.GetCenter();
+        Vector3 targetPos = target.GetCenterPosition();
 
         GameObject attack = Manager.Resources.Instantiate(_attackEffect, transform.position, true);
         Vector2 dir = (targetPos - attack.transform.position).normalized;
@@ -51,12 +54,12 @@ public class AllAttacker : MonoBehaviour
         attack.transform.Rotate(0f, 0f, _attackEffect.transform.rotation.eulerAngles.z);
 
         await UniTask.Yield();
-        await attack.transform.DOMove(target.GetCenter(), _speed)
+        await attack.transform.DOMove(target.GetCenterPosition(), _speed)
             .SetSpeedBased()
             .SetEase(Ease.Linear)
             .AsyncWaitForCompletion();
 
-        _status.CalculateDamage(_power, _damageType, ComponentProvider.Get<UnitBase>(target).StatusController);
+        _status.CalculateDamage(_physicalPower, _abilityPower, _damageType, ComponentProvider.Get<UnitBase>(target).StatusController);
         Manager.Resources.Destroy(attack);
 
         GameObject effect = Manager.Resources.Instantiate(_explosionEffect, targetPos, true);

@@ -175,17 +175,19 @@ public class PoolManager : Singleton<PoolManager>
     #region Get
     public T Get<T> (T original, Vector3 position, Quaternion rotation, Transform parent) where T : Object
     {
+        if (original == null) return null;
+
         GameObject go = original as GameObject;
         string name = go.name;
 
         var pool = GetOrCreatePool(name, go);
 
-        go = pool.Get();
+        go = pool.Get();        
 
         if (parent != null)
             go.transform.SetParent(parent, false);
 
-        go.transform.localPosition = position;
+        go.transform.position = position;
         go.transform.rotation = rotation;
 
         go.SetActive(true);

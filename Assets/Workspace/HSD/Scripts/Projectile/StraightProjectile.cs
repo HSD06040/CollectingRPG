@@ -14,10 +14,10 @@ public class StraightProjectile : Projectile
     protected override async UniTask MoveAndDestroy(float duration)
     {
         SetDirection();
-        duration = _distance / _speed;
 
-        await transform.DOMove((Vector2)transform.position + (_dir * _distance), duration)
+        await transform.DOMove((Vector2)transform.position + (_dir * _distance), _speed)
             .SetEase(Ease.Linear)
+            .SetSpeedBased()
             .AsyncWaitForCompletion();
 
         ProjectileDestroy();

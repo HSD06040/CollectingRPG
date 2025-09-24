@@ -31,6 +31,12 @@ public struct AnimatorData : IEquatable<AnimatorData>
     public AnimationType AttackAnimationType;
     public AnimationType SkillAnimationType;
 
+    public AnimatorData(AnimationType attack, AnimationType skill)
+    {
+        AttackAnimationType = attack;
+        SkillAnimationType = skill;
+    }
+
     public bool Equals(AnimatorData other)
     {
         return AttackAnimationType == other.AttackAnimationType &&

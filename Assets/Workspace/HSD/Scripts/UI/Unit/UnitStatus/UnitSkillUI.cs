@@ -18,7 +18,7 @@ public class UnitSkillUI : MonoBehaviour
         _skillIcon.sprite = skill.Icon;
         _skillNameText.text = skill.SkillName;
         _manaText.text = skill.ManaCost.ToString();
-        _skillPowerText.text = skill.Power.ToString();
+        _skillPowerText.text = skill.physicalPower.ToString();
         _skillDescriptionText.text = skill.Description;
         _skillAttackCountText.text = skill.MaxCount.ToString();
     }

@@ -12,28 +12,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e0f65ebd5830d045872b490d8f8f42b, type: 3}
   m_Name: Kingdom5
   m_EditorClassIdentifier: 
-  ID: 0
+  ID: 201005
   Icon: {fileID: 0}
   SkillName: 
   Description: 
   MaxCount: 1
   Powers: []
-  Power: 1
+  Power: 250
   ManaCost: 0
   Priority: 5
-  EffectAddress: Buff
+  EffectAddress: Position_Projectile
   EffectSpawnType: 0
   SpawnPointOffset: {x: 0, y: 0}
-  DamageType: 0
+  DamageType: 1
   _projectileSpeed: 5
-  _explosionEffect: 
+  _explosionEffect: HealRange_Effect_Skill
   _distance: 5
   _activationCondition: 2
   _throwType: 0
   _parabolaYOffset: 1
+  _isAttack: 0
+  _isModifier: 0
+  _isBuff: 0
   _isAlly: 1
-  _buffRadius: 1
-  _statEffectModifier:
-    StatType: 14
-    Value: 100
-  _pireceCount: 0
+  _radius: 0
+  _buffEffectData:
+    StatType: 0
+    Duration: 0
+    IsTicking: 0
+    TickInterval: 0
+  _statModifier:
+    StatType: 0
+    Value: 0

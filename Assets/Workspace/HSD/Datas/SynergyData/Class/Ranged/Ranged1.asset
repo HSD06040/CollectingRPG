@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91b9fe931ac8cf5418a6a4a2316ea86a, type: 3}
   m_Name: Ranged1
   m_EditorClassIdentifier: 
-  Key: e49b7da1-a1ad-4270-a640-72930742ca39
   Description: "\uACF5\uACA9 \uC18D\uB3C4 0.5"
   IsActivationsClear: 0
   IsAttack: 0
@@ -21,7 +20,11 @@ MonoBehaviour:
   IsDelay: 0
   IsFirstOnly: 0
   DelayTime: 0
+  SynergyEffectAddress: 
+  EffectDuration: 2
   IsUnitPosition: 0
+  UnitDataAddress: 
+  UnitLevel: 0
   SpawnUnitStats:
     MaxHealth: 0
     MaxMana: 0
@@ -39,9 +42,11 @@ MonoBehaviour:
   SpawnType: 0
   SpawnSynergy: 0
   SpawnAddress: 
-  EffectAttackType: 0
+  SpawnEffectAddress: 
+  EffectApplyType: 0
   SpawnPositionType: 0
   Power: 0
+  AttackDealy: 1
   AttackAddress: 
   EffectType: 1
   SynergyBuffDatas: []
@@ -51,5 +56,5 @@ MonoBehaviour:
   TriggerType: 0
   Interval: 0
   MaxActivations: 1
-  TargetType: 1
+  TargetType: 2
   NextEffect: {fileID: 0}

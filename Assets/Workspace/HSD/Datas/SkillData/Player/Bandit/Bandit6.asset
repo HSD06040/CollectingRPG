@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e0f65ebd5830d045872b490d8f8f42b, type: 3}
   m_Name: Bandit6
   m_EditorClassIdentifier: 
-  ID: 0
+  ID: 205006
   Icon: {fileID: 0}
   SkillName: 
   Description: 
   MaxCount: 1
   Powers: []
-  Power: -5
+  Power: -10
   ManaCost: 0
   Priority: 1
-  EffectAddress: 
+  EffectAddress: Bandit6_Projectile
   EffectSpawnType: 0
   SpawnPointOffset: {x: 0, y: 0}
   DamageType: 0
@@ -33,14 +33,14 @@ MonoBehaviour:
   _parabolaYOffset: 0
   _isAttack: 1
   _isModifier: 1
-  _isBuff: 0
+  _isBuff: 1
   _isAlly: 0
   _radius: 0
   _buffEffectData:
     StatType: 9
-    Duration: 3
+    Duration: 2
     IsTicking: 0
-    TickInterval: 0.5
+    TickInterval: 0
   _statModifier:
     StatType: 9
     Value: -100

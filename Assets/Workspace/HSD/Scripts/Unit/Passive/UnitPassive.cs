@@ -37,6 +37,7 @@ public class UnitPassive
                 _owner.StatusController.OnDied += EffectActives;
                 break;
             case TriggerType.OnAttack:
+                Debug.Log($"{_owner.name}에 AttackEvent 등록");
                 _owner.StatusController.OnAttack += EffectActives;
                 break;
             case TriggerType.OnUseSkill:
@@ -119,7 +120,6 @@ public class UnitPassive
         while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
         {
             EffectActives();
-            _currentActivations++;
 
             try
             {
@@ -144,9 +144,6 @@ public class UnitPassive
     {
         while (_currentActivations < Effect.MaxActivations && !token.IsCancellationRequested)
         {
-            EffectActives();
-            _currentActivations++;
-
             try
             {
                 await UniTask.WaitForSeconds(Effect.Interval, cancellationToken: token);
@@ -155,6 +152,8 @@ public class UnitPassive
             {
                 return;
             }
+
+            EffectActives();
         }
 
         // Delay 대기
@@ -210,21 +209,28 @@ public class UnitPassive
             return;
 
         _isActive = true;
-
+        
         if (_currentActivations < Effect.MaxActivations)
         {
+            _currentActivations++;
+
             SpawnActive();
             BuffEffectActive();
             AttackActive();
-            _currentActivations++;
+            if (!string.IsNullOrEmpty(Effect.SynergyEffectAddress))
+            {
+                Manager.Resources.Destroy(
+                Manager.Resources.Instantiate<GameObject>(Effect.SynergyEffectAddress, _owner.GetCenter()), Effect.EffectDuration
+                );
+            }
         }
         else
         {
             NextEffectActives();
 
             if(Effect.IsActivationsClear)
-                _currentActivations = 0;
-        }
+                _currentActivations = 0;            
+        }        
     }
 
     private void RemoveStat()
@@ -240,7 +246,13 @@ public class UnitPassive
 
     private void NextEffectActives()
     {
-        if (Effect.NextEffect == null) return;
+        if (Effect.NextEffect == null) 
+            return;
+
+        if (Effect.NextEffect.EffectApplyType == EffectApplyType.All)
+            return;
+
+        Debug.Log($"[Next]");
 
         NextBuffEffectActive();
         NextAttackActive();
@@ -285,7 +297,7 @@ public class UnitPassive
                     else if (stat.StatType == StatType.Shield)
                         _owner.StatusController.IncreaseShield(Mathf.RoundToInt(stat.Value * _mulriplier));
                     else
-                        _owner.StatusController.AddStat(stat.StatType, stat.Value * _mulriplier, _effect.Key);
+                        _owner.StatusController.AddStat(stat.StatType, stat.Value * _mulriplier, $"{_effect.Key}__{_currentActivations}");
                 }
                 break;
         }
@@ -316,11 +328,14 @@ public class UnitPassive
             Debug.LogWarning($"[시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {effect.AttackAddress}");
             return;
         }
+                 
+        GameObject attackObj = effect.SpawnPositionType == SpawnPositionType.Self ? 
+            Manager.Resources.Instantiate(effect.AttackPrefab, _owner.transform.position, Quaternion.identity, true) :
+            Manager.Resources.Instantiate(effect.AttackPrefab, _owner.Target.position, Quaternion.identity, true);
 
-        if (effect.SpawnPositionType == SpawnPositionType.Self)
-            GameObject.Instantiate(effect.NextEffect.AttackPrefab, _owner.transform.position, Quaternion.identity);
-        else if (effect.SpawnPositionType == SpawnPositionType.Target)
-            GameObject.Instantiate(effect.NextEffect.AttackPrefab, _owner.Target.position, Quaternion.identity);
+        AttackObject attack = ComponentProvider.Get<AttackObject>(attackObj);
+
+        attack.Setup(effect.Power, effect.AttackDealy);
     }
     #endregion
 
@@ -344,10 +359,14 @@ public class UnitPassive
 
         Debug.Log($"[시너지 스폰 시스템] {Effect.SpawnPrefab.name} 소환");
 
-        GameObject obj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
-        obj.name = "SpawnUnit";
-        UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(obj);
-        
+        GameObject spawnEffect = Manager.Resources.Instantiate<GameObject>(Effect.SpawnEffectPrefab, pos, true);
+        spawnEffect.transform.localScale = new Vector3(Effect.UnitLevel, Effect.UnitLevel, Effect.UnitLevel);
+        Manager.Resources.Destroy(spawnEffect, 2);
+
+        GameObject unitObj = GameObject.Instantiate(Effect.SpawnPrefab, pos, Quaternion.identity);
+        UnitBase spawnUnit = ComponentProvider.Get<UnitBase>(unitObj);
+        UnitData data = Manager.Resources.Load<UnitData>(Effect.UnitDataAddress);
+
         if (Effect.IsMultiplier)
         {
             if (spawnUnit == null)
@@ -358,6 +377,7 @@ public class UnitPassive
                 if (Effect.IsMultiplier)
                 {
                     spawnUnit.StatusController.StatMultiplier = Effect.UnitStatMultiplier;
+                    spawnUnit.Status = new UnitStatus(data, Effect.UnitLevel);
                     spawnUnit.Init(Effect.SpawnUnitStats);
                     spawnUnit.Fight();
                 }
@@ -368,8 +388,10 @@ public class UnitPassive
             }
             else if (Effect.SpawnType == SpawnStatType.LowUpgrade)
             {
-                spawnUnit.Status.Level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
+                int level = _owner.Status.Level - 1 >= 0 ? _owner.Status.Level - 1 : 0;
+                spawnUnit.Status = new UnitStatus(data, level);
                 spawnUnit.Init();
+                spawnUnit.Fight();
             }
         }
 

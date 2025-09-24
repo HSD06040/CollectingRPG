@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91b9fe931ac8cf5418a6a4a2316ea86a, type: 3}
   m_Name: NightStreetAssass1-2-2
   m_EditorClassIdentifier: 
-  Key: 6cd24649-86c9-43e9-8eef-bbdae57c8aa5
   Description: 
   IsActivationsClear: 0
   IsAttack: 1
@@ -21,6 +20,8 @@ MonoBehaviour:
   IsDelay: 0
   IsFirstOnly: 0
   DelayTime: 0
+  SynergyEffectAddress: 
+  EffectDuration: 2
   IsUnitPosition: 0
   SpawnUnitStats:
     MaxHealth: 0
@@ -39,10 +40,12 @@ MonoBehaviour:
   SpawnType: 0
   SpawnSynergy: 0
   SpawnAddress: 
-  EffectAttackType: 0
+  SpawnEffectAddress: 
+  EffectApplyType: 0
   SpawnPositionType: 1
   Power: 20
-  AttackAddress: Effect/AssassAttack
+  AttackDealy: 1
+  AttackAddress: Bandit_Hit
   EffectType: 1
   SynergyBuffDatas: []
   StatModifiers:

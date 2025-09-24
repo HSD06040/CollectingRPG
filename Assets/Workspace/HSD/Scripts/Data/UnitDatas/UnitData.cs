@@ -9,7 +9,7 @@ public class UnitData : MetaData
     [Header("MetaData")]
     public Grade Grade;
     public string AddressableAddress;
-    public GameObject UnitPrefab => Manager.Resources.Get<GameObject>(AddressableAddress);
+    public GameObject UnitPrefab => Manager.Resources.Load<GameObject>(AddressableAddress);
     public int ID;
     public int PerferredLine;
     public int Cost;

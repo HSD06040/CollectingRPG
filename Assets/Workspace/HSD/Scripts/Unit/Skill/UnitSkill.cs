@@ -14,8 +14,8 @@ public abstract class UnitSkill : ScriptableObject
 
     [Header("Stat")]
     public int MaxCount = 1;
-    public float[] Powers; // 추후 기능 추가를 위한 데이터
-    public float Power = 1;
+    public float physicalPower;
+    public float abilityPower;
     public int ManaCost;
 
     [Header("Type")]
@@ -38,17 +38,16 @@ public abstract class UnitSkill : ScriptableObject
         
         if (EffectSpawnType == EffectSpawnType.Target)
         {
-            Manager.Resources.Destroy(
-                Manager.Resources.Instantiate<GameObject>(
+            Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(
                     EffectAddress,
-                    attacker.GetTarget().gameObject.GetCenter(),
+                    attacker.GetTarget().gameObject.GetCenterPosition(),
                     true
-                ),
-             2f);
+                ), 
+            2f);
         }
         else
         {
-            GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
+            GameObject prefab = Manager.Resources.Load<GameObject>(EffectAddress);
             GameObject obj = Manager.Resources.Instantiate(
                 prefab,
                 GetSpawnPoint(attacker),
