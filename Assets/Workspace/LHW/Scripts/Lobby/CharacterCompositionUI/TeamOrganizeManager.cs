@@ -25,7 +25,8 @@ public class TeamOrganizeManager : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private CollectedCharacterData _collectedCharacterData;
-
+    [SerializeField] private CharacterList_Controller _characterList_Controller;
+    [SerializeField] private PresetListButtonController _presetListButtonController;
     private UnitStatus _selectedUnit;
     private UnitStatus[] _currentPreset;
     private List<UnitStatus> _collectedUnits;
@@ -46,8 +47,14 @@ public class TeamOrganizeManager : MonoBehaviour
     private int _currentCost = 0;
     public int CurrentCost => _currentCost;
     private int _currentOverallPower;
+    private int _currentIdx;
 
     private Dictionary<Synergy, int> synergyCounts = new();
+
+    private void Awake()
+    {
+        ButtonsSetup();
+    }
 
     private void Start()
     {
@@ -275,16 +282,19 @@ public class TeamOrganizeManager : MonoBehaviour
         //Debug.Log($"캐릭터 수 : {_collectedCharacterData.CollectedCharacterCount}");
     }
 
-    private void ShowButtonPreset()
+    private void ButtonsSetup()
     {
         if (Manager.Data.PresetDB.PresetData == null) return;
 
-        for (int i = 0; i < Manager.Data.PresetDB.PresetData.Count - 2; i++)
+        for (int i = 0; i < 4; i++)
         {
-            _presetAddButton[i].buttonText = $"{(i + 3)}";
+            _presetAddButton[i].buttonText = $"{(i+1)}";
             _presetAddButton[i].UpdateUI();
         }
+    }
 
+    private void ShowButtonPreset()
+    {        
         for (int i = 0; i < _presetAddButton.Length; i++)
         {
             if (i <= Manager.Data.PresetDB.PresetData.Count - 2)
@@ -296,8 +306,20 @@ public class TeamOrganizeManager : MonoBehaviour
                 _presetAddButton[i].GetComponent<Button>().interactable = false;
             }
         }
-    }
 
+        for (int i = 0; i < _presetAddButton.Length; i++)
+        {
+            if(i == _currentIdx)
+            {                
+                _presetAddButton[i].gameObject.SetActive(false);
+            }
+            else
+            {
+                if (!_presetAddButton[i].gameObject.activeSelf)
+                    _presetAddButton[i].gameObject.SetActive(true);
+            }
+        }
+    }
     #endregion
 
     #region Preset
@@ -349,7 +371,7 @@ public class TeamOrganizeManager : MonoBehaviour
     private void LoadPreset(int index)
     {
         _currentPreset = Manager.Data.PresetDB.PresetData[index].Statuses;
-
+        
         _currentCost = 0;
         _currentOverallPower = 0;
         for (int i = 0; i < _currentPreset.Length; i++)
@@ -360,7 +382,8 @@ public class TeamOrganizeManager : MonoBehaviour
                 _currentOverallPower += _currentPreset[i].CombatPower;
             }
         }
-
+        _currentIdx = index;
+        _presetListButtonController.SetCurrentIdx(_currentIdx);
 
         OnCharacterDataChanged?.Invoke();
     }

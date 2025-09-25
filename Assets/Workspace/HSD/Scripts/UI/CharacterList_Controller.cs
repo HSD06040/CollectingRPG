@@ -13,8 +13,7 @@ public class CharacterList_Controller : MonoBehaviour
         Setup();
     }
 
-    [ContextMenu("Setup")]
-    private void Setup()
+    public void Setup()
     {
         SynergyDatabase db = Manager.Data.SynergyDB;
         UnitData[] playerUnits = Manager.Data.PlayerUnitDatas;

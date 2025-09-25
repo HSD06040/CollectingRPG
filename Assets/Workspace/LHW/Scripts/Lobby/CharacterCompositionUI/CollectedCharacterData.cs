@@ -25,18 +25,18 @@ public class CollectedCharacterData : MonoBehaviour
     // 임시 처리 - DB 연동이 끝나면 구조 변경 필요
     private void OnEnable()
     {
-        _collectedUnit.Clear();
-        for (int i = 0; i < _charUnits.Length; i++)
-        {
-            // 획득여부 체크는 나중에 추가
-            //if(_charUnits[i].IsCollected)
-            //{
-            //_collectedCharData.Add(_charUnits[i].CharData);
+        //_collectedUnit.Clear();
+        //for (int i = 0; i < _charUnits.Length; i++)
+        //{
+        //    // 획득여부 체크는 나중에 추가
+        //    //if(_charUnits[i].IsCollected)
+        //    //{
+        //    //_collectedCharData.Add(_charUnits[i].CharData);
 
-            _collectedUnit.Add(_charUnits[i].Status);
-            //}
-        }
+        //    _collectedUnit.Add(_charUnits[i].Status);
+        //    //}
+        //}
         
-        _collectedCharacterCount = _collectedUnit.Count;
+        //_collectedCharacterCount = _collectedUnit.Count;
     }
 }
