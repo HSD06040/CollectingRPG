@@ -71,9 +71,9 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     private async void LevelUp()
     {
-        if(_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 10)
+        if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 10)
         {
-            if(PopupManager.Instance != null)
+            if (PopupManager.Instance != null)
             {
                 PopupManager.instance.ShowPopup("이미 최대 레벨입니다.");
                 return;
@@ -98,20 +98,21 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
             CharacterProfileUpdate();
             CharacterStatusUpdate();
             LevelUpButtonUpdate();
+            SkillUIUpdate();
         }
     }
 
     private void CharacterProfileUpdate()
     {
         _gradeText.text = _currentCharUnit.Status.Data.Grade.ToString();
-        _characterNameText.text = _currentCharUnit.Status.Data.name;
+        _characterNameText.text = _currentCharUnit.Status.Data.Name;
         _characterLevelText.text = $"LV.{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString()}";
         _characterImage.sprite = _currentCharUnit.Status.Data.Icon;
         _costImage.sprite = _costImages.CostSprites[_currentCharUnit.Status.Data.Cost - 1];
         if (Manager.Data.SynergyDB != null)
         {
             _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.Synergy).Icon;
-            _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.Synergy).Icon;
+            _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.ClassSynergy).Icon;
         }
     }
 
@@ -132,7 +133,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     private void LevelUpButtonUpdate()
     {
-        if(_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
             _openButton.gameObject.SetActive(true);
             _levelUpButton.gameObject.SetActive(false);
@@ -143,7 +144,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
             _levelUpButton.gameObject.SetActive(true);
         }
 
-            int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
+        int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
         if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
         {
             _pieceGauge.fillAmount = 0;
@@ -156,6 +157,13 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
         }
         _pieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
         _openPieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
+    }
+
+    private void SkillUIUpdate()
+    {
+        _skillIcon.sprite = _currentCharUnit.Status.Data.Skill.Icon;
+        _skillNameText.text = _currentCharUnit.Status.Data.Skill.SkillName;
+        _skillDescriptionText.text = _currentCharUnit.Status.Data.Skill.Description;
     }
 
     #endregion
