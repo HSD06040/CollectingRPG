@@ -265,8 +265,8 @@ public class ShopUIController : MonoBehaviour
             return;
         }
 
-        // TODO: [CYH] 광고
         _googleAdMob.ShowAd();
+        
         // 광고시청 -> count 증가
         _dailyManager.IncreaseAdRefreshCount();
 
