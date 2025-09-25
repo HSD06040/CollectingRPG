@@ -166,6 +166,8 @@ public class CsvDownloader
             int lastDigit = Mathf.Abs(id % 10);
 
             unitData.AddressableAddress = $"{synergyName}{lastDigit}";
+            unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
+
 //#if UNITY_EDITOR
 //            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
 //            EditorUtility.SetDirty(unitData);

@@ -32,8 +32,10 @@ public class DataManager : Singleton<DataManager>
 
     public async UniTask InitData()
     {
+        await Manager.Resources.SpriteLoadLable("MonsterIcon");
+        await Manager.Resources.SpriteLoadLable("PlayerUnitIcon");
+
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
-        await Manager.Resources.SpriteLoadLable("MonsterIcon");        
         await AnimationManager.Init();
         await PreLoadData();
         await CsvDownload();

@@ -57,7 +57,10 @@ public class ResourcesManager : Singleton<ResourcesManager>
     public Sprite SpriteGet(string address)
     {
         if(!_sprites.ContainsKey(address))
+        {
+            Debug.Log($"[스프라이트] {address}의 Sprite가 없습니다.");
             return null;
+        }
 
         return _sprites[address];
     }
