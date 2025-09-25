@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,9 +28,12 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     [Header("Level Up Button UI")]
     [SerializeField] private TMP_Text _pieceText;
     [SerializeField] private Image _pieceGauge;
+    [SerializeField] private TMP_Text _openPieceText;
+    [SerializeField] private Image _openPieceGauge;
 
     [Header("Button")]
     [SerializeField] private Button _levelUpButton;
+    [SerializeField] private Button _openButton;
     [SerializeField] private Button _closeButton;
 
     private CharacterUpgradeUnit _currentCharUnit;
@@ -40,6 +44,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     {
         _closeButton.onClick.AddListener(CloseUI);
         _levelUpButton.onClick.AddListener(LevelUp);
+        _openButton.onClick.AddListener(LevelUp);
         gameObject.SetActive(false);
     }
 
@@ -128,16 +133,30 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     private void LevelUpButtonUpdate()
     {
-        int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
+        if(_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        {
+            _openButton.gameObject.SetActive(true);
+            _levelUpButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            _openButton.gameObject.SetActive(false);
+            _levelUpButton.gameObject.SetActive(true);
+        }
+
+            int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
         if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
         {
             _pieceGauge.fillAmount = 0;
+            _openPieceGauge.fillAmount = 0;
         }
         else
         {
             _pieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
+            _openPieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
         }
         _pieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
+        _openPieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
     }
 
     #endregion
