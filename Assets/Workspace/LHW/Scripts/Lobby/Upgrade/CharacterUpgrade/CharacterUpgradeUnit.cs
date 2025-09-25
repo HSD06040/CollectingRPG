@@ -25,7 +25,7 @@ public class CharacterUpgradeUnit : MonoBehaviour
 
     private void Awake()
     {
-        DataInit();
+        //DataInit();
         GetComponent<Button>().onClick.AddListener(ShowPopUp);
         _manager = GetComponentInParent<UpgradeManager>();
     }
@@ -68,6 +68,8 @@ public class CharacterUpgradeUnit : MonoBehaviour
 
     private void UIUpdate()
     {
+        if(_status == null) return;
+
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         if (Manager.Data.SynergyDB != null)
@@ -83,6 +85,10 @@ public class CharacterUpgradeUnit : MonoBehaviour
     #region Data Input
 
     // 데이터 입력 관련 메소드
+    public void InitUnitStatus(UnitData data)
+    {
+        _status = new UnitStatus(data, data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
+    }
 
     #endregion
 }
