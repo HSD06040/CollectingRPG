@@ -36,17 +36,18 @@ public class TeamOrganizeManager : MonoBehaviour
     [SerializeField] private TMP_Text _totalOverallPowerText;
     [SerializeField] private TMP_Text _leaderEffectText;
     [SerializeField] private TMP_Text _characterCountText;
+    [SerializeField] private Button _autoSelectButton;
     [SerializeField] private ButtonManagerBasic[] _presetAddButton;
 
     [Header("Capacity")]
     [SerializeField] private int _totalCost = 10;
     public int TotalCost => _totalCost;
+    public Property<int> CurrentCost = new Property<int>();
+    public Property<int> CurrentOverallPower = new Property<int>();
 
     public Action OnCharacterDataChanged;
-
-    private int _currentCost = 0;
-    public int CurrentCost => _currentCost;
-    private int _currentOverallPower;
+        
+    public Property<SortingType> CurrentSortingType;
     private int _currentIdx;
 
     private Dictionary<Synergy, int> synergyCounts = new();
@@ -71,12 +72,16 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void OnEnable()
     {
+        _autoSelectButton.onClick.AddListener(AutoSelectCharacters);
+
         _collectedUnits = _collectedCharacterData.CollectedUnit;
+
         OnCharacterDataChanged += ShowCostInfo;
         OnCharacterDataChanged += ShowTotalOverallPowerInfo;
         OnCharacterDataChanged += ShowLeaderEffectInfo;
         //OnCharacterDataChanged += ShowCharacterCountInfo;
         OnCharacterDataChanged += ShowButtonPreset;
+
         ShowCostInfo();
         ShowTotalOverallPowerInfo();
         //ShowCharacterCountInfo();
@@ -85,6 +90,8 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void OnDisable()
     {
+        _autoSelectButton.onClick.RemoveListener(AutoSelectCharacters);
+
         OnCharacterDataChanged -= ShowCostInfo;
         OnCharacterDataChanged -= ShowTotalOverallPowerInfo;
         OnCharacterDataChanged -= ShowLeaderEffectInfo;
@@ -92,7 +99,7 @@ public class TeamOrganizeManager : MonoBehaviour
         OnCharacterDataChanged -= ShowButtonPreset;
     }
 
-    #endregion
+    #endregion    
 
     #region Read Data
 
@@ -118,14 +125,15 @@ public class TeamOrganizeManager : MonoBehaviour
         {
             if (_currentPreset[i].Data != null && _currentPreset[i].Data.ID == data.Data.ID)
             {
+                RemoveUnitData(i);
                 Debug.Log("이미 편성된 캐릭터입니다");
                 return;
             }
         }
 
-        if (_currentCost + data.Data.Cost > _totalCost)
+        if (CurrentCost.Value + data.Data.Cost > _totalCost)
         {
-            Debug.Log($"코스트 상한치를 초과했습니다 {data.Data.Cost} {_currentCost}");
+            Debug.Log($"코스트 상한치를 초과했습니다 {data.Data.Cost} {CurrentCost.Value}");
             return;
         }
 
@@ -135,8 +143,8 @@ public class TeamOrganizeManager : MonoBehaviour
             {
                 _currentPreset[i].Data = _selectedUnit.Data;
                 _currentPreset[i].Level = _selectedUnit.Level;
-                _currentCost += _currentPreset[i].Data.Cost;
-                _currentOverallPower += _currentPreset[i].CombatPower;
+                CurrentCost.Value += _currentPreset[i].Data.Cost;
+                CurrentOverallPower.Value += _currentPreset[i].CombatPower;
                 Debug.Log("편성됨");
                 break;
             }
@@ -155,8 +163,8 @@ public class TeamOrganizeManager : MonoBehaviour
     {
         if (_currentPreset[index].Data != null)
         {
-            _currentCost -= _currentPreset[index].Data.Cost;
-            _currentOverallPower -= _currentPreset[index].CombatPower;
+            CurrentCost.Value -= _currentPreset[index].Data.Cost;
+            CurrentOverallPower.Value -= _currentPreset[index].CombatPower;
             _currentPreset[index].Level = 0;
             _currentPreset[index].Data = null;
 
@@ -242,15 +250,15 @@ public class TeamOrganizeManager : MonoBehaviour
 
         // 기존 편성 초기화
         Array.Clear(_currentPreset, 0, _currentPreset.Length);
-        _currentCost = 0;
+        CurrentCost.Value = 0;
 
         // 최적 편성 적용
         for (int i = 0; i < bestTeam.Count; i++)
         {
             _currentPreset[i] = new UnitStatus(bestTeam[i].Data, bestTeam[i].Level);
-            _currentCost += bestTeam[i].Data.Cost;
+            CurrentCost.Value += bestTeam[i].Data.Cost;
         }
-        _currentOverallPower = bestPower;
+        CurrentOverallPower.Value = bestPower;
 
         OnCharacterDataChanged?.Invoke();
     }
@@ -295,18 +303,6 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void ShowButtonPreset()
     {        
-        for (int i = 0; i < _presetAddButton.Length; i++)
-        {
-            if (i <= Manager.Data.PresetDB.PresetData.Count - 2)
-            {
-                _presetAddButton[i].GetComponent<Button>().interactable = true;
-            }
-            else
-            {
-                _presetAddButton[i].GetComponent<Button>().interactable = false;
-            }
-        }
-
         for (int i = 0; i < _presetAddButton.Length; i++)
         {
             if(i == _currentIdx)
@@ -371,19 +367,19 @@ public class TeamOrganizeManager : MonoBehaviour
     private void LoadPreset(int index)
     {
         _currentPreset = Manager.Data.PresetDB.PresetData[index].Statuses;
-        
-        _currentCost = 0;
-        _currentOverallPower = 0;
+
+        CurrentCost.Value = 0;
+        CurrentOverallPower.Value = 0;
         for (int i = 0; i < _currentPreset.Length; i++)
         {
             if (_currentPreset[i].Data != null)
             {
-                _currentCost += _currentPreset[i].Data.Cost;
-                _currentOverallPower += _currentPreset[i].CombatPower;
+                CurrentCost.Value += _currentPreset[i].Data.Cost;
+                CurrentOverallPower.Value += _currentPreset[i].CombatPower;
             }
         }
         _currentIdx = index;
-        _presetListButtonController.SetCurrentIdx(_currentIdx);
+        _presetListButtonController.SetCurrentIdx(_currentIdx + 1);
 
         OnCharacterDataChanged?.Invoke();
     }
@@ -422,6 +418,24 @@ public class TeamOrganizeManager : MonoBehaviour
         }
 
         return synergyCounts;
+    }
+
+    #endregion
+
+    #region Sorting
+
+    public void Sorting()
+    {
+        if(CurrentSortingType.Value == SortingType.Power)
+        {
+            CurrentSortingType.Value = SortingType.Grade;
+        }
+        else if (CurrentSortingType.Value == SortingType.Grade)
+        {
+            CurrentSortingType.Value = SortingType.Power;
+        }
+
+        _characterList_Controller.Sorting(CurrentSortingType.Value);
     }
 
     #endregion

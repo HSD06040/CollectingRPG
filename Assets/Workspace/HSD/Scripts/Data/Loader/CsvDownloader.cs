@@ -67,7 +67,7 @@ public class CsvDownloader
 
         if (!string.IsNullOrEmpty(req.error))
         {
-            Debug.LogError($"CSV 다운로드 실패: {url}, Error: {req.error}");
+            Debug.LogError($"TSV 다운로드 실패: {url}, Error: {req.error}");
             return;
         }
 
@@ -77,7 +77,8 @@ public class CsvDownloader
 
         for (int i = startLine - 1; i < lines.Length; i++)
         {
-            string[] row = lines[i].Trim().Split(',');
+            // CSV → TSV 변경 (탭 기준 Split)
+            string[] row = lines[i].Trim().Split('\t');
             parsed.Add(row);
         }
 
@@ -127,7 +128,10 @@ public class CsvDownloader
 
             AnimationType attackAnimation = Enum.TryParse(row[8], out AnimationType attackAnim) ? attackAnim : AnimationType.Magic_Attack;
             AnimationType skillAnimation = Enum.TryParse(row[9], out AnimationType skillAnim) ? skillAnim : AnimationType.Magic_Attack;
-            unitData.AnimatiorData = new AnimatorData(attackAnimation, skillAnimation);
+
+            unitData.AnimatiorData = new AnimatorData();
+            unitData.AnimatiorData.AttackAnimationType = attackAnimation;
+            unitData.AnimatiorData.SkillAnimationType = skillAnimation;
 
             int attackID = int.TryParse(row[10], out int _attackID) ? _attackID : 0;
             unitData.AttackData = Array.Find(_attackDatas, a => a.ID == attackID);

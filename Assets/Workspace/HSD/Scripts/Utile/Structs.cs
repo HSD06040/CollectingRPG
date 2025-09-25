@@ -52,9 +52,9 @@ public struct CsvData
         string result = "";
 
         if(string.IsNullOrEmpty(range))
-            result = $"{baseUrl}/export?format=csv&gid={gid}";
+            result = $"{baseUrl}/export?format=tsv&gid={gid}";
         else
-            result = $"{baseUrl}/export?format=csv&gid={gid}&range={range}";
+            result = $"{baseUrl}/export?format=tsv&gid={gid}&range={range}";
 
         return result;
     }

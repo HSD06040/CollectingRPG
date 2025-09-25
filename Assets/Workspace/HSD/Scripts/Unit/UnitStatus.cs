@@ -41,7 +41,7 @@ public class UnitStatus
             Grade.NORMAL => 1,
             Grade.RARE => 1.1f,
             Grade.UNIQUE => 1.2f,
-            Grade.LEGENDARY => 1.3f,
+            Grade.LEGEND => 1.3f,
             _ => 1
         };
     }

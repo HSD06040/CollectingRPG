@@ -89,7 +89,7 @@ public class UnitSpawnChanceData : ScriptableObject
             Grade.NORMAL => chance.Normal,
             Grade.RARE => chance.Rare,
             Grade.UNIQUE => chance.Unique,
-            Grade.LEGENDARY => chance.Legendary,
+            Grade.LEGEND => chance.Legendary,
             _ => 0f
         };
     }

@@ -38,7 +38,8 @@ public class CharacterList_UI : MonoBehaviour
 
     public void GradeSorting()
     {
-        System.Array.Sort(_synergyUnits, (a, b) => b.Status.Data.Grade.CompareTo(a.Status.Data.Grade));
+        System.Array.Sort(_synergyUnits, (a, b) =>
+            ((int)b.Status.Data.Grade).CompareTo((int)a.Status.Data.Grade));
 
         for (int i = 0; i < _synergyUnits.Length; i++)
         {
