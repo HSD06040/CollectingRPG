@@ -77,4 +77,33 @@ public class GoogleAdMob : MonoBehaviour
             Preload();
         }
     }
+
+    public void ShowAd(Action onAdWatched = null)
+    {
+        if (IsReady)
+        {
+            LoadedAd.OnAdFullScreenContentClosed += () =>
+            {
+                onAdWatched?.Invoke();
+                LoadedAd.Destroy();
+                LoadedAd = null;
+                Preload();
+            };
+
+            LoadedAd.OnAdFullScreenContentFailed += err =>
+            {
+                Debug.LogError($"광고 닫힘 오류: {err}");
+                LoadedAd.Destroy();
+                LoadedAd = null;
+                Preload();
+            };
+
+            LoadedAd.Show();
+        }
+        else
+        {
+            Debug.Log("광고 준비 안 됨 / Preload 실행");
+            Preload();
+        }
+    }
 }
