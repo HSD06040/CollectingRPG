@@ -11,10 +11,25 @@ public class ShopSlot : MonoBehaviour
     [SerializeField] private TMP_Text _countText;
     [SerializeField] private TMP_Text _priceText;
     [SerializeField] private Image _itemImage;
-    [SerializeField] private Image _priceImage;  
+    [SerializeField] private Image _priceImage;
+    [SerializeField] private Button _itemObtainButton;
+    [SerializeField] private GameObject _disablePanel;
 
-    private ShopSlotData _slotData; 
-    
+    [Header("Currency Sprite")]
+    [SerializeField] private Sprite _goldSprite;
+    [SerializeField] private Sprite _diaSprite;
+
+    [Header("Item Sprite")]
+    [SerializeField] private Sprite _heroSprite;
+    [SerializeField] private Sprite _magicSprite;
+
+    private ShopSlotData _slotData;
+
+    private void Start()
+    {
+        _itemObtainButton.onClick.AddListener(() => OnClickBuy());
+    }
+
     public void SetSlot(ShopSlotData slot)
     {
         _slotData = slot;
@@ -24,8 +39,29 @@ public class ShopSlot : MonoBehaviour
         _itemImage.sprite = slot.ItemSprite;
         _priceText.text = slot.ItemPrice;
         _priceImage.sprite = slot.PriceSprite;
-     
+        _countText.text = slot.Count;
 
+        // 일일 상점 아이템 아이콘
+        if (slot.Type == ShopType.Daily && int.Parse(slot.ItemId) < 2010001)
+        {
+            _itemImage.sprite = _heroSprite;
+        }
+        else if (slot.Type == ShopType.Daily && int.Parse(slot.ItemId) >= 2010001)
+        {
+            _itemImage.sprite = _magicSprite;
+        }
+
+        // 일일 상점 가격 아이콘
+        if (slot.Type == ShopType.Daily && slot.IsGold)
+        {
+            _priceImage.sprite = _goldSprite;
+        }
+        else if (slot.Type == ShopType.Daily && slot.IsDiamond)
+        {
+            _priceImage.sprite = _diaSprite;
+        }
+
+        // 다이아몬드 상점 첫번째 슬롯 가격 텍스트 위치
         if (slot.Type == ShopType.Diamond || slot.IsFree)
         {
             _priceImage.gameObject.SetActive(false);
@@ -35,10 +71,11 @@ public class ShopSlot : MonoBehaviour
             rectTransform.offsetMin = offset;
         }
 
-        if (slot.Type == ShopType.Daily && slot.Count > 0)
+        // 구매횟수
+        if (slot.Type == ShopType.Daily)
         {
+            // soldout 이미지 setactive true
             _countText.gameObject.SetActive(true);
-            _countText.text = $"{slot.Count}";
         }
         else
         {
@@ -46,18 +83,44 @@ public class ShopSlot : MonoBehaviour
         }
     }
 
-
     public void OnClickBuy()
     {
+        if (_slotData.IsFree && _slotData.IsPurchased) return;
+
         switch (_type)
         {
             case ShopType.Diamond:
-                IAPManager.Instance.BuyProduct(_slotData.ItemId);
+                if (_slotData.IsFree)
+                {
+                    //TODO: [CYH] Firebase 재화 업데이트
+                    _slotData.IsPurchased = true;
+                    _disablePanel.SetActive(true);
+                    Debug.Log($"무료 다이아몬드 {_slotData.Count}개 획득");
+                }
+                else
+                {
+                    IAPManager.Instance.BuyProduct(_slotData.ItemId);
+                    Debug.Log($"다이아몬드 {_slotData.Count}개 구매");
+                }
                 break;
             case ShopType.Gold:
-                Debug.Log($"Gold 구매 : {_slotData.ItemName}");
+                if (_slotData.IsFree)
+                {
+                    _slotData.IsPurchased = true;
+                    _disablePanel.SetActive(true);
+                    Debug.Log($"무료 골드 {_slotData.Count}개 획득");
+
+                }
+                else
+                {
+                    //TODO: [CYH] Firebase 재화 업데이트
+                    Debug.Log($"골드 {_slotData.Count}개 구매");
+                }
                 break;
             case ShopType.Daily:
+                if (_slotData.IsPurchased) return;
+                _slotData.IsPurchased = true;
+                _disablePanel.SetActive(true);
                 Debug.Log($"Daily 구매 : {_slotData.ItemName} / {_slotData.Count}개");
                 break;
         }

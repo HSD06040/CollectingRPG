@@ -17,7 +17,7 @@ public class IAPManager : Singleton<IAPManager>
         if (product != null && product.availableToPurchase)
         {
             Debug.Log($"{productId} : localizedPriceString == {product.metadata.localizedPriceString}");
-            return product.metadata.localizedPriceString; 
+            return product.metadata.localizedPriceString;
         }
 
         return "error";
@@ -26,7 +26,7 @@ public class IAPManager : Singleton<IAPManager>
     // 상품명 로드하는 메서드
     public string GetLocalizedName(string productId)
     {
-        var product = CodelessIAPStoreListener.Instance.GetProduct(productId);
+        Product product = CodelessIAPStoreListener.Instance.GetProduct(productId);
         return (product != null && product.availableToPurchase) ? product.metadata.localizedTitle : "";
     }
 
