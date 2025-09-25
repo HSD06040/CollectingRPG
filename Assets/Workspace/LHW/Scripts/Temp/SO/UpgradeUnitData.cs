@@ -11,6 +11,8 @@ public class UpgradeUnitData : ScriptableObject
 
     public CurrentUpgradeData CurrentUpgradeData;
 
+    public event Action OnLevelUp;
+
     public void Init(Grade grade, LevelUpData data)
     {
         _grade = grade;
@@ -66,7 +68,9 @@ public class UpgradeUnitData : ScriptableObject
         if(CurrentUpgradeData.CurrentPieces >= requiredPiece)
         {
             CurrentUpgradeData.CurrentPieces -= requiredPiece;
-            CurrentUpgradeData.UpgradeLevel += 1;            
+            CurrentUpgradeData.UpgradeLevel += 1;
+
+            OnLevelUp?.Invoke();
         }
     }    
 }
