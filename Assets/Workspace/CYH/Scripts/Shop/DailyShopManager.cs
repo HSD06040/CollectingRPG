@@ -34,7 +34,7 @@ public class DailyShopManager : MonoBehaviour
     ///  3~4회 : 다이아몬드 차감
     ///  최신 일일 슬롯 데이터를 반환
     /// </summary>
-    public async UniTask<List<ShopSlotData>> RefreshDailySlotsAsync()
+    public async UniTask<List<ShopSlotData>> RerollDailySlotAsync()
     {
         if (_rerollCount >= MaxRerollCount)
         {
@@ -59,6 +59,23 @@ public class DailyShopManager : MonoBehaviour
 
         _rerollCount++;
 
+        return await GetDailySlotsAsync();
+    }
+
+    /// <summary>
+    /// 광고시청으로 일일 상점 새로고침하는 메서드
+    /// </summary>
+    public async UniTask<List<ShopSlotData>> RerollDailySlotByAdAsync()
+    {
+        if (_adRerollCount >= MaxAdRerollCount)
+        {
+            Debug.Log("광고 새로고침 불가: 한도 도달");
+            return null;
+        }
+
+        _adRerollCount++;
+        Debug.Log("새로고침 광고");
+        
         return await GetDailySlotsAsync();
     }
 

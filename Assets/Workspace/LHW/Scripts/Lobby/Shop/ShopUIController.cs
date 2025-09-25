@@ -192,7 +192,7 @@ public class ShopUIController : MonoBehaviour
             return;
         }
 
-        List<ShopSlotData> newSlots = await _dailyManager.RefreshDailySlotsAsync();
+        List<ShopSlotData> newSlots = await _dailyManager.RerollDailySlotAsync();
 
         if (newSlots != null)
         {
@@ -257,7 +257,7 @@ public class ShopUIController : MonoBehaviour
     /// <summary>
     /// 광고시청 새로고침 버튼 클릭 시 실행되는 메서드
     /// </summary>
-    private async void OnClickAdReroll()
+    private void OnClickAdReroll()
     {
         if (!_dailyManager.CanAdReroll())
         {
@@ -265,12 +265,14 @@ public class ShopUIController : MonoBehaviour
             return;
         }
 
-        _googleAdMob.ShowAd();
-        
-        // 광고시청 -> count 증가
-        _dailyManager.IncreaseAdRefreshCount();
+        // 광고 실행
+        _googleAdMob.ShowAd(OnAdWatched);
+    }
 
-        List<ShopSlotData> newSlots = await _dailyManager.RefreshDailySlotsAsync();
+    private async void OnAdWatched()
+    {
+        // 광고 끝난 후 count 증가 / 새로고침
+        List<ShopSlotData> newSlots = await _dailyManager.RerollDailySlotByAdAsync();
 
         if (newSlots != null)
         {
