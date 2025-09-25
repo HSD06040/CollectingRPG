@@ -10,6 +10,7 @@ public class DBManager : Singleton<DBManager>
 {
     public CharDB charDB = new CharDB();
     public QuestDB questDB = new QuestDB();
+    public ShopDB shopDB = new ShopDB();
 
     #region Nickname/LobbyData
 
