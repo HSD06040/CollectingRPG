@@ -1,31 +1,75 @@
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 
 public class DailyShopManager : MonoBehaviour
 {
-    public List<ShopSlotData> DailyRandomItems;
-
-    // 새로고침 버튼
-    private int _rerollCount = 0;
-    private const int MaxRerollCount = 5;
-
-    // 광고 새로고침 버튼
-    private int _adRerollCount = 0;
-    private const int MaxAdRerollCount = 2;
-
     private string _csvUrl = "https://docs.google.com/spreadsheets/d/1ICgXSMDqSO7-SW-9lKCmgLx3Kq-eA2T2DCf11_ySXV4/export?format=csv&gid=891945452";
 
     private readonly int[] _goldCosts = { 500, 1000 };
     private readonly int[] _diamondCosts = { 50, 100 };
 
+    // 새로고침 버튼
+    private int _rerollCount = 0;
+    private const int MaxRerollCount = 5;
+    public void ResetRerollCount() => _rerollCount = 0;
     public bool CanReroll() => _rerollCount < MaxRerollCount;
-    public void RerollCount() => _rerollCount = 0;
+    public int RerollCount
+    {
+        get => _rerollCount;
+        set => _rerollCount = value;
+    }
 
+    // 광고 새로고침 버튼
+    private int _adRerollCount = 0;
+    private const int MaxAdRerollCount = 2;
+    public void ResetAdRerollCount() => _adRerollCount = 0;
     public int GetAdRefreshCount() => _adRerollCount;
     public bool CanAdReroll() => _adRerollCount < MaxAdRerollCount;
-    public void RerollAdCount() => _adRerollCount = 0;
-    public void IncreaseAdRefreshCount() => _adRerollCount++;
+    public int AdRerollCount
+    {
+        get => _adRerollCount;
+        set => _adRerollCount = value;
+    }
+
+    // 데이터 연동용 리스트
+    private List<ShopSlotData> DailyRandomItems = new();   // 일일 상점 슬롯
+    private List<ShopSlotData> _goldSlots = new();        // 골드 상점 슬롯
+    private List<ShopSlotData> _diamondSlots = new();     // 다이아 상점 슬롯
+
+    public List<ShopSlotData> GetDailySlots() => DailyRandomItems;
+    public List<ShopSlotData> GetGoldSlots() => _goldSlots;
+    public List<ShopSlotData> GetDiamondSlots() => _diamondSlots;
+
+    // Firebase 로드 후 적용
+    public void SetSlotData(List<ShopSlotData> dailyList, int reroll, int adReroll)
+    {
+        DailyRandomItems = dailyList ?? new List<ShopSlotData>();
+        _rerollCount = reroll;
+        _adRerollCount = adReroll;
+    }
+
+    // Gold/Diamond 슬롯 세팅용
+    public void SetGoldSlots(List<ShopSlotData> goldSlots)
+    {
+        _goldSlots = goldSlots;
+    }
+
+    public void SetDiamondSlots(List<ShopSlotData> diamondSlots)
+    {
+        _diamondSlots = diamondSlots;
+    }
+
+    public void SaveShopData()
+    {
+        Manager.DB.shopDB.SaveUserShopDataAsync(
+            _rerollCount,
+            _adRerollCount,
+            GetDailySlots(),
+            GetGoldSlots(),
+            GetDiamondSlots()
+        );
+    }
 
     /// <summary>
     ///  일일 상점 슬롯을 새로고침하는 메서드
@@ -59,7 +103,15 @@ public class DailyShopManager : MonoBehaviour
 
         _rerollCount++;
 
-        return await GetDailySlotsAsync();
+        // 새 슬롯 뽑은 후 메모리 갱신
+        List<ShopSlotData> newSlots = await GetDailySlotsAsync();
+        DailyRandomItems = newSlots;
+
+        // reroll 후 저장
+        SaveShopData();
+
+        // 현재 DailyRandomItem 리스트 리턴
+        return DailyRandomItems;
     }
 
     /// <summary>
@@ -75,8 +127,16 @@ public class DailyShopManager : MonoBehaviour
 
         _adRerollCount++;
         Debug.Log("새로고침 광고");
-        
-        return await GetDailySlotsAsync();
+
+        // 새 슬롯 뽑은 후 메모리 갱신
+        List<ShopSlotData> newSlots = await GetDailySlotsAsync();
+        DailyRandomItems = newSlots;
+
+        // 광고 reroll 후 저장
+        SaveShopData();
+
+        // 항상 메모리에 저장된 것만 반환
+        return DailyRandomItems;
     }
 
     /// <summary>
@@ -95,7 +155,6 @@ public class DailyShopManager : MonoBehaviour
         if (_rerollCount == 3) return (_diamondCosts[0], "Diamond");
         if (_rerollCount == 4) return (_diamondCosts[1], "Diamond");
 
-        // 다이아 1/2 price 유지
         return (_diamondCosts[1], "Diamond");
     }
 
