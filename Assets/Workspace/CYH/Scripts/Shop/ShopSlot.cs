@@ -1,9 +1,11 @@
-using TMPro;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ShopSlot : MonoBehaviour
 {
+    private ShopSlotData _slotData;
     [SerializeField] private ShopType _type;
 
     [Header("UI Components")]
@@ -23,7 +25,6 @@ public class ShopSlot : MonoBehaviour
     [SerializeField] private Sprite _heroSprite;
     [SerializeField] private Sprite _magicSprite;
 
-    private ShopSlotData _slotData;
 
     private void Start()
     {
@@ -109,7 +110,6 @@ public class ShopSlot : MonoBehaviour
                     _slotData.IsPurchased = true;
                     _disablePanel.SetActive(true);
                     Debug.Log($"무료 골드 {_slotData.Count}개 획득");
-
                 }
                 else
                 {

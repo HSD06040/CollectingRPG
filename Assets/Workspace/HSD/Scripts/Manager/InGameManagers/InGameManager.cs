@@ -35,10 +35,13 @@ public class InGameManager : InGameSingleton<InGameManager>
     /// <param name="amount"></param>
     public void AddGoldWithRate(int amount)
     {
-        if (AugmentManager.Instance.currentAugment == null) return;
-        if (AugmentManager.Instance.currentAugment.EffectType != EffectType.Currency) return;
+        for (int i = 0; i < AugmentManager.Instance.currentAugment.Count; i++)
+        {
+            if (AugmentManager.Instance.currentAugment == null) return;
+            if (AugmentManager.Instance.currentAugment[i].EffectType != EffectType.Currency) return;
 
-        Gold.Value += (int)(amount * (1 + (AugmentManager.Instance.currentAugment.currentRate) / 100));
+            Gold.Value += (int)(amount * (1 + (AugmentManager.Instance.currentAugment[i].currentRate) / 100));
+        }
     }
 
     public bool SpendGold(int amount)

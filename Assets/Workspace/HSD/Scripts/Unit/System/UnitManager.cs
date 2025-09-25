@@ -1,8 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
@@ -41,12 +39,12 @@ public class UnitManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnSubscrube();        
+        UnSubscrube();
     }
 
     private async void InitAsync()
     {
-        if(IsTest)
+        if (IsTest)
             await Manager.Resources.LoadLabel("Stage");
 
         _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
@@ -122,20 +120,23 @@ public class UnitManager : MonoBehaviour
     public void ApplyHealAugment()
     {
         UnitBase[] units = UnitController.GetUnits();
-        if (AugmentManager.Instance.currentAugment.Trigger == TriggerType.OnBattleStart)
+        for (int i = 0; i < AugmentManager.Instance.currentAugment.Count; i++)
         {
-            for (int i = 0; i < units.Length; i++)
+            if (AugmentManager.Instance.currentAugment[i].Trigger == TriggerType.OnBattleStart)
             {
-                AugmentManager.Instance.ApplyHealAugment(units[i]);
+                for (int j = 0; j < units.Length; j++)
+                {
+                    AugmentManager.Instance.ApplyHealAugment(units[j]);
+                }
             }
-        }
-        else if (AugmentManager.Instance.currentAugment.Trigger == TriggerType.OnEnemyDied)
-        {
-            // TODO : 적이 죽었을 때 조건 추가 필요
-
-            for (int i = 0; i < units.Length; i++)
+            else if (AugmentManager.Instance.currentAugment[i].Trigger == TriggerType.OnEnemyDied)
             {
-                AugmentManager.Instance.ApplyHealAugment(units[i]);
+                // TODO : 적이 죽었을 때 조건 추가 필요
+
+                for (int j = 0; j < units.Length; j++)
+                {
+                    AugmentManager.Instance.ApplyHealAugment(units[j]);
+                }
             }
         }
     }
@@ -143,12 +144,12 @@ public class UnitManager : MonoBehaviour
     #region Fight
     public void Fight()
     {
-        if(UnitController.GetUnitsCount() == 0)
+        if (UnitController.GetUnitsCount() == 0)
             return;
 
         _unitUIManager.StandbyUIDeActive();
 
-        FightRoutine().Forget();        
+        FightRoutine().Forget();
     }
 
     private async UniTask FightRoutine()

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+// 더 이상 사용하지 않는 코드입니다.
 public class UpgradeCollectedCharacterData : MonoBehaviour
 {
     [Header("Reference")]

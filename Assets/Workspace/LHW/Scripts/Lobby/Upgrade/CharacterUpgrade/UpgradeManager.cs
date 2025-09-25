@@ -1,11 +1,9 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UpgradeManager : MonoBehaviour
 {
     [Header("Reference")]
-    [SerializeField] private UpgradeCollectedCharacterData _collectedCharacterData;
     [SerializeField] private UpgradeCharacterPopupUI _characterPopUpUI;
     public UpgradeCharacterPopupUI PopUpUI => _characterPopUpUI;
     [SerializeField] private UpgradeStonePopupUI _stonePopUpUI;
@@ -13,7 +11,6 @@ public class UpgradeManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private GameObject _characterUI;
     [SerializeField] private GameObject _magicStoneUI;
-    [SerializeField] private TMP_Text _characterCountText;
 
     [Header("Button")]
     [SerializeField] private Button _characterButton;
@@ -27,7 +24,6 @@ public class UpgradeManager : MonoBehaviour
 
     private void OnEnable()
     {
-        ShowCharacterCountInfo();
         _characterPopUpUI.gameObject.SetActive(false);        
     }
 
@@ -45,18 +41,5 @@ public class UpgradeManager : MonoBehaviour
     {
         _characterUI.SetActive(activePanel.Equals(_characterUI.name));
         _magicStoneUI.SetActive(activePanel.Equals(_magicStoneUI.name));
-    }
-
-
-    #region UI Output
-
-    private void ShowCharacterCountInfo()
-    {
-        _characterCountText.text = $"보유 영웅 {_collectedCharacterData.CollectedCharacterCount}/{_collectedCharacterData.CharacterCount}";
-        Debug.Log($"캐릭터 수 : {_collectedCharacterData.CollectedCharacterCount}");
-    }
-
-    #endregion
-
-    
+    }   
 }
