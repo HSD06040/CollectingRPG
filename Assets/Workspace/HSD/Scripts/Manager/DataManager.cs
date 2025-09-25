@@ -10,6 +10,7 @@ public class DataManager : Singleton<DataManager>
     public UnitData[] EnemyUnitDatas;
     public UnitData[] PlayerUnitDatas;
     public SynergyDatabase SynergyDB;
+    public UnitSpawnChanceData UnitSpawnChanceData;
 
     public AnimationManager AnimationManager = new();
 
@@ -20,17 +21,18 @@ public class DataManager : Singleton<DataManager>
     public MapDatabase MapDB { get; private set; } = new MapDatabase();
 
     // 추후 Init으로 뺄 예정
-    //private void Awake()
-    //{
-    //    InitData().Forget();
-    //    PresetDB.InitPresetData();
-    //    MapDB.InitMapData();
-    //}
+    private void Awake()
+    {
+        InitData().Forget();
+        PresetDB.InitPresetData();
+        MapDB.InitMapData();
+    }
 
     #region UniData
 
     public async UniTask InitData()
     {
+        UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         await Manager.Resources.SpriteLoadLable("MonsterIcon");        
         await AnimationManager.Init();
         await PreLoadData();

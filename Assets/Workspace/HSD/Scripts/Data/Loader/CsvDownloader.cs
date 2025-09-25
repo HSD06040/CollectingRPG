@@ -116,7 +116,6 @@ public class CsvDownloader
                 Debug.LogWarning($"UnitData with ID {id} not found.");
                 continue;
             }
-            Debug.Log($"Setting up UnitData ID: {id}");
 
             unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.NORMAL;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;

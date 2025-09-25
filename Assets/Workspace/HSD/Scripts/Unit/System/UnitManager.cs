@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 public class UnitManager : MonoBehaviour
 {
@@ -26,6 +25,7 @@ public class UnitManager : MonoBehaviour
     public EnemyController EnemyController;
 
     [Header("Data")]
+    private UnitSpawnChanceData _unitSpawnChanceData;
     [SerializeField] UnitData[] _unitDatas;
     [SerializeField] int _upgradeNeedCount = 3;
 
@@ -49,6 +49,7 @@ public class UnitManager : MonoBehaviour
         if(IsTest)
             await Manager.Resources.LoadLabel("Stage");
 
+        _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();
 
         UnitController.Init();
@@ -79,36 +80,6 @@ public class UnitManager : MonoBehaviour
             }
         }
     }
-
-    //public void Init()
-    //{
-    //    //Manager.Pool.PopUpInit();
-
-    //    Manager.Data.SynergyDB.ResetSynergys();
-
-    //    UnitController.Init();
-    //    _unitUIManager.Init();
-
-    //    _unitDatas = Manager.Data.UnitDatas;
-
-    //    Subscribe();
-
-    //    _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
-    //    _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
-                       
-    //    TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
-
-    //    if (preset == null)
-    //        return;
-
-    //    for (int i = 0; i < preset.Statuses.Length; i++)
-    //    {
-    //        if(preset.Statuses[i].Data != null)
-    //        {
-    //            AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
-    //        }
-    //    }
-    //}
 
     #region EventHandler
     private void Subscribe()
@@ -228,6 +199,7 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.UnitHealthBarManager.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
     #endregion
+
     public void GameEndedUnitStandby()
     {
         SpawnUnitStnaby();
@@ -273,7 +245,8 @@ public class UnitManager : MonoBehaviour
             Debug.Log("골드가 부족합니다.");
             return;
         }
-        UnitData unit = _unitDatas[UnityEngine.Random.Range(0, _unitDatas.Length)];
+
+        UnitData unit = _unitSpawnChanceData.RollUnit();
         UnitStatus unitStatus = new UnitStatus(unit);
 
         AddSlotUnit(unitStatus, slotIdx);

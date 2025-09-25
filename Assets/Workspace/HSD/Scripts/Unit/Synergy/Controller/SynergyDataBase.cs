@@ -42,7 +42,12 @@ public class SynergyDatabase : ScriptableObject
 
     public SynergyData GetSynergy(int synergyIdx)
     {
-        return _synergyDataDic.TryGetValue(synergyIdx, out var effect) ? effect : null;
+        if(!_synergyDataDic.TryGetValue(synergyIdx, out var effect))
+        {
+            Init();
+        }
+
+        return _synergyDataDic[synergyIdx];
     }
 
     public void ResetSynergys()
