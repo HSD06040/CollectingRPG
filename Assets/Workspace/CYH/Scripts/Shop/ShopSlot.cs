@@ -61,13 +61,13 @@ public class ShopSlot : MonoBehaviour
             _priceImage.sprite = _diaSprite;
         }
 
-        // 다이아몬드 상점 첫번째 슬롯 가격 텍스트 위치
-        if (slot.Type == ShopType.Diamond || slot.IsFree)
+        // 상점 첫번째 슬롯 가격 텍스트 위치
+        if (slot.IsFree)
         {
             _priceImage.gameObject.SetActive(false);
             RectTransform rectTransform = _priceText.rectTransform;
             Vector2 offset = rectTransform.offsetMin;
-            offset.x = 0f;
+            offset.x = 11f;
             rectTransform.offsetMin = offset;
         }
 
