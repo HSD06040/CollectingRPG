@@ -2,9 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ShopUIController : MonoBehaviour
 {
@@ -35,27 +35,54 @@ public class ShopUIController : MonoBehaviour
     [SerializeField] private Sprite _diamondSprite;
 
     [Header("Ad Reroll")]
-    [SerializeField] GoogleAdMob _googleAdMob;
     [SerializeField] private Button _adRerollButton;
     [SerializeField] private TMP_Text _adRerollCountText;
+    [SerializeField] GoogleAdMob _googleAdMob;
 
     private ShopSlotFactory _shopSlotFactory = new ShopSlotFactory();
     private DailyShopManager _dailyManager;
 
+    private bool _initialized = false; 
+
+
+    private void Awake()
+    {
+        _dailyManager = GetComponent<DailyShopManager>();
+    }
 
     private async void Start()
     {
-        _dailyManager = GetComponent<DailyShopManager>();
-        
+        UserShopData userData = await Manager.DB.shopDB.LoadUserShopDataAsync();
+
+        if (userData != null)
+        {
+            // DB 데이터 -> 인게임 데이터로 변환/적용
+            Manager.DB.shopDB.ApplyUserShopData(
+                userData,
+                out List<ShopSlotData> dailyList,
+                out List<ShopSlotData> goldList,
+                out List<ShopSlotData> diamondList,
+                out int rerollCount,
+                out int adRerollCount
+            );
+
+            _dailyManager.SetSlotData(dailyList, rerollCount, adRerollCount);
+            _dailyManager.SetGoldSlots(goldList);
+            _dailyManager.SetDiamondSlots(diamondList);
+        }
+
         await InitShopUI();
-        
+
         _rerollButton.onClick.AddListener(OnClickRefresh);
         _testButton.onClick.AddListener(RerollShopData);
+        _testButton.onClick.AddListener(OnClickRefresh);
         _adRerollButton.onClick.AddListener(OnClickAdReroll);
-  
+
         // 새로고침 횟수 UI 초기화
         UpdateRerollButtonUI();
         UpdateAdRerollButtonUI();
+
+        _initialized = true; 
     }
 
     private void OnEnable()
@@ -67,7 +94,6 @@ public class ShopUIController : MonoBehaviour
     {
         StopDailyTimer();
     }
-
 
     private void StartDailyTimer()
     {
@@ -95,9 +121,11 @@ public class ShopUIController : MonoBehaviour
             {
                 bool isResetTime = TimeManager.Instance.LoadDailyShopResetTime(out DateTime nextDate);
 
-                if (isResetTime)
+                if (_initialized && isResetTime)
                 {
+                    Debug.Log("Daily Reset 실행");
                     RerollShopData();
+                    OnClickRefresh();
                 }
 
                 DateTime now = DateTime.Now;
@@ -128,12 +156,28 @@ public class ShopUIController : MonoBehaviour
 
     private async Task InitDailyShop()
     {
+        // 기존 슬롯 제거
         foreach (Transform child in _dailyList)
         {
             Destroy(child.gameObject);
         }
 
-        List<ShopSlotData> dailySlots = await _dailyManager.GetDailySlotsAsync();
+        // Daily 슬롯 로드
+        List<ShopSlotData> dailySlots = _dailyManager.GetDailySlots();
+
+        // DB에 데이터 o -> 생성
+        if (dailySlots != null && dailySlots.Count > 0)
+        {
+            foreach (var slot in dailySlots)
+            {
+                Instantiate(_slotPrefab, _dailyList).SetSlot(slot);
+            }
+            return; 
+        }
+
+        // DB에 데이터 x -> 생성
+        dailySlots = await _dailyManager.GetDailySlotsAsync();
+        _dailyManager.SetSlotData(dailySlots, _dailyManager.RerollCount, _dailyManager.AdRerollCount);
 
         foreach (var slot in dailySlots)
         {
@@ -143,36 +187,44 @@ public class ShopUIController : MonoBehaviour
 
     private void InitGoldShop()
     {
-        foreach (Transform child in _goldList)
+        foreach (Transform child in _goldList) Destroy(child.gameObject);
+
+        if (_itemDB == null || _itemDB.Items == null)
         {
-            Destroy(child.gameObject);
+            Debug.LogError("ShopItemSO / Items 비어있음");
+            return;
         }
+
+        List<ShopSlotData> goldSlots = new List<ShopSlotData>();
 
         foreach (var meta in _itemDB.Items)
         {
-            if (meta.Type == ShopType.Gold)
+            if (meta != null && meta.Type == ShopType.Gold)
             {
                 ShopSlotData slot = _shopSlotFactory.FromGold(meta.ItemId, _itemDB);
+                goldSlots.Add(slot);
                 Instantiate(_slotPrefab, _goldList).SetSlot(slot);
             }
         }
+        _dailyManager.SetGoldSlots(goldSlots);
     }
 
     private void InitDiamondShop()
     {
-        foreach (Transform child in _diamondList)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in _diamondList) Destroy(child.gameObject);
+
+        List<ShopSlotData> diamondSlots = new List<ShopSlotData>();
 
         foreach (var meta in _itemDB.Items)
         {
             if (meta.Type == ShopType.Diamond)
             {
                 ShopSlotData slot = _shopSlotFactory.FromDiamond(meta.ItemId, _itemDB);
+                diamondSlots.Add(slot);
                 Instantiate(_slotPrefab, _diamondList).SetSlot(slot);
             }
         }
+        _dailyManager.SetDiamondSlots(diamondSlots);
     }
 
     #endregion
@@ -181,7 +233,8 @@ public class ShopUIController : MonoBehaviour
     #region currency
 
     /// <summary>
-    /// 새로고침 버튼 클릭 시 실행되는 메서드
+    /// 일일 상점을 새로고침하고 슬롯 UI를 갱신하는 메서드
+    /// 버튼 상태를 업데이트
     /// </summary>
     private async void OnClickRefresh()
     {
@@ -195,19 +248,13 @@ public class ShopUIController : MonoBehaviour
 
         if (newSlots != null)
         {
-            foreach (Transform child in _dailyList)
-                Destroy(child.gameObject);
-
-            foreach (var slot in newSlots)
-                Instantiate(_slotPrefab, _dailyList).SetSlot(slot);
+            foreach (Transform child in _dailyList) Destroy(child.gameObject);
+            foreach (var slot in newSlots) Instantiate(_slotPrefab, _dailyList).SetSlot(slot);
         }
 
         UpdateRerollButtonUI();
 
-        if (!_dailyManager.CanReroll())
-        {
-            _rerollButton.interactable = false;
-        }
+        if (!_dailyManager.CanReroll()) _rerollButton.interactable = false;
     }
 
     /// <summary>
@@ -227,24 +274,16 @@ public class ShopUIController : MonoBehaviour
         {
             _rerollPriceText.text = "무료";
             _rerollPriceImage.enabled = false;
-
-            // 텍스트 위치 조정
             RectTransform rect = _rerollPriceText.GetComponent<RectTransform>();
-            Vector2 pos = rect.anchoredPosition;
-            pos.x = 16f;
-            rect.anchoredPosition = pos;
+            rect.anchoredPosition = new Vector2(9f, rect.anchoredPosition.y);
         }
         else
         {
             _rerollPriceText.text = cost.ToString();
             _rerollPriceImage.sprite = (currency == "Gold") ? _goldSprite : _diamondSprite;
             _rerollPriceImage.enabled = true;
-
-            // 텍스트 위치 조정
             RectTransform rect = _rerollPriceText.GetComponent<RectTransform>();
-            Vector2 pos = rect.anchoredPosition;
-            pos.x = 41f;
-            rect.anchoredPosition = pos;
+            rect.anchoredPosition = new Vector2(58f, rect.anchoredPosition.y);
         }
     }
 
@@ -264,22 +303,25 @@ public class ShopUIController : MonoBehaviour
             return;
         }
 
-        // 광고 실행
         _googleAdMob.ShowAd(OnAdWatched);
     }
 
     private async void OnAdWatched()
     {
         // 광고 끝난 후 count 증가 / 새로고침
-        List<ShopSlotData> newSlots = await _dailyManager.RerollDailySlotByAdAsync();
+        await _dailyManager.RerollDailySlotByAdAsync();
 
-        if (newSlots != null)
+        // DailyRandomItems 기준으로 UI 갱신
+        List<ShopSlotData> currentSlots = _dailyManager.GetDailySlots();
+
+        foreach (Transform child in _dailyList)
         {
-            foreach (Transform child in _dailyList)
-                Destroy(child.gameObject);
+            Destroy(child.gameObject);
+        }
 
-            foreach (var slot in newSlots)
-                Instantiate(_slotPrefab, _dailyList).SetSlot(slot);
+        foreach (var slot in currentSlots)
+        {
+            Instantiate(_slotPrefab, _dailyList).SetSlot(slot);
         }
 
         UpdateAdRerollButtonUI();
@@ -305,8 +347,8 @@ public class ShopUIController : MonoBehaviour
     private async void RerollDailyShop()
     {
         await InitDailyShop();
-        _dailyManager.RerollCount();
-        _dailyManager.RerollAdCount();
+        _dailyManager.ResetRerollCount();
+        _dailyManager.ResetAdRerollCount();
 
         UpdateRerollButtonUI();
         UpdateAdRerollButtonUI();
@@ -325,5 +367,4 @@ public class ShopUIController : MonoBehaviour
         //새로고침 버튼 횟수 초기화, 일일상점 상품 리스트 초기화
         RerollDailyShop();
     }
-
 }
