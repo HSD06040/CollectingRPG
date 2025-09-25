@@ -15,11 +15,10 @@ public class UnitSpawnChanceData : ScriptableObject
     public void CalculateChances(int currentFloor)
     {
         _cachedChances.Clear();
-        
+
         UnitData[] allUnits = Manager.Data.PlayerUnitDatas;
-        
         UnitSpawnChance floorChance = UnitSpawnChances[currentFloor];
-        
+
         foreach (Grade grade in System.Enum.GetValues(typeof(Grade)))
         {
             List<UnitData> candidates = new List<UnitData>();
@@ -31,24 +30,43 @@ public class UnitSpawnChanceData : ScriptableObject
 
             if (candidates.Count == 0) continue;
 
-            float totalWeight = 0f;
-            Dictionary<UnitData, float> weights = new Dictionary<UnitData, float>();
+            float rarityChance = GetRarityChance(floorChance, grade);
+            int totalCount = candidates.Count;
+            float baseChance = rarityChance / totalCount;
+
+            List<UnitData> leaders = new List<UnitData>();
             foreach (var unit in candidates)
             {
-                float weight = (unit.Synergy == CurrentLeaderSynergy) ? leaderWeight : 1f;
-                weights[unit] = weight;
-                totalWeight += weight;
+                if (unit.Synergy == CurrentLeaderSynergy)
+                    leaders.Add(unit);
             }
 
-            float rarityChance = GetRarityChance(floorChance, grade);
+            int leaderCount = leaders.Count;
 
-            foreach (var kvp in weights)
+            if (leaderCount > 0)
             {
-                float finalChance = rarityChance * (kvp.Value / totalWeight);
-                _cachedChances[kvp.Key] = finalChance;
+                float leaderChance = baseChance * leaderWeight;
+                float totalLeaderChance = leaderChance * leaderCount;
+
+                float remainChance = rarityChance - totalLeaderChance;
+                float normalChance = remainChance / (totalCount - leaderCount);
+
+                foreach (var unit in candidates)
+                {
+                    if (leaders.Contains(unit))
+                        _cachedChances[unit] = leaderChance;
+                    else
+                        _cachedChances[unit] = normalChance;
+                }
+            }
+            else
+            {
+                foreach (var unit in candidates)
+                    _cachedChances[unit] = baseChance;
             }
         }
     }
+
 
     public UnitData RollUnit()
     {

@@ -54,7 +54,7 @@ public class UnitManager : MonoBehaviour
 
         UnitController.Init();
         EnemyController.Init();
-
+        _unitSpawnChanceData.CalculateChances(0);
         //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
         //_unitDatas = Manager.Data.EnemyUnitDatas;
         _unitDatas = Manager.Data.PlayerUnitDatas;
