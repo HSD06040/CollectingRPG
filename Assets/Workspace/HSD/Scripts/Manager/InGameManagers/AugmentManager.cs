@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 
 public class AugmentManager : InGameSingleton<AugmentManager>
 {
@@ -24,9 +23,9 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     public Stat<float> GoldBonus;
 
     [Header("CurrentAugment")]
-    public AUGData currentAugment;
+    public List<AUGData> currentAugment = new();
     // 테스트용
-    [SerializeField] private AUGData AUGData;
+    [SerializeField] private AUGData[] AUGData;
 
     // 캐릭터 스테이터스 적용
     private Dictionary<UnitBase, HashSet<string>> _appliedStatusAugments = new();
@@ -36,12 +35,20 @@ public class AugmentManager : InGameSingleton<AugmentManager>
 
     private void Start()
     {
-        SelectAugment(AUGData);
+        for (int i = 0; i < AUGData.Length; i++)
+        {
+            SelectAugment(AUGData[i]);
+        }
     }
 
     public void SelectAugment(AUGData data)
     {
-        currentAugment = data;
+        currentAugment.Add(data);
+    }
+
+    public void RemoveAugment(AUGData data)
+    {
+        currentAugment.Remove(data);
     }
 
     #region Unit Status Augment
@@ -52,19 +59,22 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     /// <param name="unit"></param>
     public void ApplyAugment(UnitBase unit)
     {
-        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType != EffectType.Buff_Debuff) return;
-
-        if (!_appliedStatusAugments.ContainsKey(unit))
-            _appliedStatusAugments[unit] = new HashSet<string>();
-
-        if (_appliedStatusAugments[unit].Contains(currentAugment.AUGID))
+        for (int i = 0; i < currentAugment.Count; i++)
         {
-            Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 이미 적용됨.");
-            return;
-        }
+            if (currentAugment == null || !IsAugmentTarget(unit, i) || currentAugment[i].EffectType != EffectType.Buff_Debuff) continue;
 
-        _appliedStatusAugments[unit].Add(currentAugment.AUGID);
-        currentAugment.ApplyBuffEffect(unit);
+            if (!_appliedStatusAugments.ContainsKey(unit))
+                _appliedStatusAugments[unit] = new HashSet<string>();
+
+            if (_appliedStatusAugments[unit].Contains(currentAugment[i].AUGID))
+            {
+                Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment[i].AUGID} 는 이미 적용됨.");
+                continue;
+            }
+
+            _appliedStatusAugments[unit].Add(currentAugment[i].AUGID);
+            currentAugment[i].ApplyBuffEffect(unit);
+        }
     }
 
     /// <summary>
@@ -73,21 +83,23 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     /// <param name="unit"></param>
     public void ReleaseAugment(UnitBase unit)
     {
-        if (currentAugment == null) return;
-
-        if (_appliedStatusAugments.TryGetValue(unit, out var augments))
+        for (int i = 0; i < currentAugment.Count; i++)
         {
-            if (augments.Contains(currentAugment.AUGID))
-            {
-                currentAugment.RemoveBuffEffect(unit);
-                augments.Remove(currentAugment.AUGID);
-                if (augments.Count == 0)
-                    _appliedStatusAugments.Remove(unit);
+            if (currentAugment == null) continue;
 
-            }
-            else
+            if (_appliedStatusAugments.TryGetValue(unit, out var augments))
             {
-                Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 적용되지 않아 해제할 수 없음.");
+                if (augments.Contains(currentAugment[i].AUGID))
+                {
+                    currentAugment[i].RemoveBuffEffect(unit);
+                    augments.Remove(currentAugment[i].AUGID);
+                    if (augments.Count == 0)
+                        _appliedStatusAugments.Remove(unit);
+                }
+                else
+                {
+                    Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment[i].AUGID} 는 적용되지 않아 해제할 수 없음.");
+                }
             }
         }
     }
@@ -97,10 +109,11 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     /// </summary>
     /// <param name="unit"></param>
     /// <returns></returns>
-    public bool IsAugmentTarget(UnitBase unit)
+    public bool IsAugmentTarget(UnitBase unit, int index)
     {
-        if (currentAugment.TargetType == EffectTargetType.Ally) return true;
-        else if (currentAugment.TargetType == EffectTargetType.SameClassType && unit.Status.Data.ClassSynergy == currentAugment.Class)
+        if (currentAugment[index] == null) return false;
+        if (currentAugment[index].TargetType == EffectTargetType.Ally) return true;
+        else if (currentAugment[index].TargetType == EffectTargetType.SameClassType && unit.Status.Data.ClassSynergy == currentAugment[index].Class)
         {
             Debug.Log("클래스가 같음");
             return true;
@@ -116,37 +129,43 @@ public class AugmentManager : InGameSingleton<AugmentManager>
 
     public void ApplyHealAugment(UnitBase unit)
     {
-        if (currentAugment == null || !IsAugmentTarget(unit) || currentAugment.EffectType != EffectType.Increase) return;
-
-        if (!_appliedStatusAugments.ContainsKey(unit))
-            _appliedStatusAugments[unit] = new HashSet<string>();
-
-        if (_appliedStatusAugments[unit].Contains(currentAugment.AUGID))
+        for (int i = 0; i < currentAugment.Count; i++)
         {
-            Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 이미 적용됨.");
-            return;
-        }
+            if (currentAugment == null || !IsAugmentTarget(unit, i) || currentAugment[i].EffectType != EffectType.Increase) continue;
 
-        _appliedStatusAugments[unit].Add(currentAugment.AUGID);
-        currentAugment.ApplyIncreaseEffect(unit);
+            if (!_appliedStatusAugments.ContainsKey(unit))
+                _appliedStatusAugments[unit] = new HashSet<string>();
+
+            if (_appliedStatusAugments[unit].Contains(currentAugment[i].AUGID))
+            {
+                Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment[i].AUGID} 는 이미 적용됨.");
+                continue;
+            }
+
+            _appliedStatusAugments[unit].Add(currentAugment[i].AUGID);
+            currentAugment[i].ApplyIncreaseEffect(unit);
+        }
     }
 
     public void ReleaseHealAugment(UnitBase unit)
     {
-        if (currentAugment == null) return;
-
-        if (_appliedStatusAugments.TryGetValue(unit, out var augments))
+        for (int i = 0; i < currentAugment.Count; i++)
         {
-            if (augments.Contains(currentAugment.AUGID))
-            {
-                augments.Remove(currentAugment.AUGID);
+            if (currentAugment == null) continue;
 
-                if (augments.Count == 0)
-                    _appliedStatusAugments.Remove(unit);
-            }
-            else
+            if (_appliedStatusAugments.TryGetValue(unit, out var augments))
             {
-                Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment.AUGID} 는 적용되지 않아 해제할 수 없음.");
+                if (augments.Contains(currentAugment[i].AUGID))
+                {
+                    augments.Remove(currentAugment[i].AUGID);
+
+                    if (augments.Count == 0)
+                        _appliedStatusAugments.Remove(unit);
+                }
+                else
+                {
+                    Debug.LogWarning($"[AugmentManager] {unit.name} 에 {currentAugment[i].AUGID} 는 적용되지 않아 해제할 수 없음.");
+                }
             }
         }
     }
@@ -160,21 +179,21 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     /// </summary>
     public void ApplyAugment()
     {
-        if (currentAugment == null) return;
-
-        if (!_appliedCurrencyAugments.ContainsKey(currentAugment))
-            _appliedCurrencyAugments[currentAugment] = new HashSet<string>();
-
-        if (_appliedCurrencyAugments[currentAugment].Contains(currentAugment.AUGID))
+        for (int i = 0; i < currentAugment.Count; i++)
         {
-            Debug.LogWarning($"[AugmentManager] {currentAugment.name} 에 {currentAugment.AUGID} 는 이미 적용됨.");
-            return;
-        }
+            if (currentAugment == null) continue;
 
-        _appliedCurrencyAugments[currentAugment].Add(currentAugment.AUGID);
-        for (int i = 0; i < currentAugment.StatTypes.Length; i++)
-        {
-            AddAugment(currentAugment.StatTypes[i], currentAugment.currentRate, currentAugment.Name);
+            if (!_appliedCurrencyAugments.ContainsKey(currentAugment[i]))
+                _appliedCurrencyAugments[currentAugment[i]] = new HashSet<string>();
+
+            if (_appliedCurrencyAugments[currentAugment[i]].Contains(currentAugment[i].AUGID))
+            {
+                Debug.LogWarning($"[AugmentManager] {currentAugment[i].name} 에 {currentAugment[i].AUGID} 는 이미 적용됨.");
+                continue;
+            }
+
+            _appliedCurrencyAugments[currentAugment[i]].Add(currentAugment[i].AUGID);
+            AddAugment(currentAugment[i].StatTypes[i], currentAugment[i].currentRate, currentAugment[i].Name);
         }
     }
 
@@ -183,24 +202,25 @@ public class AugmentManager : InGameSingleton<AugmentManager>
     /// </summary>
     public void ReleaseAugment()
     {
-        if (currentAugment == null) return;
-
-        if (_appliedCurrencyAugments.TryGetValue(currentAugment, out var augments))
+        for (int i = 0; i < currentAugment.Count; i++)
         {
-            if (augments.Contains(currentAugment.AUGID))
-            {
-                for (int i = 0; i < currentAugment.StatTypes.Length; i++)
-                {
-                    RemoveAugment(currentAugment.StatTypes[i], currentAugment.Name);
-                }
-                augments.Remove(currentAugment.AUGID);
+            if (currentAugment == null) return;
 
-                if (augments.Count == 0)
-                    _appliedCurrencyAugments.Remove(currentAugment);
-            }
-            else
+            if (_appliedCurrencyAugments.TryGetValue(currentAugment[i], out var augments))
             {
-                Debug.LogWarning($"[AugmentManager] {currentAugment.name} 에 {currentAugment.AUGID} 는 적용되지 않아 해제할 수 없음.");
+                if (augments.Contains(currentAugment[i].AUGID))
+                {
+                    RemoveAugment(currentAugment[i].StatTypes[i], currentAugment[i].Name);
+
+                    augments.Remove(currentAugment[i].AUGID);
+
+                    if (augments.Count == 0)
+                        _appliedCurrencyAugments.Remove(currentAugment[i]);
+                }
+                else
+                {
+                    Debug.LogWarning($"[AugmentManager] {currentAugment[i].name} 에 {currentAugment[i].AUGID} 는 적용되지 않아 해제할 수 없음.");
+                }
             }
         }
     }
@@ -248,7 +268,7 @@ public class AugmentManager : InGameSingleton<AugmentManager>
         switch (statType)
         {
             case StatType.GoldBonus:
-                GoldBonus.AddModifier(value, source);                
+                GoldBonus.AddModifier(value, source);
                 break;
         }
     }
