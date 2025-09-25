@@ -45,10 +45,10 @@ public class ShopUIController : MonoBehaviour
 
     private async void Start()
     {
+        _dailyManager = GetComponent<DailyShopManager>();
+        
         await InitShopUI();
         
-        _dailyManager = GetComponent<DailyShopManager>();
-
         _rerollButton.onClick.AddListener(OnClickRefresh);
         _testButton.onClick.AddListener(RerollShopData);
         _adRerollButton.onClick.AddListener(OnClickAdReroll);
@@ -133,8 +133,7 @@ public class ShopUIController : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        DailyShopManager dailyShopManager = new DailyShopManager();
-        List<ShopSlotData> dailySlots = await dailyShopManager.GetDailySlotsAsync();
+        List<ShopSlotData> dailySlots = await _dailyManager.GetDailySlotsAsync();
 
         foreach (var slot in dailySlots)
         {
