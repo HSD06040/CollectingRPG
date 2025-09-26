@@ -61,14 +61,9 @@ public class BuffSkill : UnitSkill
 
     private GameObject GetTargetPrioty(IAttacker attacker)
     {
-        LayerMask targetLayer;
-
-        if (TargetType == TargetType.Ally)
-            targetLayer = attacker.GetAllyLayerMask();
-        else if (TargetType == TargetType.Enemy)
-            targetLayer = attacker.TargetLayer;
+        LayerMask targetLayer = TargetType == TargetType.Ally ? attacker.GetAllyLayerMask() : attacker.TargetLayer;        
             
-        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());        
+        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, targetLayer, GetPriorityFilter());        
     }
 
 #if UNITY_EDITOR

@@ -10,6 +10,7 @@ public class DataManager : Singleton<DataManager>
     public UnitData[] EnemyUnitDatas;
     public UnitData[] PlayerUnitDatas;
     public SynergyDatabase SynergyDB;
+    public UnitSpawnChanceData UnitSpawnChanceData;
 
     public AnimationManager AnimationManager = new();
 
@@ -31,7 +32,10 @@ public class DataManager : Singleton<DataManager>
 
     public async UniTask InitData()
     {
-        await Manager.Resources.SpriteLoadLable("MonsterIcon");        
+        await Manager.Resources.SpriteLoadLable("MonsterIcon");
+        await Manager.Resources.SpriteLoadLable("PlayerUnitIcon");
+
+        UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         await AnimationManager.Init();
         await PreLoadData();
         await CsvDownload();

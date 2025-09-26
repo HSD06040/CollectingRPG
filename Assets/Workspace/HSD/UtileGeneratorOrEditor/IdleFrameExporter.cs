@@ -14,10 +14,10 @@ public class IdleFrameExporter : MonoBehaviour
     [ContextMenu("Create Image")]
     public void StartExport()
     {
-        CaptureIdleFrame().Forget();
+        CaptureIdleFrame();
     }
 
-    private async UniTask CaptureIdleFrame()
+    private void CaptureIdleFrame()
     {
         foreach (var prefab in prefabs)
         {

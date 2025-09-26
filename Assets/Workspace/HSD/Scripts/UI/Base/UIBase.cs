@@ -27,7 +27,7 @@ public abstract class UIBase : MonoBehaviour
                 Debug.LogError($"[UIBase] 이름으로 오브젝트를 찾을 수 없습니다: {targetName} ({field.Name}) in {GetType().Name}");
                 continue;
             }
-
+            
             var component = target.GetComponent(field.FieldType);
 
             if (component == null)

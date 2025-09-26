@@ -3,6 +3,7 @@ using System.Text;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
 public static class Utils
@@ -62,16 +63,19 @@ public static class Utils
     public static void CalculateDamage(this UnitStatusController status, UnitStatusController enemy)
     {
         bool isCrit = false;
-        float totalDamage = status.PhysicalDamage.Value;
+        float total = status.PhysicalDamage.Value;
 
         if (status.CritChance.Value > Random.Range(0f, 100f))
         {
             isCrit = true;
-            totalDamage *= 1.5f;
+            total *= 1.5f;
         }
-        float totalDefense = enemy.PhysicalDefense.Value / (enemy.PhysicalDefense.Value + 100f);        
+        float totalDefense = enemy.PhysicalDefense.Value / (enemy.PhysicalDefense.Value + 100f);
 
-        enemy.TakeDamage(Mathf.RoundToInt(totalDamage * (1f - totalDefense)), isCrit);
+        int totalDamage = Mathf.RoundToInt(total * (1f - totalDefense));
+        status.TotalDamage.Value += totalDamage;
+
+        enemy.TakeDamage(totalDamage, isCrit);
     }
     #endregion
 
@@ -355,7 +359,7 @@ public static class Utils
             Grade.NORMAL => new Color(173f / 255f, 255f / 255f, 47f / 255f),
             Grade.RARE => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
             Grade.UNIQUE => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
-            Grade.LEGENDARY => new Color32(0xF2, 0x93, 0x38, 0xFF),
+            Grade.LEGEND => new Color32(0xF2, 0x93, 0x38, 0xFF),
             _ => Color.grey,
         };
     }
@@ -420,6 +424,22 @@ public static class Utils
 
             gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
         }
+    }
+    #endregion
+
+    #region Status
+    public static UnitStats StatMultiply(this UnitStats unitStats, float multiply)
+    {
+        return new UnitStats
+        {
+            MaxHealth = Mathf.RoundToInt(unitStats.MaxHealth * multiply),
+
+            PhysicalDamage = Mathf.RoundToInt(unitStats.PhysicalDamage * multiply),
+            MagicDamage = Mathf.RoundToInt(unitStats.MagicDamage * multiply),
+
+            PhysicalDefense = Mathf.RoundToInt(unitStats.PhysicalDefense * multiply),
+            MagicDefense = Mathf.RoundToInt(unitStats.MagicDefense * multiply)
+        };
     }
     #endregion
 

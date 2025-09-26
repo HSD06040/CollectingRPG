@@ -40,20 +40,17 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void Awake()
     {
-        DataInit();
         _manager = GetComponentInParent<TeamOrganizeManager>();
         GetComponent<Button>().onClick.AddListener(TryAddCharacter);
     }
 
-    private void Start()
+    public void Setup(UnitData data)
     {
-        UIUpdate();
-    }
+        _unitData = data;
+        _status = new UnitStatus(data);
 
-    private void DataInit()
-    {
-        _status = new UnitStatus(_unitData, 1);
-    }
+        UIUpdate();
+    }    
 
     #region Event
 
@@ -62,7 +59,9 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
         if (_manager != null)
         {
             _manager.OnCharacterDataChanged += UIUpdate;
-            UIUpdate();
+
+            if(Status != null && Status.Data != null)
+                UIUpdate();
         }
     }
 

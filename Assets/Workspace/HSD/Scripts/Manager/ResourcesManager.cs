@@ -30,7 +30,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
         if (!_resources.ContainsKey(address))
         {
-            Debug.Log($"[AddressableSystem] {address} 주소의 에셋이 로드되지 않았습니다.");
+            Debug.LogWarning($"[AddressableSystem] {address} 주소의 에셋이 로드되지 않았습니다.");
             return null;
         }
 
@@ -57,7 +57,10 @@ public class ResourcesManager : Singleton<ResourcesManager>
     public Sprite SpriteGet(string address)
     {
         if(!_sprites.ContainsKey(address))
+        {
+            Debug.Log($"[스프라이트] {address}의 Sprite가 없습니다.");
             return null;
+        }
 
         return _sprites[address];
     }
