@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Net.Http.Headers;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,10 +22,15 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     [Header("Character Status")]
     [SerializeField] private TMP_Text[] _statuses;
 
-    [Header("Character Upgrade Info")]
+    [Header("Character Skill Info")]
     [SerializeField] private Image _skillIcon;
     [SerializeField] private TMP_Text _skillNameText;
     [SerializeField] private TMP_Text _skillDescriptionText;
+
+    [Header("Character Upgrade Info")]
+    [SerializeField] private TMP_Text[] _characterUpgradeLevelText;
+    [SerializeField] private TMP_Text[] _characterUpgradeDescriptionText;
+    [SerializeField] private GameObject[] _upgradeStatusDisablePanel;
 
     [Header("Level Up Button UI")]
     [SerializeField] private TMP_Text _pieceText;
@@ -99,6 +107,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
             CharacterStatusUpdate();
             LevelUpButtonUpdate();
             SkillUIUpdate();
+            StatusUpgradeUIUpdate();
         }
     }
 
@@ -164,6 +173,69 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
         _skillIcon.sprite = _currentCharUnit.Status.Data.Skill.Icon;
         _skillNameText.text = _currentCharUnit.Status.Data.Skill.SkillName;
         _skillDescriptionText.text = _currentCharUnit.Status.Data.Skill.Description;
+    }
+
+    private void StatusUpgradeUIUpdate()
+    {
+        for(int i = 0; i < _characterUpgradeLevelText.Length; i++)
+        {
+            _characterUpgradeLevelText[i].text = $"LV.{2 * (i + 1)}";
+
+            List<StatusGrowth> statusGrowths = _currentCharUnit.Status.Data.UpgradeStatData.GetCurrentStatusData(_currentCharUnit.Status.Data.Grade, 2 * (i + 1));
+
+            StringBuilder sb = new StringBuilder();
+            for(int j = 0; j < statusGrowths.Count; j++)
+            {
+                sb.Append($"{StatTypeTranslate(statusGrowths[j].Type)} {statusGrowths[j].Value} ");
+                if (j != statusGrowths.Count - 1 && j % 2 == 1) sb.Append("\n");
+            }
+
+            sb.Append("증가");
+
+            _characterUpgradeDescriptionText[i].text = sb.ToString();
+        }
+
+        ActiveUpgradeStatusInfo();
+    }
+
+    private void ActiveUpgradeStatusInfo()
+    {
+        int currentUpgradeLevel = _currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel / 2;
+
+        for(int i = 0; i < currentUpgradeLevel; i++)
+        {
+            _upgradeStatusDisablePanel[i].SetActive(false);
+        }
+        for(int i = currentUpgradeLevel; i < _upgradeStatusDisablePanel.Length; i++)
+        {
+            _upgradeStatusDisablePanel[i].SetActive(true);
+        }
+    }
+
+    private string StatTypeTranslate(StatType type)
+    {
+        string text = "";
+
+        switch(type)
+        {
+            case StatType.MaxHealth: text = "최대체력"; break;
+            case StatType.MaxMana: text = "최대마나"; break;
+            case StatType.ManaGain: text = "마나 회복속도"; break;
+            case StatType.AttackSpeed: text = "공격속도"; break;
+            case StatType.MoveSpeed: text = "공격속도"; break;
+            case StatType.PhysicalDamage: text = "물리공격력"; break;
+            case StatType.MagicDamage: text = "마법공격력"; break;
+            case StatType.CritChance: text = "크리티컬확률"; break;
+            case StatType.CritDamage: text = "크리티컬 데미지"; break;
+            case StatType.PhysicalDefense: text = "물리방어력"; break;
+            case StatType.MagicDefense: text = "마법방어력"; break;
+            case StatType.Shield: text = "쉴드"; break;
+            case StatType.AttackRange: text = "공격범위"; break;
+            case StatType.AttackCount: text = "공격횟수"; break;
+            case StatType.CurHp: text = "현재체력"; break;
+            case StatType.CurMana: text = "현재마나"; break;
+        }
+        return text;
     }
 
     #endregion
