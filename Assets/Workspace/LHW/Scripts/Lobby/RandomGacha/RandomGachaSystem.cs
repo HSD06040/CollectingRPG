@@ -271,7 +271,7 @@ public class RandomGachaSystem : MonoBehaviour
             case Grade.NORMAL: piece = UnityEngine.Random.Range(1, 16); break;
             case Grade.RARE: piece = UnityEngine.Random.Range(1, 11); break;
             case Grade.UNIQUE: piece = UnityEngine.Random.Range(1, 9); break;
-            case Grade.LEGEND: piece = UnityEngine.Random.Range(1, 6); break;
+            case Grade.LEGEND: piece = UnityEngine.Random.Range(1, 5); break;
         }
         return piece;
     }
