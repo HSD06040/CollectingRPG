@@ -129,7 +129,6 @@ public class ShopSlot : MonoBehaviour
                 }
                 else
                 {
-                    //TODO: [CYH] Firebase 재화 업데이트
                     Debug.Log($"골드 {_slotData.Count}개 구매");
                     Debug.Log($"다이아 {_slotData.ItemPrice}개 차감");
                     await Manager.DB.SubtractDiamondAsync(int.Parse(_slotData.ItemPrice));

@@ -129,13 +129,29 @@ public class DailyShopManager : MonoBehaviour
         }
         else if (_rerollCount <= 2)
         {
-            Debug.Log("골드 차감 로직 실행");
-            // TODO: [CYH] 골드 차감 처리
+            if(_rerollCount == 1)
+            {
+                Debug.Log($"골드 {_goldCosts[0]}개 차감");
+                await Manager.DB.SubtractGoldAsync(_goldCosts[0]);
+            }
+            else if(_rerollCount == 2)
+            {
+                Debug.Log($"골드 {_goldCosts[1]}개 차감");
+                await Manager.DB.SubtractGoldAsync(_goldCosts[1]);
+            }
         }
         else if (_rerollCount <= 4)
         {
-            Debug.Log("다이아 차감 로직 실행");
-            // TODO: [CYH] 다이아 차감 처리
+            if (_rerollCount == 3)
+            {
+                Debug.Log($"다이아 {_diamondCosts[0]}개 차감");
+                await Manager.DB.SubtractDiamondAsync(_diamondCosts[0]);
+            }
+            else if (_rerollCount == 4)
+            {
+                Debug.Log($"다이아 {_diamondCosts[1]}개 차감");
+                await Manager.DB.SubtractDiamondAsync(_diamondCosts[1]);
+            }
         }
 
         _rerollCount++;
