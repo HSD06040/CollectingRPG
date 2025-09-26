@@ -152,8 +152,7 @@ public class CsvDownloader
                 AttackCount = 1
             };
 
-            unitData.UnitStats = new UnitStats[4];
-
+            unitData.UnitStats = new UnitStats[4];            
             unitData.UnitStats[0] = stat;
 
             for(int i = 1; i < unitData.UnitStats.Length; i++)
