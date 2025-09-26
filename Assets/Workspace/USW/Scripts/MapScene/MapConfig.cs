@@ -1,17 +1,21 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MapConfig", menuName = "Map/Map Config")]
-public class MapConfig : ScriptableObject
+namespace Map
 {
-    [Header("Node Blueprints")]
-    public List<NodeBlueprint> nodeBlueprints;
-    
-    [Header("Random Nodes")]
-    public List<NodeType> randomNodes = new List<NodeType>
-        {NodeType.Event, NodeType.Store, NodeType.MinorEnemy};
-    
-    [Header("Grid Settings")]
-    public int minNodesPerLayer = 2;
-    public int maxNodesPerLayer = 6;
+    [CreateAssetMenu]
+    public class MapConfig : ScriptableObject
+    {
+        public List<NodeBlueprint> nodeBlueprints;
+        public List<NodeType> randomNodes = new List<NodeType>
+            {NodeType.Mystery, NodeType.Store, NodeType.MinorEnemy, NodeType.EliteEnemy};
+        public int GridWidth => Mathf.Max(numOfPreBossNodes.max, numOfStartingNodes.max);
+
+        
+        public IntMinMax numOfPreBossNodes;
+        public IntMinMax numOfStartingNodes;
+        
+        public int extraPaths;
+        public List<MapLayer> layers;
+    }
 }

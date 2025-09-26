@@ -1,87 +1,62 @@
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 
-public class MapManager : MonoBehaviour
+namespace Map
 {
-    [Header("Map Settings")]
-    [SerializeField] private MapConfig _config;
-    [SerializeField] private MapView _view;
-
-    public Map CurrentMap { get; private set; }
-
-    private void Start()
+    public class MapManager : MonoBehaviour
     {
-        if (PlayerPrefs.HasKey("Map"))
+        public MapConfig config;
+        public MapView view;
+
+        public Map CurrentMap { get; private set; }
+
+        private void Start()
         {
-            string mapJson = PlayerPrefs.GetString("Map");
-            Map map = JsonConvert.DeserializeObject<Map>(mapJson);
-            
-            // 보스에 도달했는지 확인
-            if (map.path.Any(p => p.Equals(map.GetBossNode().point)))
+            if (PlayerPrefs.HasKey("Map"))
             {
-                // 보스 클리어 시 새 맵 생성
-                Debug.Log("보스 클리어! 새로운 Stage Map 생성");
-                GenerateNewMap();
+                string mapJson = PlayerPrefs.GetString("Map");
+                Map map = JsonConvert.DeserializeObject<Map>(mapJson);
+                // using this instead of .Contains()
+                if (map.path.Any(p => p.Equals(map.GetBossNode().point)))
+                {
+                    // payer has already reached the boss, generate a new map
+                    GenerateNewMap();
+                }
+                else
+                {
+                    CurrentMap = map;
+                    // player has not reached the boss yet, load the current map
+                    view.ShowMap(map);
+                }
             }
             else
             {
-                // 기존 맵 로드
-                CurrentMap = map;
-                _view.ShowMap(map);
+                GenerateNewMap();
             }
         }
-        else
+
+        public void GenerateNewMap()
         {
-            GenerateNewMap();
+            Map map = MapGenerator.GetMap(config);
+            CurrentMap = map;
+            Debug.Log(map.ToJson());
+            view.ShowMap(map);
         }
-    }
 
-    public void GenerateNewMap()
-    {
-        // StageMapGenerator만 사용
-        Map map = StageMapGenerator.GetCustomMap(_config);
-        Debug.Log("StageMapGenerator로 맵 생성 완료!");
-        
-        CurrentMap = map;
-        Debug.Log(map.ToJson());
-        _view.ShowMap(map);
-    }
+        public void SaveMap()
+        {
+            if (CurrentMap == null) return;
 
-    public void SaveMap()
-    {
-        if (CurrentMap == null) return;
+            string json = JsonConvert.SerializeObject(CurrentMap, Formatting.Indented,
+                new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
+            PlayerPrefs.SetString("Map", json);
+            PlayerPrefs.Save();
+        }
 
-        string json = JsonConvert.SerializeObject(CurrentMap, Formatting.Indented,
-            new JsonSerializerSettings {ReferenceLoopHandling = ReferenceLoopHandling.Ignore});
-        PlayerPrefs.SetString("Map", json);
-        PlayerPrefs.Save();
-        
-        Debug.Log("Stage Map 저장 완료");
-    }
-
-    private void OnApplicationQuit()
-    {
-        SaveMap();
-    }
-
-    private void OnApplicationPause(bool pauseStatus)
-    {
-        if (pauseStatus)
+        private void OnApplicationQuit()
+        {
             SaveMap();
-    }
-
-    // 에디터 테스트 메서드
-    [ContextMenu("Generate New Stage Map")]
-    void TestStageMapGeneration()
-    {
-        GenerateNewMap();
-    }
-    
-    [ContextMenu("Clear Saved Map")]
-    void ClearSavedMap()
-    {
-        PlayerPrefs.DeleteKey("Map");
-        Debug.Log("저장된 Stage Map 데이터 삭제 완료");
+        }
     }
 }
