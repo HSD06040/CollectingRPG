@@ -27,11 +27,17 @@ public class BattleEndUI : MonoBehaviour
     }
 
     private async UniTask WaitForClose()
-    {        
-        var tcs = new UniTaskCompletionSource();
-
-        await SceneManager.LoadSceneAsync("USW_LobbyScene", LoadSceneMode.Single);
+    {
+        await SceneChangeManager.Instance.LoadSceneAsync("Lobby", Clear);
 
         await Manager.DB.SetTutorialCompleteAsync();
+    }
+
+    private async UniTask Clear()
+    {
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
+
+        await UniTask.Delay(100);
     }
 }
