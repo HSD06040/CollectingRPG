@@ -1,6 +1,6 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class ShopSlot : MonoBehaviour
 {
@@ -97,7 +97,7 @@ public class ShopSlot : MonoBehaviour
         }
     }
 
-    public void OnClickBuy()
+    public async void OnClickBuy()
     {
         if (_slotData.IsFree && _slotData.IsPurchased) return;
 
@@ -106,15 +106,17 @@ public class ShopSlot : MonoBehaviour
             case ShopType.Diamond:
                 if (_slotData.IsFree)
                 {
-                    //TODO: [CYH] Firebase 재화 업데이트
                     _slotData.IsPurchased = true;
                     _disablePanel.SetActive(true);
                     Debug.Log($"무료 다이아몬드 {_slotData.Count}개 획득");
+                    await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
                 }
                 else
                 {
                     IAPManager.Instance.BuyProduct(_slotData.ItemId);
                     Debug.Log($"다이아몬드 {_slotData.Count}개 구매");
+                    //await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
+                    //await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
                 }
                 break;
             case ShopType.Gold:
@@ -123,11 +125,15 @@ public class ShopSlot : MonoBehaviour
                     _slotData.IsPurchased = true;
                     _disablePanel.SetActive(true);
                     Debug.Log($"무료 골드 {_slotData.Count}개 획득");
+                    await Manager.DB.AddGoldAsync(int.Parse(_slotData.Count));
                 }
                 else
                 {
                     //TODO: [CYH] Firebase 재화 업데이트
                     Debug.Log($"골드 {_slotData.Count}개 구매");
+                    Debug.Log($"다이아 {_slotData.ItemPrice}개 차감");
+                    await Manager.DB.SubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
+                    await Manager.DB.AddGoldAsync(int.Parse(_slotData.Count));
                 }
                 break;
             case ShopType.Daily:
@@ -135,6 +141,16 @@ public class ShopSlot : MonoBehaviour
                 _slotData.IsPurchased = true;
                 _disablePanel.SetActive(true);
                 Debug.Log($"Daily 구매 : {_slotData.ItemName} / {_slotData.Count}개");
+                if (_slotData.IsGold)
+                {
+                    Debug.Log($"골드 {_slotData.ItemPrice}개 차감");
+                    await Manager.DB.SubtractGoldAsync(int.Parse(_slotData.ItemPrice));
+                }
+                else
+                {
+                    Debug.Log($"다이아 {_slotData.ItemPrice}개 차감");
+                    await Manager.DB.SubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
+                }
                 break;
         }
 
