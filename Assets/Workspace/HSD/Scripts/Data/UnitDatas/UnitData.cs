@@ -37,6 +37,9 @@ public class UnitData : MetaData
 
     public UnitStats GetUnitStat(int level)
     {
+        if (UpgradeStats == null || UpgradeStats.Length < 4)
+            return UnitStats[level];
+
         return UpgradeStats[level];
     }
 

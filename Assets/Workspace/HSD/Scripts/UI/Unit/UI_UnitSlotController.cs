@@ -80,6 +80,19 @@ public class UI_UnitSlotController : MonoBehaviour
         return -1;
     }
 
+    public void AddEmptySlotUnit(UnitStatus status)
+    {
+        int emptyIdx = GetEmptySlot();
+
+        if (emptyIdx == -1)
+        {
+            Debug.LogWarning("No empty slots available!");
+            return;
+        }
+
+        SetSlot(status, emptyIdx);
+    }
+
     public void AddUnit(UnitStatus unit, int idx)
     {
         if (!_unitSlotDic.ContainsKey(unit.Address))
