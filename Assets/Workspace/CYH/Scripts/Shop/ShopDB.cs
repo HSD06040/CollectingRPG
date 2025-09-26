@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Firebase.Database;
 
@@ -29,24 +29,43 @@ public class ShopDB
     /// ShopSlotDTO 리스트 -> ShopSlotData 리스트로 변환
     /// (Firebase 다운로드 후 인게임 적용용)
     /// </summary>
-    private List<ShopSlotData> ToDataList(List<ShopSlotDTO> dto)
+    private List<ShopSlotData> ToDataList(List<ShopSlotDTO> dtoList, ShopItemSO itemDB)
     {
-        return dto.Select(dto => new ShopSlotData
-        {
-            Type = dto.Type,
-            ItemId = dto.ItemId,
-            ItemPrice = dto.ItemPrice,
-            ItemName = dto.ItemName,
-            Count = dto.Count,
-            UsageCount = dto.UsageCount,
-            IsGold = dto.IsGold,
-            IsDiamond = dto.IsDiamond,
-            IsPurchased = dto.IsPurchased,
-            IsFree = dto.IsFree,
+        ShopSlotFactory factory = new ShopSlotFactory();
+        List<ShopSlotData> result = new List<ShopSlotData>();
 
-            ItemSprite = LoadItemSprite(dto.ItemId),
-            PriceSprite = LoadPriceSprite(dto.IsGold, dto.IsDiamond)
-        }).ToList();
+        foreach (var dto in dtoList)
+        {
+            ShopSlotData data;
+
+            if (dto.Type == ShopType.Gold)
+                data = factory.FromGold(dto.ItemId, itemDB);
+            else if (dto.Type == ShopType.Diamond)
+                data = factory.FromDiamond(dto.ItemId, itemDB);
+            else
+            {
+                // Daily -> 기존 dto 그대로 변환
+                data = new ShopSlotData
+                {
+                    Type = dto.Type,
+                    ItemId = dto.ItemId,
+                    ItemPrice = dto.ItemPrice,
+                    ItemName = dto.ItemName,
+                    Count = dto.Count,
+                    UsageCount = dto.UsageCount,
+                    IsGold = dto.IsGold,
+                    IsDiamond = dto.IsDiamond,
+                    IsPurchased = dto.IsPurchased,
+                    IsFree = dto.IsFree
+                };
+            }
+
+            data.IsPurchased = dto.IsPurchased;
+
+            result.Add(data);
+        }
+
+        return result;
     }
 
     #endregion
@@ -113,27 +132,16 @@ public class ShopDB
         out List<ShopSlotData> goldList,
         out List<ShopSlotData> diamondList,
         out int rerollCount,
-        out int adRerollCount)
+        out int adRerollCount,
+        ShopItemSO itemDB
+    )
     {
-        dailyList = ToDataList(userData.DailyList);
-        goldList = ToDataList(userData.GoldList);
-        diamondList = ToDataList(userData.DiamondList);
+        dailyList = ToDataList(userData.DailyList, itemDB);
+        goldList = ToDataList(userData.GoldList, itemDB);
+        diamondList = ToDataList(userData.DiamondList, itemDB);
 
         rerollCount = userData.RerollCount;
         adRerollCount = userData.AdRerollCount;
-    }
-
-    // Sprite 매핑
-    private Sprite LoadItemSprite(string itemId)
-    {
-        // TODO: [CYH] CSV itemId 기준으로 sprite 로드
-        return null;
-    }
-
-    private Sprite LoadPriceSprite(bool isGold, bool isDiamond)
-    {
-        // TODO: [CYH] currency 종류에 따라 맞는 sprite 반환
-        return null;
     }
 
     #endregion

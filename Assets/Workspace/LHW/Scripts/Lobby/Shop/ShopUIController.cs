@@ -63,7 +63,8 @@ public class ShopUIController : MonoBehaviour
                 out List<ShopSlotData> goldList,
                 out List<ShopSlotData> diamondList,
                 out int rerollCount,
-                out int adRerollCount
+                out int adRerollCount,
+                _itemDB
             );
 
             _dailyManager.SetSlotData(dailyList, rerollCount, adRerollCount);
@@ -189,14 +190,19 @@ public class ShopUIController : MonoBehaviour
     {
         foreach (Transform child in _goldList) Destroy(child.gameObject);
 
-        if (_itemDB == null || _itemDB.Items == null)
+        List<ShopSlotData> goldSlots = _dailyManager.GetGoldSlots();
+
+        if (goldSlots != null && goldSlots.Count > 0)
         {
-            Debug.LogError("ShopItemSO / Items 비어있음");
+            foreach (var slot in goldSlots)
+            {
+                Instantiate(_slotPrefab, _goldList).SetSlot(slot);
+            }
             return;
         }
 
-        List<ShopSlotData> goldSlots = new List<ShopSlotData>();
-
+        // DB 값이 없을 경우 → 새로 생성
+        goldSlots = new List<ShopSlotData>();
         foreach (var meta in _itemDB.Items)
         {
             if (meta != null && meta.Type == ShopType.Gold)
@@ -211,19 +217,32 @@ public class ShopUIController : MonoBehaviour
 
     private void InitDiamondShop()
     {
-        foreach (Transform child in _diamondList) Destroy(child.gameObject);
+        foreach (Transform child in _diamondList)
+            Destroy(child.gameObject);
 
-        List<ShopSlotData> diamondSlots = new List<ShopSlotData>();
+        List<ShopSlotData> diamondSlots = _dailyManager.GetDiamondSlots();
 
+        if (diamondSlots != null && diamondSlots.Count > 0)
+        {
+            foreach (var slot in diamondSlots)
+            {
+                Instantiate(_slotPrefab, _diamondList).SetSlot(slot);
+            }
+            return;
+        }
+
+        // DB 값이 없을 경우 → 새로 생성
+        diamondSlots = new List<ShopSlotData>();
         foreach (var meta in _itemDB.Items)
         {
-            if (meta.Type == ShopType.Diamond)
+            if (meta != null && meta.Type == ShopType.Diamond)
             {
                 ShopSlotData slot = _shopSlotFactory.FromDiamond(meta.ItemId, _itemDB);
                 diamondSlots.Add(slot);
                 Instantiate(_slotPrefab, _diamondList).SetSlot(slot);
             }
         }
+
         _dailyManager.SetDiamondSlots(diamondSlots);
     }
 
@@ -360,11 +379,31 @@ public class ShopUIController : MonoBehaviour
     /// </summary>
     private void RerollShopData()
     {
-        // Dia, Gold 무료 획득 초기화
+        // Gold, Diamond 슬롯 로드
         InitGoldShop();
         InitDiamondShop();
 
-        //새로고침 버튼 횟수 초기화, 일일상점 상품 리스트 초기화
+        // Gold 슬롯 구매 상태 초기화
+        List<ShopSlotData> goldSlots = _dailyManager.GetGoldSlots();
+        foreach (var slot in goldSlots)
+        {
+            slot.IsPurchased = false;
+        }
+
+        // Diamond 슬롯 구매 상태 초기화
+        List<ShopSlotData> diamondSlots = _dailyManager.GetDiamondSlots();
+        foreach (var slot in diamondSlots)
+        {
+            slot.IsPurchased = false;
+        }
+
+        _dailyManager.SaveShopData();
+
+        // 새로고침 버튼 횟수 초기화, 일일상점 상품 리스트 초기화
         RerollDailyShop();
+
+        // UI 갱신
+        InitGoldShop();
+        InitDiamondShop();
     }
 }

@@ -1,46 +1,52 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 
-[System.Serializable]
-public class Map
+namespace Map
 {
-    public List<Node> nodes;
-    public List<Vector2Int> path;
-    public string bossNodeName;
-    public string configName;
-
-    public Map(string configName, string bossNodeName, List<Node> nodes, List<Vector2Int> path)
+    public class Map
     {
-        this.configName = configName;
-        this.bossNodeName = bossNodeName;
-        this.nodes = nodes;
-        this.path = path;
-    }
+        public List<Node> nodes;
+        public List<Vector2Int> path;
+        public string bossNodeName;
+        public string configName; 
 
-    public Node GetBossNode()
-    {
-        return nodes.FirstOrDefault(n => n.nodeType == NodeType.Boss);
-    }
+        public Map(string configName, string bossNodeName, List<Node> nodes, List<Vector2Int> path)
+        {
+            this.configName = configName;
+            this.bossNodeName = bossNodeName;
+            this.nodes = nodes;
+            this.path = path;
+        }
 
-    public float DistanceBetweenFirstAndLastLayers()
-    {
-        Node bossNode = GetBossNode();
-        Node firstLayerNode = nodes.FirstOrDefault(n => n.point.y == 0);
+        public Node GetBossNode()
+        {
+            return nodes.FirstOrDefault(n => n.nodeType == NodeType.Boss);
+        }
 
-        if (bossNode == null || firstLayerNode == null)
-            return 0f;
+        public float DistanceBetweenFirstAndLastLayers()
+        {
+            Node bossNode = GetBossNode();
+            Node firstLayerNode = nodes.FirstOrDefault(n => n.point.y == 0);
 
-        return bossNode.position.y - firstLayerNode.position.y;
-    }
+            if (bossNode == null || firstLayerNode == null)
+                return 0f;
 
-    public Node GetNode(Vector2Int point)
-    {
-        return nodes.FirstOrDefault(n => n.point.Equals(point));
-    }
+            return bossNode.position.y - firstLayerNode.position.y;
+        }
 
-    public string ToJson()
-    {
-        return JsonUtility.ToJson(this);
+        public Node GetNode(Vector2Int point)
+        {
+            return nodes.FirstOrDefault(n => n.point.Equals(point));
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+        }
     }
 }

@@ -1,125 +1,95 @@
-using System;
+﻿using System;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
 
-public class MapPlayerTracker : MonoBehaviour
+namespace Map
 {
-    [Header("Selection Settings")]
-    [SerializeField] private bool _lockAfterSelecting = false;
-    [SerializeField] private float _enterNodeDelay = 1f;
-    
-    [Header("References")]
-    [SerializeField] private MapManager _mapManager;
-    [SerializeField] private MapView _view;
-
-    public static MapPlayerTracker Instance;
-
-    public bool Locked { get; set; }
-
-    private void Awake()
+    public class MapPlayerTracker : MonoBehaviour
     {
-        Instance = this;
-    }
+        public bool lockAfterSelecting = false;
+        public float enterNodeDelay = 1f;
+        public MapManager mapManager;
+        public MapView view;
 
-    public void SelectNode(MapNode mapNode)
-    {
-        if (Locked) return;
+        public static MapPlayerTracker Instance;
 
-        Debug.Log("Selected node: " + mapNode.Node.point);
+        public bool Locked { get; set; }
 
-        if (_mapManager.CurrentMap.path.Count == 0)
+        private void Awake()
         {
-            // 첫 번째 노드 선택 - 1층(y=0) 노드만 선택 가능
-            if (mapNode.Node.point.y == 0)
-                SendPlayerToNode(mapNode);
+            Instance = this;
+        }
+
+        public void SelectNode(MapNode mapNode)
+        {
+            if (Locked) return;
+
+            // Debug.Log("Selected node: " + mapNode.Node.point);
+
+            if (mapManager.CurrentMap.path.Count == 0)
+            {
+                // player has not selected the node yet, he can select any of the nodes with y = 0
+                if (mapNode.Node.point.y == 0)
+                    SendPlayerToNode(mapNode);
+                else
+                    PlayWarningThatNodeCannotBeAccessed();
+            }
             else
-                PlayWarningThatNodeCannotBeAccessed();
+            {
+                Vector2Int currentPoint = mapManager.CurrentMap.path[mapManager.CurrentMap.path.Count - 1];
+                Node currentNode = mapManager.CurrentMap.GetNode(currentPoint);
+
+                if (currentNode != null && currentNode.outgoing.Any(point => point.Equals(mapNode.Node.point)))
+                    SendPlayerToNode(mapNode);
+                else
+                    PlayWarningThatNodeCannotBeAccessed();
+            }
         }
-        else
+
+        private void SendPlayerToNode(MapNode mapNode)
         {
-            Vector2Int currentPoint = _mapManager.CurrentMap.path[_mapManager.CurrentMap.path.Count - 1];
-            Node currentNode = _mapManager.CurrentMap.GetNode(currentPoint);
+            Locked = lockAfterSelecting;
+            mapManager.CurrentMap.path.Add(mapNode.Node.point);
+            mapManager.SaveMap();
+            view.SetAttainableNodes();
+            view.SetLineColors();
+            mapNode.ShowSwirlAnimation();
 
-            if (currentNode != null && currentNode.outgoing.Any(point => point.Equals(mapNode.Node.point)))
-                SendPlayerToNode(mapNode);
-            else
-                PlayWarningThatNodeCannotBeAccessed();
+            DOTween.Sequence().AppendInterval(enterNodeDelay).OnComplete(() => EnterNode(mapNode));
         }
-    }
 
-    private void SendPlayerToNode(MapNode mapNode)
-    {
-        Locked = _lockAfterSelecting;
-        _mapManager.CurrentMap.path.Add(mapNode.Node.point);
-        _mapManager.SaveMap();
-        _view.SetAttainableNodes();
-        _view.SetLineColors();
-        mapNode.ShowSwirlAnimation();
-
-        DOTween.Sequence().AppendInterval(_enterNodeDelay).OnComplete(() => EnterNode(mapNode));
-    }
-
-    private static void EnterNode(MapNode mapNode)
-    {
-        
-        // UIManager를 통한 패널 표시
-        switch (mapNode.Node.nodeType)
+        private static void EnterNode(MapNode mapNode)
         {
-            case NodeType.MinorEnemy:
-                Debug.Log("일반 전투 시작");
-                UIManager.Instance?.ShowBattleTransition();
-                break;
-                
-            case NodeType.EliteEnemy:
-                Debug.Log("엘리트 전투 시작");
-                UIManager.Instance?.ShowBattleTransition();
-                break;
-                
-            case NodeType.Store:
-                Debug.Log("상점 발견");
-                UIManager.Instance?.ShowStorePanel();
-                break;
-                
-            case NodeType.Boss:
-                Debug.Log("보스 전투 시작");
-                UIManager.Instance?.ShowBattleTransition();
-                break;
-                
-            case NodeType.Event:
-                Debug.Log("Stage Dialog 이벤트 발생");
-                UIManager.Instance?.ShowEventPanel();
-                break;
-                
-            default:
-                Debug.LogWarning($"처리되지 않은 노드 타입: {mapNode.Node.nodeType}");
-                break;
+            // we have access to blueprint name here as well
+            Debug.Log("Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
+            // load appropriate scene with context based on nodeType:
+            // or show appropriate GUI over the map: 
+            // if you choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
+            switch (mapNode.Node.nodeType)
+            {
+                case NodeType.MinorEnemy:
+                    break;
+                case NodeType.EliteEnemy:
+                    break;
+                case NodeType.RestSite:
+                    break;
+                case NodeType.Treasure:
+                    break;
+                case NodeType.Store:
+                    break;
+                case NodeType.Boss:
+                    break;
+                case NodeType.Mystery:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
-    }
 
-    private void PlayWarningThatNodeCannotBeAccessed()
-    {
-        Debug.Log("선택할 수 없는 노드입니다");
-        // TODO: UI 경고 효과 추가
-        // 예: 빨간색 깜빡임, 사운드 효과 등
-    }
-
-    // 패널에서 호출할 수 있는 공개 메서드들
-    public void OnBattleComplete()
-    {
-        Debug.Log("전투 완료");
-        UIManager.Instance?.ClosePanelAndContinue();
-    }
-
-    public void OnStoreExit()
-    {
-        Debug.Log("상점 나가기");
-        UIManager.Instance?.ClosePanelAndContinue();
-    }
-
-    public void OnEventComplete()
-    {
-        Debug.Log("Stage Dialog 이벤트 완료");
-        UIManager.Instance?.ClosePanelAndContinue();
+        private void PlayWarningThatNodeCannotBeAccessed()
+        {
+            Debug.Log("Selected node cannot be accessed");
+        }
     }
 }
