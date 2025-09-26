@@ -8,6 +8,18 @@ public class SceneChangeManager : Singleton<SceneChangeManager>
 {
     [SerializeField] FadeScreen _fadeScreen;
 
+    private void Awake()
+    {
+        if(Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            return;
+        }
+
+        Destroy(gameObject);
+    }
+
     public async UniTask LoadSceneAsync(string sceneName, System.Func<UniTask> init = null)
     {
         await LoadSceneAsyncTask(sceneName, init);

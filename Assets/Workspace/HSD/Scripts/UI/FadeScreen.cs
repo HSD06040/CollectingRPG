@@ -17,6 +17,8 @@ public class FadeScreen : MonoBehaviour
     /// <summary>
     /// 화면을 어둡게 (0 -> 1)
     /// </summary>
+    /// 
+    [ContextMenu("FadeIn")]
     public async UniTask FadeIn()
     {
         _screen.gameObject.SetActive(true);

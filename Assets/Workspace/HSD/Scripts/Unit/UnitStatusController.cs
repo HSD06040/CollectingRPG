@@ -90,6 +90,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public void Init(UnitStatus status, UnitStats plusUnitStat = null)
     {
         Transform root = transform.GetChild(0);
+        DetectionRange = 10;
 
         if (root.childCount > 0)
             root = root.GetChild(0);
