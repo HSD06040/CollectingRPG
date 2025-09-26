@@ -76,6 +76,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     [HideInInspector] public float StatMultiplier = 0;
 
     public bool IsDead { get; set; }
+    public bool IsInvincible { get; set; }
 
     private void OnDestroy()
     {
@@ -194,7 +195,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     private StatStruct GetStatStruct()
     {
         AugmentManager augment = AugmentManager.Instance;
-
+        
         bool isPlayer = gameObject.layer == LayerMask.NameToLayer("Player");
 
         return new StatStruct
@@ -252,9 +253,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     #region TakeDamage
     public void TakeDamage(int amount, bool isCrit = false)
     {
-        if (IsDead)
+        if (IsDead || IsInvincible)
             return;
-        Debug.Log($"[데미지 시스템] {name}이 {amount} 만큼의 피해를 입음");
 
         if (Shield.Value > 0)
         {
@@ -375,6 +375,22 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         IsStunned.Value = false;
     }
     #endregion
+
+    #region Invincible
+    public void Invincible(float duration = 0.2f)
+    {
+        InvincibleActive(duration).Forget();
+    }
+    #endregion
+
+    private async UniTask InvincibleActive(float duration)
+    {
+        IsInvincible = true;
+
+        await UniTask.WaitForSeconds(duration, cancellationToken: _cts.Token);
+
+        IsInvincible = false;
+    }
 
     private void Die()
     {

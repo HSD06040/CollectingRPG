@@ -18,9 +18,15 @@ public enum Synergy
 }
 #endregion
 
+public enum SortingType
+{
+    Grade,
+    Power
+}
+
 public enum Grade
 {
-    NORMAL, RARE, UNIQUE, LEGENDARY
+    NORMAL, RARE, UNIQUE, LEGEND
 }
 
 public enum SubGrade

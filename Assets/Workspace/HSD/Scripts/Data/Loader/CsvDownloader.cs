@@ -67,7 +67,7 @@ public class CsvDownloader
 
         if (!string.IsNullOrEmpty(req.error))
         {
-            Debug.LogError($"CSV 다운로드 실패: {url}, Error: {req.error}");
+            Debug.LogError($"TSV 다운로드 실패: {url}, Error: {req.error}");
             return;
         }
 
@@ -77,7 +77,8 @@ public class CsvDownloader
 
         for (int i = startLine - 1; i < lines.Length; i++)
         {
-            string[] row = lines[i].Trim().Split(',');
+            // CSV → TSV 변경 (탭 기준 Split)
+            string[] row = lines[i].Trim().Split('\t');
             parsed.Add(row);
         }
 
@@ -116,7 +117,6 @@ public class CsvDownloader
                 Debug.LogWarning($"UnitData with ID {id} not found.");
                 continue;
             }
-            Debug.Log($"Setting up UnitData ID: {id}");
 
             unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.NORMAL;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
@@ -128,7 +128,10 @@ public class CsvDownloader
 
             AnimationType attackAnimation = Enum.TryParse(row[8], out AnimationType attackAnim) ? attackAnim : AnimationType.Magic_Attack;
             AnimationType skillAnimation = Enum.TryParse(row[9], out AnimationType skillAnim) ? skillAnim : AnimationType.Magic_Attack;
-            unitData.AnimatiorData = new AnimatorData(attackAnimation, skillAnimation);
+
+            unitData.AnimatiorData = new AnimatorData();
+            unitData.AnimatiorData.AttackAnimationType = attackAnimation;
+            unitData.AnimatiorData.SkillAnimationType = skillAnimation;
 
             int attackID = int.TryParse(row[10], out int _attackID) ? _attackID : 0;
             unitData.AttackData = Array.Find(_attackDatas, a => a.ID == attackID);
@@ -152,15 +155,19 @@ public class CsvDownloader
             unitData.UnitStats = new UnitStats[4];
 
             unitData.UnitStats[0] = stat;
-            unitData.UnitStats[1] = stat;
-            unitData.UnitStats[2] = stat;
-            unitData.UnitStats[3] = stat;
 
+            for(int i = 1; i < unitData.UnitStats.Length; i++)
+            {
+                unitData.UnitStats[i] = unitData.UnitStats[i-1].StatMultiply(1.5f);
+            }
+            
             string synergyText = unitData.Synergy.ToString();
             string synergyName = $"{char.ToUpper(synergyText[0])}{synergyText.Substring(1).ToLower()}";
             int lastDigit = Mathf.Abs(id % 10);
 
             unitData.AddressableAddress = $"{synergyName}{lastDigit}";
+            unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
+
 //#if UNITY_EDITOR
 //            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
 //            EditorUtility.SetDirty(unitData);

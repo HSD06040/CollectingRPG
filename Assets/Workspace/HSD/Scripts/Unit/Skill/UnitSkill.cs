@@ -14,8 +14,8 @@ public abstract class UnitSkill : ScriptableObject
 
     [Header("Stat")]
     public int MaxCount = 1;
-    public float physicalPower;
-    public float abilityPower;
+    public float physicalPower = 1;
+    public float abilityPower = 1;
     public int ManaCost;
 
     [Header("Type")]
@@ -77,7 +77,12 @@ public abstract class UnitSkill : ScriptableObject
             )
         );
     }
-   
+    protected virtual GameObject GetTargetSingle(IAttacker attacker)
+    {
+        var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());
+        return target;
+    }
+
     protected System.Func<IAttacker, List<GameObject>, GameObject> GetPriorityFilter()
     {
         switch (Priority)

@@ -16,6 +16,9 @@ public class EffectController
 
     public void AddBuffEffect(BuffEffect buffEffect, float duration = 2)
     {
+        if (!InGameManager.Instance.IsBattle)
+            return;
+
         string address = _addressData.GetBuffAddress(buffEffect);
 
         if (string.IsNullOrEmpty(address))

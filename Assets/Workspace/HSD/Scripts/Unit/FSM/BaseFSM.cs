@@ -35,15 +35,15 @@ public class BaseFSM : MonoBehaviour
 
         Owner = owner;
 
-        StateMachine = new StateMachine();
+        StateMachine ??= new StateMachine();
 
-        StandbyState = new StandbyState(this, _idleHash);
-        IdleState = new IdleState(this, _idleHash);
-        MoveState = new MoveState(this, _moveHash);
-        AttackState = new AttackState(this, _attackHash);
-        SkillState = new SkillState(this, _skillHash);
-        DeadState = new DeadState(this, _deadHash);
-        StunState = new StunState(this, _stunHash);
+        StandbyState ??= new StandbyState(this, _idleHash);
+        IdleState ??= new IdleState(this, _idleHash);
+        MoveState ??= new MoveState(this, _moveHash);
+        AttackState ??= new AttackState(this, _attackHash);
+        SkillState ??= new SkillState(this, _skillHash);
+        DeadState ??= new DeadState(this, _deadHash);
+        StunState ??= new StunState(this, _stunHash);
 
         _isInit = true;
     }
