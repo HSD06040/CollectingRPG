@@ -61,18 +61,29 @@ public class UpgradeUnitData : ScriptableObject
     public void LevelUp()
     {
         // 최대레벨 변수 추가?
-        if (CurrentUpgradeData.UpgradeLevel >= 10 || CurrentUpgradeData.UpgradeLevel <= 0) return;
+        if (CurrentUpgradeData.UpgradeLevel >= 10) return;
 
-        int requiredPiece = GetRequiredPiece();
-        
-        if(CurrentUpgradeData.CurrentPieces >= requiredPiece)
+        if (CurrentUpgradeData.UpgradeLevel == 0)
         {
-            CurrentUpgradeData.CurrentPieces -= requiredPiece;
-            CurrentUpgradeData.UpgradeLevel += 1;
-
-            OnLevelUp?.Invoke();
+            if(CurrentUpgradeData.CurrentPieces >= 10)
+            {
+                CurrentUpgradeData.CurrentPieces -= 10;
+                CurrentUpgradeData.UpgradeLevel += 1;
+            }
         }
-    }    
+        else
+        {
+            int requiredPiece = GetRequiredPiece();
+
+            if (CurrentUpgradeData.CurrentPieces >= requiredPiece)
+            {
+                CurrentUpgradeData.CurrentPieces -= requiredPiece;
+                CurrentUpgradeData.UpgradeLevel += 1;
+
+                OnLevelUp?.Invoke();
+            }
+        }
+    }
 }
 
 [CreateAssetMenu(fileName = "Unit_LevelUpData", menuName = "Data/Temp/Unit_LevelUpData")]

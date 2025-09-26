@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -201,21 +200,12 @@ public class RandomGachaSystem : MonoBehaviour
     {
         UnitData data = _testData;
 
-        if (_testData.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
-        {
-            _testData.UpgradeData.ObtainCharacter();
+        // 조각 등장 확률도 나중에 가중치로 전환되면 가중치로 적용 필요
+        int pieceNum = UnityEngine.Random.Range(1, 11);
 
-            _resultUI.HeroGachaUpdate(data, 0, "New");
-        }
-        else
-        {
-            // 조각 등장 확률도 나중에 가중치로 전환되면 가중치로 적용 필요
-            int pieceNum = UnityEngine.Random.Range(1, 11);
+        _testData.UpgradeData.AddPiece(pieceNum);
 
-            _testData.UpgradeData.AddPiece(pieceNum);
-
-            _resultUI.HeroGachaUpdate(data, 0, pieceNum.ToString());
-        }
+        _resultUI.HeroGachaUpdate(data, 0, pieceNum.ToString());
 
         await DBManager.Instance.charDB.SaveCharacterUpgradeData(_testData);
 
