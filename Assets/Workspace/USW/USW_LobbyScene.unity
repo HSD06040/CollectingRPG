@@ -1661,24 +1661,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 167075576}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &167075578 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8370188681689240614, guid: 381aaac507dcac84ba42fb792cc380de,
-    type: 3}
-  m_PrefabInstance: {fileID: 167075576}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 167075579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7be4a12f6f9c1044496ce3b2625ccd1d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &167075579 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 279044534188340694, guid: 381aaac507dcac84ba42fb792cc380de,
-    type: 3}
-  m_PrefabInstance: {fileID: 167075576}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &212882580
 GameObject:
   m_ObjectHideFlags: 0
@@ -2772,7 +2754,7 @@ GameObject:
   - component: {fileID: 410223398}
   - component: {fileID: 410223397}
   m_Layer: 5
-  m_Name: TopPanel_GoldText
+  m_Name: GoldText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3977,18 +3959,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 663338834}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &663338837 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2272897546409234890, guid: a73c91055a7683e43bef8df9c218f323,
-    type: 3}
-  m_PrefabInstance: {fileID: 663338834}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 663338835}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30cb53f33aeff7740a0affd0b6ec4a13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &675345336
 GameObject:
   m_ObjectHideFlags: 0
@@ -8815,7 +8785,7 @@ GameObject:
   - component: {fileID: 1349029915}
   - component: {fileID: 1349029914}
   m_Layer: 5
-  m_Name: TopPanel_StaminaTimerText
+  m_Name: StaminaTimerText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9201,7 +9171,7 @@ GameObject:
   - component: {fileID: 1418099632}
   - component: {fileID: 1418099631}
   m_Layer: 5
-  m_Name: TopPanel_StaminaText
+  m_Name: StaminaText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10719,7 +10689,7 @@ GameObject:
   - component: {fileID: 1785548522}
   - component: {fileID: 1785548521}
   m_Layer: 5
-  m_Name: TopPanel_DiamondText
+  m_Name: DiamondText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12087,65 +12057,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2007800045}
   m_CullTransparentMesh: 1
---- !u!1 &2007981546
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2007981548}
-  - component: {fileID: 2007981547}
-  m_Layer: 0
-  m_Name: LobbyPopupManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2007981547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2007981546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25cb4694ae573674d83b0698cfaeedff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _playerDataController: {fileID: 1221979879}
-  _playerMailBoxController: {fileID: 1221979881}
-  _googleAdMob: {fileID: 1400070480}
-  _playerProfilePopup: {fileID: 4982083837498228991}
-  _profilePopup: {fileID: 5645908935224333320}
-  _playerProfileButton: {fileID: 0}
-  _adButton: {fileID: 0}
-  _googleLinkPopup: {fileID: 1523534093}
-  _accountLinkButton: {fileID: 6088371663516242225}
-  _mailboxPopup: {fileID: 167075579}
-  _mailPopup: {fileID: 167075578}
-  _mailboxButton: {fileID: 0}
-  _couponPopup: {fileID: 663338835}
-  _couponPopupCs: {fileID: 663338837}
-  _couponButton: {fileID: 9155954021517761208}
---- !u!4 &2007981548
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2007981546}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 309.49884, y: 1187.9225, z: 207.77333}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2027661924
 GameObject:
   m_ObjectHideFlags: 0
@@ -16473,6 +16384,17 @@ PrefabInstance:
       propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6888187392026226910, guid: ca5ae34399f9a5946b7951c631962f1c,
+        type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
+        type: 2}
+    - target: {fileID: 6888187392026226910, guid: ca5ae34399f9a5946b7951c631962f1c,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8579672917784594172, guid: ca5ae34399f9a5946b7951c631962f1c,
         type: 3}
       propertyPath: m_fontAsset
@@ -16494,13 +16416,18 @@ PrefabInstance:
         type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee,
+      objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
         type: 2}
     - target: {fileID: 8993632612096526319, guid: ca5ae34399f9a5946b7951c631962f1c,
         type: 3}
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 8993632612096526319, guid: ca5ae34399f9a5946b7951c631962f1c,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -29138,6 +29065,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 423679870810456165}
     m_Modifications:
+    - target: {fileID: 204307331875216861, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
+        type: 2}
+    - target: {fileID: 204307331875216861, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 226610937566827648, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
         type: 3}
       propertyPath: m_fontAsset
@@ -30348,6 +30286,17 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3323244806261940759, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
+        type: 2}
+    - target: {fileID: 3323244806261940759, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3468618394955892118, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
         type: 3}
       propertyPath: m_fontAsset
@@ -30569,6 +30518,17 @@ PrefabInstance:
       propertyPath: m_hasFontAssetChanged
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3968720367867093690, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
+        type: 2}
+    - target: {fileID: 3968720367867093690, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4000298991230915053, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
         type: 3}
       propertyPath: m_fontAsset
@@ -30659,6 +30619,17 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -520
+      objectReference: {fileID: 0}
+    - target: {fileID: 4404233876501731505, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
+        type: 2}
+    - target: {fileID: 4404233876501731505, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4406471294216396523, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
         type: 3}
@@ -30761,7 +30732,7 @@ PrefabInstance:
     - target: {fileID: 4695719365161231767, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
         type: 3}
       propertyPath: m_hasFontAssetChanged
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4697875895968026841, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
         type: 3}
@@ -31103,6 +31074,17 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
         type: 2}
     - target: {fileID: 5806378132500156401, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5852621715011720488, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
+        type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 93cffe20da9125345b9ab19985f4bfe6,
+        type: 2}
+    - target: {fileID: 5852621715011720488, guid: 6ae7d47b0c32d1e4faf32c9467dbeb52,
         type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 1
@@ -38545,7 +38527,6 @@ SceneRoots:
   - {fileID: 1709549707}
   - {fileID: 509639509}
   - {fileID: 784970162}
-  - {fileID: 2007981548}
   - {fileID: 1400070481}
   - {fileID: 1221979880}
   - {fileID: 6110971822199750252}
