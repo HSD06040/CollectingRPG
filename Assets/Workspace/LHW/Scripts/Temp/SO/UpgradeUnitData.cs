@@ -112,7 +112,6 @@ public class UpgradeUnitData : ScriptableObject
             {
                 currentGold = Convert.ToInt32(snapshot.Value);
             }
-            Debug.Log($"현재 골드 : {currentGold}");
 
             if (CurrentUpgradeData.CurrentPieces >= requiredPiece && currentGold >= requiredGold)
             {
