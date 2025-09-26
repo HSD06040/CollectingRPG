@@ -1,7 +1,6 @@
-using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class ShopSlot : MonoBehaviour
 {
@@ -42,6 +41,8 @@ public class ShopSlot : MonoBehaviour
         _priceImage.sprite = slot.PriceSprite;
         _countText.text = slot.Count;
 
+        //Debug.Log($"[SetSlot] {slot.ItemName} / Purchased={slot.IsPurchased}");
+
         // 일일 상점 아이템 아이콘
         if (slot.Type == ShopType.Daily && int.Parse(slot.ItemId) < 2010001)
         {
@@ -72,7 +73,7 @@ public class ShopSlot : MonoBehaviour
             rectTransform.offsetMin = offset;
         }
 
-        // 구매횟수
+        // 구매 횟수
         if (slot.Type == ShopType.Daily)
         {
             // soldout 이미지 setactive true
@@ -82,9 +83,21 @@ public class ShopSlot : MonoBehaviour
         {
             _countText.gameObject.SetActive(false);
         }
+
+        // 이미 구매한 경우(일일 상점/골드&다이아 무료) -> 버튼 비활성화 & disablePanel setactive true
+        if (slot.IsPurchased)
+        {
+            _disablePanel.SetActive(true);
+            _itemObtainButton.interactable = false;
+        }
+        else
+        {
+            _disablePanel.SetActive(false);
+            _itemObtainButton.interactable = true;
+        }
     }
 
-    public void OnClickBuy()
+    public async void OnClickBuy()
     {
         if (_slotData.IsFree && _slotData.IsPurchased) return;
 
@@ -93,15 +106,17 @@ public class ShopSlot : MonoBehaviour
             case ShopType.Diamond:
                 if (_slotData.IsFree)
                 {
-                    //TODO: [CYH] Firebase 재화 업데이트
                     _slotData.IsPurchased = true;
                     _disablePanel.SetActive(true);
                     Debug.Log($"무료 다이아몬드 {_slotData.Count}개 획득");
+                    await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
                 }
                 else
                 {
                     IAPManager.Instance.BuyProduct(_slotData.ItemId);
                     Debug.Log($"다이아몬드 {_slotData.Count}개 구매");
+                    //await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
+                    //await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
                 }
                 break;
             case ShopType.Gold:
@@ -110,11 +125,14 @@ public class ShopSlot : MonoBehaviour
                     _slotData.IsPurchased = true;
                     _disablePanel.SetActive(true);
                     Debug.Log($"무료 골드 {_slotData.Count}개 획득");
+                    await Manager.DB.AddGoldAsync(int.Parse(_slotData.Count));
                 }
                 else
                 {
-                    //TODO: [CYH] Firebase 재화 업데이트
                     Debug.Log($"골드 {_slotData.Count}개 구매");
+                    Debug.Log($"다이아 {_slotData.ItemPrice}개 차감");
+                    await Manager.DB.SubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
+                    await Manager.DB.AddGoldAsync(int.Parse(_slotData.Count));
                 }
                 break;
             case ShopType.Daily:
@@ -122,7 +140,24 @@ public class ShopSlot : MonoBehaviour
                 _slotData.IsPurchased = true;
                 _disablePanel.SetActive(true);
                 Debug.Log($"Daily 구매 : {_slotData.ItemName} / {_slotData.Count}개");
+                if (_slotData.IsGold)
+                {
+                    Debug.Log($"골드 {_slotData.ItemPrice}개 차감");
+                    await Manager.DB.SubtractGoldAsync(int.Parse(_slotData.ItemPrice));
+                }
+                else
+                {
+                    Debug.Log($"다이아 {_slotData.ItemPrice}개 차감");
+                    await Manager.DB.SubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
+                }
                 break;
+        }
+
+        DailyShopManager dailyShopManager = FindObjectOfType<DailyShopManager>();
+        if (dailyShopManager != null)
+        {
+            dailyShopManager.UpdateSlotData(_slotData);
+            dailyShopManager.SaveShopData();
         }
     }
 }
