@@ -14,6 +14,11 @@ public class AddressableDownload_UI : UIBase
     [UIBind("Addressable_Downloader")] AddressablesDownloader _downloader;
     [UIBind("Download_Popup")] Download_Popup download_Popup;
 
+    private void Start()
+    {
+        Check();
+    }
+
     private void OnEnable()
     {
         Subscribe();
@@ -23,6 +28,7 @@ public class AddressableDownload_UI : UIBase
     {
         UnSubscribe();
     }
+
     #region Event
     private void Subscribe()
     {
