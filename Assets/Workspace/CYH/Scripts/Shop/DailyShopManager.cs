@@ -72,6 +72,43 @@ public class DailyShopManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 슬롯 타입에 따라 해당 리스트에서 ItemId가 같은 슬롯을 찾아 갱신하는 메서드
+    /// 갱신 후 DB 저장
+    /// </summary>
+    /// <param name="updatedSlot">갱신할 대상 슬롯 데이터</param>
+    public void UpdateSlotData(ShopSlotData updatedSlot)
+    {
+        List<ShopSlotData> targetList = null;
+
+        switch (updatedSlot.Type)
+        {
+            case ShopType.Daily:
+                targetList = DailyRandomItems;
+                break;
+            case ShopType.Gold:
+                targetList = _goldSlots;
+                break;
+            case ShopType.Diamond:
+                targetList = _diamondSlots;
+                break;
+        }
+
+        if (targetList == null) return;
+
+        for (int i = 0; i < targetList.Count; i++)
+        {
+            if (targetList[i].ItemId == updatedSlot.ItemId)
+            {
+                targetList[i] = updatedSlot;
+                break;
+            }
+        }
+
+        // 리스트 갱신 후 DB 저장
+        SaveShopData();
+    }
+
+    /// <summary>
     ///  일일 상점 슬롯을 새로고침하는 메서드
     ///  0회 : 무료 새로고침
     ///  1~2회 : 골드 차감

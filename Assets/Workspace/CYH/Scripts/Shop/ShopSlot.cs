@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -42,6 +41,8 @@ public class ShopSlot : MonoBehaviour
         _priceImage.sprite = slot.PriceSprite;
         _countText.text = slot.Count;
 
+        //Debug.Log($"[SetSlot] {slot.ItemName} / Purchased={slot.IsPurchased}");
+
         // 일일 상점 아이템 아이콘
         if (slot.Type == ShopType.Daily && int.Parse(slot.ItemId) < 2010001)
         {
@@ -72,7 +73,7 @@ public class ShopSlot : MonoBehaviour
             rectTransform.offsetMin = offset;
         }
 
-        // 구매횟수
+        // 구매 횟수
         if (slot.Type == ShopType.Daily)
         {
             // soldout 이미지 setactive true
@@ -81,6 +82,18 @@ public class ShopSlot : MonoBehaviour
         else
         {
             _countText.gameObject.SetActive(false);
+        }
+
+        // 이미 구매한 경우(일일 상점/골드&다이아 무료) -> 버튼 비활성화 & disablePanel setactive true
+        if (slot.IsPurchased)
+        {
+            _disablePanel.SetActive(true);
+            _itemObtainButton.interactable = false;
+        }
+        else
+        {
+            _disablePanel.SetActive(false);
+            _itemObtainButton.interactable = true;
         }
     }
 
@@ -123,6 +136,13 @@ public class ShopSlot : MonoBehaviour
                 _disablePanel.SetActive(true);
                 Debug.Log($"Daily 구매 : {_slotData.ItemName} / {_slotData.Count}개");
                 break;
+        }
+
+        DailyShopManager dailyShopManager = FindObjectOfType<DailyShopManager>();
+        if (dailyShopManager != null)
+        {
+            dailyShopManager.UpdateSlotData(_slotData);
+            dailyShopManager.SaveShopData();
         }
     }
 }
