@@ -78,11 +78,7 @@ public class CharDB
 
     public async UniTask SaveCharacterUpgradeData(UnitData charData)
     {
-        if (_characterReference == null)
-        {
-            _characterReference = FirebaseManager.DataReference
-        .Child("UserData").Child(_uid).Child("CharacterData");
-        }
+        _characterReference = FirebaseManager.DataReference.Child("UserData").Child(_uid).Child("CharacterData");
 
         await _characterReference.Child(charData.Name).
                 SetRawJsonValueAsync(JsonUtility.ToJson(charData.UpgradeData.CurrentUpgradeData));
