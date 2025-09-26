@@ -28,7 +28,7 @@ public class BattleEndUI : MonoBehaviour
 
     private async UniTask WaitForClose()
     {
-        await SceneChangeManager.Instance.LoadSceneAsync("Lobby", Clear);
+        await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", Clear);
 
         await Manager.DB.SetTutorialCompleteAsync();
     }
