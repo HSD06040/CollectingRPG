@@ -1,7 +1,6 @@
 using Firebase.Auth;
 using Firebase.Extensions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GuestSignIn : MonoBehaviour
@@ -77,7 +76,7 @@ public class GuestSignIn : MonoBehaviour
                 // 튜토리얼 isTutorialComplete = true Data 변경
                 SetTutorialCompleteAsync();
                 _isClicked = false;
-                SceneManager.LoadScene("USW_LobbyScene");
+                await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene");
             }
         });
     }
@@ -87,12 +86,12 @@ public class GuestSignIn : MonoBehaviour
         bool isTutorialCompleted = await Manager.DB.CheckTutorialCompletedAsync();
         if (isTutorialCompleted)
         {
-            SceneManager.LoadScene("USW_LobbyScene");
+            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene");
             //SceneManager.LoadScene("USW_LobbyScene_Copy");
         }
         else
         {
-            SceneManager.LoadScene("USW_LobbyScene");
+            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene");
             //SceneManager.LoadScene("USW_LoadingScene_Copy2");
             // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
             //tutorialPanel.SetActive(true);
