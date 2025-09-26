@@ -35,6 +35,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     [Header("Level Up Button UI")]
     [SerializeField] private TMP_Text _pieceText;
     [SerializeField] private Image _pieceGauge;
+    [SerializeField] private TMP_Text _goldText;
     [SerializeField] private TMP_Text _openPieceText;
     [SerializeField] private Image _openPieceGauge;
 
@@ -154,6 +155,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
         }
 
         int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
+        int requireGold = _currentCharUnit.Status.Data.UpgradeData.GetRequiredGold();
         if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
         {
             _pieceGauge.fillAmount = 0;
@@ -165,6 +167,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
             _openPieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
         }
         _pieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
+        _goldText.text = requireGold.ToString();
         _openPieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/10";
     }
 
