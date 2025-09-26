@@ -14,9 +14,6 @@ public class PoolManager : Singleton<PoolManager>
     private Dictionary<string, Transform> _parentDic;
     private Dictionary<string, float> _lastUseTimeDic;
 
-    private ObjectPool<DamagePopUp> _popUpPool;
-    private DamagePopUp _damagePopUp;
-
     private Transform _parent;
     private Transform _uiParent;
 

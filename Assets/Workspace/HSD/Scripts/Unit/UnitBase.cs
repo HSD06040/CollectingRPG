@@ -290,8 +290,6 @@ public class UnitBase : MonoBehaviour, IAttacker
     {        
         if (Status == null || StatusController == null) return;
 
-        Gizmos.DrawWireSphere(GetCenter(), StatusController.DetectionRange);
-
         if (Status.Data == null) return;
 
         if (Status.Data.AttackData == null) return;

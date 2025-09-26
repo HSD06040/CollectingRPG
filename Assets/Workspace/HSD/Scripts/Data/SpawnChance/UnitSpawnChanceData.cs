@@ -65,12 +65,17 @@ public class UnitSpawnChanceData : ScriptableObject
                     _cachedChances[unit] = baseChance;
             }
         }
+        float total = 0f;
+        foreach (var kvp in _cachedChances)
+            total += kvp.Value;
+
+        Debug.Log($"Total chance = {total}");
     }
 
 
     public UnitData RollUnit()
     {
-        float roll = Random.value;
+        float roll = Random.Range(0, 100);
         foreach (var kvp in _cachedChances)
         {
             roll -= kvp.Value;

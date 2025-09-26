@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -53,11 +54,14 @@ public class PartySelectPanelController : MonoBehaviour
     private async void GameStart()
     {
         // 씬 전환
-        SceneManager.LoadScene("USW_GameScene");
-
-        await Manager.Resources.LoadLabel("Stage");
+        await SceneChangeManager.Instance.LoadSceneAsync("GameScene", GameSceneInit);
 
         Debug.Log("게임 시작");
+    }
+
+    private async UniTask GameSceneInit()
+    {
+        await Manager.Resources.LoadLabel("Stage");
     }
 
     public void ArrangePreset()

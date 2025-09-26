@@ -433,6 +433,10 @@ public class UnitController : MonoBehaviour
     {
         return GetUnitCount(unit.Address);
     }
+    public bool IsFull()
+    {
+        return CurrentUnitCount >= UnitMaxCount;
+    }
     /// <summary>
     /// GC 할당 없이 현재 유닛들을 반환합니다.
     /// 반환된 배열의 유효한 요소는 처음부터 GetUnitsCount()개까지입니다.
