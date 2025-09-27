@@ -27,13 +27,15 @@ public class UnitInfoUI : MonoBehaviour
     [SerializeField] UnitStatusUI _unitStatusUI;
     [SerializeField] UnitSellOrAutoSelectionUI _unitSellOrAutoSelectionUI;
 
-    public void Setup(UnitStatus status, bool isUI, bool isSell)
+    public void Setup(UnitStatus status, bool isUI, bool isSell, bool isEnemy)
     {
         _unitNameText.text = status.Data.Name;
         _unitIcon.sprite = status.Data.Icon;
 
         _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
         _powerText.text = status.CombatPower.ToString();
+
+        // isEnemy로 분리
 
         _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.Synergy).Icon;
         _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.ClassSynergy).Icon;

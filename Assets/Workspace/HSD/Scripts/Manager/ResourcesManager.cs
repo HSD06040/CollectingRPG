@@ -5,13 +5,13 @@ using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Rendering;
 using UnityEngine.ResourceManagement.ResourceLocations;
 
 public class ResourcesManager : Singleton<ResourcesManager>
 {
-    private static Dictionary<string, Object> _resources = new Dictionary<string, Object>();    
+    private SerializedDictionary<string, Object> _resources = new SerializedDictionary<string, Object>();    
     private static Dictionary<string, Sprite> _sprites = new Dictionary<string, Sprite>();
-    public Sprite sprite;
 
     #region Get
     public async UniTask<T> LoadRefAsync<T>(AssetReference reference) where T : Object
@@ -26,6 +26,8 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public T Load<T>(string address) where T : Object
     {
+        Debug.Log($"주소 {address}");
+
         if(string.IsNullOrEmpty(address)) return null;
 
         if (!_resources.ContainsKey(address))
@@ -156,13 +158,13 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     private async UniTask LoadAndCache(IResourceLocation location)
     {
-        var handle = Addressables.LoadAssetAsync<Object>(location.PrimaryKey);
+        var handle = Addressables.LoadAssetAsync<Object>(location);
         var asset = await handle.Task;
 
         if (!_resources.ContainsKey(location.PrimaryKey))
-        {
             _resources.Add(location.PrimaryKey, asset);
-        }
+        else
+            _resources[location.PrimaryKey] = asset;
     }
 
     public async UniTask<T[]> LoadAll<T>(string label) where T : Object

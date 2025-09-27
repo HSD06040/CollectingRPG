@@ -14,14 +14,10 @@ public class AddressableDownload_UI : UIBase
     [UIBind("Addressable_Downloader")] AddressablesDownloader _downloader;
     [UIBind("Download_Popup")] Download_Popup download_Popup;
 
-    private void Start()
-    {
-        Check();
-    }
-
     private void OnEnable()
     {
         Subscribe();
+        Check();
     }
 
     private void OnDisable()
