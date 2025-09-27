@@ -43,6 +43,22 @@ public class AugmentManager : InGameSingleton<AugmentManager>
 
     public void SelectAugment(AUGData data)
     {
+        string augment = data.Name;
+
+        for (int i = 0; i < currentAugment.Count; i++)
+        {
+            if (augment == currentAugment[i].Name && (int)data.Grade <= (int)currentAugment[i].Grade)
+            {
+                Debug.LogWarning("이미 적용된 증강입니다. 중복 적용이 불가합니다.");
+                return;
+            }
+            else if (augment == currentAugment[i].Name && (int)data.Grade > (int)currentAugment[i].Grade)
+            {
+                currentAugment.Remove(currentAugment[i]);
+                break;
+            }
+        }
+
         currentAugment.Add(data);
     }
 
