@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -36,12 +38,34 @@ public class GameManager : Singleton<GameManager>
             return;
 
         _currentIdx = idx;
-        SetTimeScale(accelerates[_currentIdx]);
+        SetTimeScale(GetTimeScale());
     }
 
     private void SetTimeScale(float scale)
     {
         Time.timeScale = scale;
         Time.fixedDeltaTime = 0.02f * scale;
+    }
+
+    public async UniTask SlowMotionAsync(float scale, float duration)
+    {
+        Time.timeScale = scale * GetTimeScale();
+
+        await UniTask.WaitForSeconds(duration / (Time.timeScale * GetTimeScale()));
+
+        SetTimeScale(GetTimeScale());
+    }
+
+    public async UniTask CameraDoMove(Vector2 targetPos, float duration, float zoomSize)
+    {
+        duration = duration / (Time.timeScale * GetTimeScale());
+
+        Camera.main.transform.DOMove(new Vector3(targetPos.x, targetPos.y, -10), duration);
+        await Camera.main.DOOrthoSize(zoomSize, duration).AsyncWaitForCompletion();
+    }
+
+    private float GetTimeScale()
+    {
+        return accelerates[_currentIdx];
     }
 }
