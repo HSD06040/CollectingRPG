@@ -339,6 +339,12 @@ public class DBManager : Singleton<DBManager>
             current = Convert.ToInt32(snapshot.Value);
         }
 
+        if (current-subAmount < 0)
+        {
+            Debug.LogWarning("골드 부족");
+            return;
+        }
+
         int next = current - subAmount;
 
         await goldRef.SetValueAsync(next);
@@ -362,6 +368,12 @@ public class DBManager : Singleton<DBManager>
         if (snapshot.Exists && snapshot.Value != null)
         {
             current = Convert.ToInt32(snapshot.Value);
+        }
+
+        if (current - subAmount < 0)
+        {
+            Debug.LogWarning("다이아 부족");
+            return;
         }
 
         int next = current - subAmount;
