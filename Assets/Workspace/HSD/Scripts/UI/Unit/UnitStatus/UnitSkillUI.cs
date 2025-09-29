@@ -27,8 +27,6 @@ public class UnitSkillUI : MonoBehaviour
 
     private string GetDescription(UnitSkill skill, UnitStatus status)
     {
-        int totalDamage = skill.GetCalculateDamage(status);
-
-        return skill.Description.Replace("{damage}", totalDamage.ToString());
+        return skill.Description.Replace("{value}", skill.GetCalculateValueString(status));
     }
 }

@@ -32,7 +32,10 @@ public class UnitManager : MonoBehaviour
     private void Awake()
     {
         if (IsTest)
+        {
             CsvDownloader.OnDataSetupCompleted += InitAsync;
+            Manager.Data.InitAsync().Forget();
+        }
         else
             InitAsync();
     }
@@ -45,7 +48,9 @@ public class UnitManager : MonoBehaviour
     private async void InitAsync()
     {
         if (IsTest)
+        {
             await Manager.Resources.LoadLabel("Stage");
+        }
 
         _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();

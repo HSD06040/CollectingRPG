@@ -225,11 +225,11 @@ public abstract class UnitSkill : ScriptableObject
     }
     #endregion
 
-    public int GetCalculateDamage(UnitStatus status)
+    public virtual string GetCalculateValueString(UnitStatus status)
     {
         UnitStats stat = status.GetCurrentStat();
 
-        return Mathf.RoundToInt(stat.PhysicalDamage * PhysicalPower + stat.MagicDamage * (AbilityPower / 100));
+        return Mathf.RoundToInt(stat.PhysicalDamage * PhysicalPower + stat.MagicDamage * (AbilityPower / 100)).ToString("F0");
     }    
 
     #if  UNITY_EDITOR

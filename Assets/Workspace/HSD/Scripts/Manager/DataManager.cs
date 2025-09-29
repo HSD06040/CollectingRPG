@@ -21,11 +21,11 @@ public class DataManager : Singleton<DataManager>
     public MapDatabase MapDB { get; private set; } = new MapDatabase();
 
     // 추후 Init으로 뺄 예정
-    private void Awake()
+    public async UniTask InitAsync()
     {
-        InitData().Forget();
         PresetDB.InitPresetData();
         MapDB.InitMapData();
+        await InitData();
     }
 
     #region UniData

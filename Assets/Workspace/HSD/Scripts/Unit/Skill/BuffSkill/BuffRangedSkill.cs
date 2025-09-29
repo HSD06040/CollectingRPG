@@ -97,6 +97,28 @@ public class BuffRangedSkill : RangedSkill
             return GetTargetSingle(attacker)?.transform;
         }
     }
+
+    public override string GetCalculateValueString(UnitStatus status)
+    {
+        UnitStats stat = status.GetCurrentStat();
+        float value = stat.MagicDamage * (AbilityPower / 100);
+
+        if(_isBuff)
+        {
+            if (_buffEffectData.StatType == StatType.CurHp || _buffEffectData.StatType == StatType.Shield)
+                return Mathf.RoundToInt(value).ToString();
+            else
+                return value.ToString("F1");
+        }        
+        else
+        {
+            if (_statModifier.StatType == StatType.CurHp || _statModifier.StatType == StatType.Shield)
+                return Mathf.RoundToInt(value).ToString();
+            else
+                return value.ToString("F1");
+        }
+    }
+
 #if UNITY_EDITOR
     public override void DrawGizmos(IAttacker attacker)
     {

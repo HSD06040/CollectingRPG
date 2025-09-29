@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 
 [CreateAssetMenu(fileName = "BuffSkill", menuName = "Data/Unit/Skill/BuffSkill")]
@@ -57,6 +56,17 @@ public class BuffSkill : UnitSkill
             default:
                 return null;
         }
+    }
+
+    public override string GetCalculateValueString(UnitStatus status)
+    {
+        UnitStats stat = status.GetCurrentStat();
+        float value = stat.MagicDamage * (AbilityPower / 100);
+
+        if (BuffEffectData.StatType == StatType.CurHp || BuffEffectData.StatType == StatType.Shield)
+            return Mathf.RoundToInt(value).ToString();
+        else
+            return value.ToString("F1");
     }
 
     private GameObject GetTargetPrioty(IAttacker attacker)
