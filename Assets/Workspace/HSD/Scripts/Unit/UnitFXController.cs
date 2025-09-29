@@ -2,17 +2,20 @@ using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class UnitFXController
 {
-    private SpriteRenderer[] _renderers;
+    private readonly SpriteRenderer[] _renderers;
+    private readonly SortingGroup _sortingGroup;
     private Color[] _baseColors;
     private const float HIT_DURATION = .1f;
     private readonly Color hitColor = new Color(1f, 0.447f, 0.447f);
 
-    public UnitFXController(SpriteRenderer[] renderers)
+    public UnitFXController(SpriteRenderer[] renderers, SortingGroup sortingGroup)
     {
         _renderers = renderers;
+        _sortingGroup = sortingGroup;
 
         _baseColors = new Color[_renderers.Length];
         for (int i = 0; i < _renderers.Length; i++)
@@ -24,6 +27,11 @@ public class UnitFXController
     public void Flash()
     {
         FlashRoutine().Forget();
+    }
+
+    public void BattleSetting()
+    {
+        _sortingGroup.sortingLayerName = "BattleUnit";
     }
 
     private async UniTask FlashRoutine()

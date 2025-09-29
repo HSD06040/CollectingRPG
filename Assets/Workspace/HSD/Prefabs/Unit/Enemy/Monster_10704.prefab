@@ -74,7 +74,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1333506943
-  m_SortingLayer: 1
+  m_SortingLayer: 3
   m_SortingOrder: 5
   m_Sprite: {fileID: 2065694605, guid: 84ed838cc6da7f6408acda9f9edb714c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -216,9 +216,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Anim>k__BackingField: {fileID: 4836945524277190425}
   <Rb>k__BackingField: {fileID: 6081732089813946743}
-  <Status>k__BackingField:
-    Data: {fileID: 11400000, guid: 3bc3b1f76963f8a4e8fd14572077f2a1, type: 2}
-    Level: 0
   <Col>k__BackingField: {fileID: 4406518054073837713}
   <TriggerCol>k__BackingField: {fileID: 598637240894591649}
   <Target>k__BackingField: {fileID: 0}
@@ -273,6 +270,7 @@ MonoBehaviour:
     _baseValue: 0
     _modifiers: []
   DetectionRange: 5
+  CurrentAttackData: {fileID: 0}
   StatMultiplier: 0
 --- !u!70 &4406518054073837713
 CapsuleCollider2D:
