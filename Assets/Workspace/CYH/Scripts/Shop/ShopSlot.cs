@@ -63,14 +63,15 @@ public class ShopSlot : MonoBehaviour
             _priceImage.sprite = _diaSprite;
         }
 
-        // 상점 첫번째 슬롯 가격 텍스트 위치
-        if (slot.IsFree)
+        // 상점 첫번째 슬롯/인앱결제 다이아 슬롯 가격 텍스트 위치
+        if (slot.IsFree|| (slot.Type == ShopType.Diamond && !slot.IsFree))
         {
             _priceImage.gameObject.SetActive(false);
-            RectTransform rectTransform = _priceText.rectTransform;
-            Vector2 offset = rectTransform.offsetMin;
-            offset.x = 11f;
-            rectTransform.offsetMin = offset;
+            
+            RectTransform rect = _priceText.GetComponent<RectTransform>();
+            Vector2 pos = rect.anchoredPosition;
+            pos.x = 11f;
+            rect.anchoredPosition = pos;
         }
 
         // 구매 횟수
@@ -96,7 +97,6 @@ public class ShopSlot : MonoBehaviour
             _itemObtainButton.interactable = true;
         }
     }
-
     public async void OnClickBuy()
     {
         if (_slotData.IsFree && _slotData.IsPurchased) return;
