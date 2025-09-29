@@ -34,6 +34,7 @@ public class DataManager : Singleton<DataManager>
     {
         await Manager.Resources.SpriteLoadLable("MonsterIcon");
         await Manager.Resources.SpriteLoadLable("PlayerUnitIcon");
+        await Manager.Resources.SpriteLoadLable("SkillIcon");
 
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         await AnimationManager.Init();

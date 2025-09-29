@@ -50,7 +50,7 @@ public class UnitInfoUI : MonoBehaviour
         _mpSlider.value = stat.MaxMana;
         _mpText.text = $"{stat.MaxMana}/{stat.MaxMana}";
 
-        _unitSkillUI.Setup(status.Data.Skill);
+        _unitSkillUI.Setup(status);
         _unitStatusUI.Setup(stat);
 
         if(isSell)

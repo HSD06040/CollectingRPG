@@ -21,7 +21,7 @@ public class BuffSkill : UnitSkill
 
         if (TargetType == TargetType.Self)
         {
-            attacker.GetStatusController().ApplyEffect(BuffEffectData, abilityPower, name);
+            attacker.GetStatusController().ApplyEffect(BuffEffectData, AbilityPower, name);
             return;
         }
         
@@ -29,13 +29,13 @@ public class BuffSkill : UnitSkill
         {
             foreach (GameObject target in GetTargetFromTargetType(attacker))
             {
-                attacker.GetStatusController().ProvideEffect(BuffEffectData, abilityPower, 
+                attacker.GetStatusController().ProvideEffect(BuffEffectData, AbilityPower, 
                     name, ComponentProvider.Get<UnitBase>(target).StatusController);                
             }
         }
         else
         {
-            attacker.GetStatusController().ProvideEffect(BuffEffectData, abilityPower, 
+            attacker.GetStatusController().ProvideEffect(BuffEffectData, AbilityPower, 
                 name, ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController);            
         }
     }

@@ -41,8 +41,8 @@ public class OverlapSkill : AttackSkill
             UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(attacker.GetTarget().gameObject).StatusController;
 
             attacker.GetStatusController().CalculateDamage(
-                physicalPower,
-                abilityPower,
+                PhysicalPower,
+                AbilityPower,
                 DamageType,
                 targetStatus
                 );
@@ -58,8 +58,8 @@ public class OverlapSkill : AttackSkill
                 UnitStatusController targetStatus = ComponentProvider.Get<UnitBase>(target).StatusController;
 
                 attacker.GetStatusController().CalculateDamage(
-                    physicalPower,
-                    abilityPower,
+                    PhysicalPower,
+                    AbilityPower,
                     DamageType,
                     targetStatus
                     );
@@ -86,7 +86,7 @@ public class OverlapSkill : AttackSkill
                 }
 
                 UnitStatusController targetStatus = ub.StatusController;
-                attacker.GetStatusController().CalculateDamage(physicalPower, abilityPower, DamageType, targetStatus);
+                attacker.GetStatusController().CalculateDamage(PhysicalPower, AbilityPower, DamageType, targetStatus);
 
                 if (IsStun)
                     targetStatus.Stun(StunDuration);
@@ -113,7 +113,7 @@ public class OverlapSkill : AttackSkill
             }
 
             UnitStatusController targetStatus = ub.StatusController;
-            attacker.GetStatusController().CalculateDamage(physicalPower, abilityPower, DamageType, targetStatus);
+            attacker.GetStatusController().CalculateDamage(PhysicalPower, AbilityPower, DamageType, targetStatus);
 
             if (IsStun)
                 targetStatus.Stun(StunDuration);

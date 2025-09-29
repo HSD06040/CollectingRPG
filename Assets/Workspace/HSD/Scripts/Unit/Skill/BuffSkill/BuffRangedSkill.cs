@@ -49,13 +49,13 @@ public class BuffRangedSkill : RangedSkill
         if (_isBuff)
         {
             projectile.Init(_buffEffectData, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), PhysicalPower, AbilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
         else if (!_isBuff)
         {
             projectile.Init(_statModifier, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), PhysicalPower, AbilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
     }

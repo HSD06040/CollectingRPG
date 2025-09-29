@@ -23,7 +23,7 @@ public class BuffChainSkill : UnitSkill
 
         buffChainAttacker.Setup(
             _buffEffectData, attacker, Manager.Resources.Load<GameObject>(EffectAddress), 
-            target, _count, _interval, attacker.TargetLayer, abilityPower
+            target, _count, _interval, attacker.TargetLayer, AbilityPower
             );
     }
 
