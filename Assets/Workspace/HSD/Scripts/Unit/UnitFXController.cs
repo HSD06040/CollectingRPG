@@ -31,7 +31,28 @@ public class UnitFXController
 
     public void BattleSetting()
     {
-        _sortingGroup.sortingLayerName = "BattleUnit";
+        if(_sortingGroup != null)
+            _sortingGroup.sortingLayerName = "BattleUnit";
+        else
+        {
+            foreach (var renderer in _renderers)
+            {
+                renderer.sortingLayerName = "BattleUnit";
+            }
+        }    
+    }
+
+    public void SortingLayer(int line)
+    {
+        if (_sortingGroup != null)
+            _sortingGroup.sortingOrder = line;
+        else
+        {
+            foreach (var renderer in _renderers)
+            {
+                renderer.sortingOrder = line;
+            }
+        }
     }
 
     private async UniTask FlashRoutine()

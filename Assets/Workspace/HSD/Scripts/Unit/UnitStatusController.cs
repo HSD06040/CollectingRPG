@@ -100,7 +100,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         EffectController = new EffectController(transform);
         UnitFXController = new UnitFXController(
             root.GetComponentsInChildren<SpriteRenderer>(),
-            root.GetComponentInChildren<SortingGroup>()
+            GetComponentInChildren<SortingGroup>()
             );
 
         Status = status;

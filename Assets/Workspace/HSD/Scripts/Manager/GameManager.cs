@@ -61,7 +61,7 @@ public class GameManager : Singleton<GameManager>
         duration = duration / (Time.timeScale * GetTimeScale());
 
         Camera.main.transform.DOMove(new Vector3(targetPos.x, targetPos.y, -10), duration);
-        await Camera.main.DOOrthoSize(zoomSize, duration).SetUpdate(true).AsyncWaitForCompletion();
+        await Camera.main.DOOrthoSize(zoomSize, duration).AsyncWaitForCompletion();
     }
 
     private float GetTimeScale()
