@@ -17,8 +17,13 @@ public class UnitToolTip : MonoBehaviour
 
     public void Close()
     {
-        //if (_isSell) return;
+        if (_isSell) return;
 
+        _unitInfoUI.gameObject.SetActive(false);
+    }
+
+    public void ForceClose()
+    {
         _unitInfoUI.gameObject.SetActive(false);
     }
 }

@@ -74,7 +74,7 @@ public class UnitManager : MonoBehaviour
         {
             if (preset.Statuses[i].Data != null)
             {
-                AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
+                _unitSlotController.AddEmptySlotUnit(preset.Statuses[i]);                
             }
         }
     }
@@ -208,7 +208,8 @@ public class UnitManager : MonoBehaviour
         EnemyController.EnemyStandby();
     }
 
-    public void StandbyGame()
+    [ContextMenu("GameStanby")]
+    public void GameStandby()
     {
         ClearSpawnUnit();
         EnemyController.ResetEnemy();
@@ -216,6 +217,8 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.StandbyUISetting();
 
         _battleManager.GameStanby();
+        Camera.main.transform.position = new Vector3(0, 0, -10);
+        Camera.main.orthographicSize = 13;
     }
 
     private void UnitsIdle()

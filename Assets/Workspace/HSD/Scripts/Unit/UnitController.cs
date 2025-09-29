@@ -144,7 +144,11 @@ public class UnitController : MonoBehaviour
     {
         UnitBase slotUnit = slot.Unit;
 
-        if (IsUnitMaxCount())
+        Debug.Log($"[AddUnit]");
+
+        bool isMax = unit.CurrentSlot != Vector2Int.zero ? false : IsUnitMaxCount() && slotUnit == null;
+
+        if (isMax)
         {
             if (unit.CurrentSlot == Vector2Int.zero)
             {
@@ -187,9 +191,11 @@ public class UnitController : MonoBehaviour
         {
             UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(unit);
 
+            Debug.Log($"[AddUnit] {unit.CurrentSlot} is Not Zero");
             // 스왑
             if (slotUnit != null && slotUnit != unit)
             {
+                Debug.Log($"[AddUnit] Swap");
                 ClearSlot(unitSlot, unit);
                 ClearSlot(slot, slotUnit);
 
@@ -204,6 +210,8 @@ public class UnitController : MonoBehaviour
             }
             else
             {
+                Debug.Log($"[AddUnit] JustMove");
+
                 ClearSlot(unitSlot, unit);
 
                 _battleUnitManager.MoveUnit(unitSlot, slot, unit);
@@ -279,14 +287,25 @@ public class UnitController : MonoBehaviour
 
     public Vector2Int RemoveUnitGetPosition(UnitStatus unit)
     {
-        UnitBase unitBase = _unitBaseDic[unit.Address][0];
-        UnitSlot slot = _unitSlotManager.GetUnitSlot(unitBase);
+        if (unit == null || string.IsNullOrEmpty(unit.Address))
+        {
+            return Vector2Int.zero;
+        }
 
+        if (!_unitBaseDic.TryGetValue(unit.Address, out var unitList) || unitList.Count == 0)
+        {
+            return Vector2Int.zero;
+        }
+
+        UnitBase unitBase = unitList[0];
         Vector2Int pos = unitBase.CurrentSlot;
+
+        UnitSlot slot = _unitSlotManager.GetUnitSlot(unitBase);
         RemoveUnit(slot);
 
-        return unitBase.CurrentSlot;
+        return pos;
     }
+
 
     public void RemoveUnit(UnitStatus removeUnit)
     {
@@ -432,10 +451,6 @@ public class UnitController : MonoBehaviour
     public int GetUnitCount(UnitStatus unit)
     {
         return GetUnitCount(unit.Address);
-    }
-    public bool IsFull()
-    {
-        return CurrentUnitCount >= UnitMaxCount;
     }
     /// <summary>
     /// GC 할당 없이 현재 유닛들을 반환합니다.

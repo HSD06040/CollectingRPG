@@ -26,8 +26,6 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public T Load<T>(string address) where T : Object
     {
-        Debug.Log($"주소 {address}");
-
         if(string.IsNullOrEmpty(address)) return null;
 
         if (!_resources.ContainsKey(address))
