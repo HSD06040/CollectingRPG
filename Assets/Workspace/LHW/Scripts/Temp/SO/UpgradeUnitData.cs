@@ -88,7 +88,7 @@ public class UpgradeUnitData : ScriptableObject
 
         if (CurrentUpgradeData.UpgradeLevel == 0)
         {
-            if(CurrentUpgradeData.CurrentPieces >= 10)
+            if (CurrentUpgradeData.CurrentPieces >= 10)
             {
                 CurrentUpgradeData.CurrentPieces -= 10;
                 CurrentUpgradeData.UpgradeLevel += 1;
@@ -102,9 +102,11 @@ public class UpgradeUnitData : ScriptableObject
             int requiredGold = GetRequiredGold();
 
             string uid = FirebaseManager.Auth.CurrentUser.UserId;
-            var diaRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Gold");
+            var goldRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Gold");
+            var mythStoneRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("MythStone");
 
-            DataSnapshot snapshot = await diaRef.GetValueAsync();
+            DataSnapshot snapshot = await goldRef.GetValueAsync();
+            DataSnapshot snapshot2 = await mythStoneRef.GetValueAsync();
 
             int currentGold = 0;
 
@@ -112,6 +114,15 @@ public class UpgradeUnitData : ScriptableObject
             {
                 currentGold = Convert.ToInt32(snapshot.Value);
             }
+
+            int currentMythStone = 0;
+
+            if (snapshot2.Exists && snapshot2.Value != null)
+            {
+                currentMythStone = Convert.ToInt32(snapshot2.Value);
+            }
+
+            int conversedMythstone = currentMythStone / MythStonePieceRatio(_grade);
 
             if (CurrentUpgradeData.CurrentPieces >= requiredPiece && currentGold >= requiredGold)
             {
@@ -121,7 +132,33 @@ public class UpgradeUnitData : ScriptableObject
 
                 OnLevelUp?.Invoke();
             }
+            else if (CurrentUpgradeData.CurrentPieces + conversedMythstone >= requiredPiece && currentGold >= requiredGold)
+            {
+                int subMythStone = requiredPiece - CurrentUpgradeData.CurrentPieces;
+                await DBManager.Instance.SubtractMythStoneAsync(subMythStone * MythStonePieceRatio(_grade));
+
+                CurrentUpgradeData.CurrentPieces = 0;
+                CurrentUpgradeData.UpgradeLevel += 1;
+                await DBManager.Instance.SubtractGoldAsync(requiredGold);
+
+                OnLevelUp?.Invoke();
+            }
         }
+    }
+
+    private int MythStonePieceRatio(Grade grade)
+    {
+        int pieceRatio = 0;
+
+        switch (grade)
+        {
+            case Grade.NORMAL: pieceRatio = 2; break;
+            case Grade.RARE: pieceRatio = 4; break;
+            case Grade.UNIQUE: pieceRatio = 6; break;
+            case Grade.LEGEND: pieceRatio = 9; break;
+        }
+
+        return pieceRatio;
     }
 }
 
@@ -129,6 +166,39 @@ public class UpgradeUnitData : ScriptableObject
 public class LevelUpData : ScriptableObject
 {
     public List<RequirePiece> RequirePieceData = new();
+
+    /// <summary>
+    /// 현재 캐릭터의 등급, 레벨을 기반으로, 최대 레벨을 찍기까지
+    /// 남은 조각 개수를 반환하는 함수
+    /// </summary>
+    /// <param name="grade"></param>
+    /// <param name="level"></param>
+    public int GetCumulativePiece(Grade grade, int level)
+    {
+        RequirePiece requirePiece = RequirePieceData.Find(r => r.Grade == grade);
+        if (requirePiece == null)
+        {
+            Debug.LogError($"[{name}] {grade} 등급에 맞는 RequirePiece 데이터가 없습니다.");
+            return 0;
+        }
+
+        int cumulativePiece = 0;
+
+        int index = level - 1;
+        if (index < 0)
+        {
+            index = 0;
+            cumulativePiece += 10;
+        }
+
+        for(int i = index; i < requirePiece.LevelRatio.Count; i++)
+        {
+            cumulativePiece += requirePiece.LevelRatio[i].RequirePiece;
+        }
+        Debug.Log(cumulativePiece);
+
+        return cumulativePiece;
+    }
 }
 
 [Serializable]

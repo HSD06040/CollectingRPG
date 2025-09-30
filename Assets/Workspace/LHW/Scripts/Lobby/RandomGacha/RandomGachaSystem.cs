@@ -1,4 +1,5 @@
 using Firebase.Database;
+using GoogleMobileAds.Ump.Api;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,13 +31,14 @@ public class RandomGachaSystem : MonoBehaviour
 
     // 확률 소수점 자릿수
     [Header("ProbOffset")]
-    [SerializeField] private int digits = 0;
+    [SerializeField] private int digits = 2;
 
     [Header("DB Test")]
     [SerializeField] private UnitData _testData;
     [SerializeField] private Button _testCharacterGachaButton;
 
-    private WeightedRandom<Grade> _gradeRandom = new WeightedRandom<Grade>();
+    private WeightedRandom<Grade> _gradeCharRandom = new WeightedRandom<Grade>();
+    private WeightedRandom<int>[] _gradeCharPieceRandom = new WeightedRandom<int>[4];
 
     private void Awake()
     {
@@ -71,11 +73,22 @@ public class RandomGachaSystem : MonoBehaviour
     /// <param name="probability"></param>
     private void RandomInit(ItemProbabilitySO probability)
     {
+        for (int i = 0; i < _gradeCharPieceRandom.Length; i++)
+        {
+            _gradeCharPieceRandom[i] = new WeightedRandom<int>();
+        }
+
         for (int i = 0; i < probability.ItemsProbability.Count; i++)
         {
             Grade grade = probability.ItemsProbability[i].ItemGrade;
-            int value = (int)(probability.ItemsProbability[i].Probability * (int)Math.Pow(10, digits));
-            _gradeRandom.Add(grade, value);
+            int value = (int)(probability.ItemsProbability[i].Probability * Math.Pow(10, digits));
+            _gradeCharRandom.Add(grade, value);
+
+            for (int j = 0; j < probability.ItemsProbability[i].Pieces.Count; j++)
+            {
+                int pieceValue = (int)(probability.ItemsProbability[i].Pieces[j].PieceProbability * Math.Pow(10, digits));
+                _gradeCharPieceRandom[i].Add(probability.ItemsProbability[i].Pieces[j].PieceNum, pieceValue);
+            }
         }
     }
 
@@ -186,12 +199,11 @@ public class RandomGachaSystem : MonoBehaviour
         {
             currentDiamond = Convert.ToInt32(snapshot.Value);
         }
-        Debug.Log(currentDiamond);
 
         if (currentDiamond >= 300 * number)
         {
             ItemSelect(number);
-            await DBManager.Instance.SubtractDiamondAsync(300  * number);
+            await DBManager.Instance.SubtractDiamondAsync(300 * number);
         }
         else
         {
@@ -236,7 +248,7 @@ public class RandomGachaSystem : MonoBehaviour
     // 확률 변동이 없는 가중치 확률
     private async void ItemSelect(int number)
     {
-        if (_gradeRandom.GetList() == null) RandomInit(_prob);        
+        if (_gradeCharRandom.GetList() == null) RandomInit(_prob);
 
         for (int i = 0; i < number; i++)
         {
@@ -244,43 +256,90 @@ public class RandomGachaSystem : MonoBehaviour
 
             int pieceNum = ReturnPieceByGrade(data);
 
-            data.UpgradeData.AddPiece(pieceNum);
+            if (IsOveredPieceUpperLimit(data, pieceNum, out int overPiece, out int mythPiece))
+            {
+                if (overPiece != pieceNum)
+                {
+                    data.UpgradeData.AddPiece(pieceNum - overPiece);
+                    await DBManager.Instance.charDB.SaveCharacterUpgradeData(data);
+                }
 
-            _resultUI.HeroGachaUpdate(data, i, pieceNum.ToString());
+                _resultUI.HeroGachaUpdate(data, i, pieceNum.ToString());
 
-            await DBManager.Instance.charDB.SaveCharacterUpgradeData(data);
+                await DBManager.Instance.AddMythStoneAsync(mythPiece);
+            }
+            else
+            {
+                data.UpgradeData.AddPiece(pieceNum);
+
+                _resultUI.HeroGachaUpdate(data, i, pieceNum.ToString());
+
+                await DBManager.Instance.charDB.SaveCharacterUpgradeData(data);
+            }
         }
 
         _resultUI.gameObject.SetActive(true);
     }
 
+
     // 확률 변동 없는 캐릭터 뽑기
     private UnitData ReturnData()
     {
-        Grade grade = _gradeRandom.GetRandomItem();
+        Grade grade = _gradeCharRandom.GetRandomItem();
         return _data.GetRandomUnitByGrade(grade);
     }
 
     private int ReturnPieceByGrade(UnitData data)
     {
-        int piece = 0;
         Grade grade = data.Grade;
-
-        switch (grade)
-        {
-            case Grade.NORMAL: piece = UnityEngine.Random.Range(1, 16); break;
-            case Grade.RARE: piece = UnityEngine.Random.Range(1, 11); break;
-            case Grade.UNIQUE: piece = UnityEngine.Random.Range(1, 9); break;
-            case Grade.LEGEND: piece = UnityEngine.Random.Range(1, 5); break;
-        }
+        int piece = _gradeCharPieceRandom[(int)grade].GetRandomItem();
         return piece;
+    }
+
+    private bool IsOveredPieceUpperLimit(UnitData data, int inputPiece, out int overPiece, out int mythPiece)
+    {
+        Grade grade = data.Grade;
+        int level = data.UpgradeData.CurrentUpgradeData.UpgradeLevel;
+        int requirePiece = data.LevelUpData.GetCumulativePiece(grade, level);
+
+        if (data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece < requirePiece )
+        {
+            overPiece = 0;
+            mythPiece = 0;
+            return false;
+        }
+        else
+        {
+            if(data.UpgradeData.CurrentUpgradeData.CurrentPieces > requirePiece)
+            {
+                overPiece = inputPiece;
+            }
+            else
+            {
+                overPiece = data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece - requirePiece;
+            }
+            
+            int pieceRatio = 0;
+            switch(grade)
+            {
+                case Grade.NORMAL: pieceRatio = overPiece * 2; break;
+                case Grade.RARE: pieceRatio = overPiece * 4; break;
+                case Grade.UNIQUE: pieceRatio = overPiece * 6; break;
+                case Grade.LEGEND: pieceRatio = overPiece * 9; break;
+            }
+            Debug.Log($"{data.Name}의 조각 개수 초과. {overPiece}개를 초과하여 신화석 {pieceRatio}만큼 지급");
+
+            mythPiece = pieceRatio;
+
+            return true;
+        }
     }
 
 
     // 천장이 있는 가중치 확률
     private void ItemSelectBySub(int number)
     {
-        if (_gradeRandom.GetList() == null) RandomInit(_prob);
+        if (_gradeCharRandom.GetList() == null) RandomInit(_prob);
 
         for (int i = 0; i < number; i++)
         {
@@ -291,7 +350,7 @@ public class RandomGachaSystem : MonoBehaviour
     // 확률 변동 있는 캐릭터 뽑기
     private UnitData ReturnDataBySub()
     {
-        Grade grade = _gradeRandom.GetRandomItemBySub();
+        Grade grade = _gradeCharRandom.GetRandomItemBySub();
         return _data.GetRandomUnitByGrade(grade);
     }
 
