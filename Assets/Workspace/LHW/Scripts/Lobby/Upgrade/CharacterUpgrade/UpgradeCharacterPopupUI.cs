@@ -88,11 +88,40 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
                 return;
             }
         }
-        _currentCharUnit.Status.Data.UpgradeData.LevelUp();
 
-        await DBManager.Instance.charDB.SaveCharacterUpgradeData(_currentCharUnit.Status.Data);
+        bool success = await _currentCharUnit.Status.Data.UpgradeData.LevelUpWithPiecesOnly();
 
-        OnCharacterStatusChanged?.Invoke();
+        if (!success)
+        {
+            if (PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowConfirmationPopup(
+                    "조각이 부족합니다. 신화석을 사용해서 레벨업 하시겠습니까?",
+                    async () =>
+                    {
+                        bool mythSuccess = await _currentCharUnit.Status.Data.UpgradeData.LevelUpWithMythStone();
+                        if (!mythSuccess)
+                        {
+                            PopupManager.instance.ShowPopup("레벨업에 필요한 재화가 부족합니다.");
+                        }
+                        else
+                        {
+                            await DBManager.Instance.charDB.SaveCharacterUpgradeData(_currentCharUnit.Status.Data);
+                            OnCharacterStatusChanged?.Invoke();
+                        }
+                    },
+                    () =>
+                    {
+                        PopupManager.instance.ShowPopup("레벨업이 취소되었습니다.");
+                    }
+                );
+            }
+        }
+        else
+        {
+            await DBManager.Instance.charDB.SaveCharacterUpgradeData(_currentCharUnit.Status.Data);
+            OnCharacterStatusChanged?.Invoke();
+        }
     }
 
     #endregion
