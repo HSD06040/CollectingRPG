@@ -32,7 +32,11 @@ public class UnitInfoUI : MonoBehaviour
         _unitNameText.text = status.Data.Name;
         _unitIcon.sprite = status.Data.Icon;
 
-        _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
+        if(status.Data.UpgradeData != null)
+            _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
+        else
+            _levelText.text = "0";
+
         _powerText.text = status.CombatPower.ToString();
 
         // isEnemy로 분리
