@@ -382,7 +382,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     {
         IsStunned.Value = true;
 
-        await UniTask.WaitForSeconds(stunTime, cancellationToken: this.GetCancellationTokenOnDestroy());
+        await UniTask.WaitForSeconds(stunTime, cancellationToken: _cts.Token);
 
         if (IsDead)
             return;
@@ -410,6 +410,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     private void Die()
     {
         EffectController.ClearAllEffects();
+        _cts.Cancel();
         IsDead = true;
         OnDied?.Invoke();
     }

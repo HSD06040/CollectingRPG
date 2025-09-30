@@ -148,9 +148,26 @@ public abstract class MagicStoneData : ScriptableObject
             }
         }
     }
+
+    protected void ApplyTakeDamageSingle(UnitBase unit)
+    {
+        unit.StatusController.TakeDamage((int)Value);
+    }
+
+    protected void ApplyTakeDamageMultiple(GameObject[] objs)
+    {
+        foreach (var obj in objs)
+        {
+            UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
+            if (unit != null)
+            {
+                ApplyTakeDamageSingle(unit);
+            }
+        }
+    }
     #endregion
 
-#region SpawnEffect
+    #region SpawnEffect
     protected virtual void SpawnEffect(Vector2 pos)
     {
         if (string.IsNullOrEmpty(Address))
