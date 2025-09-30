@@ -39,8 +39,8 @@ public class BattleUnitManager : MonoBehaviour
         UnitBase newUnit = ComponentProvider.Get<UnitBase>(Instantiate(unit.Status.Data.UnitPrefab));
         newUnit.Status = unit.Status;
         AddToCachedArray(newUnit);
-        newUnit.SetBattleUnit();
         newUnit.Init();
+        newUnit.SetBattleUnit(-slot.GetPos().y);
 
         AugmentManager.Instance.ApplyAugment(newUnit);
 

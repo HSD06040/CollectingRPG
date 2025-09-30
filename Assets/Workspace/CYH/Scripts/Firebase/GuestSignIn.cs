@@ -115,6 +115,7 @@ public class GuestSignIn : MonoBehaviour
 
     private async UniTask LoadPrefabs()
     {
-        await Manager.Resources.LoadLabel("UnitPrefab");
+        Manager.Resources.LoadLabel("UnitPrefab").Forget();
+        await Manager.Data.InitAsync();
     }
 }

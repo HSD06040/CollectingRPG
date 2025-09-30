@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
@@ -71,10 +71,6 @@ namespace Map
                 case NodeType.MinorEnemy:
                     break;
                 case NodeType.EliteEnemy:
-                    break;
-                case NodeType.RestSite:
-                    break;
-                case NodeType.Treasure:
                     break;
                 case NodeType.Store:
                     break;

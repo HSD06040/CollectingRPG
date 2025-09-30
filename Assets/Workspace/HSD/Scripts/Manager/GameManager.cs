@@ -50,8 +50,8 @@ public class GameManager : Singleton<GameManager>
     public async UniTask SlowMotionAsync(float scale, float duration)
     {
         Time.timeScale = scale * GetTimeScale();
-
-        await UniTask.WaitForSeconds(duration / (Time.timeScale * GetTimeScale()));
+        
+        await UniTask.Delay(System.TimeSpan.FromSeconds(duration), true);
 
         SetTimeScale(GetTimeScale());
     }
