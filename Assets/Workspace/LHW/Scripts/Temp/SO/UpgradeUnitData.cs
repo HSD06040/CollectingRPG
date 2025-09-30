@@ -86,6 +86,13 @@ public class UpgradeUnitData : ScriptableObject
     {
         if (CurrentUpgradeData.UpgradeLevel >= 10) return false;
 
+        if(CurrentUpgradeData.UpgradeLevel <= 0 && CurrentUpgradeData.CurrentPieces >= 10)
+        {
+            CurrentUpgradeData.CurrentPieces -= 10;
+            CurrentUpgradeData.UpgradeLevel += 1;
+            return true;
+        }
+
         int requiredPiece = GetRequiredPiece();
         int requiredGold = GetRequiredGold();
 
