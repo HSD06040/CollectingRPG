@@ -87,6 +87,7 @@ public class UnitManager : MonoBehaviour
     #region EventHandler
     private void Subscribe()
     {
+        BattleManager.OnSpawnUnit += _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
         BattleManager.OnBattleStarted += ApplyHealAugment;
@@ -105,6 +106,7 @@ public class UnitManager : MonoBehaviour
 
     private void UnSubscrube()
     {
+        BattleManager.OnSpawnUnit -= _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
         BattleManager.OnBattleStarted -= ApplyHealAugment;

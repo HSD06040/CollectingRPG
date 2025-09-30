@@ -32,6 +32,7 @@ public class UnitUIManager : MonoBehaviour
         _battleUI.SetActive(false);
         _notBattleUI.SetActive(true);
         _fightButton.gameObject.SetActive(true);
+        UnitHealthBarManager.Clear();
     }
 
     public void StandbyUIDeActive()
