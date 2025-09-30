@@ -88,7 +88,7 @@ public class UnitController : MonoBehaviour
 
     public void UnitFight()
     {
-        foreach (var unit in _battleUnitManager.GetUnitGrid())
+        foreach (var unit in _battleUnitManager.GetUnits())
         {
             if (unit == null)
                 continue;

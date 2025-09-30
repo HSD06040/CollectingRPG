@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
 public static class Utils
 {
@@ -212,7 +209,7 @@ public static class Utils
     public static GameObject[] GetTargetsNonAlloc(Vector2 origin, SearchType searchType, float sizeOrRadius, Vector2 boxSize, LayerMask layerMask)
     {
         int hitCount = 0;
-
+        Debug.Log(layerMask.ToString());
         switch (searchType)
         {
             case SearchType.Circle:
@@ -226,10 +223,19 @@ public static class Utils
                 break;
         }
 
+        if (hitCount <= 0)
+            return null;
+        
         var result = new GameObject[hitCount];
+
         for (int i = 0; i < hitCount; i++)
         {
-            if (ComponentProvider.Get<UnitBase>(result[i]).StatusController.IsDead)
+            UnitBase unit = ComponentProvider.Get<UnitBase>(_hitBuffer[i].gameObject);
+
+            if(unit == null)
+                continue;
+
+            if (unit.StatusController.IsDead)
                 continue;
 
             result[i] = _hitBuffer[i].gameObject;

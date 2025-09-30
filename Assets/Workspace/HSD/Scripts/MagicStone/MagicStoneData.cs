@@ -19,7 +19,7 @@ public abstract class MagicStoneData : ScriptableObject
     public float Value { get => _value; }
 
     [SerializeField] private TargetType _targetType;
-    public TargetType TargetType { get; set; }
+    public TargetType TargetType { get => _targetType;}
 
     public abstract void UseMagicStone(Vector2 pos);
 
@@ -119,7 +119,7 @@ public abstract class MagicStoneData : ScriptableObject
         unit.StatusController.TakeTickDamage((int)Value, tickDamageData.TickCount, tickDamageData.TickInterval);
     }
     protected void ApplyTickDamageMultiple(GameObject[] objs, TickDamageData tickDamageData)
-    {
+    {        
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
@@ -132,11 +132,13 @@ public abstract class MagicStoneData : ScriptableObject
 
     protected void ApplyStatSingle(UnitBase unit, StatType statType)
     {
+        Debug.Log($"{unit.name}에게 {statType} {Value} 적용");
         unit.StatusController.AddStat(statType, Value, name);
     }
 
     protected void ApplyStatMultiple(GameObject[] objs, StatType statType)
     {
+        Debug.Log($"대상 수 : {objs.Length}");
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
@@ -146,14 +148,37 @@ public abstract class MagicStoneData : ScriptableObject
             }
         }
     }
+
+    protected void ApplyTakeDamageSingle(UnitBase unit)
+    {
+        unit.StatusController.TakeDamage((int)Value);
+    }
+
+    protected void ApplyTakeDamageMultiple(GameObject[] objs)
+    {
+        foreach (var obj in objs)
+        {
+            UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
+            if (unit != null)
+            {
+                ApplyTakeDamageSingle(unit);
+            }
+        }
+    }
     #endregion
 
-#region SpawnEffect
+    #region SpawnEffect
     protected virtual void SpawnEffect(Vector2 pos)
     {
-        Manager.Resources.Destroy(
-        Manager.Resources.Instantiate<GameObject>(Address, pos, true)
-        , EffectDuration);
+        if (string.IsNullOrEmpty(Address))
+            return;
+
+        GameObject effect = Manager.Resources.Instantiate<GameObject>(Address, pos, true);
+
+        if (effect == null)
+            return;
+
+        Manager.Resources.Destroy(effect, EffectDuration);
     }
 #endregion
 }
