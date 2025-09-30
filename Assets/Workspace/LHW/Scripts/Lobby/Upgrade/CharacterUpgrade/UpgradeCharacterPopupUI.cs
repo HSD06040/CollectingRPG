@@ -91,7 +91,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
         bool success = await _currentCharUnit.Status.Data.UpgradeData.LevelUpWithPiecesOnly();
 
-        if (!success)
+        if (!success && _currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 1)
         {
             if (PopupManager.Instance != null)
             {

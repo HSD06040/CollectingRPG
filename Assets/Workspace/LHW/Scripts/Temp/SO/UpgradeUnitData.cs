@@ -86,32 +86,33 @@ public class UpgradeUnitData : ScriptableObject
     {
         if (CurrentUpgradeData.UpgradeLevel >= 10) return false;
 
-        if(CurrentUpgradeData.UpgradeLevel <= 0 && CurrentUpgradeData.CurrentPieces >= 10)
+        if (CurrentUpgradeData.UpgradeLevel <= 0 && CurrentUpgradeData.CurrentPieces >= 10)
         {
             CurrentUpgradeData.CurrentPieces -= 10;
             CurrentUpgradeData.UpgradeLevel += 1;
             return true;
         }
-
-        int requiredPiece = GetRequiredPiece();
-        int requiredGold = GetRequiredGold();
-
-        // 골드, 조각 체크
-        string uid = FirebaseManager.Auth.CurrentUser.UserId;
-        var goldRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Gold");
-        DataSnapshot snapshot = await goldRef.GetValueAsync();
-        int currentGold = snapshot.Exists ? Convert.ToInt32(snapshot.Value) : 0;
-
-        if (CurrentUpgradeData.CurrentPieces >= requiredPiece && currentGold >= requiredGold)
+        else if(CurrentUpgradeData.UpgradeLevel >= 1)
         {
-            CurrentUpgradeData.CurrentPieces -= requiredPiece;
-            CurrentUpgradeData.UpgradeLevel += 1;
+            int requiredPiece = GetRequiredPiece();
+            int requiredGold = GetRequiredGold();
 
-            await DBManager.Instance.SubtractGoldAsync(requiredGold);
-            OnLevelUp?.Invoke();
-            return true;
+            // 골드, 조각 체크
+            string uid = FirebaseManager.Auth.CurrentUser.UserId;
+            var goldRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Gold");
+            DataSnapshot snapshot = await goldRef.GetValueAsync();
+            int currentGold = snapshot.Exists ? Convert.ToInt32(snapshot.Value) : 0;
+
+            if (CurrentUpgradeData.CurrentPieces >= requiredPiece && currentGold >= requiredGold)
+            {
+                CurrentUpgradeData.CurrentPieces -= requiredPiece;
+                CurrentUpgradeData.UpgradeLevel += 1;
+
+                await DBManager.Instance.SubtractGoldAsync(requiredGold);
+                OnLevelUp?.Invoke();
+                return true;
+            }
         }
-
         return false;
     }
 
