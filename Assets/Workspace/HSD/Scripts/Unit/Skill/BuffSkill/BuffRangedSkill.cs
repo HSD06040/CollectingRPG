@@ -49,13 +49,13 @@ public class BuffRangedSkill : RangedSkill
         if (_isBuff)
         {
             projectile.Init(_buffEffectData, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), PhysicalPower, AbilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
         else if (!_isBuff)
         {
             projectile.Init(_statModifier, _radius, _throwType, _activationCondition, _isAttack, _isModifier,
-            target, attacker.GetStatusController(), physicalPower, abilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
+            target, attacker.GetStatusController(), PhysicalPower, AbilityPower, DamageType, GetLayerMask(attacker), _projectileSpeed, GetExplosionEffect(),
             _parabolaYOffset);
         }
     }
@@ -97,6 +97,28 @@ public class BuffRangedSkill : RangedSkill
             return GetTargetSingle(attacker)?.transform;
         }
     }
+
+    public override string GetCalculateValueString(UnitStatus status)
+    {
+        UnitStats stat = status.GetCurrentStat();
+        float value = stat.MagicDamage * (AbilityPower / 100);
+
+        if(_isBuff)
+        {
+            if (_buffEffectData.StatType == StatType.CurHp || _buffEffectData.StatType == StatType.Shield)
+                return Mathf.RoundToInt(value).ToString();
+            else
+                return value.ToString("F1");
+        }        
+        else
+        {
+            if (_statModifier.StatType == StatType.CurHp || _statModifier.StatType == StatType.Shield)
+                return Mathf.RoundToInt(value).ToString();
+            else
+                return value.ToString("F1");
+        }
+    }
+
 #if UNITY_EDITOR
     public override void DrawGizmos(IAttacker attacker)
     {

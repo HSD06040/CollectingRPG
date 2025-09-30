@@ -52,6 +52,7 @@ public class EffectController
             BuffEffect.Shield => _transform.GetCenterPosition(),
             BuffEffect.AttackSpeed => _transform.GetCenterPosition(),
             BuffEffect.Defense => _transform.GetCenterPosition(),
+            _ => _transform.position
         };
     }
 }

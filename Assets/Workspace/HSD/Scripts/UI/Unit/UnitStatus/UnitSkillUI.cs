@@ -13,13 +13,20 @@ public class UnitSkillUI : MonoBehaviour
     [SerializeField] TMP_Text _skillDescriptionText;
     [SerializeField] TMP_Text _skillAttackCountText;
 
-    public void Setup(UnitSkill skill)
+    public void Setup(UnitStatus status)
     {
+        UnitSkill skill = status.Data.Skill;
+
         _skillIcon.sprite = skill.Icon;
         _skillNameText.text = skill.SkillName;
         _manaText.text = skill.ManaCost.ToString();
-        _skillPowerText.text = skill.physicalPower.ToString();
-        _skillDescriptionText.text = skill.Description;
+        _skillPowerText.text = skill.PhysicalPower.ToString();
+        _skillDescriptionText.text = GetDescription(skill, status);
         _skillAttackCountText.text = skill.MaxCount.ToString();
+    }
+
+    private string GetDescription(UnitSkill skill, UnitStatus status)
+    {
+        return skill.Description.Replace("{value}", skill.GetCalculateValueString(status));
     }
 }

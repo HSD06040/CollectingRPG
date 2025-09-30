@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 {
@@ -98,8 +99,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         PassiveController = new UnitPassiveController(gameObject);
         EffectController = new EffectController(transform);
         UnitFXController = new UnitFXController(
-            root.
-            GetComponentsInChildren<SpriteRenderer>()
+            root.GetComponentsInChildren<SpriteRenderer>(),
+            GetComponentInChildren<SortingGroup>()
             );
 
         Status = status;

@@ -126,12 +126,12 @@ public class BattleManager : MonoBehaviour
     private async UniTask GameEndRoutineAsync(bool isPlayerWin)
     {
         Manager.Game.CameraDoMove(_lastTargetPos, _cameraZoomDuration, 5).Forget();
-
-        await Manager.Game.SlowMotionAsync(.1f, 1);
+        await Manager.Game.SlowMotionAsync(.1f, 2);
+        Debug.Log("끝났다!");
 
         if(isPlayerWin)
         {
-            OnPlayerVictory?.Invoke();      
+            OnPlayerVictory?.Invoke();
         }
         else
         {

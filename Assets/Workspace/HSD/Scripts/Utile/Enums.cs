@@ -159,7 +159,8 @@ public enum TargetType
     Enemy,
     Ally,
     Self,
-    Boss
+    Boss,
+    RandomEnemy
 }
 
 public enum EffectTime

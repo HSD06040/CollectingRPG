@@ -14,8 +14,8 @@ public abstract class UnitSkill : ScriptableObject
 
     [Header("Stat")]
     public int MaxCount = 1;
-    public float physicalPower = 1;
-    public float abilityPower = 1;
+    public float PhysicalPower = 1;
+    public float AbilityPower = 1;
     public int ManaCost;
 
     [Header("Type")]
@@ -224,6 +224,13 @@ public abstract class UnitSkill : ScriptableObject
         };
     }
     #endregion
+
+    public virtual string GetCalculateValueString(UnitStatus status)
+    {
+        UnitStats stat = status.GetCurrentStat();
+
+        return Mathf.RoundToInt(stat.PhysicalDamage * PhysicalPower + stat.MagicDamage * (AbilityPower / 100)).ToString("F0");
+    }    
 
     #if  UNITY_EDITOR
     public virtual void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기

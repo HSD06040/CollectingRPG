@@ -26,6 +26,13 @@ public struct BuffEffectData
 }
 
 [Serializable]
+public struct TickDamageData
+{
+    public int TickCount;
+    public float TickInterval;
+}
+
+[Serializable]
 public struct CsvData
 {
     public CsvType CsvType;
