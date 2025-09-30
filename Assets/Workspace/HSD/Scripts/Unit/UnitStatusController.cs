@@ -82,6 +82,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     private void OnDestroy()
     {
         PassiveController?.DeActiveAllPassive();
+        EffectController?.ClearAllEffects();
 
         _cts.Cancel();
         _cts.Dispose();
@@ -227,6 +228,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public void ClearAllStat()
     {
         Debug.Log("ClearAllStat called");
+
         // 모든 스탯의 모디파이어 제거
         MaxHealth.ClearModifiers();
         MaxMana.ClearModifiers();
@@ -245,6 +247,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
         AttackRange.ClearModifiers();
         AttackCount.ClearModifiers();
+
+        EffectController?.ClearAllEffects();
 
         _cts.Cancel();
         _cts.Dispose();
@@ -350,12 +354,21 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
     public void IncreaseShield(int amount)
     {
         Debug.Log($"[쉴드추가] {name} : {amount} 만큼 쉴드추가");
+
+        int prevShield = Shield.Value;
         Shield.Value += amount;
 
-        if(Shield.Value < 0)
+        if (Shield.Value < 0)
             Shield.Value = 0;
 
-        EffectController.AddBuffEffect(BuffEffect.Shield);
+        if (prevShield <= 0 && Shield.Value > 0)
+        {
+            EffectController.StartShieldEffect();
+        }
+        else if (prevShield > 0 && Shield.Value <= 0)
+        {
+            EffectController.StopShieldEffect();
+        }
     }
     #endregion
 
@@ -396,8 +409,9 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     private void Die()
     {
+        EffectController.ClearAllEffects();
         IsDead = true;
-        OnDied?.Invoke();        
+        OnDied?.Invoke();
     }
 
     public void AttackDataChange(UnitAttackData attackData, float _duration)
