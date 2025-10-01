@@ -22,7 +22,7 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         public int CritChance;
     }
 
-    public UnitStatus Status { get; set; }
+    [field : SerializeField] public UnitStatus Status { get; set; }
 
     #region Stat
     [Header("Status")]

@@ -144,8 +144,6 @@ public class UnitController : MonoBehaviour
     {
         UnitBase slotUnit = slot.Unit;
 
-        Debug.Log($"[AddUnit]");
-
         bool isMax = unit.CurrentSlot != Vector2Int.zero ? false : IsUnitMaxCount() && slotUnit == null;
 
         if (isMax)
