@@ -232,7 +232,9 @@ public class CsvDownloader
         {
             int id = int.Parse(row[0]);
 
-           UnitSkill skill = Array.Find(_monsterSkills, u => u.ID == id);
+            UnitSkill skill = Array.Find(_monsterSkills, u => u.ID == id);
+
+            if (skill == null) continue;
 
             skill.SkillName = row[1];
             skill.Description = row[14];

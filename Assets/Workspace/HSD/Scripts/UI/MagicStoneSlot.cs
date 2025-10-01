@@ -55,7 +55,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (_magicStoneIcon.sprite == null) return;
+        if (MagicStoneData == null || InGameManager.Instance.IsBattle) return;
 
         Vector3 worldPos;
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
@@ -77,7 +77,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (_magicStoneIcon.sprite == null) return;
+        if (_magicStoneIcon.sprite == null || InGameManager.Instance.IsBattle) return;
 
         bool insideDropArea = RectTransformUtility.RectangleContainsScreenPoint(
             _dropAreaPanel as RectTransform,
