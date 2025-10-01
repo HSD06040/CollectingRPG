@@ -12,8 +12,13 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private Image _highlight;
 
     [Header("Drag Settings")]
-    [SerializeField] private Transform _dropAreaPanel;
+    private Transform _dropAreaPanel;
     private Vector3 _originalPos;
+
+    public void Init(Transform dropArea)
+    {
+        _dropAreaPanel = dropArea;
+    }
 
     public void ClearMagicStone()
     {
@@ -42,7 +47,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private void UseMagicStone(Vector2 pos)
     {
-        if (MagicStoneData == null) return;
+        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
 
         MagicStoneData.UseMagicStone(pos);
         ClearMagicStone();
@@ -55,7 +60,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (MagicStoneData == null || InGameManager.Instance.IsBattle) return;
+        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
 
         Vector3 worldPos;
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
@@ -77,7 +82,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (_magicStoneIcon.sprite == null || InGameManager.Instance.IsBattle) return;
+        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
 
         bool insideDropArea = RectTransformUtility.RectangleContainsScreenPoint(
             _dropAreaPanel as RectTransform,

@@ -31,6 +31,7 @@ public class UnitManager : MonoBehaviour
 
     private void Awake()
     {
+#if UNITY_EDITOR
         if (IsTest)
         {
             CsvDownloader.OnDataSetupCompleted += InitAsync;
@@ -38,6 +39,9 @@ public class UnitManager : MonoBehaviour
         }
         else
             InitAsync();
+#else
+        InitAsync();
+#endif
     }
 
     private void OnDestroy()
