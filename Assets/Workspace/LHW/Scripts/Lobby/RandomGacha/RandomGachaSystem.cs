@@ -8,10 +8,11 @@ public class RandomGachaSystem : MonoBehaviour
 {
     [Header("Reference")]
     // 캐릭터 가챠
-    [SerializeField] private CharacterDatabase _data;
+    [SerializeField] private CharacterDatabase _charData;
     [SerializeField] private ItemProbabilitySO _charProb;
     // 마법석
     [SerializeField] private MagicStoneGachaSO _stoneProb;
+    // 마법석 데이터베이스
     // UI
     [SerializeField] private GachaResultUI _resultUI;
 
@@ -407,7 +408,7 @@ public class RandomGachaSystem : MonoBehaviour
     private UnitData ReturnCharacterData()
     {
         Grade grade = _gradeCharRandom.GetRandomItem();
-        return _data.GetRandomUnitByGrade(grade);
+        return _charData.GetRandomUnitByGrade(grade);
     }
 
     /// <summary>

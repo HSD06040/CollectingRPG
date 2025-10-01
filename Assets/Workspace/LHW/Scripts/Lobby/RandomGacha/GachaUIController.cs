@@ -1,24 +1,38 @@
 using System;
 using System.Collections;
+using System.Data;
+using System.Net.Http.Headers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GachaUIController : MonoBehaviour
 {
-    [Header("AdButtonUI")]
-    [SerializeField] private Image[] _adImages;
-    [SerializeField] private GameObject _adCooltimeImage;
-    [SerializeField] private TMP_Text _adCooltimeText;
+    [Header("CharAdButtonUI")]
+    [SerializeField] private Image[] _charAdImages;
+    [SerializeField] private GameObject _charAdCooltimeImage;
+    [SerializeField] private TMP_Text _charAdCooltimeText;
+
+    [Header("CharOneButtonUI")]
+    [SerializeField] private TMP_Text _charOneText;
+    [SerializeField] private GameObject _charFreeGacha;
+    [SerializeField] private GameObject _charConsumeGacha;
+    [SerializeField] private GameObject _charDailyCooltimeImage;
+    [SerializeField] private TMP_Text _charDailyCooltimeText;
+
+    [Header("StoneAdButtonUI")]
+    [SerializeField] private Image[] _stoneAdImages;
+    [SerializeField] private GameObject _stoneAdCooltimeImage;
+    [SerializeField] private TMP_Text _stoneAdCooltimeText;
+
+    [Header("StoneOneButtonUI")]
+    [SerializeField] private TMP_Text _stoneOneText;
+    [SerializeField] private GameObject _stoneFreeGacha;
+    [SerializeField] private GameObject _stoneConsumeGacha;
+    [SerializeField] private GameObject _stoneDailyCooltimeImage;
+    [SerializeField] private TMP_Text _stoneDailyCooltimeText;
 
     private Coroutine _adCooltimeTimer;
-
-    [Header("OneButtonUI")]
-    [SerializeField] private TMP_Text _oneText;
-    [SerializeField] private GameObject _freeGacha;
-    [SerializeField] private GameObject _consumeGacha;
-    [SerializeField] private GameObject _dailyCooltimeImage;
-    [SerializeField] private TMP_Text _dailyCooltimeText;
 
     private Coroutine _dailyCooltimeTimer;
 
@@ -105,20 +119,42 @@ public class GachaUIController : MonoBehaviour
             switch (TimeManager.Instance.DailyCharAdGachaRewardInfo.state)
             {
                 case 2:
-                    _adImages[0].color = Color.white;
-                    _adImages[1].color = Color.white;
-                    _adCooltimeImage.gameObject.SetActive(false);
+                    _charAdImages[0].color = Color.white;
+                    _charAdImages[1].color = Color.white;
+                    _charAdCooltimeImage.gameObject.SetActive(false);
                     break;
 
                 case 1:
-                    _adImages[0].color = Color.grey;
-                    _adImages[1].color = Color.white;
-                    _adCooltimeImage.gameObject.SetActive(true);
+                    _charAdImages[0].color = Color.grey;
+                    _charAdImages[1].color = Color.white;
+                    _charAdCooltimeImage.gameObject.SetActive(true);
                     break;
                 case 0:
-                    _adImages[0].color = Color.grey;
-                    _adImages[1].color = Color.grey;
-                    _adCooltimeImage.gameObject.SetActive(true);
+                    _charAdImages[0].color = Color.grey;
+                    _charAdImages[1].color = Color.grey;
+                    _charAdCooltimeImage.gameObject.SetActive(true);
+                    break;
+                default:
+                    break;
+            }
+
+            switch(TimeManager.Instance.DailyStoneAdGachaRewardInfo.state)
+            {
+                case 2:
+                    _stoneAdImages[0].color = Color.white;
+                    _stoneAdImages[1].color = Color.white;
+                    _stoneAdCooltimeImage.gameObject.SetActive(false);
+                    break;
+
+                case 1:
+                    _stoneAdImages[0].color = Color.grey;
+                    _stoneAdImages[1].color = Color.white;
+                    _stoneAdCooltimeImage.gameObject.SetActive(true);
+                    break;
+                case 0:
+                    _stoneAdImages[0].color = Color.grey;
+                    _stoneAdImages[1].color = Color.grey;
+                    _stoneAdCooltimeImage.gameObject.SetActive(true);
                     break;
                 default:
                     break;
@@ -132,17 +168,32 @@ public class GachaUIController : MonoBehaviour
         {
             if (TimeManager.Instance.DailyCharFreeGachaRewardInfo.state == 1)
             {
-                _freeGacha.SetActive(true);
-                _consumeGacha.SetActive(false);
-                _dailyCooltimeImage.gameObject.SetActive(false);
-                _oneText.text = "일일 모집";
+                _charFreeGacha.SetActive(true);
+                _charConsumeGacha.SetActive(false);
+                _charDailyCooltimeImage.gameObject.SetActive(false);
+                _charOneText.text = "일일 무료";
             }
             else
             {
-                _freeGacha.SetActive(false);
-                _consumeGacha.SetActive(true);
-                _dailyCooltimeImage.gameObject.SetActive(true);
-                _oneText.text = "1회 모집";
+                _charFreeGacha.SetActive(false);
+                _charConsumeGacha.SetActive(true);
+                _charDailyCooltimeImage.gameObject.SetActive(true);
+                _charOneText.text = "1회 뽑기";
+            }
+
+            if (TimeManager.Instance.DailyStoneFreeGachaRewardInfo.state == 1)
+            {
+                _stoneFreeGacha.SetActive(true);
+                _stoneConsumeGacha.SetActive(false);
+                _stoneDailyCooltimeImage.gameObject.SetActive(false);
+                _stoneOneText.text = "일일 무료";
+            }
+            else
+            {
+                _stoneFreeGacha.SetActive(false);
+                _stoneConsumeGacha.SetActive(true);
+                _stoneDailyCooltimeImage.gameObject.SetActive(true);
+                _stoneOneText.text = "1회 뽑기";
             }
         }
     }
@@ -156,13 +207,17 @@ public class GachaUIController : MonoBehaviour
             if (TimeManager.Instance != null)
             {
                 TimeManager.Instance.CanObtainAdGachaReward(GachaType.Char);
-
-                DateTime lastTime = TimeManager.Instance.DailyCharAdGachaRewardInfo.GetDateTime();
+                TimeManager.Instance.CanObtainAdGachaReward(GachaType.Stone);
+                
                 DateTime now = DateTime.Now;
 
-                TimeSpan cooltime = lastTime.AddHours(12) - now;
+                DateTime charLastTime = TimeManager.Instance.DailyCharAdGachaRewardInfo.GetDateTime();
+                TimeSpan charCooltime = charLastTime.AddHours(12) - now;
+                _charAdCooltimeText.text = $"다음 초기화 : {charCooltime.Hours}시간 {charCooltime.Minutes}분";
 
-                _adCooltimeText.text = $"다음 초기화 : {cooltime.Hours}시간 {cooltime.Minutes}분";
+                DateTime stoneLastTime = TimeManager.Instance.DailyStoneAdGachaRewardInfo.GetDateTime();
+                TimeSpan stoneCooltime = stoneLastTime.AddHours(12) - now;
+                _stoneAdCooltimeText.text = $"다음 초기화 : {stoneCooltime.Hours}시간 {stoneCooltime.Minutes}분";
             }
 
             UpdateAdButton();
@@ -178,12 +233,20 @@ public class GachaUIController : MonoBehaviour
             if (TimeManager.Instance != null)
             {
                 TimeManager.Instance.CanObtainedFreeGachaReward(GachaType.Char);
+                TimeManager.Instance.CanObtainedFreeGachaReward(GachaType.Stone);
 
-                DateTime nextdate = TimeManager.Instance.DailyCharFreeGachaRewardInfo.GetDateTime();
                 DateTime now = DateTime.Now;
 
-                TimeSpan cooltime = nextdate - now;
-                _dailyCooltimeText.text = $"다음 초기화 : {cooltime.Hours}시간 {cooltime.Minutes}분";
+                DateTime charNextdate = TimeManager.Instance.DailyCharFreeGachaRewardInfo.GetDateTime();
+                Debug.Log(charNextdate.ToString());
+
+                TimeSpan charCooltime = charNextdate - now;
+                Debug.Log(charCooltime.ToString());
+                _charDailyCooltimeText.text = $"다음 초기화 : {charCooltime.Hours}시간 {charCooltime.Minutes}분";
+
+                DateTime stoneNextdate = TimeManager.Instance.DailyStoneFreeGachaRewardInfo.GetDateTime();
+                TimeSpan stoneCooltime = stoneNextdate - now;
+                _stoneDailyCooltimeText.text = $"다음 초기화 : {stoneCooltime.Hours}시간 {stoneCooltime.Minutes}분";
             }
 
             UpdateOneButton();
