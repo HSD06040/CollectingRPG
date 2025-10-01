@@ -39,6 +39,8 @@ namespace Map
             
             string bossNodeName = config.nodeBlueprints.Where(b => b.nodeType == NodeType.Boss).ToList().Random().name;
             return new Map(conf.name, bossNodeName, nodesList, new List<Vector2Int>());
+            
+            
         }
 
         private static void GenerateLayerDistances()
@@ -59,7 +61,7 @@ namespace Map
         {
             MapLayer layer = config.layers[layerIndex];
             List<Node> nodesOnThisLayer = new List<Node>();
-            
+    
             float offset = layer.nodesApartDistance * config.GridWidth / 2f;
 
             for (int i = 0; i < config.GridWidth; i++)
@@ -69,6 +71,13 @@ namespace Map
                 NodeType nodeType = Random.Range(0f, 1f) < layer.randomizeNodes && supportedRandomNodeTypes.Count > 0
                     ? supportedRandomNodeTypes.Random()
                     : layer.nodeType;
+        
+                // Boss 생성 로그 추가
+                if (nodeType == NodeType.Boss)
+                {
+                    Debug.LogWarning($"🔴 Boss created at Layer {layerIndex}, GridPos ({i}, {layerIndex}) - layerType: {layer.nodeType}, randomize: {layer.randomizeNodes}");
+                }
+        
                 string blueprintName = config.nodeBlueprints.Where(b => b.nodeType == nodeType).ToList().Random().name;
                 Node node = new Node(nodeType, blueprintName, new Vector2Int(i, layerIndex))
                 {
