@@ -102,7 +102,7 @@ public class GachaUIController : MonoBehaviour
     {
         if (TimeManager.Instance != null)
         {
-            switch (TimeManager.Instance.DailyAdGachaRewardInfo.state)
+            switch (TimeManager.Instance.DailyCharAdGachaRewardInfo.state)
             {
                 case 2:
                     _adImages[0].color = Color.white;
@@ -130,7 +130,7 @@ public class GachaUIController : MonoBehaviour
     {
         if (TimeManager.Instance != null)
         {
-            if (TimeManager.Instance.DailyFreeGachaRewardInfo.state == 1)
+            if (TimeManager.Instance.DailyCharFreeGachaRewardInfo.state == 1)
             {
                 _freeGacha.SetActive(true);
                 _consumeGacha.SetActive(false);
@@ -155,9 +155,9 @@ public class GachaUIController : MonoBehaviour
         {
             if (TimeManager.Instance != null)
             {
-                TimeManager.Instance.CanObtainAdGachaReward();
+                TimeManager.Instance.CanObtainAdGachaReward(GachaType.Char);
 
-                DateTime lastTime = TimeManager.Instance.DailyAdGachaRewardInfo.GetDateTime();
+                DateTime lastTime = TimeManager.Instance.DailyCharAdGachaRewardInfo.GetDateTime();
                 DateTime now = DateTime.Now;
 
                 TimeSpan cooltime = lastTime.AddHours(12) - now;
@@ -177,9 +177,9 @@ public class GachaUIController : MonoBehaviour
         {
             if (TimeManager.Instance != null)
             {
-                TimeManager.Instance.CanObtainedFreeGachaReward();
+                TimeManager.Instance.CanObtainedFreeGachaReward(GachaType.Char);
 
-                DateTime nextdate = TimeManager.Instance.DailyFreeGachaRewardInfo.GetDateTime();
+                DateTime nextdate = TimeManager.Instance.DailyCharFreeGachaRewardInfo.GetDateTime();
                 DateTime now = DateTime.Now;
 
                 TimeSpan cooltime = nextdate - now;

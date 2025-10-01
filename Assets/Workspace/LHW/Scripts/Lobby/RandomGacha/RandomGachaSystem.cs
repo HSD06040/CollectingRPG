@@ -1,6 +1,6 @@
 using Firebase.Database;
-using GoogleMobileAds.Ump.Api;
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -41,8 +41,12 @@ public class RandomGachaSystem : MonoBehaviour
     [SerializeField] private UnitData _testData;
     [SerializeField] private Button _testCharacterGachaButton;
 
+    // 캐릭터 확률
     private WeightedRandom<Grade> _gradeCharRandom = new WeightedRandom<Grade>();
     private WeightedRandom<int>[] _gradeCharPieceRandom = new WeightedRandom<int>[4];
+    // 마법석 확률
+    private WeightedRandom<MagicStoneRewardType> _magicStoneRewardRandom = new WeightedRandom<MagicStoneRewardType>();
+    private WeightedRandom<int> _gradeMagicStonePieceRandom = new WeightedRandom<int>();
 
     private void Awake()
     {
@@ -54,28 +58,34 @@ public class RandomGachaSystem : MonoBehaviour
     private void Init()
     {
         // 확률 테이블 초기화
-        RandomInit(_charProb);
+        CharRandomInit(_charProb);
+        MagicStoneRandomInit(_stoneProb);
 
         // 가챠 종류 전환용 버튼 이벤트
         _characterGachaButton.onClick.AddListener(() => SetActivePanel("CharacterGacha"));
         _stoneGachaButton.onClick.AddListener(() => SetActivePanel("MagicStoneGacha"));
 
         // 캐릭터 가챠에 대한 버튼 이벤트
-        _dailyCharacterGachaButton.onClick.AddListener(AdButtonClick);
-        _oneCharacterGachaButton.onClick.AddListener(OneButtonClick);
-        _tenCharacterGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(10));
+        _dailyCharacterGachaButton.onClick.AddListener(CharAdButtonClick);
+        _oneCharacterGachaButton.onClick.AddListener(CharOneButtonClick);
+        _tenCharacterGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(GachaType.Char, 10));
+
+        // 마법석 가챠에 대한 버튼 이벤트
+        _dailyStoneButton.onClick.AddListener(StoneAdButtonClick);
+        _oneStoneGachaButton.onClick.AddListener(StoneOneButtonClick);
+        _tenStoneGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(GachaType.Stone, 10));
 
         // 테스트 기능
         _testCharacterGachaButton.onClick.AddListener(TestItemSelect);
     }
 
     /// <summary>
-    /// 확률표 데이터(SO)를 바탕으로 확률 초기화.
+    /// 확률표 데이터(SO)를 바탕으로 캐릭터 확률 초기화.
     /// * 유의사항 - 확률표에서 소수점의 길이만큼 digits를 늘려줄 것.
     /// ex) 확률표상 소수점 네 자리(70.4356) -> digits : 최소 4 이상의 수 입력
     /// </summary>
     /// <param name="probability"></param>
-    private void RandomInit(ItemProbabilitySO probability)
+    private void CharRandomInit(ItemProbabilitySO probability)
     {
         for (int i = 0; i < _gradeCharPieceRandom.Length; i++)
         {
@@ -93,6 +103,24 @@ public class RandomGachaSystem : MonoBehaviour
                 int pieceValue = (int)(probability.ItemsProbability[i].Pieces[j].PieceProbability * Math.Pow(10, digits));
                 _gradeCharPieceRandom[i].Add(probability.ItemsProbability[i].Pieces[j].PieceNum, pieceValue);
             }
+        }
+    }
+
+    private void MagicStoneRandomInit(MagicStoneGachaSO probability)
+    {
+        for (int i = 0; i < probability.rewards.Count; i++)
+        {
+            MagicStoneRewardType type = probability.rewards[i].rewardType;
+            int value = (int)(probability.rewards[i].RewardProbability * Math.Pow(10, digits));
+            _magicStoneRewardRandom.Add(type, value);
+        }
+
+        for (int i = 0; i < probability.rewards[0].PieceEntries.Count; i++)
+        {
+            int pieceNum = probability.rewards[0].PieceEntries[i].PieceNum;
+            int pieceProbable = (int)(probability.rewards[0].PieceEntries[i].PieceProbability * Math.Pow(10, digits));
+
+            _gradeMagicStonePieceRandom.Add(pieceNum, pieceProbable);
         }
     }
 
@@ -121,10 +149,10 @@ public class RandomGachaSystem : MonoBehaviour
     /// <summary>
     /// 광고 버튼 클릭 이벤트
     /// </summary>
-    private void AdButtonClick()
+    private void CharAdButtonClick()
     {
         // 일일 광고 가챠가 가능할 경우 실행
-        if (DailyAdGacha()) return;
+        if (DailyCharAdGacha()) return;
 
         // 광고 가챠가 불가능할 경우 경고 팝업
         if (PopupManager.Instance != null)
@@ -137,13 +165,13 @@ public class RandomGachaSystem : MonoBehaviour
     /// 광고 가챠의 가능 여부를 판별하고 가능할 시 광고 시청 후 가챠를 진행
     /// </summary>
     /// <returns></returns>
-    private bool DailyAdGacha()
+    private bool DailyCharAdGacha()
     {
         // 광고 가챠가 가능할 때
-        if (TimeManager.Instance.CanObtainAdGachaReward())
+        if (TimeManager.Instance.CanObtainAdGachaReward(GachaType.Char))
         {
             // 광고 가챠 쿨타임 업데이트
-            TimeManager.Instance.UpdateAdGachaResetTimeInfo();
+            TimeManager.Instance.UpdateAdGachaResetTimeInfo(GachaType.Char);
             // 1회 뽑기 진행
             CharacterSelect(1);
             TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
@@ -160,37 +188,117 @@ public class RandomGachaSystem : MonoBehaviour
     /// <summary>
     /// 1회 뽑기 버튼 클릭 이벤트
     /// </summary>
-    private void OneButtonClick()
+    private void CharOneButtonClick()
     {
         // 일일 무료 뽑기가 가능할 때 해당 뽑기 우선 진행
-        if (DailyFreeGacha()) return;
+        if (DailyCharFreeGacha()) return;
 
-        ConsumeGoodsButtonClick(1);
+        ConsumeGoodsButtonClick(GachaType.Char, 1);
     }
 
     /// <summary>
     /// 일일 뽑기의 가능 여부를 판별하고, 가능할 시 횟수를 소모하고 진행
     /// </summary>
     /// <returns></returns>
-    private bool DailyFreeGacha()
+    private bool DailyCharFreeGacha()
     {
         // 일일 무료 뽑기가 가능할 때
-        if (TimeManager.Instance.CanObtainedFreeGachaReward())
+        if (TimeManager.Instance.CanObtainedFreeGachaReward(GachaType.Char))
         {
             // 1회 뽑기 진행
             CharacterSelect(1);
             // 일일 무료 뽑기 쿨타임 업데이트
-            TimeManager.Instance.UpdateDailyFreeGachaResetTimeInfo();
+            TimeManager.Instance.UpdateDailyFreeGachaResetTimeInfo(GachaType.Char);
             return true;
         }
         return false;
     }
 
+    #endregion
+
+    #endregion
+
+    #region MagicStoneGachaButton
+
+    #region AdButton
+
+    /// <summary>
+    /// 광고 버튼 클릭 이벤트
+    /// </summary>
+    private async void StoneAdButtonClick()
+    {
+        // 일일 광고 가챠가 가능할 경우 실행
+        if (await DailyStoneAdGacha()) return;
+
+        // 광고 가챠가 불가능할 경우 경고 팝업
+        if (PopupManager.Instance != null)
+        {
+            PopupManager.instance.ShowPopup("일일 광고 가챠를 전부 사용하였습니다.");
+        }
+    }
+
+    /// <summary>
+    /// 광고 가챠의 가능 여부를 판별하고 가능할 시 광고 시청 후 가챠를 진행
+    /// </summary>
+    /// <returns></returns>
+    private async Task<bool> DailyStoneAdGacha()
+    {
+        // 광고 가챠가 가능할 때
+        if (TimeManager.Instance.CanObtainAdGachaReward(GachaType.Stone))
+        {
+            // 광고 가챠 쿨타임 업데이트
+            TimeManager.Instance.UpdateAdGachaResetTimeInfo(GachaType.Stone);
+            // 1회 뽑기 진행
+            await MagicStoneSelect(1);
+            TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
+            return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region DailyButton
+
+    /// <summary>
+    /// 1회 뽑기 버튼 클릭 이벤트
+    /// </summary>
+    private async void StoneOneButtonClick()
+    {
+        // 일일 무료 뽑기가 가능할 때 해당 뽑기 우선 진행
+        if (await DailyStoneFreeGacha()) return;
+
+        ConsumeGoodsButtonClick(GachaType.Stone, 1);
+    }
+
+    /// <summary>
+    /// 일일 뽑기의 가능 여부를 판별하고, 가능할 시 횟수를 소모하고 진행
+    /// </summary>
+    /// <returns></returns>
+    private async Task<bool> DailyStoneFreeGacha()
+    {
+        // 일일 무료 뽑기가 가능할 때
+        if (TimeManager.Instance.CanObtainedFreeGachaReward(GachaType.Stone))
+        {
+            // 1회 뽑기 진행
+            await MagicStoneSelect(1);
+            // 일일 무료 뽑기 쿨타임 업데이트
+            TimeManager.Instance.UpdateDailyFreeGachaResetTimeInfo(GachaType.Stone);
+            return true;
+        }
+        return false;
+    }
+
+    #endregion
+
+    #endregion
+
     /// <summary>
     /// 재화를 소모하고 뽑기를 진행 - 이후 소모하는 재료 종류에 대한 확장성 고려 필요 (input으로 넣기?)
     /// </summary>
     /// <param name="number"></param>
-    private async void ConsumeGoodsButtonClick(int number)
+    private async void ConsumeGoodsButtonClick(GachaType type, int number)
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
         var diaRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Diamond");
@@ -206,7 +314,16 @@ public class RandomGachaSystem : MonoBehaviour
 
         if (currentDiamond >= 300 * number)
         {
-            CharacterSelect(number);
+            switch (type)
+            {
+                case GachaType.Char:
+                    CharacterSelect(number);
+                    break;
+                case GachaType.Stone:
+                    await MagicStoneSelect(number);
+                    break;
+            }
+
             await DBManager.Instance.SubtractDiamondAsync(300 * number);
         }
         else
@@ -217,10 +334,6 @@ public class RandomGachaSystem : MonoBehaviour
             }
         }
     }
-
-    #endregion
-
-    #endregion
 
     #region DB Test
 
@@ -254,7 +367,7 @@ public class RandomGachaSystem : MonoBehaviour
     // 확률 변동이 없는 가중치 확률
     private async void CharacterSelect(int number)
     {
-        if (_gradeCharRandom.GetList() == null) RandomInit(_charProb);
+        if (_gradeCharRandom.GetList() == null) CharRandomInit(_charProb);
 
         for (int i = 0; i < number; i++)
         {
@@ -324,7 +437,7 @@ public class RandomGachaSystem : MonoBehaviour
         int level = data.UpgradeData.CurrentUpgradeData.UpgradeLevel;
         int requirePiece = data.LevelUpData.GetCumulativePiece(grade, level);
 
-        if (data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece < requirePiece )
+        if (data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece < requirePiece)
         {
             overPiece = 0;
             mythPiece = 0;
@@ -332,7 +445,7 @@ public class RandomGachaSystem : MonoBehaviour
         }
         else
         {
-            if(data.UpgradeData.CurrentUpgradeData.CurrentPieces > requirePiece)
+            if (data.UpgradeData.CurrentUpgradeData.CurrentPieces > requirePiece)
             {
                 overPiece = inputPiece;
             }
@@ -340,9 +453,9 @@ public class RandomGachaSystem : MonoBehaviour
             {
                 overPiece = data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece - requirePiece;
             }
-            
+
             int pieceRatio = 0;
-            switch(grade)
+            switch (grade)
             {
                 case Grade.NORMAL: pieceRatio = overPiece * 2; break;
                 case Grade.RARE: pieceRatio = overPiece * 4; break;
@@ -359,23 +472,55 @@ public class RandomGachaSystem : MonoBehaviour
 
     #endregion
 
-    // 천장이 있는 가중치 확률
-    private void ItemSelectBySub(int number)
+    #region MagicStoneGacha
+
+    private async Task MagicStoneSelect(int number)
     {
-        if (_gradeCharRandom.GetList() == null) RandomInit(_charProb);
+        if (_magicStoneRewardRandom.GetList() == null) MagicStoneRandomInit(_stoneProb);
 
         for (int i = 0; i < number; i++)
         {
-            ReturnDataBySub();
+            MagicStoneRewardType type = _magicStoneRewardRandom.GetRandomItem();
+
+            switch (type)
+            {
+                case MagicStoneRewardType.MagicStone:
+                    MagicStoneSelection();
+                    break;
+                case MagicStoneRewardType.Gold500:
+                    await DBManager.Instance.AddGoldAsync(500);
+                    Debug.Log("골드 500");
+                    break;
+                case MagicStoneRewardType.Gold1000:
+                    await DBManager.Instance.AddGoldAsync(1000);
+                    Debug.Log("골드 1000");
+                    break;
+                case MagicStoneRewardType.Gold10000:
+                    await DBManager.Instance.AddGoldAsync(10000);
+                    Debug.Log("골드 10000");
+                    break;
+                case MagicStoneRewardType.Dia50:
+                    await DBManager.Instance.AddDiamondAsync(50);
+                    Debug.Log("다이아 50");
+                    break;
+                case MagicStoneRewardType.Dia100:
+                    await DBManager.Instance.AddDiamondAsync(100);
+                    Debug.Log("다이아 100");
+                    break;
+                case MagicStoneRewardType.Dia1000:
+                    await DBManager.Instance.AddDiamondAsync(1000);
+                    Debug.Log("다이아 1000");
+                    break;
+            }
         }
     }
 
-    // 확률 변동 있는 캐릭터 뽑기
-    private UnitData ReturnDataBySub()
+    private void MagicStoneSelection()
     {
-        Grade grade = _gradeCharRandom.GetRandomItemBySub();
-        return _data.GetRandomUnitByGrade(grade);
+        Debug.Log("마법석 선택");
     }
+
+    #endregion
 
     #endregion
 }
