@@ -26,7 +26,7 @@ public class SynergyPanel : MonoBehaviour
 
     public void Init(SynergyDatabase db)
     {
-        _synergySlotPrefab = Manager.Resources.Get<GameObject>(_synergySlotAddress);
+        _synergySlotPrefab = Manager.Resources.Load<GameObject>(_synergySlotAddress);
 
         CreateSynergtSlots(db); 
         SetActivate();

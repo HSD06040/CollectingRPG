@@ -163,7 +163,7 @@ public class StunState : BaseState
 
     public StunState(BaseFSM fsm, int animHash) : base(fsm, animHash)
     {
-        _status.IsStund.AddEvent(fsm.ChangeStunState);
+        _status.IsStunned.AddEvent(fsm.ChangeStunState);
     }
 
     public override void Enter()
@@ -219,6 +219,9 @@ public class DeadState : BaseState
         
         _owner.Col.enabled = false;
         _status.OnUnitDied?.Invoke(_status);
+
+        if (_owner.TargetLayer.Contain(LayerMask.NameToLayer("Player")))
+            Object.Destroy(_owner.gameObject, 1);
     }
 
     public override void Exit()

@@ -16,7 +16,6 @@ public class SelectedCharacterUnit : MonoBehaviour
     [SerializeField] private Image _charImage;
     [SerializeField] private GameObject _crownImage;
 
-    private CharacterSO _charData;
     private TeamOrganizeManager _manager;
 
     [SerializeField] private UnitStatus _status;
@@ -59,14 +58,14 @@ public class SelectedCharacterUnit : MonoBehaviour
             _status = _manager.GetCurrentPresetData(_index);
         }
 
+        if (_obj != null)
+        {
+            Manager.Pool.Release(_obj);
+            _obj = null;
+        }
+
         if (_manager == null || _status == null || _status.Data == null)
         {
-            if (_obj != null)
-            {
-                Manager.Pool.Release(_obj);
-                _obj = null;
-            }
-
             if(_index == 0)
             {
                 _crownImage.SetActive(false);

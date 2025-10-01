@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 public static class Utils
@@ -19,17 +17,30 @@ public static class Utils
     {        
         return transform.rotation.y == 0 ? 1 : -1;
     }
-    public static Vector2 GetCenter(this GameObject obj)
+    public static Vector2 GetTopPosition(this GameObject obj)
+    {
+        return GetCenterPosition(obj) + new Vector2(0, obj.transform.localScale.y / 2);
+    }
+    public static Vector2 GetTopPosition(this Transform transform)
+    {
+        return GetTopPosition(transform.gameObject);
+    }
+    public static Vector2 GetCenterPosition(this GameObject obj)
     {
         return ComponentProvider.Get<UnitBase>(obj).GetCenter();
     }
+    public static Vector2 GetCenterPosition(this Transform transform)
+    {
+        return GetCenterPosition(transform.gameObject);
+    }
 
     #region Damage Calculation
-    public static void CalculateDamage(this UnitStatusController status, float attackPower, DamageType damageType, UnitStatusController enemy)
+    public static void CalculateDamage(this UnitStatusController status, float physicalPower, float abilityPower, DamageType damageType, UnitStatusController enemy)
     {
-        int damage = damageType == DamageType.Physical ? status.PhysicalDamage.Value : status.MagicDamage.Value;
+        // 총 데미지 = 물리 계수 * 물리 공격력 + 마법 계수 * (마법 공격력 / 100)
+
         int defense = damageType == DamageType.Physical ? enemy.PhysicalDefense.Value : enemy.MagicDefense.Value;
-        float total = damage * attackPower;
+        float total = status.PhysicalDamage.Value * physicalPower + status.MagicDamage.Value * (status.MagicDamage.Value / 100);
 
         bool isCrit = false;
 
@@ -45,8 +56,40 @@ public static class Utils
 
         status.TotalDamage.Value += totalDamage;
         enemy.TakeDamage(totalDamage, isCrit);
+    }
+    public static void CalculateDamage(this UnitStatusController status, UnitStatusController enemy)
+    {
+        bool isCrit = false;
+        float total = status.PhysicalDamage.Value;
 
-        Debug.Log($"[데미지 시스템] 적{enemy.name}이 {totalDamage} 만큼의 피해를 입음!");
+        if (status.CritChance.Value > Random.Range(0f, 100f))
+        {
+            isCrit = true;
+            total *= 1.5f;
+        }
+        float totalDefense = enemy.PhysicalDefense.Value / (enemy.PhysicalDefense.Value + 100f);
+
+        int totalDamage = Mathf.RoundToInt(total * (1f - totalDefense));
+        status.TotalDamage.Value += totalDamage;
+
+        enemy.TakeDamage(totalDamage, isCrit);
+    }
+    #endregion
+
+    #region ApplyEffect
+    public static void ProvideEffect(this UnitStatusController status, BuffEffectData buffEffectData, float abilityPower,
+        string source, UnitStatusController enemy)
+    {
+        float value = abilityPower * (status.MagicDamage.Value / 100);
+
+        enemy.ApplyEffect(buffEffectData, value, source);
+    }
+    public static void ProvideStat(this UnitStatusController status, StatEffectModifier statEffectModifier, float abilityPower, 
+        string source, UnitStatusController enemy)
+    {
+        float value = abilityPower * (status.MagicDamage.Value / 100);
+
+        enemy.AddStat(statEffectModifier.StatType, value, source);
     }
     #endregion
 
@@ -62,12 +105,18 @@ public static class Utils
         Transform closest = null;
         float bestDistSq = float.PositiveInfinity;
 
+        var result = new GameObject[count];
         for (int i = 0; i < count; i++)
         {
-            var hit = _hitBuffer[i];
-            if (hit == null) continue;
+            result[i] = _hitBuffer[i].gameObject;
+        }
 
-            if (filter(hit.transform)) continue;
+        for (int i = 0; i < result.Length; i++)
+        {
+            var hit = result[i];
+            if (hit == null) continue;
+            if (ComponentProvider.Get<UnitBase>(hit).StatusController.IsDead) continue;            
+            if (filter != null && filter(hit.transform)) continue;
 
             float distSq = (hit.transform.position - origin).sqrMagnitude;
             if (distSq < bestDistSq)
@@ -82,17 +131,8 @@ public static class Utils
     #endregion
 
     #region GetTargetsNonAlloc
-    public static GameObject[] GetTargetsNonAlloc(
-        IAttacker attacker,
-        Vector2 origin,
-        SearchType shape,
-        float sizeOrRadius,
-        Vector2 boxSize,
-        float angle,
-        int maxCount,
-        LayerMask layerMask,
-        System.Func<IAttacker, List<GameObject>, int, GameObject[]> filter = null,
-        int maxTargets = 50,
+    public static GameObject[] GetTargetsNonAlloc(IAttacker attacker, Vector2 origin, SearchType shape, float sizeOrRadius, Vector2 boxSize,
+        float angle, int maxCount, LayerMask layerMask, System.Func<IAttacker, List<GameObject>, int, GameObject[]> filter = null, int maxTargets = 50, 
         bool sortByDistance = true)
     {
         _cachedTargets.Clear(); // 재사용
@@ -117,6 +157,8 @@ public static class Utils
 
                 foreach (var hit in _hitBuffer)
                 {
+                    if (hit == null) continue;
+
                     Vector2 dirToTarget = (hit.transform.position - attacker.GetTransform().position).normalized;
                     float dot = Vector2.Dot(attacker.GetTargetDir(), dirToTarget);
 
@@ -138,6 +180,9 @@ public static class Utils
             if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
                 _cachedTargets.Add(_hitBuffer[i].gameObject);
         }
+
+        _cachedTargets.RemoveAll(target =>
+            ComponentProvider.Get<UnitBase>(target).StatusController.IsDead);
 
         if (sortByDistance && _cachedTargets.Count > 1)
         {
@@ -161,19 +206,49 @@ public static class Utils
         return result;
     }
 
-    public static GameObject GetTargetsNonAllocSingle(
-        IAttacker attacker,
-        SearchType shape,
-        float sizeOrRadius,
-        Vector2 boxSize,
-        float angle,
-        LayerMask layerMask,
-        System.Func<IAttacker, List<GameObject>, GameObject> filter = null)
+    public static GameObject[] GetTargetsNonAlloc(Vector2 origin, SearchType searchType, float sizeOrRadius, Vector2 boxSize, LayerMask layerMask)
     {
-        _cachedTargets.Clear(); // 재사용
-
         int hitCount = 0;
+        Debug.Log(layerMask.ToString());
+        switch (searchType)
+        {
+            case SearchType.Circle:
+                hitCount = Physics2D.OverlapCircleNonAlloc(origin, sizeOrRadius, _hitBuffer, layerMask);
+                break;
+            case SearchType.Box:
+                hitCount = Physics2D.OverlapBoxNonAlloc(origin, boxSize, 0, _hitBuffer, layerMask);
+                break;
+            case SearchType.Capsule:
+                hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, 0, _hitBuffer, layerMask);
+                break;
+        }
 
+        if (hitCount <= 0)
+            return null;
+        
+        var result = new GameObject[hitCount];
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            UnitBase unit = ComponentProvider.Get<UnitBase>(_hitBuffer[i].gameObject);
+
+            if(unit == null)
+                continue;
+
+            if (unit.StatusController.IsDead)
+                continue;
+
+            result[i] = _hitBuffer[i].gameObject;
+        }
+
+        return result;
+    }
+
+    public static GameObject GetTargetsNonAllocSingle(IAttacker attacker, SearchType shape, float sizeOrRadius, Vector2 boxSize, float angle,
+        LayerMask layerMask, System.Func<IAttacker, List<GameObject>, GameObject> filter = null)
+    {
+        _cachedTargets.Clear();
+        int hitCount = 0;
         Vector2 origin = attacker.GetTransform().position;
 
         switch (shape)
@@ -188,45 +263,49 @@ public static class Utils
                 hitCount = Physics2D.OverlapCapsuleNonAlloc(origin, boxSize, CapsuleDirection2D.Vertical, angle, _hitBuffer, layerMask);
                 break;
             case SearchType.Sector:
-                List<Collider2D> results = new List<Collider2D>();
-
-                Physics2D.OverlapCircleNonAlloc(attacker.GetTransform().position, sizeOrRadius, _hitBuffer, layerMask);
-
-                foreach (var hit in _hitBuffer)
+                int total = Physics2D.OverlapCircleNonAlloc(origin, sizeOrRadius, _hitBuffer, layerMask);
+                for (int i = 0; i < total; i++)
                 {
+                    var hit = _hitBuffer[i];
+                    if (hit == null) continue;
+
                     Vector2 dirToTarget = (hit.transform.position - attacker.GetTransform().position).normalized;
                     float dot = Vector2.Dot(attacker.GetTargetDir(), dirToTarget);
-
                     float theta = Mathf.Acos(dot) * Mathf.Rad2Deg;
 
                     if (theta <= angle / 2f)
                     {
-                        results.Add(hit);
+                        _cachedTargets.Add(hit.gameObject);
                     }
                 }
-
-                hitCount = results.Count;
-                _hitBuffer = results.ToArray();
+                hitCount = _cachedTargets.Count;
                 break;
         }
 
-        for (int i = 0; i < hitCount; i++)
+        if (shape != SearchType.Sector)
         {
-            if (_hitBuffer[i] != null && _hitBuffer[i].gameObject != null)
-                _cachedTargets.Add(_hitBuffer[i].gameObject);
+            for (int i = 0; i < hitCount; i++)
+            {
+                if (_hitBuffer[i] != null)
+                    _cachedTargets.Add(_hitBuffer[i].gameObject);
+            }
         }
 
-        GameObject result;
+        if (_cachedTargets.Count == 0)
+            return null;
 
-        if (filter != null)
-            result = filter.Invoke(attacker, _cachedTargets);
-        else
-            result = _cachedTargets[0];
+        _cachedTargets.RemoveAll(target =>
+            ComponentProvider.Get<UnitBase>(target).StatusController.IsDead);
 
-        return result;
+        if (_cachedTargets.Count == 0)
+            return null;
+
+        return filter != null
+            ? filter.Invoke(attacker, _cachedTargets)
+            : _cachedTargets[0];
     }
     #endregion
-   
+
     #region String
     public static string ToAbbreviation(long value)
     {
@@ -286,7 +365,7 @@ public static class Utils
             Grade.NORMAL => new Color(173f / 255f, 255f / 255f, 47f / 255f),
             Grade.RARE => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
             Grade.UNIQUE => new Color32(0xC8, 0x5D, 0xD8, 0xFF),
-            Grade.LEGENDARY => new Color32(0xF2, 0x93, 0x38, 0xFF),
+            Grade.LEGEND => new Color32(0xF2, 0x93, 0x38, 0xFF),
             _ => Color.grey,
         };
     }
@@ -351,6 +430,22 @@ public static class Utils
 
             gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
         }
+    }
+    #endregion
+
+    #region Status
+    public static UnitStats StatMultiply(this UnitStats unitStats, float multiply)
+    {
+        return new UnitStats
+        {
+            MaxHealth = Mathf.RoundToInt(unitStats.MaxHealth * multiply),
+
+            PhysicalDamage = Mathf.RoundToInt(unitStats.PhysicalDamage * multiply),
+            MagicDamage = Mathf.RoundToInt(unitStats.MagicDamage * multiply),
+
+            PhysicalDefense = Mathf.RoundToInt(unitStats.PhysicalDefense * multiply),
+            MagicDefense = Mathf.RoundToInt(unitStats.MagicDefense * multiply)
+        };
     }
     #endregion
 

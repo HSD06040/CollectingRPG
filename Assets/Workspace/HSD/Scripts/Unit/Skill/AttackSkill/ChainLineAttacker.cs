@@ -10,7 +10,8 @@ public class ChainLineAttacker : MonoBehaviour
     private Transform _target;
     private GameObject _effect;
     private float _interval;
-    private float _power;
+    private float _physicalPower;
+    private float _abilityPower;
     private int _count;
     private int _ratio;
     private DamageType _damageType;
@@ -24,19 +25,30 @@ public class ChainLineAttacker : MonoBehaviour
 
     private void OnDisable()
     {
-        _source.Cancel();
-        _source.Dispose();
+        Dispose();
     }
 
+    private void Dispose()
+    {
+        if (_source != null)
+        {
+            _source.Cancel();
+            _source.Dispose();
+            _source = null;
+        }
+    }
+
+
     public void Setup(IAttacker attacker, GameObject effect, Transform target, int count, float interval, 
-        LayerMask targetLayer, float power, DamageType damageType, float attackThickness, int ratio)
+        LayerMask targetLayer, float physicalPower, float abilityPower, DamageType damageType, float attackThickness, int ratio)
     {
         _count = count;
         _target = target;
         _effect = effect;
         _interval = interval;
         _damageType = damageType;
-        _power = power;
+        _physicalPower = physicalPower;
+        _abilityPower = abilityPower;
         _targetLayer = targetLayer;
         _attacker = attacker;
         _ratio = ratio;
@@ -45,21 +57,32 @@ public class ChainLineAttacker : MonoBehaviour
         _targetList.Clear();
         _currentPos = transform.position;
 
+        if (_source == null)
+            _source = new();
+
         ChainLineAttack().Forget();
     }
 
     private async UniTask ChainLineAttack()
     {
-        for(int i = 0; i < _count; i++)
+        for (int i = 0; i < _count; i++)
         {
+            if (_target == null)
+            {
+                Manager.Resources.Destroy(gameObject);
+                Dispose();
+                return;
+            }
+
             SpawnEffect();
             ChangeTarget();
 
-            await UniTask.Delay(TimeSpan.FromSeconds(_interval), cancellationToken: _source.Token);
-        }        
-    }
+            await UniTask.WaitForSeconds(_interval, cancellationToken: _source.Token);
+        }
 
-    [ContextMenu("SpawnEffect")]
+        Manager.Resources.Destroy(gameObject);
+    }
+    
     private void SpawnEffect()
     {
         Vector2 spawnPos = GetSpawnPosition(_target.position);
@@ -82,7 +105,7 @@ public class ChainLineAttacker : MonoBehaviour
     }
 
     private void ChangeTarget()
-    {        
+    {
         _targetList.Add(_target);
         _currentPos = ComponentProvider.Get<UnitBase>(_target.gameObject).GetCenter();
         _target = Utils.GetClosestTargetNonAlloc(_currentPos, 100, _targetLayer, Filter);        
@@ -99,7 +122,7 @@ public class ChainLineAttacker : MonoBehaviour
             var col = _overlapResults[i];
             if (col == null) continue;
 
-            _attacker.GetStatusController().CalculateDamage(_power, _damageType, ComponentProvider.Get<UnitBase>(col.gameObject).StatusController);
+            _attacker.GetStatusController().CalculateDamage(_physicalPower, _abilityPower, _damageType, ComponentProvider.Get<UnitBase>(col.gameObject).StatusController);
         }
 
         for (int i = hitCount; i < _overlapResults.Length; i++)
@@ -113,7 +136,7 @@ public class ChainLineAttacker : MonoBehaviour
 
     private bool Filter(Transform target)
     {
-        return _targetList.Contains(target);
+        return !ComponentProvider.Get<UnitBase>(target.gameObject).StatusController.IsDead && _targetList.Contains(target);
     }
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()

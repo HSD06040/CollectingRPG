@@ -13,7 +13,6 @@ public class UnitBase : MonoBehaviour, IAttacker
             SetAnimator(value);
         }
     }
-
     [field: SerializeField] public Animator Anim { get; private set; }
     [field: SerializeField] public Rigidbody2D Rb { get; private set; }
     [field: SerializeField] public Collider2D Col { get; private set; }
@@ -38,12 +37,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         TargetLayer = gameObject.layer == LayerMask.NameToLayer("Player") ? LayerMask.GetMask("Enemy") : LayerMask.GetMask("Player");
         _enemyLayer = LayerMask.NameToLayer("Enemy");
 
-        Anim = GetComponentInChildren<Animator>();
-        Rb = GetComponent<Rigidbody2D>();
-        Col = GetComponent<Collider2D>();
-        StatusController = GetComponent<UnitStatusController>();
-        TriggerCol = GetComponentInChildren<BoxCollider2D>();
-        _fsm = GetComponentInChildren<BaseFSM>();
+        Inject();
 
         AddProviderComponents();
     }
@@ -59,8 +53,18 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
     #endregion
 
+    public void Inject()
+    {
+        Anim = GetComponentInChildren<Animator>();
+        Rb = GetComponent<Rigidbody2D>();
+        Col = GetComponent<Collider2D>();
+        StatusController = GetComponent<UnitStatusController>();
+        TriggerCol = GetComponentInChildren<BoxCollider2D>();
+        _fsm = GetComponentInChildren<BaseFSM>();
+    }
+
     public void Init(UnitStats plusUnitStat = null)
-    {  
+    {
         Col.enabled = true;
         _fsm.Init(this);
         StatusController.Init(Status, plusUnitStat);
@@ -86,15 +90,17 @@ public class UnitBase : MonoBehaviour, IAttacker
         if (unitStatus.Data.isNotChange)
             return;
 
-        Anim.runtimeAnimatorController = Manager.Data.AnimatorDic[Status.Data.AnimatiorData];
+        Anim.runtimeAnimatorController = Manager.Data.AnimationManager.GetAnimator(unitStatus.Data.AnimatiorData);
     }
 
-    public void SetBattleUnit()
+    public void SetBattleUnit(int line)
     {
         if(TriggerCol != null)
             TriggerCol.enabled = false;
 
         tag = "BattleUnit";
+        StatusController.UnitFXController.BattleSetting();
+        StatusController.UnitFXController.SortingLayer(line);
     }
 
     #region Provider
@@ -127,7 +133,6 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Fight()
     {
-        Init();
         _fsm.Fight();
     }
     public void Standby()
@@ -145,7 +150,8 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void Attack()
     {
-        StatusController.CurrentAttackData.Attack(this);        
+        StatusController.CurrentAttackData.Attack(this);
+        StatusController.OnAttack?.Invoke();
     }
 
     public bool SkillCheck()
@@ -165,8 +171,10 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target == null || (Target != null && ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead))
-            Target = Utils.GetClosestTargetNonAlloc(transform.position, StatusController.DetectionRange, TargetLayer);
+        if (Target == null || ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead)
+        {
+            Target = Utils.GetClosestTargetNonAlloc(GetCenter(), StatusController.DetectionRange, TargetLayer);
+        }
     }
 
     public void FlipToTarget()
@@ -242,6 +250,9 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         if (Target == null)
             FindTarget();
+
+        if (Target == null)
+            return Utils.GetClosestTargetNonAlloc(transform.position, 100, TargetLayer);
 
         return Target;
     }

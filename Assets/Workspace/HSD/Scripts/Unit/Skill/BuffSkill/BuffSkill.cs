@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 
@@ -12,8 +9,8 @@ public class BuffSkill : UnitSkill
     [SerializeField] float _range;
 
     [Header("Buff")]
-    [SerializeField] private TargetType TargetType;
-    [SerializeField] private BuffEffectData BuffEffectData;
+    [SerializeField] TargetType TargetType;
+    public BuffEffectData BuffEffectData;
 
     public override void Active(IAttacker attacker)
     {
@@ -23,19 +20,22 @@ public class BuffSkill : UnitSkill
 
         if (TargetType == TargetType.Self)
         {
-            attacker.GetStatusController().ApplyEffect(BuffEffectData, (int)Power, name);
+            attacker.GetStatusController().ApplyEffect(BuffEffectData, AbilityPower, name);
+            return;
         }
-
+        
         if (Priority == Priority.None)
         {
             foreach (GameObject target in GetTargetFromTargetType(attacker))
             {
-                ComponentProvider.Get<UnitBase>(target).StatusController.ApplyEffect(BuffEffectData, Power, name);
+                attacker.GetStatusController().ProvideEffect(BuffEffectData, AbilityPower, 
+                    name, ComponentProvider.Get<UnitBase>(target).StatusController);                
             }
         }
         else
         {
-            ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController.ApplyEffect(BuffEffectData, Power, name);
+            attacker.GetStatusController().ProvideEffect(BuffEffectData, AbilityPower, 
+                name, ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController);            
         }
     }
 
@@ -58,16 +58,22 @@ public class BuffSkill : UnitSkill
         }
     }
 
+    public override string GetCalculateValueString(UnitStatus status)
+    {
+        UnitStats stat = status.GetCurrentStat();
+        float value = stat.MagicDamage * (AbilityPower / 100);
+
+        if (BuffEffectData.StatType == StatType.CurHp || BuffEffectData.StatType == StatType.Shield)
+            return Mathf.RoundToInt(value).ToString();
+        else
+            return value.ToString("F1");
+    }
+
     private GameObject GetTargetPrioty(IAttacker attacker)
     {
-        LayerMask targetLayer;
-
-        if (TargetType == TargetType.Ally)
-            targetLayer = attacker.GetAllyLayerMask();
-        else if (TargetType == TargetType.Enemy)
-            targetLayer = attacker.TargetLayer;
+        LayerMask targetLayer = TargetType == TargetType.Ally ? attacker.GetAllyLayerMask() : attacker.TargetLayer;        
             
-        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());        
+        return Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, targetLayer, GetPriorityFilter());        
     }
 
 #if UNITY_EDITOR

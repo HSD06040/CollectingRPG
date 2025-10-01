@@ -11,10 +11,6 @@ public class WaveTextManager : MonoBehaviour
     [Header("대사 목록")]
     [SerializeField, TextArea(2, 5)] 
     private string[] dialogues = {
-        "게임을 불러오는 중입니다...",
-        "데이터를 확인하고 있습니다...",
-        "리소스를 로딩하고 있습니다...",
-        "거의 완료되었습니다..."
     };
     
     [Header("웨이브 효과 설정")]
@@ -60,37 +56,33 @@ public class WaveTextManager : MonoBehaviour
         dialogueSequence = DOTween.Sequence();
         currentDialogueIndex = 0;
         
-        // 첫 번째 대사 시작과 함께 웨이브 효과 시작
         dialogueSequence.AppendCallback(() => {
             currentDialogueIndex = 0;
-            ShowDialogue(dialogues[0], true); // 첫 번째 대사에서 웨이브 시작
+            ShowDialogue(dialogues[0], true); 
         });
         
         dialogueSequence.AppendInterval(dialogueInterval);
         
-        // 나머지 대사들 순서대로 표시
         for (int i = 1; i < dialogues.Length; i++)
         {
             int index = i;
             
             dialogueSequence.AppendCallback(() => {
                 currentDialogueIndex = index;
-                ShowDialogue(dialogues[index], false); // 웨이브 유지
+                ShowDialogue(dialogues[index], false); 
             });
             
             dialogueSequence.AppendInterval(dialogueInterval);
         }
         
-        // 시퀀스를 무한 반복하도록 설정
+        
         dialogueSequence.SetLoops(-1, LoopType.Restart);
     }
     
     private void ShowDialogue(string text, bool startWave = false)
     {
-        // 페이드 없이 바로 텍스트 변경
         textDisplay.text = text;
         
-        // 텍스트가 변경되었으므로 originalVertices 재설정 필요
         ResetOriginalVertices();
         
         if (startWave && !isWaveActive)
@@ -103,8 +95,6 @@ public class WaveTextManager : MonoBehaviour
     {
         if (isWaveActive)
         {
-            // 웨이브가 활성화된 상태에서 텍스트가 변경될 때
-            // 새로운 텍스트의 원본 버텍스 정보를 저장
             textDisplay.ForceMeshUpdate();
             var textInfo = textDisplay.textInfo;
             
@@ -118,7 +108,7 @@ public class WaveTextManager : MonoBehaviour
     
     public void StartSequentialWaveEffect()
     {
-        if (isWaveActive) return; // 이미 웨이브가 활성화되어 있으면 중복 실행 방지
+        if (isWaveActive) return; 
         
         isWaveActive = true;
         
@@ -146,15 +136,12 @@ public class WaveTextManager : MonoBehaviour
             
             var verts = textInfo.meshInfo[charInfo.materialReferenceIndex].vertices;
             
-            // 글자별 웨이브 오프셋 계산
             float charOffset = GetCharacterOffset(i, textInfo.characterCount);
             float waveTime = time + charOffset;
             
-            // 웨이브 높이 계산
             float waveValue = Mathf.Sin(waveTime * Mathf.Deg2Rad) * waveHeight;
             waveValue *= wavePattern.Evaluate((waveTime % 360f) / 360f);
             
-            // 4개 버텍스에 웨이브 적용
             for (int j = 0; j < 4; j++)
             {
                 int vertIndex = charInfo.vertexIndex + j;

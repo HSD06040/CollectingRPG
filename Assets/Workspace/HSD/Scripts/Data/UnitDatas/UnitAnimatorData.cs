@@ -15,7 +15,13 @@ public enum AnimationType
     Axe_Skill,
     Magic_Skill,
     Buff,
-    Concentrate
+    Concentrate,
+    Horse_Attack
+}
+
+public enum BaseControllerType
+{
+    Unit, Horse
 }
 
 [Serializable]
@@ -30,11 +36,13 @@ public struct AnimatorData : IEquatable<AnimatorData>
 {
     public AnimationType AttackAnimationType;
     public AnimationType SkillAnimationType;
+    public BaseControllerType BaseControllerType;
 
     public bool Equals(AnimatorData other)
     {
         return AttackAnimationType == other.AttackAnimationType &&
-               SkillAnimationType == other.SkillAnimationType;
+               SkillAnimationType == other.SkillAnimationType &&
+               BaseControllerType == other.BaseControllerType;
     }
 
     public override bool Equals(object obj)
@@ -60,6 +68,7 @@ public class UnitAnimatorData : ScriptableObject
     public AnimationData[] Animations;
 
     [Header("Control")]
+    public RuntimeAnimatorController HorseBaseController;
     public RuntimeAnimatorController BaseController;
     public AnimatorData[] Animators;
 

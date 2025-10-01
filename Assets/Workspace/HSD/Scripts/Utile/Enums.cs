@@ -18,9 +18,15 @@ public enum Synergy
 }
 #endregion
 
+public enum SortingType
+{
+    Grade,
+    Power
+}
+
 public enum Grade
 {
-    NORMAL, RARE, UNIQUE, LEGENDARY
+    NORMAL, RARE, UNIQUE, LEGEND
 }
 
 public enum SubGrade
@@ -29,6 +35,18 @@ public enum SubGrade
 }
 
 #region Type
+public enum BuffEffect
+{
+    Shield,
+    Stun,
+    Buff,
+    Debuff,
+    Heal,
+    Damage,
+    AttackSpeed,
+    Defense
+}
+
 public enum AnimatorType
 {
 
@@ -141,7 +159,8 @@ public enum TargetType
     Enemy,
     Ally,
     Self,
-    Boss
+    Boss,
+    RandomEnemy
 }
 
 public enum EffectTime

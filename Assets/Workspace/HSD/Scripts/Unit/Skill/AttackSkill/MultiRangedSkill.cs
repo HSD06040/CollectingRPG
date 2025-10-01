@@ -11,6 +11,8 @@ public class MultiRangedSkill : RangedSkill
 
     public override void Active(IAttacker attacker)
     {
+        SpawnEffect(attacker);
+
         MultiRangedAttack(attacker).Forget();
     }
 
@@ -18,10 +20,10 @@ public class MultiRangedSkill : RangedSkill
     {
         for (int i = 0; i < _count; i++)
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(_interval));
+            await UniTask.WaitForSeconds(_interval);
             GameObject obj = Manager.Resources.Instantiate<GameObject>(_address, GetSpawnPoint(attacker), true);
             Projectile projectile = ComponentProvider.Get<Projectile>(obj);
-            projectile.Init(attacker.GetTarget(), attacker.GetStatusController(), Power, DamageType, attacker.TargetLayer, _projectileSpeed);
+            projectile.Init(attacker.GetTarget(), attacker.GetStatusController(), PhysicalPower, AbilityPower, DamageType, attacker.TargetLayer, _projectileSpeed);
         }
     }
 }

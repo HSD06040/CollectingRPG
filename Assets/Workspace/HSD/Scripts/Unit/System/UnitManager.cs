@@ -1,10 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 public class UnitManager : MonoBehaviour
 {
@@ -26,6 +23,7 @@ public class UnitManager : MonoBehaviour
     public EnemyController EnemyController;
 
     [Header("Data")]
+    private UnitSpawnChanceData _unitSpawnChanceData;
     [SerializeField] UnitData[] _unitDatas;
     [SerializeField] int _upgradeNeedCount = 3;
 
@@ -34,28 +32,35 @@ public class UnitManager : MonoBehaviour
     private void Awake()
     {
         if (IsTest)
+        {
             CsvDownloader.OnDataSetupCompleted += InitAsync;
+            Manager.Data.InitAsync().Forget();
+        }
         else
             InitAsync();
     }
 
     private void OnDestroy()
     {
-        UnSubscrube();        
+        UnSubscrube();
     }
 
     private async void InitAsync()
     {
-        if(IsTest)
+        if (IsTest)
+        {
             await Manager.Resources.LoadLabel("Stage");
+        }
 
+        _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();
 
         UnitController.Init();
         EnemyController.Init();
-
+        _unitSpawnChanceData.CalculateChances(0);
         //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
-        _unitDatas = Manager.Data.EnemyUnitDatas;
+        //_unitDatas = Manager.Data.EnemyUnitDatas;
+        _unitDatas = Manager.Data.PlayerUnitDatas;
 
         Subscribe();
 
@@ -74,46 +79,17 @@ public class UnitManager : MonoBehaviour
         {
             if (preset.Statuses[i].Data != null)
             {
-                AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
+                _unitSlotController.AddEmptySlotUnit(preset.Statuses[i]);                
             }
         }
     }
-
-    //public void Init()
-    //{
-    //    //Manager.Pool.PopUpInit();
-
-    //    Manager.Data.SynergyDB.ResetSynergys();
-
-    //    UnitController.Init();
-    //    _unitUIManager.Init();
-
-    //    _unitDatas = Manager.Data.UnitDatas;
-
-    //    Subscribe();
-
-    //    _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
-    //    _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
-                       
-    //    TeamPresetData preset = TempDataManager.Instance.ReadCurrentSelectedPreset();
-
-    //    if (preset == null)
-    //        return;
-
-    //    for (int i = 0; i < preset.Statuses.Length; i++)
-    //    {
-    //        if(preset.Statuses[i].Data != null)
-    //        {
-    //            AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
-    //        }
-    //    }
-    //}
 
     #region EventHandler
     private void Subscribe()
     {
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
+        BattleManager.OnBattleStarted += ApplyHealAugment;
 
         UnitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
@@ -131,6 +107,7 @@ public class UnitManager : MonoBehaviour
     {
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
+        BattleManager.OnBattleStarted -= ApplyHealAugment;
 
         UnitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
@@ -145,15 +122,39 @@ public class UnitManager : MonoBehaviour
     }
     #endregion
 
+    public void ApplyHealAugment()
+    {
+        UnitBase[] units = UnitController.GetUnits();
+        for (int i = 0; i < AugmentManager.Instance.currentAugment.Count; i++)
+        {
+            if (AugmentManager.Instance.currentAugment[i].Trigger == TriggerType.OnBattleStart)
+            {
+                for (int j = 0; j < units.Length; j++)
+                {
+                    AugmentManager.Instance.ApplyHealAugment(units[j]);
+                }
+            }
+            else if (AugmentManager.Instance.currentAugment[i].Trigger == TriggerType.OnEnemyDied)
+            {
+                // TODO : 적이 죽었을 때 조건 추가 필요
+
+                for (int j = 0; j < units.Length; j++)
+                {
+                    AugmentManager.Instance.ApplyHealAugment(units[j]);
+                }
+            }
+        }
+    }
+
     #region Fight
     public void Fight()
     {
-        if(UnitController.GetUnitsCount() == 0)
+        if (UnitController.GetUnitsCount() == 0)
             return;
 
         _unitUIManager.StandbyUIDeActive();
 
-        FightRoutine().Forget();        
+        FightRoutine().Forget();
     }
 
     private async UniTask FightRoutine()
@@ -163,21 +164,22 @@ public class UnitManager : MonoBehaviour
         .SetEase(Ease.OutQuad)
         .AsyncWaitForCompletion();
 
-        await Camera.main.DOFieldOfView(120, 0.5f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
+        await Camera.main.DOOrthoSize(17, 0.5f).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
         SlotsDeActive();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(.1f));
+        await UniTask.WaitForSeconds(.1f);
         UnitsMove();
 
         UnitController.BattleParent.DOMoveX(_center.position.x - 5, 2).SetEase(Ease.Linear);
         Camera.main.transform.DOMoveX(_center.position.x, 2.2f);
-        await UniTask.Delay(TimeSpan.FromSeconds(1));
+        await UniTask.WaitForSeconds(1);
+
         EnemyController.BattleParent.DOMoveX(-(_center.position.x - 5), 1).SetEase(Ease.Linear);
-        await UniTask.Delay(TimeSpan.FromSeconds(1));
+        await UniTask.WaitForSeconds(1);
 
         UnitsIdle();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(0.3f));
+        await UniTask.WaitForSeconds(0.3f);
 
         UnitController.UnitFight();
         EnemyController.EnemyFight();
@@ -203,6 +205,7 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.UnitHealthBarManager.Init(UnitController.GetUnits(), EnemyController.GetUnits());
     }
     #endregion
+
     public void GameEndedUnitStandby()
     {
         SpawnUnitStnaby();
@@ -210,7 +213,8 @@ public class UnitManager : MonoBehaviour
         EnemyController.EnemyStandby();
     }
 
-    public void StandbyGame()
+    [ContextMenu("GameStanby")]
+    public void GameStandby()
     {
         ClearSpawnUnit();
         EnemyController.ResetEnemy();
@@ -218,6 +222,8 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.StandbyUISetting();
 
         _battleManager.GameStanby();
+        Camera.main.transform.position = new Vector3(0, 0, -10);
+        Camera.main.orthographicSize = 13;
     }
 
     private void UnitsIdle()
@@ -248,7 +254,8 @@ public class UnitManager : MonoBehaviour
             Debug.Log("골드가 부족합니다.");
             return;
         }
-        UnitData unit = _unitDatas[UnityEngine.Random.Range(0, _unitDatas.Length)];
+
+        UnitData unit = _unitSpawnChanceData.RollUnit();
         UnitStatus unitStatus = new UnitStatus(unit);
 
         AddSlotUnit(unitStatus, slotIdx);

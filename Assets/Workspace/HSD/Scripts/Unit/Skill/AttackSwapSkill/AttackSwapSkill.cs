@@ -10,6 +10,6 @@ public class AttackSwapSkill : UnitSkill
 
     public override void Active(IAttacker attacker)
     {
-        attacker.GetStatusController().AttackDataChange(Manager.Resources.Get<UnitAttackData>(_attackAddress), _duration);
+        attacker.GetStatusController().AttackDataChange(Manager.Resources.Load<UnitAttackData>(_attackAddress), _duration);
     }
 }

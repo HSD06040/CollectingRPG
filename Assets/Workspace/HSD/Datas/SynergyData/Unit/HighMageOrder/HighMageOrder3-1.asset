@@ -21,9 +21,9 @@ MonoBehaviour:
   IsDelay: 1
   IsFirstOnly: 1
   DelayTime: 10
+  SynergyEffectAddress: 
+  EffectDuration: 2
   IsUnitPosition: 0
-  IsMultiplier: 0
-  SpawnType: 0
   SpawnUnitStats:
     MaxHealth: 0
     MaxMana: 0
@@ -37,13 +37,20 @@ MonoBehaviour:
     MagicDefense: 0
     AttackRange: 0
     AttackCount: 0
+  IsMultiplier: 0
+  SpawnType: 0
   SpawnSynergy: 0
   SpawnAddress: 
+  SpawnEffectAddress: 
   EffectAttackType: 0
+  SpawnPositionType: 0
   Power: 0
   AttackAddress: 
-  EffectType: 1
-  SynergyBuffDatas: []
+  EffectType: 0
+  SynergyBuffDatas:
+  - StatType: 2
+    Duration: 10
+    Value: 5
   StatModifiers:
   - StatType: 2
     Value: 30

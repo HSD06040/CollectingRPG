@@ -18,8 +18,8 @@ public class SkillPopUpController : MonoBehaviour
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
-        _playerUnitSkillPopUpPrefab = Manager.Resources.Get<GameObject>(_playerUnitSkillPopUpAddress);
-        _enemyUnitSkillPopUpPrefab = Manager.Resources.Get<GameObject>(_enemyUnitSkillPopUpAddress);
+        _playerUnitSkillPopUpPrefab = Manager.Resources.Load<GameObject>(_playerUnitSkillPopUpAddress);
+        _enemyUnitSkillPopUpPrefab = Manager.Resources.Load<GameObject>(_enemyUnitSkillPopUpAddress);
 
         if (_playerUnits != null && _playerUnits.Length != 0)
         {

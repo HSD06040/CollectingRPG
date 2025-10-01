@@ -9,7 +9,7 @@ public class UnitData : MetaData
     [Header("MetaData")]
     public Grade Grade;
     public string AddressableAddress;
-    public GameObject UnitPrefab => Manager.Resources.Get<GameObject>(AddressableAddress);
+    public GameObject UnitPrefab => Manager.Resources.Load<GameObject>(AddressableAddress);
     public int ID;
     public int PerferredLine;
     public int Cost;
@@ -24,7 +24,7 @@ public class UnitData : MetaData
 
     [Header("Unit_Stat")]    
     public UnitStats[] UnitStats; // 3개 1,2,3 성
-    public UnitStats AugmentStat = new();
+    public UnitStats[] UpgradeStats; // UnitStats의 레벨 강화 반영
 
     [Header("Synergy")]
     public ClassType ClassSynergy;
@@ -33,15 +33,63 @@ public class UnitData : MetaData
     [Header("Upgrade")]
     public UpgradeUnitData UpgradeData;
     public LevelUpData LevelUpData;
+    public UpgradeStatData UpgradeStatData;
 
     public UnitStats GetUnitStat(int level)
     {
-        return UnitStats[level];
+        if (UpgradeStats == null || UpgradeStats.Length < 4)
+            return UnitStats[level];
+
+        return UpgradeStats[level];
     }
 
     public void Init()
     {
         UpgradeData?.Init(Grade, LevelUpData);
+
+        if(UpgradeData != null)
+        {
+            UpgradeData.OnLevelUp += UpdateUpgradeStats;
+            UpdateUpgradeStats();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if(UpgradeData != null)
+        {
+            UpgradeData.OnLevelUp -= UpdateUpgradeStats;
+        }
+    }
+
+    public void UpdateUpgradeStats()
+    {
+        UpgradeStats = new UnitStats[UnitStats.Length];
+        for (int i = 0; i < UnitStats.Length; i++)
+        {
+            UpgradeStats[i] = UnitStats[i].Clone();
+        }
+
+        if (UpgradeStatData == null) return;
+
+        var gradeGrowth = UpgradeStatData.StatData.Find(g => g.CharGrade == Grade);
+        if (gradeGrowth.Stats == null || gradeGrowth.Stats.Count == 0) return;
+
+        int currentLevel = UpgradeData?.CurrentUpgradeData.UpgradeLevel ?? 0;
+
+        foreach (var levelGrowth in gradeGrowth.Stats)
+        {
+            if (levelGrowth.Level <= currentLevel)
+            {
+                foreach (var statGrowth in levelGrowth.Stats)
+                {
+                    for (int i = 0; i < UpgradeStats.Length; i++)
+                    {
+                        UpgradeStats[i].AddStat(statGrowth.Type, statGrowth.Value);
+                    }
+                }
+            }
+        }
     }
 
     public UnitDataDTO ToDTO(UnitData data)

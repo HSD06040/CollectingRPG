@@ -16,7 +16,6 @@ public class DamageMeterController : MonoBehaviour
     private void Start()
     {
         _gridLayoutGroup.SetupGridLayoutGroup(_content, 1, 5, 10);
-    
         DamageMeterSlot.OnDamaged += SortingDamageMeter;
     }
 
@@ -26,7 +25,7 @@ public class DamageMeterController : MonoBehaviour
     }
 
     public void Init(UnitBase[] units)
-    {        
+    {
         int count = 0;
         for (int i = 0; i < units.Length; i++)
         {
@@ -60,9 +59,7 @@ public class DamageMeterController : MonoBehaviour
         _activeSlots.Clear();
 
         foreach (var slot in _damageMeterSlots)
-        {
             _activeSlots.Add(slot);
-        }
 
         _activeSlots.Sort((a, b) => b.TotalDamage.CompareTo(a.TotalDamage));
 
@@ -76,42 +73,22 @@ public class DamageMeterController : MonoBehaviour
         {
             var slot = _activeSlots[i];
             slot.gameObject.SetActive(true);
-
             slot.transform.SetSiblingIndex(i);
-
             slot.SetNumber(i + 1);
         }
 
-        SettingSliderMaxValue();
+        RefreshAllSlots();
     }
 
-
-    private async UniTaskVoid AnimateReorder(DamageMeterSlot slot, int targetIndex, float duration = 0.3f)
+    private void RefreshAllSlots()
     {
-        RectTransform rt = slot.GetComponent<RectTransform>();
-        Vector2 startPos = rt.anchoredPosition;
-        Vector2 endPos = ((RectTransform)_content.GetChild(targetIndex)).anchoredPosition;
+        if (_activeSlots.Count == 0) return;
 
-        float t = 0f;
-        while (t < 1f)
-        {
-            t += Time.deltaTime / duration;
-            rt.anchoredPosition = Vector2.Lerp(startPos, endPos, Mathf.SmoothStep(0, 1, t));
-            await UniTask.Yield(PlayerLoopTiming.Update, _cts.Token);
-        }
-
-        slot.transform.SetSiblingIndex(targetIndex);
-        rt.anchoredPosition = endPos;
-    }
-
-    private void SettingSliderMaxValue()
-    {
         int maxValue = _activeSlots[0].TotalDamage;
 
         foreach (var slot in _damageMeterSlots)
         {
-            slot.SetSliderMaxValue(maxValue);
-            slot.RefreshValue();
+            slot.RefreshValue(maxValue);
         }
     }
 }

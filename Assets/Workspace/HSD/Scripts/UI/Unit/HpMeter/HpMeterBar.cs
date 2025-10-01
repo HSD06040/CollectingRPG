@@ -14,6 +14,7 @@ public class HpMeterBar : MonoBehaviour
     public void Init(UnitBase[] units)
     {
         _units = units;
+        _hpSlider.value = 0;
         _hpSlider.maxValue = GetAllMaxHp(units);
         
         if(_hpMeterPresenter != null)
@@ -21,7 +22,7 @@ public class HpMeterBar : MonoBehaviour
 
         _hpMeterPresenter = new HpMeterPresenter(units, this);
 
-        Reflash(0);
+        Reflash();
     }
 
     private int GetAllMaxHp(UnitBase[] units)
@@ -37,7 +38,7 @@ public class HpMeterBar : MonoBehaviour
         return max;
     }
 
-    public void Reflash(int amount)
+    public void Reflash(int amount = 0)
     {
         int currentHp = 0;
 
@@ -48,6 +49,6 @@ public class HpMeterBar : MonoBehaviour
         }
 
         _hpText.text = Utils.ToAbbreviation(currentHp);
-        _hpSlider.value = currentHp;
+        _hpSlider.Lerp(currentHp);
     }
 }

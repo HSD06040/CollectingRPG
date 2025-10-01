@@ -9,6 +9,7 @@ public class AutoMaticSelectionSystem : MonoBehaviour
     public class AutoUnitInfo
     {
         public UnitStatus Status;
+
         public UI_UnitSlot UI_UnitSlot;
         public AutoUnitType AutoUnitType;
 
@@ -28,6 +29,9 @@ public class AutoMaticSelectionSystem : MonoBehaviour
 
     public void AutoSelectCharacters()
     {
+#if UNITY_EDITOR
+        TestUtils.TimerStart();
+#endif
         units.Clear();
         sortedUnits.Clear();
 
@@ -47,31 +51,47 @@ public class AutoMaticSelectionSystem : MonoBehaviour
             }
         }
 
-        units = units
-        .OrderByDescending(u => u.Status.CombatPower)
-        .Take(10)
-        .ToList();
-
-        for (int i = 0; i < units.Count; i++)
+        foreach (var info in units)
         {
-            if(units[i].AutoUnitType == AutoUnitType.Unit)
+            if (info.AutoUnitType == AutoUnitType.Unit)
             {
-                sortedUnits.Add(units[i].Status);
-                _unitManager.UnitController.RemoveUnitGetPosition(units[i].Status);
+                sortedUnits.Add(info.Status);
+                _unitManager.UnitController.RemoveUnitGetPosition(info.Status);
             }
             else
             {
-                sortedUnits.Add(units[i].UI_UnitSlot.GetUnit());
-                _unitManager.UnitController.UISlotController.ClearSlot(units[i].UI_UnitSlot.GetSlotIdx());
+                sortedUnits.Add(info.UI_UnitSlot.GetUnit());
+                _unitManager.UnitController.UISlotController.ClearSlot(info.UI_UnitSlot.GetSlotIdx());
             }
-        }       
+        }
 
-        Set(sortedUnits);
+        var battleUnits = units
+            .OrderByDescending(u => u.Status.CombatPower)
+            .Take(10)
+            .Select(u => u.Status)
+            .ToList();
+
+        var slotUnits = units
+            .OrderByDescending(u => u.Status.CombatPower)
+            .Skip(10)
+            .Select(u => u.Status)
+            .ToList();
+
+        SetBattleUnit(battleUnits);
+
+        foreach (var status in slotUnits)
+        {
+            _unitManager.UnitController.UISlotController.AddEmptySlotUnit(status);
+        }
+
+#if UNITY_EDITOR
+        TestUtils.TimerStop();
+#endif
     }
 
-    private void Set(List<UnitStatus> units)
+    private void SetBattleUnit(List<UnitStatus> units)
     {  
-        for (int i = 0; i < Mathf.Min(UnitController.UnitMaxCount, units.Count); i++)
+        for (int i = 0; i < units.Count; i++)
         {
             int perferredLine = units[i].Data.PerferredLine;
             UnitSlot slot = _unitManager.UnitController.GetEmptyLineSlot(perferredLine);

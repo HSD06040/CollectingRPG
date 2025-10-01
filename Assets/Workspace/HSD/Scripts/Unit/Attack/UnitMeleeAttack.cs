@@ -17,29 +17,31 @@ public class UnitMeleeAttack : UnitAttackData
             return;
         }
 
-        status.CalculateDamage(
-            AttackPower,
-            DamageType,
+        status.CalculateDamage(            
             ComponentProvider.Get<UnitBase>(attacker.GetTarget()?.gameObject).StatusController
             );
 
-        GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
-        GameObject obj = Manager.Resources.Instantiate(prefab, attacker.GetTarget().gameObject.GetCenter(), true);
+        GameObject prefab = Manager.Resources.Load<GameObject>(EffectAddress);
 
-        // 항상 프리팹 기준 스케일로 초기화
-        obj.transform.localScale = prefab.transform.localScale;
-
-        Vector3 finalScale =
-            prefab.transform.localScale * Mathf.Abs(attacker.GetTransform().localScale.x);
-
-        if (obj.transform.GetFacingDir() == attacker.GetTransform().GetFacingDir())
+        if(prefab != null)
         {
-            finalScale.x *= -1;
-        }
+            GameObject obj = Manager.Resources.Instantiate(prefab, attacker.GetTarget().gameObject.GetCenterPosition(), true);
 
-        obj.transform.localScale = finalScale;
+            // 항상 프리팹 기준 스케일로 초기화
+            obj.transform.localScale = prefab.transform.localScale;
 
-        Manager.Resources.Destroy(obj, 2f);
+            Vector3 finalScale =
+                prefab.transform.localScale * Mathf.Abs(attacker.GetTransform().localScale.x);
+
+            if (obj.transform.GetFacingDir() == attacker.GetTransform().GetFacingDir())
+            {
+                finalScale.x *= -1;
+            }
+
+            obj.transform.localScale = finalScale;
+
+            Manager.Resources.Destroy(obj, 2f);
+        }        
 
         status.GetMana();
     }

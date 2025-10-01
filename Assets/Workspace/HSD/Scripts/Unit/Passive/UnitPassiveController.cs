@@ -14,7 +14,6 @@ public class UnitPassiveController
 
     public void AddPassiveEffect(SynergyEffect effect, int statMultiplier = 1, bool isChange = false)
     {
-        Debug.Log($"AddPassiveEffect");
         if (isChange)
         {
             RemovePassiveEffect(effect);
@@ -38,11 +37,16 @@ public class UnitPassiveController
 
     public void DeActiveAllPassive()
     {
+        PassiveAllDeActive();
+        _passives.Clear();
+    }
+
+    public void PassiveAllDeActive()
+    {
         foreach (var passive in _passives.Values)
         {
             passive.Deactive();
         }
-        _passives.Clear();
     }
 
     public void RefreshBaseStats()

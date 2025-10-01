@@ -1,7 +1,7 @@
+using Cysharp.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Extensions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GuestSignIn : MonoBehaviour
@@ -19,6 +19,9 @@ public class GuestSignIn : MonoBehaviour
     {
         _guestLoginButton.onClick.AddListener(() =>
         {
+            if (!AddressablesDownloader.IsDownloaded)
+                return;
+
             if (!_isClicked)
             {
                 if (FirebaseManager.Auth.CurrentUser != null)
@@ -77,7 +80,7 @@ public class GuestSignIn : MonoBehaviour
                 // 튜토리얼 isTutorialComplete = true Data 변경
                 SetTutorialCompleteAsync();
                 _isClicked = false;
-                SceneManager.LoadScene("USW_LobbyScene");
+                await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", LoadPrefabs);
             }
         });
     }
@@ -87,12 +90,12 @@ public class GuestSignIn : MonoBehaviour
         bool isTutorialCompleted = await Manager.DB.CheckTutorialCompletedAsync();
         if (isTutorialCompleted)
         {
-            SceneManager.LoadScene("USW_LobbyScene");
+            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", LoadPrefabs);
             //SceneManager.LoadScene("USW_LobbyScene_Copy");
         }
         else
         {
-            SceneManager.LoadScene("USW_LobbyScene");
+            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", LoadPrefabs);
             //SceneManager.LoadScene("USW_LoadingScene_Copy2");
             // TODO: [CYH] 패널 전환 테스트_2 (삭제 예정)
             //tutorialPanel.SetActive(true);
@@ -108,5 +111,11 @@ public class GuestSignIn : MonoBehaviour
     private async void SetTutorialCompleteAsync()
     {
         await Manager.DB.SetTutorialCompleteAsync();
+    }
+
+    private async UniTask LoadPrefabs()
+    {
+        Manager.Resources.LoadLabel("UnitPrefab").Forget();
+        await Manager.Data.InitAsync();
     }
 }

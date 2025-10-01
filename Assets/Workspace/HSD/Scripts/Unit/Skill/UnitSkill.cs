@@ -14,8 +14,8 @@ public abstract class UnitSkill : ScriptableObject
 
     [Header("Stat")]
     public int MaxCount = 1;
-    public float[] Powers; // 추후 기능 추가를 위한 데이터
-    public float Power = 1;
+    public float PhysicalPower = 1;
+    public float AbilityPower = 1;
     public int ManaCost;
 
     [Header("Type")]
@@ -38,17 +38,16 @@ public abstract class UnitSkill : ScriptableObject
         
         if (EffectSpawnType == EffectSpawnType.Target)
         {
-            Manager.Resources.Destroy(
-                Manager.Resources.Instantiate<GameObject>(
+            Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(
                     EffectAddress,
-                    attacker.GetTarget().gameObject.GetCenter(),
+                    attacker.GetTarget().gameObject.GetCenterPosition(),
                     true
-                ),
-             2f);
+                ), 
+            2f);
         }
         else
         {
-            GameObject prefab = Manager.Resources.Get<GameObject>(EffectAddress);
+            GameObject prefab = Manager.Resources.Load<GameObject>(EffectAddress);
             GameObject obj = Manager.Resources.Instantiate(
                 prefab,
                 GetSpawnPoint(attacker),
@@ -78,7 +77,12 @@ public abstract class UnitSkill : ScriptableObject
             )
         );
     }
-   
+    protected virtual GameObject GetTargetSingle(IAttacker attacker)
+    {
+        var target = Utils.GetTargetsNonAllocSingle(attacker, SearchType.Circle, 100, Vector2.zero, 1, attacker.TargetLayer, GetPriorityFilter());
+        return target;
+    }
+
     protected System.Func<IAttacker, List<GameObject>, GameObject> GetPriorityFilter()
     {
         switch (Priority)
@@ -220,6 +224,13 @@ public abstract class UnitSkill : ScriptableObject
         };
     }
     #endregion
+
+    public virtual string GetCalculateValueString(UnitStatus status)
+    {
+        UnitStats stat = status.GetCurrentStat();
+
+        return Mathf.RoundToInt(stat.PhysicalDamage * PhysicalPower + stat.MagicDamage * (AbilityPower / 100)).ToString("F0");
+    }    
 
     #if  UNITY_EDITOR
     public virtual void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기

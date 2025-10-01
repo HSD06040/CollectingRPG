@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 [CreateAssetMenu(fileName = "LineSkill", menuName = "Data/Unit/Skill/LineSkill")]
 public class PierceLineSkill : AttackSkill
@@ -17,15 +16,18 @@ public class PierceLineSkill : AttackSkill
     {
         base.Active(attacker);
 
-        Transform target = Priority == Priority.Target ? attacker.GetTarget() : GetTargetSingle(attacker).transform;
+        Transform target = Priority == Priority.Target ? attacker.GetTarget() : GetTargetSingle(attacker)?.transform;
 
-        GameObject effect = Manager.Resources.Get<GameObject>(EffectAddress);
+        if (target == null)
+            return;
+
+        GameObject effect = Manager.Resources.Load<GameObject>(EffectAddress);
         ChainLineAttacker chainLineAttacker = Manager.Resources.Instantiate<GameObject>(CHAIN_LINE_ATTACKER, attacker.GetCenter())
             .GetComponent<ChainLineAttacker>();
 
         chainLineAttacker.Setup(
             attacker, effect, target, _count, _interval, attacker.TargetLayer,
-            Power, DamageType, _attackThickness, _ratio
+            PhysicalPower, AbilityPower, DamageType, _attackThickness, _ratio
             );
     }
 
