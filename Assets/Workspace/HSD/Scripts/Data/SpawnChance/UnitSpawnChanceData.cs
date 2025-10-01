@@ -7,8 +7,14 @@ public class UnitSpawnChanceData : ScriptableObject
 {
     private Dictionary<UnitData, float> _cachedChances = new Dictionary<UnitData, float>();
 
-    [SerializeField] private Synergy CurrentLeaderSynergy;
-    [SerializeField] private UnitSpawnChance[] UnitSpawnChances;
+    [SerializeField] private Synergy _currentLeaderSynergy;
+    public Synergy CurrentLeaderSynergy
+    {
+        get => _currentLeaderSynergy;
+        set => _currentLeaderSynergy = value;
+    }
+
+    [SerializeField] private UnitSpawnChance[] _unitSpawnChances;
 
     [SerializeField] private float leaderWeight = 1.5f; // 고정 규칙
 
@@ -17,7 +23,7 @@ public class UnitSpawnChanceData : ScriptableObject
         _cachedChances.Clear();
 
         UnitData[] allUnits = Manager.Data.PlayerUnitDatas;
-        UnitSpawnChance floorChance = UnitSpawnChances[currentFloor];
+        UnitSpawnChance floorChance = _unitSpawnChances[currentFloor];
 
         foreach (Grade grade in System.Enum.GetValues(typeof(Grade)))
         {
@@ -37,7 +43,7 @@ public class UnitSpawnChanceData : ScriptableObject
             List<UnitData> leaders = new List<UnitData>();
             foreach (var unit in candidates)
             {
-                if (unit.Synergy == CurrentLeaderSynergy)
+                if (unit.Synergy == _currentLeaderSynergy)
                     leaders.Add(unit);
             }
 

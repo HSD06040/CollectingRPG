@@ -23,8 +23,7 @@ public class UnitManager : MonoBehaviour
     public EnemyController EnemyController;
 
     [Header("Data")]
-    private UnitSpawnChanceData _unitSpawnChanceData;
-    [SerializeField] UnitData[] _unitDatas;
+    private UnitSpawnChanceData _unitSpawnChanceData;    
     [SerializeField] int _upgradeNeedCount = 3;
 
     private List<UnitBase> _spawnUnitList = new List<UnitBase>(10);
@@ -61,16 +60,18 @@ public class UnitManager : MonoBehaviour
 
         UnitController.Init();
         EnemyController.Init();
-        _unitSpawnChanceData.CalculateChances(0);
-        //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
-        //_unitDatas = Manager.Data.EnemyUnitDatas;
-        _unitDatas = Manager.Data.PlayerUnitDatas;
 
         Subscribe();
 
         _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
         _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
+        PresetSetting();
+        _unitSpawnChanceData.CalculateChances(0);
+    }
+
+    private void PresetSetting()
+    {
         if (Manager.Data == null)
             return;
 
@@ -83,9 +84,11 @@ public class UnitManager : MonoBehaviour
         {
             if (preset.Statuses[i].Data != null)
             {
-                _unitSlotController.AddEmptySlotUnit(preset.Statuses[i]);                
+                _unitSlotController.AddEmptySlotUnit(preset.Statuses[i]);
             }
         }
+
+        _unitSpawnChanceData.CurrentLeaderSynergy = preset.Statuses[0].Data.Synergy;
     }
 
     #region EventHandler
