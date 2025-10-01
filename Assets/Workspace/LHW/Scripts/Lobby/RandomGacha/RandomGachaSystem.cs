@@ -7,8 +7,12 @@ using UnityEngine.UI;
 public class RandomGachaSystem : MonoBehaviour
 {
     [Header("Reference")]
+    // 캐릭터 가챠
     [SerializeField] private CharacterDatabase _data;
-    [SerializeField] private ItemProbabilitySO _prob;
+    [SerializeField] private ItemProbabilitySO _charProb;
+    // 마법석
+    [SerializeField] private MagicStoneGachaSO _stoneProb;
+    // UI
     [SerializeField] private GachaResultUI _resultUI;
 
     [Header("GachaListUIButton")]
@@ -50,7 +54,7 @@ public class RandomGachaSystem : MonoBehaviour
     private void Init()
     {
         // 확률 테이블 초기화
-        RandomInit(_prob);
+        RandomInit(_charProb);
 
         // 가챠 종류 전환용 버튼 이벤트
         _characterGachaButton.onClick.AddListener(() => SetActivePanel("CharacterGacha"));
@@ -141,7 +145,7 @@ public class RandomGachaSystem : MonoBehaviour
             // 광고 가챠 쿨타임 업데이트
             TimeManager.Instance.UpdateAdGachaResetTimeInfo();
             // 1회 뽑기 진행
-            ItemSelect(1);
+            CharacterSelect(1);
             TimeManager.Instance.OnDailyGachaInfoChanged?.Invoke();
             return true;
         }
@@ -174,7 +178,7 @@ public class RandomGachaSystem : MonoBehaviour
         if (TimeManager.Instance.CanObtainedFreeGachaReward())
         {
             // 1회 뽑기 진행
-            ItemSelect(1);
+            CharacterSelect(1);
             // 일일 무료 뽑기 쿨타임 업데이트
             TimeManager.Instance.UpdateDailyFreeGachaResetTimeInfo();
             return true;
@@ -202,7 +206,7 @@ public class RandomGachaSystem : MonoBehaviour
 
         if (currentDiamond >= 300 * number)
         {
-            ItemSelect(number);
+            CharacterSelect(number);
             await DBManager.Instance.SubtractDiamondAsync(300 * number);
         }
         else
@@ -245,18 +249,20 @@ public class RandomGachaSystem : MonoBehaviour
 
     #region 가중치 확률 선택
 
+    #region CharacterGacha
+
     // 확률 변동이 없는 가중치 확률
-    private async void ItemSelect(int number)
+    private async void CharacterSelect(int number)
     {
-        if (_gradeCharRandom.GetList() == null) RandomInit(_prob);
+        if (_gradeCharRandom.GetList() == null) RandomInit(_charProb);
 
         for (int i = 0; i < number; i++)
         {
-            UnitData data = ReturnData();
+            UnitData data = ReturnCharacterData();
 
-            int pieceNum = ReturnPieceByGrade(data);
+            int pieceNum = ReturnCharacterPieceByGrade(data);
 
-            if (IsOveredPieceUpperLimit(data, pieceNum, out int overPiece, out int mythPiece))
+            if (IsOveredCharPieceUpperLimit(data, pieceNum, out int overPiece, out int mythPiece))
             {
                 if (overPiece != pieceNum)
                 {
@@ -281,22 +287,38 @@ public class RandomGachaSystem : MonoBehaviour
         _resultUI.gameObject.SetActive(true);
     }
 
-
-    // 확률 변동 없는 캐릭터 뽑기
-    private UnitData ReturnData()
+    /// <summary>
+    /// 등급에 따른 캐릭터 랜덤 반환
+    /// </summary>
+    /// <returns></returns>
+    private UnitData ReturnCharacterData()
     {
         Grade grade = _gradeCharRandom.GetRandomItem();
         return _data.GetRandomUnitByGrade(grade);
     }
 
-    private int ReturnPieceByGrade(UnitData data)
+    /// <summary>
+    /// 등급에 따른 캐릭터 조각 개수 반환
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    private int ReturnCharacterPieceByGrade(UnitData data)
     {
         Grade grade = data.Grade;
         int piece = _gradeCharPieceRandom[(int)grade].GetRandomItem();
         return piece;
     }
 
-    private bool IsOveredPieceUpperLimit(UnitData data, int inputPiece, out int overPiece, out int mythPiece)
+    /// <summary>
+    /// 캐릭터 조각을 획득했을 때, 조각 개수가 해당 캐릭터의
+    /// 최대 강화에 필요한 조각 개수를 초과했는지 확인함.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="inputPiece"></param>
+    /// <param name="overPiece"></param>
+    /// <param name="mythPiece"></param>
+    /// <returns></returns>
+    private bool IsOveredCharPieceUpperLimit(UnitData data, int inputPiece, out int overPiece, out int mythPiece)
     {
         Grade grade = data.Grade;
         int level = data.UpgradeData.CurrentUpgradeData.UpgradeLevel;
@@ -335,11 +357,12 @@ public class RandomGachaSystem : MonoBehaviour
         }
     }
 
+    #endregion
 
     // 천장이 있는 가중치 확률
     private void ItemSelectBySub(int number)
     {
-        if (_gradeCharRandom.GetList() == null) RandomInit(_prob);
+        if (_gradeCharRandom.GetList() == null) RandomInit(_charProb);
 
         for (int i = 0; i < number; i++)
         {
