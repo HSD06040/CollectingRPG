@@ -14,7 +14,7 @@ public class UnitSpawnChanceData : ScriptableObject
         set => _currentLeaderSynergy = value;
     }
 
-    [SerializeField] private UnitSpawnChance[] _unitSpawnChances;
+    [SerializeField] private UnitSpawnChance[] UnitSpawnChances;
 
     [SerializeField] private float leaderWeight = 1.5f; // 고정 규칙
 
@@ -23,7 +23,7 @@ public class UnitSpawnChanceData : ScriptableObject
         _cachedChances.Clear();
 
         UnitData[] allUnits = Manager.Data.PlayerUnitDatas;
-        UnitSpawnChance floorChance = _unitSpawnChances[currentFloor];
+        UnitSpawnChance floorChance = UnitSpawnChances[currentFloor];
 
         foreach (Grade grade in System.Enum.GetValues(typeof(Grade)))
         {

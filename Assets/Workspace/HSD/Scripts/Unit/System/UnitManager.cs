@@ -80,6 +80,9 @@ public class UnitManager : MonoBehaviour
         if (preset == null)
             return;
 
+        if (preset.Statuses[0] == null || preset.Statuses[0].Data == null)
+            return;
+
         for (int i = 0; i < preset.Statuses.Length; i++)
         {
             if (preset.Statuses[i].Data != null)

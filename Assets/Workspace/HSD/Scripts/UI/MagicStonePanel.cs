@@ -29,6 +29,11 @@ public class MagicStonePanel : MonoBehaviour
         return false;
     }
 
+    public void SetMagicStone(int idx, MagicStoneData magicStoneData)
+    {        
+        _magicStoneSlots[idx].SetMagicStone(magicStoneData);
+    }
+
     public void ClearAllMagicStones()
     {
         foreach (var slot in _magicStoneSlots)
