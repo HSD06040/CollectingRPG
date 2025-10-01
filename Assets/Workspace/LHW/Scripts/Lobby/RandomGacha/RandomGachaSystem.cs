@@ -11,8 +11,8 @@ public class RandomGachaSystem : MonoBehaviour
     [SerializeField] private CharacterDatabase _charData;
     [SerializeField] private ItemProbabilitySO _charProb;
     // 마법석
+    [SerializeField] private MagicStoneDatabase _stoneDatabase;
     [SerializeField] private MagicStoneGachaSO _stoneProb;
-    // 마법석 데이터베이스
     // UI
     [SerializeField] private GachaResultUI _resultUI;
 
@@ -47,7 +47,7 @@ public class RandomGachaSystem : MonoBehaviour
     private WeightedRandom<int>[] _gradeCharPieceRandom = new WeightedRandom<int>[4];
     // 마법석 확률
     private WeightedRandom<MagicStoneRewardType> _magicStoneRewardRandom = new WeightedRandom<MagicStoneRewardType>();
-    private WeightedRandom<int> _gradeMagicStonePieceRandom = new WeightedRandom<int>();
+    private WeightedRandom<int> _magicStonePieceRandom = new WeightedRandom<int>();
 
     private void Awake()
     {
@@ -121,7 +121,7 @@ public class RandomGachaSystem : MonoBehaviour
             int pieceNum = probability.rewards[0].PieceEntries[i].PieceNum;
             int pieceProbable = (int)(probability.rewards[0].PieceEntries[i].PieceProbability * Math.Pow(10, digits));
 
-            _gradeMagicStonePieceRandom.Add(pieceNum, pieceProbable);
+            _magicStonePieceRandom.Add(pieceNum, pieceProbable);
         }
     }
 
@@ -486,39 +486,52 @@ public class RandomGachaSystem : MonoBehaviour
             switch (type)
             {
                 case MagicStoneRewardType.MagicStone:
-                    MagicStoneSelection();
+                    MagicStoneSelection(i);
                     break;
                 case MagicStoneRewardType.Gold500:
                     await DBManager.Instance.AddGoldAsync(500);
+                    _resultUI.StoneGachaUpdate(type, i, 500.ToString());
                     Debug.Log("골드 500");
                     break;
                 case MagicStoneRewardType.Gold1000:
                     await DBManager.Instance.AddGoldAsync(1000);
+                    _resultUI.StoneGachaUpdate(type, i, 1000.ToString());
                     Debug.Log("골드 1000");
                     break;
                 case MagicStoneRewardType.Gold10000:
                     await DBManager.Instance.AddGoldAsync(10000);
+                    _resultUI.StoneGachaUpdate(type, i, 10000.ToString());
                     Debug.Log("골드 10000");
                     break;
                 case MagicStoneRewardType.Dia50:
                     await DBManager.Instance.AddDiamondAsync(50);
+                    _resultUI.StoneGachaUpdate(type, i, 50.ToString());
                     Debug.Log("다이아 50");
                     break;
                 case MagicStoneRewardType.Dia100:
                     await DBManager.Instance.AddDiamondAsync(100);
+                    _resultUI.StoneGachaUpdate(type, i, 100.ToString());
                     Debug.Log("다이아 100");
                     break;
                 case MagicStoneRewardType.Dia1000:
                     await DBManager.Instance.AddDiamondAsync(1000);
+                    _resultUI.StoneGachaUpdate(type, i, 1000.ToString());
                     Debug.Log("다이아 1000");
                     break;
             }
         }
+
+        _resultUI.gameObject.SetActive(true);
     }
 
-    private void MagicStoneSelection()
+    private void MagicStoneSelection(int index)
     {
-        Debug.Log("마법석 선택");
+        int pickedStone = UnityEngine.Random.Range(0, _stoneDatabase.MagicStoneDatas.Count);
+        MagicStoneData data = _stoneDatabase.MagicStoneDatas[pickedStone];
+
+        int pieces = _magicStonePieceRandom.GetRandomItem();
+
+        _resultUI.StoneGachaUpdate(data, index, pieces.ToString());
     }
 
     #endregion

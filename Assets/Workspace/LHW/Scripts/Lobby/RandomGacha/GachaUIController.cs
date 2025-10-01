@@ -236,12 +236,8 @@ public class GachaUIController : MonoBehaviour
                 TimeManager.Instance.CanObtainedFreeGachaReward(GachaType.Stone);
 
                 DateTime now = DateTime.Now;
-
                 DateTime charNextdate = TimeManager.Instance.DailyCharFreeGachaRewardInfo.GetDateTime();
-                Debug.Log(charNextdate.ToString());
-
                 TimeSpan charCooltime = charNextdate - now;
-                Debug.Log(charCooltime.ToString());
                 _charDailyCooltimeText.text = $"다음 초기화 : {charCooltime.Hours}시간 {charCooltime.Minutes}분";
 
                 DateTime stoneNextdate = TimeManager.Instance.DailyStoneFreeGachaRewardInfo.GetDateTime();
