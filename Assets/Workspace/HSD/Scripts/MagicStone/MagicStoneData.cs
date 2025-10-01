@@ -119,7 +119,9 @@ public abstract class MagicStoneData : ScriptableObject
         unit.StatusController.TakeTickDamage((int)Value, tickDamageData.TickCount, tickDamageData.TickInterval);
     }
     protected void ApplyTickDamageMultiple(GameObject[] objs, TickDamageData tickDamageData)
-    {        
+    {
+        if (objs == null) return;
+
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
@@ -132,13 +134,13 @@ public abstract class MagicStoneData : ScriptableObject
 
     protected void ApplyStatSingle(UnitBase unit, StatType statType)
     {
-        Debug.Log($"{unit.name}에게 {statType} {Value} 적용");
         unit.StatusController.AddStat(statType, Value, name);
     }
 
     protected void ApplyStatMultiple(GameObject[] objs, StatType statType)
     {
-        Debug.Log($"대상 수 : {objs.Length}");
+        if (objs == null) return;
+
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
@@ -156,6 +158,8 @@ public abstract class MagicStoneData : ScriptableObject
 
     protected void ApplyTakeDamageMultiple(GameObject[] objs)
     {
+        if (objs == null) return;
+
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);

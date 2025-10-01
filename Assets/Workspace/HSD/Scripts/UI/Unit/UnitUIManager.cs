@@ -10,7 +10,6 @@ public class UnitUIManager : MonoBehaviour
     [SerializeField] GameObject _notBattleUI;
 
     [Header("Battle")]
-    public FightUnitSlotController FightSlotController;
     public DamageMeterController DamageMeterController;
     public HpMeterController HpMeterController;
     public SkillPopUpController SkillPopUpController;

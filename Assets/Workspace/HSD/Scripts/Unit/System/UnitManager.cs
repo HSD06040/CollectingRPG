@@ -102,7 +102,6 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
         BattleManager.OnBattleStarted += ApplyHealAugment;
 
-        UnitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergyPanel.UpdateSynergySlot;
 
@@ -121,7 +120,6 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
         BattleManager.OnBattleStarted -= ApplyHealAugment;
 
-        UnitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergyPanel.UpdateSynergySlot;
 
