@@ -40,8 +40,11 @@ public class SplashAttack : UnitAttackData
         );
     }
 
+#if UNITY_EDITOR
     public void DrawGizmos(IAttacker attacker)
     {
+        if (attacker == null || attacker.GetTarget() == null) return;
+
         Vector2 targetDir = attacker.GetTargetDir();
 
         switch (_searchType)
@@ -62,4 +65,5 @@ public class SplashAttack : UnitAttackData
                 break;
         } 
     }
+#endif
 }

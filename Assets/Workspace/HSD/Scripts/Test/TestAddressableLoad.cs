@@ -6,8 +6,17 @@ using UnityEngine.AddressableAssets;
 
 public class TestAddressableLoad : MonoBehaviour
 {
+    [SerializeField] Unit_InitTest _initTest;
+
     private void Start()
     {
-        Manager.Resources.LoadLabel("Test").Forget();        
+        TestInit().Forget();
+    }
+
+    private async UniTask TestInit()
+    {
+        await Manager.Resources.LoadLabel("Stage");
+        await Manager.Resources.LoadLabel("Test");
+        _initTest.Init();
     }
 }

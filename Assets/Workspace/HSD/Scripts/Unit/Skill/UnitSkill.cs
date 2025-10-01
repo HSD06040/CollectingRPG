@@ -235,6 +235,8 @@ public abstract class UnitSkill : ScriptableObject
     #if  UNITY_EDITOR
     public virtual void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기
     {
+        if (attacker == null || attacker.GetTarget() == null) return;
+
         Handles.color = Color.blue;
         Handles.DrawSolidDisc(GetSpawnPoint(attacker), Vector3.forward, 0.05f);
     }

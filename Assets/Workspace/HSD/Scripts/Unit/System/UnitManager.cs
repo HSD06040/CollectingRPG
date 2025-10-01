@@ -23,14 +23,14 @@ public class UnitManager : MonoBehaviour
     public EnemyController EnemyController;
 
     [Header("Data")]
-    private UnitSpawnChanceData _unitSpawnChanceData;
-    [SerializeField] UnitData[] _unitDatas;
+    private UnitSpawnChanceData _unitSpawnChanceData;    
     [SerializeField] int _upgradeNeedCount = 3;
 
     private List<UnitBase> _spawnUnitList = new List<UnitBase>(10);
 
     private void Awake()
     {
+#if UNITY_EDITOR
         if (IsTest)
         {
             CsvDownloader.OnDataSetupCompleted += InitAsync;
@@ -38,6 +38,9 @@ public class UnitManager : MonoBehaviour
         }
         else
             InitAsync();
+#else
+        InitAsync();
+#endif
     }
 
     private void OnDestroy()
@@ -57,16 +60,18 @@ public class UnitManager : MonoBehaviour
 
         UnitController.Init();
         EnemyController.Init();
-        _unitSpawnChanceData.CalculateChances(0);
-        //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
-        //_unitDatas = Manager.Data.EnemyUnitDatas;
-        _unitDatas = Manager.Data.PlayerUnitDatas;
 
         Subscribe();
 
         _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
         _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
+        PresetSetting();
+        _unitSpawnChanceData.CalculateChances(0);
+    }
+
+    private void PresetSetting()
+    {
         if (Manager.Data == null)
             return;
 
@@ -75,18 +80,24 @@ public class UnitManager : MonoBehaviour
         if (preset == null)
             return;
 
+        if (preset.Statuses[0] == null || preset.Statuses[0].Data == null)
+            return;
+
         for (int i = 0; i < preset.Statuses.Length; i++)
         {
             if (preset.Statuses[i].Data != null)
             {
-                _unitSlotController.AddEmptySlotUnit(preset.Statuses[i]);                
+                _unitSlotController.AddEmptySlotUnit(preset.Statuses[i]);
             }
         }
+
+        _unitSpawnChanceData.CurrentLeaderSynergy = preset.Statuses[0].Data.Synergy;
     }
 
     #region EventHandler
     private void Subscribe()
     {
+        BattleManager.OnSpawnUnit += _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
         BattleManager.OnBattleStarted += ApplyHealAugment;
@@ -105,6 +116,7 @@ public class UnitManager : MonoBehaviour
 
     private void UnSubscrube()
     {
+        BattleManager.OnSpawnUnit -= _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
         BattleManager.OnBattleStarted -= ApplyHealAugment;
