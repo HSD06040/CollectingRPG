@@ -24,25 +24,29 @@ public class EnemyController : MonoBehaviour
 
         foreach (var unitData in _gridDataSO.unitDatas)
         {
-            UnitSlot slot = _slotManager.GetUnitSlot(unitData.position + new Vector2Int(1, 1));
+            Vector2Int slotPosition = unitData.position - new Vector2Int(2, 0);
 
-            int x = unitData.position.x;
-            int y = unitData.position.y;
+            UnitSlot slot = _slotManager.GetUnitSlot(slotPosition + new Vector2Int(1,1));
+
+            int x = slotPosition.x;
+            int y = slotPosition.y;
 
             GameObject obj = Instantiate(unitData.unitStatus.Data.UnitPrefab);
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
 
-            if(unitData.unitStatus == null)
-                Debug.Log($"UnitStatus is null at position {unitData.position}");
+            if (unitData.unitStatus == null)
+            {
+                Debug.LogError($"UnitStatus is null at position {unitData.position}");
+                Destroy(obj);
+                continue;
+            }
 
             unit.Status = unitData.unitStatus;
-
             unit.transform.position = slot.transform.position;
             unit.transform.SetParent(slot.transform);
             unit.TargetLayer = _targetLayer;
             unit.gameObject.layer = LayerMask.NameToLayer("Enemy");
             unit.Init();
-
             unit.SetBattleUnit(-slot.GetPos().y + 5);
 
             if (unit.transform.localScale.x < 0)
@@ -51,6 +55,7 @@ public class EnemyController : MonoBehaviour
             _unitGrid[y, x] = unit;
         }
     }
+
 
     public void EnemyFight()
     {
