@@ -34,15 +34,16 @@ public class EnemyController : MonoBehaviour
 
             if(unitData.unitStatus == null)
                 Debug.Log($"UnitStatus is null at position {unitData.position}");
+
             unit.Status = unitData.unitStatus;
 
             unit.transform.position = slot.transform.position;
             unit.transform.SetParent(slot.transform);
             unit.TargetLayer = _targetLayer;
-            unit.SetBattleUnit();
-
             unit.gameObject.layer = LayerMask.NameToLayer("Enemy");
             unit.Init();
+
+            unit.SetBattleUnit(-slot.GetPos().y + 5);
 
             if (unit.transform.localScale.x < 0)
                 unit.transform.localScale = new Vector3(-unit.transform.localScale.x, unit.transform.localScale.y, unit.transform.localScale.z);

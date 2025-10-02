@@ -77,7 +77,6 @@ public class CsvDownloader
 
         for (int i = startLine - 1; i < lines.Length; i++)
         {
-            // CSV → TSV 변경 (탭 기준 Split)
             string[] row = lines[i].Trim().Split('\t');
             parsed.Add(row);
         }
@@ -166,15 +165,16 @@ public class CsvDownloader
 
             unitData.AddressableAddress = $"{synergyName}{lastDigit}";
             unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
+            unitData.Skill.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_SkillIcon");
 
-//#if UNITY_EDITOR
-//            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
-//            EditorUtility.SetDirty(unitData);
+            //#if UNITY_EDITOR
+            //            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
+            //            EditorUtility.SetDirty(unitData);
 
-//            string path = AssetDatabase.GetAssetPath(unitData);
-//            AssetDatabase.RenameAsset(path, unitData.Name);
-//            AssetDatabase.SaveAssets();
-//#endif
+            //            string path = AssetDatabase.GetAssetPath(unitData);
+            //            AssetDatabase.RenameAsset(path, unitData.Name);
+            //            AssetDatabase.SaveAssets();
+            //#endif
         }
     }
 
@@ -230,7 +230,26 @@ public class CsvDownloader
     {
         foreach (var row in data)
         {
+            int id = int.Parse(row[0]);
+
+            UnitSkill skill = Array.Find(_monsterSkills, u => u.ID == id);
+
+            if (skill == null) continue;
+
+            skill.SkillName = row[1];
+            skill.Description = row[14];
+
+            skill.ManaCost = int.TryParse(row[2], out int manaCost) ? manaCost : 60;
             
+            if(skill is AttackSkill attackSkill)
+            {
+                attackSkill.DamageType = Enum.TryParse(row[4], out DamageType damageType) ? damageType : DamageType.Physical;
+            }
+
+            skill.PhysicalPower = float.TryParse(row[6], out float power) ? power : 1;
+            skill.AbilityPower = float.TryParse(row[7], out float abilityPower) ? abilityPower : 100;
+
+            skill.Icon = Manager.Resources.SpriteGet($"{skill.ID}_SkillIcon");
         }
     }
 
@@ -251,7 +270,10 @@ public class CsvDownloader
             skillData.Description = row[4];
 
             if (int.TryParse(row[8], out int power))
-                skillData.physicalPower = power;
+                skillData.PhysicalPower = power;
+
+            if (int.TryParse(row[9], out int abilityPower))
+                skillData.AbilityPower = abilityPower;
 
             if (skillData is AttackSkill attackSkillData)
             {

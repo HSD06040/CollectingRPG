@@ -78,9 +78,15 @@ public class UnitDragDropSystem : MonoBehaviour
 
         bool isInteractable = false;
         bool isSetUnit = false;
+        bool isEnemy = false;
 
         for (int i = 0; i < hits.Length; i++)
         {
+            if(hits[i].collider != null && hits[i].collider.CompareTag("Unit"))
+            {
+                isEnemy = ComponentProvider.Get<UnitBase>(hits[i].collider.gameObject).GetAllyLayerMask().Contain(LayerMask.NameToLayer("Enemy"));
+            }
+
             if (hits[i].collider != null && hits[i].collider.CompareTag("UnitTrigger"))
             {
                 if (isSetUnit) return;
@@ -94,7 +100,7 @@ public class UnitDragDropSystem : MonoBehaviour
                 isInteractable = true;
                 ToolTipController.UnitToolTip.Show(
                     ComponentProvider.Get<UnitBase>(hits[i].collider.gameObject).Status
-                    , false, false);
+                    , false, false, isEnemy);
 
                 ToolTipController.SynergyToolTip.Close();
             }

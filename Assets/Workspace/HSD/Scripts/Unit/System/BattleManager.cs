@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,9 +17,14 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] LayerMask _playerLayer;
 
+    private bool _isPlayerWin;
+
+    [SerializeField] float _cameraZoomDuration = .3f;
+    private Vector2 _lastTargetPos;
+
     [Header("UnitCount")]
     private int _playerUnitCount;
-    private int _enemyUnitCount;
+    private int _enemyUnitCount;    
 
     private void OnDestroy()
     {
@@ -73,22 +80,23 @@ public class BattleManager : MonoBehaviour
         }
         Debug.Log($"플레이어 유닛 수: {_playerUnitCount}, 적 유닛 수: {_enemyUnitCount}");
         statusCon.OnUnitDied -= CheckBattleEnded;
+        _lastTargetPos = statusCon.transform.position;
 
         if (_playerUnitCount > 0 && _enemyUnitCount > 0)
             return;
 
         if (_playerUnitCount <= 0)
-        {
-            OnPlayerDefeat?.Invoke();
+        {  
+            _isPlayerWin = false;
             Debug.Log("플레이어 패배");
         }
         else if (_enemyUnitCount <= 0)
         {
-            OnPlayerVictory?.Invoke();
+            _isPlayerWin = true;
             Debug.Log("플레이어 승리");
         }
 
-        OnBattleEnded?.Invoke();
+        GameEnd(_isPlayerWin);
     }
 
     private UnitBase[] GetNotNullUnits(UnitBase[] units)
@@ -108,13 +116,28 @@ public class BattleManager : MonoBehaviour
         {
             units[i].StatusController.OnUnitDied += CheckBattleEnded;
         }
+    }    
+
+    private void GameEnd(bool isPlayerWin)
+    {
+        GameEndRoutineAsync(isPlayerWin).Forget();
     }
 
-    private void UnRegisterEvent(UnitBase[] units)
+    private async UniTask GameEndRoutineAsync(bool isPlayerWin)
     {
-        for (int i = 0; i < units.Length; i++)
+        Manager.Game.CameraDoMove(_lastTargetPos, _cameraZoomDuration, 5).Forget();
+        await Manager.Game.SlowMotionAsync(.1f, 2);
+        Debug.Log("끝났다!");
+
+        if(isPlayerWin)
         {
-            units[i].StatusController.OnUnitDied -= CheckBattleEnded;
+            OnPlayerVictory?.Invoke();
         }
+        else
+        {
+            OnPlayerDefeat?.Invoke();
+        }
+
+        OnBattleEnded?.Invoke();
     }
 }

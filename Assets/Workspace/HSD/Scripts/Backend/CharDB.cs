@@ -82,8 +82,6 @@ public class CharDB
 
         await _characterReference.Child(charData.Name).
                 SetRawJsonValueAsync(JsonUtility.ToJson(charData.UpgradeData.CurrentUpgradeData));
-
-        Debug.Log($"[SaveCharacterUpgradeData] 저장 완료 → {charData.Name}");
     }
 
     public async UniTask LoadAllCharacterDatas()

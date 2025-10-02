@@ -339,6 +339,12 @@ public class DBManager : Singleton<DBManager>
             current = Convert.ToInt32(snapshot.Value);
         }
 
+        if (current-subAmount < 0)
+        {
+            Debug.LogWarning("골드 부족");
+            return;
+        }
+
         int next = current - subAmount;
 
         await goldRef.SetValueAsync(next);
@@ -354,6 +360,128 @@ public class DBManager : Singleton<DBManager>
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
         var diaRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Diamond");
+
+        DataSnapshot snapshot = await diaRef.GetValueAsync();
+
+        int current = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            current = Convert.ToInt32(snapshot.Value);
+        }
+
+        if (current - subAmount < 0)
+        {
+            Debug.LogWarning("다이아 부족");
+            return;
+        }
+
+        int next = current - subAmount;
+
+        await diaRef.SetValueAsync(next);
+        Debug.Log($"감소한 Diamond: {subAmount} -> {next}");
+    }
+
+    /// <summary>
+    /// 유저의 현재 Diamond 값을 읽어와 지정한 값만큼 감소시킨 뒤 저장하는 메서드
+    /// </summary>
+    /// <param name="addAmount">감소시킬 Diamond 양</param>
+    /// <returns></returns>
+    public async Task<bool> TrySubtractGoldAsync(int subAmount)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        var goldRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Gold");
+
+        DataSnapshot snapshot = await goldRef.GetValueAsync();
+
+        int current = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            current = Convert.ToInt32(snapshot.Value);
+        }
+
+        if (current - subAmount < 0)
+        {
+            Debug.LogWarning("골드 부족");
+            return false;
+        }
+
+        int next = current - subAmount;
+
+        await goldRef.SetValueAsync(next);
+        Debug.Log($"감소한 Diamond: {subAmount} -> {next}");
+        return true;
+    }
+
+    /// <summary>
+    /// 유저의 현재 Diamond 값을 읽어와 지정한 값만큼 감소시킨 뒤 저장하는 메서드
+    /// </summary>
+    /// <param name="addAmount">감소시킬 Diamond 양</param>
+    /// <returns></returns>
+    public async Task<bool> TrySubtractDiamondAsync(int subAmount)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        var diaRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Diamond");
+
+        DataSnapshot snapshot = await diaRef.GetValueAsync();
+
+        int current = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            current = Convert.ToInt32(snapshot.Value);
+        }
+
+        if (current - subAmount < 0)
+        {
+            Debug.LogWarning("다이아 부족");
+            return false;
+        }
+
+        int next = current - subAmount;
+
+        await diaRef.SetValueAsync(next);
+        Debug.Log($"감소한 Diamond: {subAmount} -> {next}");
+        return true;
+    }
+
+    /// <summary>
+    /// 9/29 이형원 추가
+    /// 유저의 현재 캐릭터 신화석 값을 읽어와 지정한 값만큼 증가시킨 뒤 저장하는 메서드
+    /// </summary>
+    /// <param name="subAmount"></param>
+    /// <returns></returns>
+    public async Task AddMythStoneAsync(int subAmount)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        var diaRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("MythStone");
+
+        DataSnapshot snapshot = await diaRef.GetValueAsync();
+
+        int current = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            current = Convert.ToInt32(snapshot.Value);
+        }
+
+        int next = current + subAmount;
+
+        await diaRef.SetValueAsync(next);
+        Debug.Log($"감소한 Diamond: {subAmount} -> {next}");
+    }
+
+    /// <summary>
+    /// 9/29 이형원 추가
+    /// 유저의 현재 캐릭터 신화석 값을 읽어와 지정한 값만큼 감소시킨 뒤 저장하는 메서드
+    /// </summary>
+    /// <param name="subAmount"></param>
+    /// <returns></returns>
+    public async Task SubtractMythStoneAsync(int subAmount)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        var diaRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("MythStone");
 
         DataSnapshot snapshot = await diaRef.GetValueAsync();
 

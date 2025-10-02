@@ -18,16 +18,6 @@ public class SplashBuffProjectile : Projectile
 
     private UnitStatusController _targetStatus;
 
-    private float _totalPower
-    {
-        get
-        {
-            float power = _damageType == DamageType.Magic ? _status.MagicDamage.Value : _status.PhysicalDamage.Value;
-
-            return power * _physicalPower;
-        }
-    }
-
     protected override void Awake()
     {
         ComponentProvider.Add(gameObject, this);
@@ -35,7 +25,7 @@ public class SplashBuffProjectile : Projectile
 
     protected override void OnDestroy()
     {
-        ComponentProvider.Remove<SplashBuffProjectile>(gameObject);
+        ComponentProvider.Remove<SplashBuffProjectile>(gameObject);        
     }
     private void Update()
     {
@@ -98,6 +88,7 @@ public class SplashBuffProjectile : Projectile
             }
         }        
     }
+
     protected override async UniTask MoveAndDestroy(float duration)
     {
         await UniTask.Yield();
