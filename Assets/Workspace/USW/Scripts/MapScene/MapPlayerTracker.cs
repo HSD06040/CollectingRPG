@@ -2,7 +2,6 @@
 using System.Linq;
 using DG.Tweening;
 using map;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Map
@@ -53,7 +52,6 @@ namespace Map
         {
             Locked = lockAfterSelecting;
             mapManager.CurrentMap.path.Add(mapNode.Node.point);
-            mapManager.SaveMap();
             view.SetAttainableNodes();
             view.SetLineColors();
             mapNode.ShowSwirlAnimation();
@@ -70,9 +68,9 @@ namespace Map
 
         private static void EnterNode(MapNode mapNode)
         {
-            // we have access to blueprint name here as well
+            
             Debug.Log("Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
-            // Logic should be entered by here 
+           
             switch (mapNode.Node.nodeType)
             {
                 case NodeType.MinorEnemy:

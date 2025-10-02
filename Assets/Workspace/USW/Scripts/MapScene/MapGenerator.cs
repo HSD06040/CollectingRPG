@@ -35,6 +35,7 @@ namespace Map
 
             RemoveCrossConnections();
             
+            // 경로에 연결되지 않은 노드들은 제거
             List<Node> nodesList = nodes.SelectMany(n => n).Where(n => n.incoming.Count > 0 || n.outgoing.Count > 0).ToList();
             
             string bossNodeName = config.nodeBlueprints.Where(b => b.nodeType == NodeType.Boss).ToList().Random().name;
@@ -66,23 +67,19 @@ namespace Map
 
             for (int i = 0; i < config.GridWidth; i++)
             {
-                var supportedRandomNodeTypes =
-                    config.randomNodes.Where(t => config.nodeBlueprints.Any(b => b.nodeType == t)).ToList();
-                NodeType nodeType = Random.Range(0f, 1f) < layer.randomizeNodes && supportedRandomNodeTypes.Count > 0
-                    ? supportedRandomNodeTypes.Random()
-                    : layer.nodeType;
-        
-                // Boss 생성 로그 추가
-                if (nodeType == NodeType.Boss)
-                {
-                    Debug.LogWarning($"🔴 Boss created at Layer {layerIndex}, GridPos ({i}, {layerIndex}) - layerType: {layer.nodeType}, randomize: {layer.randomizeNodes}");
-                }
-        
-                string blueprintName = config.nodeBlueprints.Where(b => b.nodeType == nodeType).ToList().Random().name;
-                Node node = new Node(nodeType, blueprintName, new Vector2Int(i, layerIndex))
+                NodeType _nodeType = Random.Range(0f, 1f) < layer.randomizeNodes
+                    ? config.GetRandomNodeType()  // 가중치 기반
+                    : layer.nodeType;             // 레이어 고정
+
+                string blueprintName = config.nodeBlueprints
+                    .Where(b => b.nodeType == _nodeType)
+                    .ToList().Random().name;
+
+                Node node = new Node(_nodeType, blueprintName, new Vector2Int(i, layerIndex))
                 {
                     position = new Vector2(-offset + i * layer.nodesApartDistance, GetDistanceToLayer(layerIndex))
                 };
+                
                 nodesOnThisLayer.Add(node);
             }
 
