@@ -134,9 +134,12 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     private void UpdateUI()
     {
+        Debug.Log($"{_currentCharUnit != null} {_currentCharUnit.Status.Data.UpgradeData != null} {_currentCharUnit.Status.Data.LevelUpData != null}");
         if (_currentCharUnit != null && _currentCharUnit.Status.Data.UpgradeData != null && _currentCharUnit.Status.Data.LevelUpData != null)
         {
             // UI 표기
+            Debug.Log("UIUpdate");
+
             CharacterProfileUpdate();
             CharacterStatusUpdate();
             LevelUpButtonUpdate();
@@ -146,12 +149,17 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     }
 
     private void CharacterProfileUpdate()
-    {
+    {        
         _gradeText.text = _currentCharUnit.Status.Data.Grade.ToString();
+        Debug.Log("GradeTextUpdate");
         _characterNameText.text = _currentCharUnit.Status.Data.Name;
+        Debug.Log("CharacterName Update");
         _characterLevelText.text = $"LV.{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString()}";
+        Debug.Log("CharacterLevel Update");
         _characterImage.sprite = _currentCharUnit.Status.Data.Icon;
+        Debug.Log("CharacterIcon Update");
         _costImage.sprite = _costImages.CostSprites[_currentCharUnit.Status.Data.Cost - 1];
+        Debug.Log("CosSprite Update");
         if (Manager.Data.SynergyDB != null)
         {
             _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.Synergy).Icon;

@@ -11,7 +11,6 @@ public class UnitSkillUI : MonoBehaviour
     [SerializeField] TMP_Text _manaText;
     [SerializeField] TMP_Text _skillPowerText;
     [SerializeField] TMP_Text _skillDescriptionText;
-    [SerializeField] TMP_Text _skillAttackCountText;
 
     public void Setup(UnitStatus status)
     {
@@ -22,7 +21,6 @@ public class UnitSkillUI : MonoBehaviour
         _manaText.text = skill.ManaCost.ToString();
         _skillPowerText.text = skill.PhysicalPower.ToString();
         _skillDescriptionText.text = GetDescription(skill, status);
-        _skillAttackCountText.text = skill.MaxCount.ToString();
     }
 
     private string GetDescription(UnitSkill skill, UnitStatus status)

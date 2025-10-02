@@ -15,7 +15,12 @@ public class EnemyController : MonoBehaviour
     public void Init()
     {
         _slotManager.Init();
-        _unitGrid = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];        
+        _unitGrid = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];
+
+        if(InGameManager.Instance.IsOneBattle)
+        {
+            SetUnit(_gridDataSO);
+        }
     }
 
     public void SetUnit(UnitGridDataSO gridData)
@@ -24,12 +29,12 @@ public class EnemyController : MonoBehaviour
 
         foreach (var unitData in _gridDataSO.unitDatas)
         {
-            Vector2Int slotPosition = unitData.position - new Vector2Int(2, 0);
+            Vector2Int slotPosition = unitData.position + new Vector2Int(1, 1);
 
-            UnitSlot slot = _slotManager.GetUnitSlot(slotPosition + new Vector2Int(1,1));
+            UnitSlot slot = _slotManager.GetUnitSlot(slotPosition);
 
-            int x = slotPosition.x;
-            int y = slotPosition.y;
+            int x = unitData.position.x;
+            int y = unitData.position.y;
 
             GameObject obj = Instantiate(unitData.unitStatus.Data.UnitPrefab);
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);

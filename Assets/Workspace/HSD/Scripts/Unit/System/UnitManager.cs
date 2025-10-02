@@ -60,8 +60,12 @@ public class UnitManager : MonoBehaviour
             await Manager.Data.StageGridData.SetGridData(1,1);
         }
 
-        MapPlayerTracker.Instance.unitManager = this;
-        _mapManager.GenerateNewMap();
+        if (!InGameManager.Instance.IsOneBattle)
+        {
+            MapPlayerTracker.Instance.unitManager = this;
+            _mapManager.GenerateNewMap();
+        }
+
         _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();
 
