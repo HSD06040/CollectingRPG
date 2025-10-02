@@ -11,11 +11,13 @@ public class InGameManager : InGameSingleton<InGameManager>
     private void OnEnable()
     {
         BattleManager.OnBattleStarted += BattleStart;
+        BattleManager.OnGameStanby += BattleEnded;
     }
 
     private void OnDisable()
     {
         BattleManager.OnBattleStarted -= BattleStart;
+        BattleManager.OnGameStanby -= BattleEnded;
     }
 
     private void Start()
@@ -27,6 +29,11 @@ public class InGameManager : InGameSingleton<InGameManager>
     public void AddGold(int amount)
     {
         Gold.Value += amount;
+    }
+
+    private void BattleEnded()
+    {
+        IsBattle = false;
     }
 
     /// <summary>

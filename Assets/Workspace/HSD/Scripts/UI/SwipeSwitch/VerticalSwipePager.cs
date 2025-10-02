@@ -37,6 +37,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
             SetEnemyPosition();
         }
     }
+
     [SerializeField] float _xDragSensitivity;
     [SerializeField] float _xTweenDuration = .5f;
     private float _initialCameraX;
@@ -62,13 +63,9 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
 
     private void OnEnable()
     {
-        BattleManager.OnGameStanby += _slotPositionSetter.SetPositions;
+        BattleManager.OnGameStanby += () => MoveToPage(0);
     }
-
-    private void OnDisable()
-    {
-        BattleManager.OnGameStanby -= _slotPositionSetter.SetPositions;
-    }
+    
     #endregion    
 
     private void SetEnemyPosition()

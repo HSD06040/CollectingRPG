@@ -116,11 +116,20 @@ public class EnemyController : MonoBehaviour
 
     private void ClearAllEnemyUnits()
     {
+        if (_unitGrid == null)
+            return;
+
         foreach (var unit in _unitGrid)
         {
             if (unit != null)
             {
-                _slotManager.GetUnitSlot(unit).ClearSlot();
+                UnitSlot slot = _slotManager.GetUnitSlot(unit);
+
+                if (slot == null)
+                    return;
+
+                slot.ClearSlot();
+
                 Destroy(unit.gameObject);
             }
         }

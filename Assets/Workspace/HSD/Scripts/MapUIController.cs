@@ -15,9 +15,9 @@ public class MapUIController : MonoBehaviour
 
 #if UNITY_EDITOR
     [Button("MapEnter")]
-    public void MapEnterButton() => MapEnter().Forget();
+    private void MapEnterButton() => MapEnterAsync().Forget();
     [Button("MapExit")]
-    public void MapExitButton() => MapExit().Forget();
+    private void MapExitButton() => MapExitAsync().Forget();
 #endif
     private void Awake()
     {
@@ -40,12 +40,22 @@ public class MapUIController : MonoBehaviour
         _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, _downY);
     }
 
-    public async UniTask MapEnter()
+    public void MapEnter()
+    {
+        MapEnterAsync().Forget();
+    }
+
+    public void MapExit()
+    {
+        MapExitAsync().Forget();
+    }
+
+    public async UniTask MapEnterAsync()
     {
         await MapEnterAnimation();
     }
 
-    public async UniTask MapExit()
+    public async UniTask MapExitAsync()
     {
         await MapExitAnimation();
     }

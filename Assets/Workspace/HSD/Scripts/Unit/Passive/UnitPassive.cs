@@ -251,8 +251,6 @@ public class UnitPassive
         if (Effect.NextEffect.EffectApplyType == EffectApplyType.All)
             return;
 
-        Debug.Log($"[Next]");
-
         NextBuffEffectActive();
         NextAttackActive();
     }

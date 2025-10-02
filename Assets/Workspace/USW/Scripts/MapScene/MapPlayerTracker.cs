@@ -10,18 +10,22 @@ namespace Map
     {
         public bool lockAfterSelecting = false;
         public float enterNodeDelay = 1f;
-        public MapManager mapManager;
+        public MapManager mapManager;        
         public UnitManager unitManager;
         public MapView view;
 
-        public static MapPlayerTracker Instance;        
+        public static MapPlayerTracker Instance;
+
+        // 각 이벤트가 끝날때 호출
+        public static Action OnEventEnded;
 
         public bool Locked { get; set; }
 
         private void Awake()
         {
             Instance = this;
-        }
+            OnEventEnded += Unlock;
+        }        
 
         public void SelectNode(MapNode mapNode)
         {
@@ -78,8 +82,9 @@ namespace Map
                 case NodeType.Boss:
                     if (Instance != null)
                     {
+                        Instance.Locked = true;
                         Instance.unitManager.EnemyController.SetUnit(mapNode.Node.gridData);
-                        Instance.unitManager.GameStandby();
+                        Instance.unitManager.GameStandby();                        
                     }
                     break;                
                 case NodeType.Store:
@@ -102,5 +107,8 @@ namespace Map
         {
             Debug.Log("Selected node cannot be accessed");
         }
+
+        private void Lock() { Locked = true; }
+        private void Unlock() { Locked = false; }
     }
 }

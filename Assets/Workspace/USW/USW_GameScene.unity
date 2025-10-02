@@ -9989,7 +9989,7 @@ Tilemap:
       - {fileID: 6807214062609787494, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6852165731233830433, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6497433421722253745, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   m_TileAssetArray:
@@ -39699,6 +39699,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 631938004}
   m_CullTransparentMesh: 0
+--- !u!1 &634575346 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9117909395291036272, guid: 4803894f1cc7eb946803618b52fc3791,
+    type: 3}
+  m_PrefabInstance: {fileID: 8877578517234140708}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &635628885
 GameObject:
   m_ObjectHideFlags: 0
@@ -40454,8 +40460,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsTest: 1
   _center: {fileID: 1750745815}
-  _mapManager: {fileID: 0}
+  _mapManager: {fileID: 1593051923}
   _battleManager: {fileID: 1736584827}
+  MapUIController: {fileID: 348762038}
   _unitUIManager: {fileID: 1434084937}
   _unitSlotController: {fileID: 185726854}
   UnitController: {fileID: 1059808075}
@@ -65070,7 +65077,7 @@ Tilemap:
       - {fileID: 6807214062609787494, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6852165731233830433, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6497433421722253745, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -3, y: -6, z: 0}
@@ -70840,7 +70847,7 @@ Tilemap:
       - {fileID: 6807214062609787494, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6852165731233830433, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6497433421722253745, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -3, y: 12, z: 0}
@@ -102283,7 +102290,7 @@ Tilemap:
       - {fileID: 9165710306475261066, guid: 52d66968beb437b47aa95a6b61e6cd66, type: 3}
       - {fileID: -2092317922923651828, guid: 52d66968beb437b47aa95a6b61e6cd66, type: 3}
       - {fileID: 9015670353412449868, guid: 52d66968beb437b47aa95a6b61e6cd66, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 7, y: -10, z: 0}
@@ -104277,6 +104284,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1591719548}
   m_CullTransparentMesh: 0
+--- !u!114 &1593051923 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2921679671282911217, guid: 2cc2ae73b51e70540a5070e4aaebc56b,
+    type: 3}
+  m_PrefabInstance: {fileID: 2117907973}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8418e9714e8379842b1361eac223d970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1593993900
 GameObject:
   m_ObjectHideFlags: 0
@@ -109154,7 +109173,7 @@ Tilemap:
       - {fileID: 6807214062609787494, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6852165731233830433, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6497433421722253745, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 4, y: -6, z: 0}
@@ -109193,7 +109212,7 @@ Tilemap:
       - {fileID: 6807214062609787494, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6852165731233830433, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
       - {fileID: -6497433421722253745, guid: 65834c024e8bd2c459388bfbd14ad949, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 6, y: -3, z: 0}
@@ -128304,7 +128323,7 @@ Tilemap:
       - {fileID: 9165710306475261066, guid: 52d66968beb437b47aa95a6b61e6cd66, type: 3}
       - {fileID: -2092317922923651828, guid: 52d66968beb437b47aa95a6b61e6cd66, type: 3}
       - {fileID: 9015670353412449868, guid: 52d66968beb437b47aa95a6b61e6cd66, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 0, y: -10, z: 0}
@@ -137462,6 +137481,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3714012045705637248, guid: 2cc2ae73b51e70540a5070e4aaebc56b,
         type: 3}
+      propertyPath: linePrefab
+      value: 
+      objectReference: {fileID: 634575346}
+    - target: {fileID: 3714012045705637248, guid: 2cc2ae73b51e70540a5070e4aaebc56b,
+        type: 3}
+      propertyPath: nodePrefab
+      value: 
+      objectReference: {fileID: 5037388882644343366, guid: c7db66268820aac42b99331134a62483,
+        type: 3}
+    - target: {fileID: 3714012045705637248, guid: 2cc2ae73b51e70540a5070e4aaebc56b,
+        type: 3}
       propertyPath: uiLinePrefab
       value: 
       objectReference: {fileID: 2086194373}
@@ -137494,7 +137524,7 @@ PrefabInstance:
         type: 3}
       propertyPath: scrollRectHorizontal
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1606208874501977912}
     - target: {fileID: 3714012045705637248, guid: 2cc2ae73b51e70540a5070e4aaebc56b,
         type: 3}
       propertyPath: backgroundPPUMultiplier
@@ -139771,7 +139801,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1080, y: 2340}
+  m_ReferenceResolution: {x: 1080, y: 1920}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
@@ -142243,8 +142273,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 35
+  m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -143730,7 +143760,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 3476371484035867823}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.99999106
+  m_Size: 0.7873706
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

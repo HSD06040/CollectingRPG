@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Map;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ public class UnitManager : MonoBehaviour
     [SerializeField] BattleManager _battleManager;
 
     [Header("UI")]
+    public MapUIController MapUIController;
     [SerializeField] UnitUIManager _unitUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
 
@@ -105,6 +107,8 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnSpawnUnit += _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
+        BattleManager.OnBattleEnded += MapPlayerTracker.OnEventEnded;
+        BattleManager.OnPlayerVictory += MapUIController.MapEnter;
         BattleManager.OnBattleStarted += ApplyHealAugment;
 
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
@@ -123,6 +127,8 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnSpawnUnit -= _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
+        BattleManager.OnBattleEnded -= MapPlayerTracker.OnEventEnded;
+        BattleManager.OnPlayerVictory -= MapUIController.MapEnter;
         BattleManager.OnBattleStarted -= ApplyHealAugment;
 
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
@@ -167,7 +173,7 @@ public class UnitManager : MonoBehaviour
         if (UnitController.GetUnitsCount() == 0)
             return;
 
-        _unitUIManager.StandbyUIDeActive();
+        _unitUIManager.StandbyUIDeActive().Forget();
 
         FightRoutine().Forget();
     }
@@ -212,7 +218,7 @@ public class UnitManager : MonoBehaviour
 
     private void FightUISetup()
     {
-        _unitUIManager.BattleUISetting();
+        _unitUIManager.BattleUISetting().Forget();
 
         _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
         _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
@@ -228,18 +234,21 @@ public class UnitManager : MonoBehaviour
         EnemyController.EnemyStandby();
     }
 
-    [ContextMenu("GameStanby")]
     public void GameStandby()
     {
         ClearSpawnUnit();
         EnemyController.ResetEnemy();
+        EnemyController.BattleParent.transform.position = Vector2.zero;
         UnitController.UnitStandbyAndSetSlotPosition();
+        UnitController.BattleParent.transform.position = Vector2.zero;
         _unitUIManager.StandbyUISetting().Forget();
 
         _battleManager.GameStanby();
         Camera.main.transform.position = new Vector3(0, 0, -10);
         Camera.main.orthographicSize = 13;
-    }
+
+        MapUIController.MapExit();
+    }    
 
     private void UnitsIdle()
     {
