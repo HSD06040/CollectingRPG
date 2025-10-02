@@ -82,10 +82,6 @@ public class MagicStoneUpgradeData : ScriptableObject
             }
             else
             {
-                if (PopupManager.Instance != null)
-                {
-                    PopupManager.instance.ShowPopup("조각이 부족합니다.");
-                }
                 return false;
             }
         }
@@ -114,28 +110,3 @@ public class MagicStoneUpgradeData : ScriptableObject
     }
 }
 
-[CreateAssetMenu(fileName = "MagicStone_LevelUpData", menuName = "Data/Temp/MagicStone_LevelUpData")]
-public class MagicStoneLevelUpData : ScriptableObject
-{
-    public List<PieceLevelRatio> LevelRatio = new List<PieceLevelRatio>();
-
-    public int GetCumulativePiece(int level)
-    {
-        int cumulativePiece = 0;
-
-        int index = level - 1;
-        if (index < 0)
-        {
-            index = 0;
-            cumulativePiece += 10;
-        }
-
-        for (int i = index; i < LevelRatio.Count; i++)
-        {
-            cumulativePiece += LevelRatio[i].RequirePiece;
-        }
-        Debug.Log(cumulativePiece);
-
-        return cumulativePiece;
-    }
-}

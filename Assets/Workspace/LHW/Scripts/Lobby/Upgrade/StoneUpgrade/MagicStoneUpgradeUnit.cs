@@ -1,6 +1,4 @@
-using System.Runtime.CompilerServices;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +11,7 @@ public class MagicStoneUpgradeUnit : MonoBehaviour
 
     private UpgradeManager _manager;
     private MagicStoneData _data;
+    public MagicStoneData Data => _data;
 
     private void Awake()
     {
@@ -40,6 +39,7 @@ public class MagicStoneUpgradeUnit : MonoBehaviour
 
     private void ShowPopup()
     {
+        _manager.StonePopUpUI.GetCurrentMagicStoneUnit(this);
         _manager.ShowStonePopUp();
     }
 
