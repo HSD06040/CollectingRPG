@@ -9,12 +9,24 @@ public class BattleEndUI : MonoBehaviour
 {
     private void OnEnable()
     {
-        BattleManager.OnBattleEnded += ShowPopup;
+        if(InGameManager.Instance.IsOneBattle)
+        {
+            BattleManager.OnBattleEnded += ShowPopup;
+            return;
+        }
+        
+        BattleManager.OnPlayerDefeat += ShowPopup;
     }
 
     private void OnDisable()
     {
-        BattleManager.OnBattleEnded -= ShowPopup;
+        if (InGameManager.Instance.IsOneBattle)
+        {
+            BattleManager.OnBattleEnded -= ShowPopup;
+            return;
+        }
+
+        BattleManager.OnPlayerDefeat -= ShowPopup;
     }
 
     private void ShowPopup()

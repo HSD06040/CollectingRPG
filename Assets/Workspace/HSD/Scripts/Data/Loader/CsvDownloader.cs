@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 public enum CsvType
 {
@@ -24,7 +25,8 @@ public class CsvDownloader
     private UnitSkill[] _playerSkills;
     private UnitData[] _monsterUnitDatas;
     private UnitAttackData[] _attackDatas;
-    
+    private LevelUpData _levelUpData;
+
     public CsvDownloader(CsvLoadData csvLoadData)
     {
         _csvLoadData = csvLoadData;
@@ -39,6 +41,7 @@ public class CsvDownloader
         _playerSkills = await Manager.Resources.LoadAll<UnitSkill>("SkillData_Player");
         _monsterUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");
         _attackDatas = await Manager.Resources.LoadAll<UnitAttackData>("AttackData");
+        _levelUpData = await Addressables.LoadAssetAsync<LevelUpData>("Data/LevelUpData");
 
         List<UniTask> tasks = new List<UniTask>(10);
 
@@ -46,8 +49,6 @@ public class CsvDownloader
         {
             tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));
         }
-
-        //await LoadCSV(_csvLoadData.CsvDatas[2].GetURL(), GetSetupMethod(CsvType.Monster));
 
         await UniTask.WhenAll(tasks);
 
@@ -159,6 +160,8 @@ public class CsvDownloader
                 unitData.UnitStats[i] = unitData.UnitStats[i-1].StatMultiply(1.5f);
             }
             
+            unitData.LevelUpData = _levelUpData;
+
             string synergyText = unitData.Synergy.ToString();
             string synergyName = $"{char.ToUpper(synergyText[0])}{synergyText.Substring(1).ToLower()}";
             int lastDigit = Mathf.Abs(id % 10);
@@ -191,6 +194,8 @@ public class CsvDownloader
                 continue;
             }
 
+            unitData.Name = row[2];
+
             UnitStats stat = new UnitStats
             {
                 AttackRange = float.TryParse(row[1], out float attackRange) ? attackRange * 1.5f : 1,
@@ -220,9 +225,7 @@ public class CsvDownloader
             unitData.UnitStats[0] = stat;
             unitData.UnitStats[1] = stat;
             unitData.UnitStats[2] = stat;
-            unitData.UnitStats[3] = stat;
-
-            unitData.Name = id.ToString(); // 임시
+            unitData.UnitStats[3] = stat;            
         }
     }
 

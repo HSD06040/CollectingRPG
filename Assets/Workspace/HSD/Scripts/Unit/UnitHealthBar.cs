@@ -11,6 +11,11 @@ public class UnitHealthBar : MonoBehaviour
     private UnitBase _owner;    
     private CancellationTokenSource _cts;
 
+    private void OnDisable()
+    {
+        Dispose();
+    }
+
     public void Setup(UnitBase owner)
     {
         if (_owner != null)
@@ -76,7 +81,7 @@ public class UnitHealthBar : MonoBehaviour
         _shieldSlider.UpdateShield(_owner.StatusController.CurHp.Value, _owner.StatusController.MaxHealth.Value, value);
     }
 
-    private void BarDestroy()
+    public void BarDestroy()
     {
         Dispose();
         Manager.Resources.Destroy(gameObject);

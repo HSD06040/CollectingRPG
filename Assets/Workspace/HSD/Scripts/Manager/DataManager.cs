@@ -23,6 +23,7 @@ public class DataManager : Singleton<DataManager>
 
     // 맵 데이터 관련
     public MapDatabase MapDB { get; private set; } = new MapDatabase();
+    public StageGridData StageGridData = new();
 
     // 추후 Init으로 뺄 예정
     public async UniTask InitAsync()
@@ -31,7 +32,6 @@ public class DataManager : Singleton<DataManager>
         MapDB.InitMapData();
         await InitData();
     }
-
     #region UniData
 
     public async UniTask InitData()

@@ -227,8 +227,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
 
     public void ClearAllStat()
     {
-        Debug.Log("ClearAllStat called");
-
         // 모든 스탯의 모디파이어 제거
         MaxHealth.ClearModifiers();
         MaxMana.ClearModifiers();
@@ -253,6 +251,8 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         _cts.Cancel();
         _cts.Dispose();
         _cts = new CancellationTokenSource();
+
+        SetBaseStat(Status.GetCurrentStat());
     }
     #endregion
 

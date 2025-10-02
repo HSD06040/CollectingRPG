@@ -80,6 +80,18 @@ namespace Map
                     position = new Vector2(-offset + i * layer.nodesApartDistance, GetDistanceToLayer(layerIndex))
                 };
                 
+                switch (node.nodeType)
+                {
+                    case NodeType.MinorEnemy:
+                    case NodeType.EliteEnemy:
+                    case NodeType.Boss:
+                        node.gridData = Manager.Data.StageGridData.GetGridData(node.nodeType);
+                    break;
+
+                    default:
+                        break;
+                }
+
                 nodesOnThisLayer.Add(node);
             }
 

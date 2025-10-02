@@ -4,20 +4,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InGameSettingButtonPanel : UIBase
+public class InGameSettingButtonPanel : MonoBehaviour
 {
-    [UIBind("AccelerateButton")] Button _accelerateButton;
-    [UIBind("AccelerateAmount")] TMP_Text _accelerateAmount;
+    [SerializeField] Button _accelerateButton;
+    [SerializeField] TMP_Text _accelerateAmount;
 
-    [UIBind("PauseButton")] Button _pauseButton;
-    [UIBind("PauseIcon")] Image _pauseImage;
-
-    [SerializeField] Sprite[] _accelerateAmountSprites;
-
-    [SerializeField] Sprite _pauseSprite;
-    [SerializeField] Sprite _replaySprite;
-    [SerializeField] string _pauseSpriteAddress;
-    [SerializeField] string _replaySpriteAddress;
+    [SerializeField] Button _pauseButton;
 
     private void OnEnable()
     {
@@ -25,7 +17,6 @@ public class InGameSettingButtonPanel : UIBase
         Manager.Game.CurrentAccelerate.AddEvent(AccelerateAmountUpdate);
 
         _pauseButton.onClick.AddListener(ChangePause);
-        Manager.Game.IsPause.AddEvent(PauseUpdate);
     }
 
     private void OnDisable()
@@ -34,7 +25,6 @@ public class InGameSettingButtonPanel : UIBase
         Manager.Game.CurrentAccelerate.RemoveEvent(AccelerateAmountUpdate);
 
         _pauseButton.onClick.RemoveListener(ChangePause);
-        Manager.Game.IsPause.RemoveEvent(PauseUpdate);
     }
 
     private void NextAccelerate()
@@ -50,12 +40,5 @@ public class InGameSettingButtonPanel : UIBase
     private void AccelerateAmountUpdate(float amount)
     {
         _accelerateAmount.text = amount.ToString();
-    }
-
-    private void PauseUpdate(bool isPause)
-    {        
-        _pauseImage.sprite = isPause ? 
-            Manager.Resources.SpriteGet(_pauseSpriteAddress) :
-            Manager.Resources.SpriteGet(_replaySpriteAddress);
     }
 }

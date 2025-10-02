@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,11 +8,12 @@ using UnityEngine.UI;
 public class UnitUIManager : MonoBehaviour
 {           
     [SerializeField] Button _fightButton;
-    [SerializeField] GameObject _battleUI;
-    [SerializeField] GameObject _notBattleUI;
+    [SerializeField] CanvasGroup _battleUI;
+    [SerializeField] CanvasGroup _notBattleUI;
+
+    [SerializeField] private float _fadeDuration = 0.3f;
 
     [Header("Battle")]
-    public FightUnitSlotController FightSlotController;
     public DamageMeterController DamageMeterController;
     public HpMeterController HpMeterController;
     public SkillPopUpController SkillPopUpController;
@@ -22,22 +25,48 @@ public class UnitUIManager : MonoBehaviour
     public UnitCountPanel UnitCountPanel;
     public UnitTotalPowerPanel[] UnitTotalPowerPanel;
 
-    public void BattleUISetting()
+    public async UniTask BattleUISetting()
     {
-        _battleUI.SetActive(true);        
+        await UIFadeOut(_notBattleUI);
+
+        await UIFadeIn(_battleUI);
     }
 
-    public void StandbyUISetting()
+    public async UniTask StandbyUISetting()
     {
-        _battleUI.SetActive(false);
-        _notBattleUI.SetActive(true);
-        _fightButton.gameObject.SetActive(true);
         UnitHealthBarManager.Clear();
+
+        await UIFadeOut(_battleUI);
+
+        _fightButton.gameObject.SetActive(true);
+
+        await UIFadeIn(_notBattleUI);
     }
 
-    public void StandbyUIDeActive()
+    public async UniTask StandbyUIDeActive()
     {
-        _notBattleUI.SetActive(false);
+        await UIFadeOut(_notBattleUI);
+
         _fightButton.gameObject.SetActive(false);
+    }
+
+    private async UniTask UIFadeIn(CanvasGroup canvasGroup)
+    {
+        canvasGroup.alpha = 0f;
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
+
+        await canvasGroup.DOFade(1f, _fadeDuration).AsyncWaitForCompletion();
+
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.interactable = true;
+    }
+
+    private async UniTask UIFadeOut(CanvasGroup canvasGroup)
+    {
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
+
+        await canvasGroup.DOFade(0f, _fadeDuration).AsyncWaitForCompletion();
     }
 }
