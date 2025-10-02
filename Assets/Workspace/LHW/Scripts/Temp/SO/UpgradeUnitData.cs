@@ -96,10 +96,6 @@ public class UpgradeUnitData : ScriptableObject
             }
             else
             {
-                if(PopupManager.Instance != null)
-                {
-                    PopupManager.instance.ShowPopup("조각이 부족합니다.");
-                }
                 return false;
             }
         }

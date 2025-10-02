@@ -35,30 +35,25 @@ public class CharacterUpgradeUnit : MonoBehaviour
         UIUpdate();
     }
 
-    private void DataInit()
-    {
-        _status = new UnitStatus(_unitData, 1);
-    }
-
     private void OnEnable()
     {
         if (_manager != null)
         {
-            _manager.PopUpUI.OnCharacterStatusChanged += UIUpdate;
+            _manager.CharPopUpUI.OnCharacterStatusChanged += UIUpdate;
             UIUpdate();
         }
     }
 
     private void OnDisable()
     {
-        if (_manager != null) _manager.PopUpUI.OnCharacterStatusChanged -= UIUpdate;
+        if (_manager != null) _manager.CharPopUpUI.OnCharacterStatusChanged -= UIUpdate;
     }
 
     #region Onclick
 
     private void ShowPopUp()
     {
-        _manager.PopUpUI.GetCurrentCharacterUnitData(this);
+        _manager.CharPopUpUI.GetCurrentCharacterUnitData(this);
         _manager.ShowCharacterPopUp();
     }
 
