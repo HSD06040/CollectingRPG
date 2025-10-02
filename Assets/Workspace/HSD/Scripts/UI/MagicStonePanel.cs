@@ -36,13 +36,12 @@ public class MagicStonePanel : MonoBehaviour
     }
 #endif
 
-    private void Awake()
+    private void Start()
     {
         foreach (var slot in _magicStoneSlots)
         {
             slot.Init(_dropArea);
             slot.OnCleared += HandleSlotCleared;
-            ClearAllMagicStones();
         }
     }
 

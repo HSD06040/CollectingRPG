@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 
@@ -9,12 +9,7 @@ namespace Map
         public MapConfig config;
         public MapView view;
 
-        public Map CurrentMap { get; private set; }
-
-        private void Start()
-        {
-            GenerateNewMap();
-        }
+        public Map CurrentMap { get; private set; }        
 
         public void GenerateNewMap()
         {

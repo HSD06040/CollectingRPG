@@ -11,9 +11,10 @@ namespace Map
         public bool lockAfterSelecting = false;
         public float enterNodeDelay = 1f;
         public MapManager mapManager;
+        public UnitManager unitManager;
         public MapView view;
 
-        public static MapPlayerTracker Instance;
+        public static MapPlayerTracker Instance;        
 
         public bool Locked { get; set; }
 
@@ -68,15 +69,19 @@ namespace Map
 
         private static void EnterNode(MapNode mapNode)
         {
-            
             Debug.Log("Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
            
             switch (mapNode.Node.nodeType)
             {
                 case NodeType.MinorEnemy:
-                    break;
                 case NodeType.EliteEnemy:
-                    break;
+                case NodeType.Boss:
+                    if (Instance != null)
+                    {
+                        Instance.unitManager.EnemyController.SetUnit(mapNode.Node.gridData);
+                        Instance.unitManager.GameStandby();
+                    }
+                    break;                
                 case NodeType.Store:
                     if (Instance != null)
                         Instance.Locked = true;
@@ -85,10 +90,7 @@ namespace Map
                     {
                         StageShopPanel.Instance.OpenShop();
                     }
-
-                    break;
-                case NodeType.Boss:
-                    break;
+                    break;                                   
                 case NodeType.Event:
                     break;
                 default:

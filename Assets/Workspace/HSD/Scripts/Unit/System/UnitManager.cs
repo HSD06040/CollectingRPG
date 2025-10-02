@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Map;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,8 @@ public class UnitManager : MonoBehaviour
     [Header("Center")]
     [SerializeField] Transform _center;
 
-    [Header("BattleManager")]
+    [Header("Manager")]
+    [SerializeField] MapManager _mapManager;
     [SerializeField] BattleManager _battleManager;
 
     [Header("UI")]
@@ -53,8 +55,11 @@ public class UnitManager : MonoBehaviour
         if (IsTest)
         {
             await Manager.Resources.LoadLabel("Stage");
+            await Manager.Data.StageGridData.SetGridData(1,1);
         }
 
+        MapPlayerTracker.Instance.unitManager = this;
+        _mapManager.GenerateNewMap();
         _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();
 
@@ -229,7 +234,7 @@ public class UnitManager : MonoBehaviour
         ClearSpawnUnit();
         EnemyController.ResetEnemy();
         UnitController.UnitStandbyAndSetSlotPosition();
-        _unitUIManager.StandbyUISetting();
+        _unitUIManager.StandbyUISetting().Forget();
 
         _battleManager.GameStanby();
         Camera.main.transform.position = new Vector3(0, 0, -10);

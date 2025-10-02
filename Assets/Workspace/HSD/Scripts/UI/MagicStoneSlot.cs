@@ -13,6 +13,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private RectTransform _magicStone;
     [SerializeField] private Image _magicStoneIcon;
     [SerializeField] private Image _highlight;
+    private Image[] _images;
 
     [Header("Drag Settings")]
     private Transform _dropAreaPanel;
@@ -21,6 +22,8 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void Init(Transform dropArea)
     {
         _dropAreaPanel = dropArea;
+        _images = GetComponentsInChildren<Image>(true);
+        DragEnd();
     }
 
     public void ClearMagicStone()
@@ -62,6 +65,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void OnBeginDrag(PointerEventData eventData)
     {
         _originalPos = _highlight.rectTransform.position;
+        DragStart();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -103,5 +107,23 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         _magicStone.position = _originalPos;
 
         _highlight.enabled = false;
+
+        DragEnd();
+    }
+
+    private void DragStart()
+    {
+        foreach (var image in _images)
+        {
+            image.maskable = false;
+        }
+    }
+
+    private void DragEnd()
+    {
+        foreach (var image in _images)
+        {
+            image.maskable = true;
+        }
     }
 }

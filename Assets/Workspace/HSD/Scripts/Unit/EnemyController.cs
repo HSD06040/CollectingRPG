@@ -15,13 +15,13 @@ public class EnemyController : MonoBehaviour
     public void Init()
     {
         _slotManager.Init();
-        _unitGrid = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];
-
-        SetUnit();
+        _unitGrid = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];        
     }
 
-    public void SetUnit()
+    public void SetUnit(UnitGridDataSO gridData)
     {
+        _gridDataSO = gridData;
+
         foreach (var unitData in _gridDataSO.unitDatas)
         {
             UnitSlot slot = _slotManager.GetUnitSlot(unitData.position + new Vector2Int(1, 1));
