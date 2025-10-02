@@ -68,15 +68,15 @@ public class MagicStoneUpgradeData : ScriptableObject
         CurrentUpgradeData.CurrentPieces += piece;
     }
 
-    public async Task<bool> LevelUpWithPiecesOnly()
+    public async Task<bool> LevelUpWithPieces()
     {
         if (CurrentUpgradeData.UpgradeLevel >= 10) return false;
 
         if (CurrentUpgradeData.UpgradeLevel <= 0)
         {
-            if (CurrentUpgradeData.CurrentPieces >= 10)
+            if (CurrentUpgradeData.CurrentPieces >= 5)
             {
-                CurrentUpgradeData.CurrentPieces -= 10;
+                CurrentUpgradeData.CurrentPieces -= 5;
                 CurrentUpgradeData.UpgradeLevel += 1;
                 return true;
             }
@@ -111,63 +111,6 @@ public class MagicStoneUpgradeData : ScriptableObject
             }
         }
         return false;
-    }
-
-    public async Task<bool> CanLevelUpWithMythStone()
-    {
-
-        if (CurrentUpgradeData.UpgradeLevel >= 10) return false;
-
-        int requiredPiece = GetRequiredPiece();
-        int requiredGold = GetRequiredGold();
-
-        string uid = FirebaseManager.Auth.CurrentUser.UserId;
-        var goldRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Gold");
-        var mythStoneRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("MagicStone");
-
-        DataSnapshot goldSnap = await goldRef.GetValueAsync();
-        DataSnapshot mythSnap = await mythStoneRef.GetValueAsync();
-
-        int currentGold = goldSnap.Exists ? Convert.ToInt32(goldSnap.Value) : 0;
-        int currentMythStone = mythSnap.Exists ? Convert.ToInt32(mythSnap.Value) : 0;
-
-        int ratio = MythStonePieceRatio(_grade);
-        int conversedMythstone = currentMythStone / ratio;
-
-        return (CurrentUpgradeData.CurrentPieces + conversedMythstone >= requiredPiece
-            && currentGold >= requiredGold);
-    }
-
-    public async Task LevelUpWithMythStone()
-    {
-
-        int requiredPiece = GetRequiredPiece();
-        int requiredGold = GetRequiredGold();
-        int ratio = MythStonePieceRatio(_grade);
-
-        int neededFromMythStone = requiredPiece - CurrentUpgradeData.CurrentPieces;
-        if (neededFromMythStone > 0)
-            await DBManager.Instance.SubtractMythStoneAsync(neededFromMythStone * ratio);
-
-        CurrentUpgradeData.CurrentPieces = 0;
-        CurrentUpgradeData.UpgradeLevel += 1;
-        await DBManager.Instance.SubtractGoldAsync(requiredGold);
-
-        OnLevelUp?.Invoke();
-    }
-
-    private int MythStonePieceRatio(SubGrade grade)
-    {
-        int pieceRatio = 0;
-
-        switch (grade)
-        {
-            case SubGrade.SILVER: pieceRatio = 2; break;
-            case SubGrade.GOLD: pieceRatio = 4; break;
-            case SubGrade.PRISM: pieceRatio = 6; break;
-        }
-
-        return pieceRatio;
     }
 }
 

@@ -446,7 +446,7 @@ public class RandomGachaSystem : MonoBehaviour
         }
         else
         {
-            if (data.UpgradeData.CurrentUpgradeData.CurrentPieces > requirePiece)
+            if (data.UpgradeData.CurrentUpgradeData.CurrentPieces >= requirePiece)
             {
                 overPiece = inputPiece;
             }
@@ -483,7 +483,7 @@ public class RandomGachaSystem : MonoBehaviour
         }
         else
         {
-            if (data.UpgradeData.CurrentUpgradeData.CurrentPieces > requirePiece)
+            if (data.UpgradeData.CurrentUpgradeData.CurrentPieces >= requirePiece)
             {
                 overPiece = inputPiece;
             }
@@ -558,7 +558,14 @@ public class RandomGachaSystem : MonoBehaviour
 
         if (IsOveredPieceUpperLimit(data, pieces, out int overPiece))
         {
-            await DBManager.Instance.AddMythStoneAsync(overPiece);
+            if (overPiece != pieces)
+            {
+                data.UpgradeData.AddPiece(pieces - overPiece);
+                await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(data);
+            }
+
+            // 최대 강화 조각 초과 획득시, 조각당 1400 골드로 변환
+            await DBManager.Instance.AddGoldAsync(overPiece * 1400);
         }
         else
         {

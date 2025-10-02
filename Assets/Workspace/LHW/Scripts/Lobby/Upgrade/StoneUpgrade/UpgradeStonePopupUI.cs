@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ public class UpgradeStonePopupUI : MonoBehaviour
     [SerializeField] private TMP_Text _stoneEffectText;
     [SerializeField] private TMP_Text _stoneProbableAddText;
     [SerializeField] private TMP_Text[] _stoneProbleText;
+
+    public Action OnMagicStoneStatusChanged;
 
     private void OnEnable()
     {

@@ -5,8 +5,9 @@ public class UpgradeManager : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private UpgradeCharacterPopupUI _characterPopUpUI;
-    public UpgradeCharacterPopupUI PopUpUI => _characterPopUpUI;
+    public UpgradeCharacterPopupUI CharPopUpUI => _characterPopUpUI;
     [SerializeField] private UpgradeStonePopupUI _stonePopUpUI;
+    public UpgradeStonePopupUI StonePopUpUI => _stonePopUpUI;
 
     [Header("UI")]
     [SerializeField] private GameObject _characterUI;
