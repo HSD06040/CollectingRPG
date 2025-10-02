@@ -59,6 +59,9 @@ public class Projectile : MonoBehaviour
         _distance = distance;
         _effect = effect;
 
+        if (target == null)
+            Manager.Resources.Destroy(gameObject);
+
         MoveAsync().Forget();
     }
     private async UniTask MoveAsync()

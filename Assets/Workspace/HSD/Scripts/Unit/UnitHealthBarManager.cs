@@ -42,7 +42,7 @@ public class UnitHealthBarManager : MonoBehaviour
     {
         foreach (UnitHealthBar healthBar in _hpbarList)
         {
-            if (healthBar.gameObject.activeSelf)
+            if (healthBar != null && healthBar.gameObject.activeSelf)
                 healthBar.BarDestroy();
         }
 
