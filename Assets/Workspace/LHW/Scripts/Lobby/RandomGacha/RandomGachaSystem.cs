@@ -376,7 +376,7 @@ public class RandomGachaSystem : MonoBehaviour
 
             int pieceNum = ReturnCharacterPieceByGrade(data);
 
-            if (IsOveredCharPieceUpperLimit(data, pieceNum, out int overPiece, out int mythPiece))
+            if (IsOveredPieceUpperLimit(data, pieceNum, out int overPiece, out int mythPiece))
             {
                 if (overPiece != pieceNum)
                 {
@@ -432,7 +432,7 @@ public class RandomGachaSystem : MonoBehaviour
     /// <param name="overPiece"></param>
     /// <param name="mythPiece"></param>
     /// <returns></returns>
-    private bool IsOveredCharPieceUpperLimit(UnitData data, int inputPiece, out int overPiece, out int mythPiece)
+    private bool IsOveredPieceUpperLimit(UnitData data, int inputPiece, out int overPiece, out int mythPiece)
     {
         Grade grade = data.Grade;
         int level = data.UpgradeData.CurrentUpgradeData.UpgradeLevel;
@@ -466,6 +466,31 @@ public class RandomGachaSystem : MonoBehaviour
             Debug.Log($"{data.Name}의 조각 개수 초과. {overPiece}개를 초과하여 신화석 {pieceRatio}만큼 지급");
 
             mythPiece = pieceRatio;
+
+            return true;
+        }
+    }
+    private bool IsOveredPieceUpperLimit(MagicStoneData data, int inputPiece, out int overPiece)
+    {
+        SubGrade grade = data.Grade;
+        int level = data.UpgradeData.CurrentUpgradeData.UpgradeLevel;
+        int requirePiece = data.LevelUpData.GetCumulativePiece(level);
+
+        if (data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece < requirePiece)
+        {
+            overPiece = 0;
+            return false;
+        }
+        else
+        {
+            if (data.UpgradeData.CurrentUpgradeData.CurrentPieces > requirePiece)
+            {
+                overPiece = inputPiece;
+            }
+            else
+            {
+                overPiece = data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece - requirePiece;
+            }
 
             return true;
         }
@@ -524,12 +549,23 @@ public class RandomGachaSystem : MonoBehaviour
         _resultUI.gameObject.SetActive(true);
     }
 
-    private void MagicStoneSelection(int index)
+    private async void MagicStoneSelection(int index)
     {
         int pickedStone = UnityEngine.Random.Range(0, _stoneDatabase.MagicStoneDatas.Count);
         MagicStoneData data = _stoneDatabase.MagicStoneDatas[pickedStone];
 
         int pieces = _magicStonePieceRandom.GetRandomItem();
+
+        if (IsOveredPieceUpperLimit(data, pieces, out int overPiece))
+        {
+            await DBManager.Instance.AddMythStoneAsync(overPiece);
+        }
+        else
+        {
+            data.UpgradeData.AddPiece(pieces);
+
+            await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(data);
+        }
 
         _resultUI.StoneGachaUpdate(data, index, pieces.ToString());
     }
