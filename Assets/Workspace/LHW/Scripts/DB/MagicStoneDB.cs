@@ -66,7 +66,7 @@ public class MagicStoneDB : MonoBehaviour
                 int upgradeLevel = args.Snapshot.Child("UpgradeLevel").Value is long level
                     ? (int)level : 0;
 
-                //magicStoneData.UpgradeData.CurrentUpgradeData.SetData(currentPieces, upgradeLevel);
+                magicStoneData.UpgradeData.CurrentUpgradeData.SetData(currentPieces, upgradeLevel);
             }
         }
     }

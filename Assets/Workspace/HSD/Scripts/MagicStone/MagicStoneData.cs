@@ -21,6 +21,14 @@ public abstract class MagicStoneData : ScriptableObject
 
     public abstract void UseMagicStone(Vector2 pos);
 
+    public MagicStoneUpgradeData UpgradeData;
+    public MagicStoneLevelUpData LevelUpData;
+
+    public void Init()
+    {
+        UpgradeData?.Init(Grade, LevelUpData);
+    }
+
     /// <summary>
     /// 적이 1명일때 사용 (랜덤, 보스)
     /// </summary>   

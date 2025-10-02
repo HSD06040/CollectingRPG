@@ -113,7 +113,7 @@ public class DataManager : Singleton<DataManager>
             if (!MagicStoneDataDic.ContainsKey(magicStoneData.Name))
                 MagicStoneDataDic.Add(magicStoneData.Name, magicStoneData);
 
-            // Init과정 필요
+            magicStoneData.Init();
         }
     }
 
@@ -121,7 +121,6 @@ public class DataManager : Singleton<DataManager>
     {
         return MagicStoneDataDic.TryGetValue(magicStoneName, out var magicStoneData) ? magicStoneData : null;
     }
-
 
     #endregion
 }

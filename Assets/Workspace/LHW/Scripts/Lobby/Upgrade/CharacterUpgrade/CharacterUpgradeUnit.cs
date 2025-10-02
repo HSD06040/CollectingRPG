@@ -35,11 +35,6 @@ public class CharacterUpgradeUnit : MonoBehaviour
         UIUpdate();
     }
 
-    private void DataInit()
-    {
-        _status = new UnitStatus(_unitData, 1);
-    }
-
     private void OnEnable()
     {
         if (_manager != null)
