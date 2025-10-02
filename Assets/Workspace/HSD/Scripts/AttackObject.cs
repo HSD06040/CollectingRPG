@@ -34,8 +34,13 @@ public class AttackObject : MonoBehaviour
     private async UniTask Attack()
     {
         await UniTask.WaitForSeconds(_delay);
-        
-        foreach (var target in Utils.GetTargetsNonAlloc(GetAttackPoint(transform), _searchType, _sizeOrRadius, _boxSize, _targetLayer))
+
+        GameObject[] objs = Utils.GetTargetsNonAlloc(GetAttackPoint(transform), _searchType, _sizeOrRadius, _boxSize, _targetLayer);
+
+        if (objs == null)
+            return;
+
+        foreach (var target in objs)
         {
             ComponentProvider.Get<UnitBase>(target.gameObject).StatusController.TakeDamage((int)_power);
         }

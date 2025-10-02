@@ -6,6 +6,7 @@ public class UnitHealthBarManager : MonoBehaviour
 {
     [SerializeField] Transform _healthBarContent;    
     [SerializeField] string _healthBarAddress;
+    private List<UnitHealthBar> _hpbarList = new List<UnitHealthBar>(20);
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
@@ -33,13 +34,18 @@ public class UnitHealthBarManager : MonoBehaviour
             ).GetComponent<UnitHealthBar>();
 
         bar.Setup(unit);
+
+        _hpbarList.Add(bar);
     }
 
     public void Clear()
     {
-        foreach (Transform healthBar in _healthBarContent)
-        {            
-            Manager.Resources.Destroy(healthBar.gameObject);
+        foreach (UnitHealthBar healthBar in _hpbarList)
+        {
+            if (healthBar != null && healthBar.gameObject.activeSelf)
+                healthBar.BarDestroy();
         }
+
+        _hpbarList.Clear();
     }
 }
