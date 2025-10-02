@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using DG.Tweening;
+using map;
 using UnityEngine;
 
 namespace Map
@@ -51,21 +52,25 @@ namespace Map
         {
             Locked = lockAfterSelecting;
             mapManager.CurrentMap.path.Add(mapNode.Node.point);
-            mapManager.SaveMap();
             view.SetAttainableNodes();
             view.SetLineColors();
             mapNode.ShowSwirlAnimation();
 
-            DOTween.Sequence().AppendInterval(enterNodeDelay).OnComplete(() => EnterNode(mapNode));
+            if (mapNode.Node.nodeType == NodeType.Store)
+            {
+                EnterNode(mapNode);
+            }
+            else
+            {
+                DOTween.Sequence().AppendInterval(enterNodeDelay).OnComplete(() => EnterNode(mapNode));
+            }
         }
 
         private static void EnterNode(MapNode mapNode)
         {
-            // we have access to blueprint name here as well
+            
             Debug.Log("Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
-            // load appropriate scene with context based on nodeType:
-            // or show appropriate GUI over the map: 
-            // if you choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
+           
             switch (mapNode.Node.nodeType)
             {
                 case NodeType.MinorEnemy:
@@ -73,10 +78,18 @@ namespace Map
                 case NodeType.EliteEnemy:
                     break;
                 case NodeType.Store:
+                    if (Instance != null)
+                        Instance.Locked = true;
+
+                    if (StageShopPanel.Instance != null)
+                    {
+                        StageShopPanel.Instance.OpenShop();
+                    }
+
                     break;
                 case NodeType.Boss:
                     break;
-                case NodeType.Mystery:
+                case NodeType.Event:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

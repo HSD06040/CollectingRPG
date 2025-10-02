@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -88,11 +87,45 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
                 return;
             }
         }
-        _currentCharUnit.Status.Data.UpgradeData.LevelUp();
 
-        await DBManager.Instance.charDB.SaveCharacterUpgradeData(_currentCharUnit.Status.Data);
+        bool success = await _currentCharUnit.Status.Data.UpgradeData.LevelUpWithPiecesOnly();
 
-        OnCharacterStatusChanged?.Invoke();
+        if (!success && _currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel >= 1)
+        {
+            bool canUseMyth = await _currentCharUnit.Status.Data.UpgradeData.CanLevelUpWithMythStone();
+
+            if (!canUseMyth)
+            {
+                if (PopupManager.Instance != null)
+                {
+                    PopupManager.instance.ShowPopup("조각이 부족합니다.");
+                    return;
+                }
+            }
+
+            if (PopupManager.Instance != null)
+            {
+                PopupManager.instance.ShowConfirmationPopup(
+                    "조각이 부족합니다. 신화석을 사용해서 레벨업 하시겠습니까?",
+                    async () =>
+                    {
+                        await _currentCharUnit.Status.Data.UpgradeData.LevelUpWithMythStone();
+                        await DBManager.Instance.charDB.SaveCharacterUpgradeData(_currentCharUnit.Status.Data);
+                        OnCharacterStatusChanged?.Invoke();
+
+                    },
+                    () =>
+                    {
+                        PopupManager.instance.ShowPopup("레벨업이 취소되었습니다.");
+                    }
+                );
+            }
+        }
+        else
+        {
+            await DBManager.Instance.charDB.SaveCharacterUpgradeData(_currentCharUnit.Status.Data);
+            OnCharacterStatusChanged?.Invoke();
+        }
     }
 
     #endregion
@@ -180,14 +213,14 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     private void StatusUpgradeUIUpdate()
     {
-        for(int i = 0; i < _characterUpgradeLevelText.Length; i++)
+        for (int i = 0; i < _characterUpgradeLevelText.Length; i++)
         {
             _characterUpgradeLevelText[i].text = $"LV.{2 * (i + 1)}";
 
             List<StatusGrowth> statusGrowths = _currentCharUnit.Status.Data.UpgradeStatData.GetCurrentStatusData(_currentCharUnit.Status.Data.Grade, 2 * (i + 1));
 
             StringBuilder sb = new StringBuilder();
-            for(int j = 0; j < statusGrowths.Count; j++)
+            for (int j = 0; j < statusGrowths.Count; j++)
             {
                 sb.Append($"{StatTypeTranslate(statusGrowths[j].Type)} {statusGrowths[j].Value} ");
                 if (j != statusGrowths.Count - 1 && j % 2 == 1) sb.Append("\n");
@@ -205,11 +238,11 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     {
         int currentUpgradeLevel = _currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel / 2;
 
-        for(int i = 0; i < currentUpgradeLevel; i++)
+        for (int i = 0; i < currentUpgradeLevel; i++)
         {
             _upgradeStatusDisablePanel[i].SetActive(false);
         }
-        for(int i = currentUpgradeLevel; i < _upgradeStatusDisablePanel.Length; i++)
+        for (int i = currentUpgradeLevel; i < _upgradeStatusDisablePanel.Length; i++)
         {
             _upgradeStatusDisablePanel[i].SetActive(true);
         }
@@ -219,7 +252,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     {
         string text = "";
 
-        switch(type)
+        switch (type)
         {
             case StatType.MaxHealth: text = "최대체력"; break;
             case StatType.MaxMana: text = "최대마나"; break;

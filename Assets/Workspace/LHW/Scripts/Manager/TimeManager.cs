@@ -1,6 +1,12 @@
 using System;
 using UnityEngine;
 
+public enum GachaType
+{
+    Char,
+    Stone,
+}
+
 [Serializable]
 public class RewardInfo
 {
@@ -58,12 +64,19 @@ public class TimeManager : MonoBehaviour
     [Header("Reference")]
     [SerializeField] private GoogleAdMob _adMob;
 
-    // 가챠
-    private RewardInfo _dailyFreeGachaRewardInfo;
-    public RewardInfo DailyFreeGachaRewardInfo => _dailyFreeGachaRewardInfo;
+    // 캐릭터 가챠
+    private RewardInfo _dailyCharFreeGachaRewardInfo;
+    public RewardInfo DailyCharFreeGachaRewardInfo => _dailyCharFreeGachaRewardInfo;
 
-    private RewardInfo _dailyAdGachaRewardInfo;
-    public RewardInfo DailyAdGachaRewardInfo => _dailyAdGachaRewardInfo;
+    private RewardInfo _dailyCharAdGachaRewardInfo;
+    public RewardInfo DailyCharAdGachaRewardInfo => _dailyCharAdGachaRewardInfo;
+
+    // 마법석 가챠
+    private RewardInfo _dailyStoneFreeGachaRewardInfo;
+    public RewardInfo DailyStoneFreeGachaRewardInfo => _dailyStoneFreeGachaRewardInfo;
+
+    private RewardInfo _dailyStoneAdGachaRewardInfo;
+    public RewardInfo DailyStoneAdGachaRewardInfo => _dailyStoneAdGachaRewardInfo;
 
     // 상점 
     private DateTime _dailyShopResetTime;
@@ -90,32 +103,50 @@ public class TimeManager : MonoBehaviour
 
         // 테스트용: 오늘 아침 6시, 가챠횟수 1회
         DateTime todayReset = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 6, 0, 0);
-        _dailyFreeGachaRewardInfo = new RewardInfo(todayReset.Ticks, 1);
+        _dailyCharFreeGachaRewardInfo = new RewardInfo(todayReset.Ticks, 1);
+        _dailyStoneFreeGachaRewardInfo = new RewardInfo(todayReset.Ticks, 1);
 
-        if (_dailyFreeGachaRewardInfo.state == 0 && IsDailyResetTime(_dailyFreeGachaRewardInfo.GetDateTime()))
+        if (_dailyCharFreeGachaRewardInfo.state == 0 && IsDailyResetTime(_dailyCharFreeGachaRewardInfo.GetDateTime()))
         {
-            _dailyFreeGachaRewardInfo.state = 1;
+            _dailyCharFreeGachaRewardInfo.state = 1;
 
             // TODO : DB에 [일일 무료 가챠] 시간과 상태를 저장 
         }
+        if(_dailyStoneFreeGachaRewardInfo.state == 0 && IsDailyResetTime(_dailyStoneFreeGachaRewardInfo.GetDateTime()))
+        {
+            _dailyStoneFreeGachaRewardInfo.state = 1;
+
+            // TODO : DB에 [일일 무료 가챠] 시간과 상태를 저장
+        }
+
         OnDailyGachaInfoChanged?.Invoke();
     }
 
     /// <summary>
     /// 일일 무료 가챠 시간을 업데이트 - 횟수 사용 시
     /// </summary>
-    public void UpdateDailyFreeGachaResetTimeInfo()
+    public void UpdateDailyFreeGachaResetTimeInfo(GachaType type)
     {
         DateTime now = DateTime.Now;
         DateTime todayReset = new DateTime(now.Year, now.Month, now.Day, 6, 0, 0);
         DateTime nextResetDate = (now.Hour < 6) ? todayReset : todayReset.AddDays(1);
 
-        _dailyFreeGachaRewardInfo.SetDateTime(nextResetDate);
-        _dailyFreeGachaRewardInfo.state = 0;
+        switch(type)
+        {
+            case GachaType.Char:
+                _dailyCharFreeGachaRewardInfo.SetDateTime(nextResetDate);
+                _dailyCharFreeGachaRewardInfo.state = 0;
 
-        // TODO : DB에 [일일 무료 가챠] 시간과 상태를 저장
+                // TODO : DB에 [일일 무료 가챠] 시간과 상태를 저장
+                break;
+            case GachaType.Stone:
+                _dailyStoneFreeGachaRewardInfo.SetDateTime(nextResetDate);
+                _dailyStoneFreeGachaRewardInfo.state = 0;
 
-        Debug.Log($"다음 무료 가챠 초기화 시간 : {nextResetDate}");
+                // TODO : DB에 [일일 무료 가챠] 시간과 상태를 저장
+                break;
+        }
+
         OnDailyGachaInfoChanged?.Invoke();
     }
 
@@ -132,24 +163,47 @@ public class TimeManager : MonoBehaviour
         // TODO : DB에 저장된 [광고 가챠] 시간 및 횟수 데이터를 가져와서 캐싱
 
         // 테스트용 초기값: 11시간 전, 가챠 횟수 1회
-        _dailyAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-11).AddMinutes(-59).Ticks, 1);
+        _dailyCharAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-11).AddMinutes(-59).Ticks, 1);
+        _dailyStoneAdGachaRewardInfo = new RewardInfo(DateTime.Now.AddHours(-11).AddMinutes(-59).Ticks, 1);
 
-        if (_dailyAdGachaRewardInfo.state < 2 && IsDailyAdGachaResetTime(out int stack))
+        if (_dailyCharAdGachaRewardInfo.state < 2 && IsDailyCharAdGachaResetTime(out int stack))
         {
-            _dailyAdGachaRewardInfo.state += stack;
-            if (_dailyAdGachaRewardInfo.state > 2) _dailyAdGachaRewardInfo.state = 2;
+            _dailyCharAdGachaRewardInfo.state += stack;
+            if (_dailyCharAdGachaRewardInfo.state > 2) _dailyCharAdGachaRewardInfo.state = 2;
 
             // TODO : DB에 [광고 가챠] 시간과 상태를 저장
         }
+        if(_dailyStoneAdGachaRewardInfo.state < 2 && IsDailyCharAdGachaResetTime(out int stack2))
+        {
+            _dailyStoneAdGachaRewardInfo.state += stack2;
+            if (_dailyStoneAdGachaRewardInfo.state > 2) _dailyStoneAdGachaRewardInfo.state = 2;
+
+            // TODO : DB에 [광고 가챠] 시간과 상태를 저장
+        }
+
         OnDailyGachaInfoChanged?.Invoke();
     }
 
     /// <summary>
     /// 광고 가챠 횟수를 업데이트 - 횟수 사용 시
     /// </summary>
-    public void UpdateAdGachaResetTimeInfo()
+    public void UpdateAdGachaResetTimeInfo(GachaType type)
     {
-        if (_dailyAdGachaRewardInfo.state > 0)
+        switch(type)
+        {
+            case GachaType.Char:
+                UpdateCharAdGachaResetTimeInfo();
+                break;
+            case GachaType.Stone:
+                UpdateStoneAdGachaResetTimeInfo();
+                break;
+        }
+        OnDailyGachaInfoChanged?.Invoke();
+    }
+
+    private void UpdateCharAdGachaResetTimeInfo()
+    {
+        if (_dailyCharAdGachaRewardInfo.state > 0)
         {
             // 해당 부분은 RandomGachaSystem으로 옮기는 게 적절해 보임
             // 추후에 옮길 예정
@@ -157,13 +211,30 @@ public class TimeManager : MonoBehaviour
             {
                 _adMob.LoadedAd.Show();
             }
-            _dailyAdGachaRewardInfo.state -= 1;
+            _dailyCharAdGachaRewardInfo.state -= 1;
 
             // TODO : DB에 [광고 가챠] 시간과 상태를 저장
 
-            Debug.Log($"광고 가챠 스택 감소: {_dailyAdGachaRewardInfo.state}, 마지막 갱신: {_dailyAdGachaRewardInfo.GetDateTime()}");
-            OnDailyGachaInfoChanged?.Invoke();
-        }        
+            Debug.Log($"광고 가챠 스택 감소: {_dailyCharAdGachaRewardInfo.state}, 마지막 갱신: {_dailyCharAdGachaRewardInfo.GetDateTime()}");
+        }
+    }
+
+    private void UpdateStoneAdGachaResetTimeInfo()
+    {
+        if (_dailyStoneAdGachaRewardInfo.state > 0)
+        {
+            // 해당 부분은 RandomGachaSystem으로 옮기는 게 적절해 보임
+            // 추후에 옮길 예정
+            if (_adMob.IsReady)
+            {
+                _adMob.LoadedAd.Show();
+            }
+            _dailyStoneAdGachaRewardInfo.state -= 1;
+
+            // TODO : DB에 [광고 가챠] 시간과 상태를 저장
+
+            Debug.Log($"광고 가챠 스택 감소: {_dailyStoneAdGachaRewardInfo.state}, 마지막 갱신: {_dailyCharAdGachaRewardInfo.GetDateTime()}");
+        }
     }
 
     #endregion
@@ -229,12 +300,44 @@ public class TimeManager : MonoBehaviour
     /// 일일 가챠가 가능한 상태인지 판별함.
     /// </summary>
     /// <returns></returns>
-    public bool CanObtainedFreeGachaReward()
+    public bool CanObtainedFreeGachaReward(GachaType type)
     {
-        if (_dailyFreeGachaRewardInfo.state == 1) return true;
-        if (IsDailyResetTime(_dailyFreeGachaRewardInfo.GetDateTime()))
+        bool canObtain = false;
+
+        switch (type)
         {
-            _dailyFreeGachaRewardInfo.state = 1;
+            case GachaType.Char:
+                canObtain = CanObtainFreeCharGachaReward();
+                break;
+            case GachaType.Stone:
+                canObtain = CanObtainFreeStoneGachaReward();
+                break;                
+        }
+
+        return canObtain;
+    }
+
+    private bool CanObtainFreeCharGachaReward()
+    {
+        if (_dailyCharFreeGachaRewardInfo.state == 1) return true;
+        if (IsDailyResetTime(_dailyCharFreeGachaRewardInfo.GetDateTime()))
+        {
+            _dailyCharFreeGachaRewardInfo.state = 1;
+
+            // TODO : DB에 [일일 무료 가챠] 시간과 상태를 저장
+
+            OnDailyGachaInfoChanged?.Invoke();
+            return true;
+        }
+        return false;
+    }
+
+    private bool CanObtainFreeStoneGachaReward()
+    {
+        if (_dailyStoneFreeGachaRewardInfo.state == 1) return true;
+        if (IsDailyResetTime(_dailyStoneFreeGachaRewardInfo.GetDateTime()))
+        {
+            _dailyStoneFreeGachaRewardInfo.state = 1;
 
             // TODO : DB에 [일일 무료 가챠] 시간과 상태를 저장
 
@@ -269,12 +372,29 @@ public class TimeManager : MonoBehaviour
     /// 광고 가챠가 가능한 상태인지 판별함.
     /// </summary>
     /// <returns></returns>
-    public bool CanObtainAdGachaReward()
+    public bool CanObtainAdGachaReward(GachaType type)
     {
-        if (IsDailyAdGachaResetTime(out int stack))
+        bool canObtain = false;
+
+        switch (type)
         {
-            _dailyAdGachaRewardInfo.state += stack;
-            if (_dailyAdGachaRewardInfo.state > 2) _dailyAdGachaRewardInfo.state = 2;
+            case GachaType.Char:
+                canObtain = CanObtainCharAdGachaReward();
+                break;
+            case GachaType.Stone:
+                canObtain = CanObtainStoneAdGachaReward();
+                break;
+        }
+
+        return canObtain;
+    }
+
+    private bool CanObtainCharAdGachaReward()
+    {
+        if (IsDailyCharAdGachaResetTime(out int stack))
+        {
+            _dailyCharAdGachaRewardInfo.state += stack;
+            if (_dailyCharAdGachaRewardInfo.state > 2) _dailyCharAdGachaRewardInfo.state = 2;
 
             // TODO : DB에 시간과 상태를 저장
 
@@ -282,7 +402,25 @@ public class TimeManager : MonoBehaviour
             return true;
         }
 
-        if (_dailyAdGachaRewardInfo.state >= 1) return true;
+        if (_dailyCharAdGachaRewardInfo.state >= 1) return true;
+
+        return false;
+    }
+
+    private bool CanObtainStoneAdGachaReward()
+    {
+        if (IsDailyStoneAdGachaResetTime(out int stack))
+        {
+            _dailyStoneAdGachaRewardInfo.state += stack;
+            if (_dailyStoneAdGachaRewardInfo.state > 2) _dailyStoneAdGachaRewardInfo.state = 2;
+
+            // TODO : DB에 시간과 상태를 저장
+
+            OnDailyGachaInfoChanged?.Invoke();
+            return true;
+        }
+
+        if (_dailyStoneAdGachaRewardInfo.state >= 1) return true;
 
         return false;
     }
@@ -290,10 +428,10 @@ public class TimeManager : MonoBehaviour
     /// <summary>
     /// 12시간 단위 누적 스택 계산
     /// </summary>
-    private bool IsDailyAdGachaResetTime(out int stack)
+    private bool IsDailyCharAdGachaResetTime(out int stack)
     {
         DateTime now = DateTime.Now;
-        DateTime lastTime = _dailyAdGachaRewardInfo.GetDateTime();
+        DateTime lastTime = _dailyCharAdGachaRewardInfo.GetDateTime();
         TimeSpan difference = now - lastTime;
 
         stack = 0;
@@ -304,9 +442,32 @@ public class TimeManager : MonoBehaviour
             stack = Mathf.Min(stackCount, 2); // 최대 2 스택
 
             // 마지막 갱신 시간 이동
-            _dailyAdGachaRewardInfo.SetDateTime(lastTime.AddHours(12 * stack));
+            _dailyCharAdGachaRewardInfo.SetDateTime(lastTime.AddHours(12 * stack));
 
-            Debug.Log($"스택 증가: {stack}, 새로운 마지막 갱신 시간: {_dailyAdGachaRewardInfo.GetDateTime()}");
+            Debug.Log($"스택 증가: {stack}, 새로운 마지막 갱신 시간: {_dailyCharAdGachaRewardInfo.GetDateTime()}");
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsDailyStoneAdGachaResetTime(out int stack)
+    {
+        DateTime now = DateTime.Now;
+        DateTime lastTime = _dailyStoneAdGachaRewardInfo.GetDateTime();
+        TimeSpan difference = now - lastTime;
+
+        stack = 0;
+
+        if (difference.TotalHours >= 12)
+        {
+            int stackCount = (int)(difference.TotalHours / 12);
+            stack = Mathf.Min(stackCount, 2); // 최대 2 스택
+
+            // 마지막 갱신 시간 이동
+            _dailyStoneAdGachaRewardInfo.SetDateTime(lastTime.AddHours(12 * stack));
+
+            Debug.Log($"스택 증가: {stack}, 새로운 마지막 갱신 시간: {_dailyStoneAdGachaRewardInfo.GetDateTime()}");
             return true;
         }
 
