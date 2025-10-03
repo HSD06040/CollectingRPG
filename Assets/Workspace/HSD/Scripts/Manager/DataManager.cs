@@ -44,7 +44,7 @@ public class DataManager : Singleton<DataManager>
         await AnimationManager.Init();
         await PreLoadData();
         await CsvDownload();
-        PreLoadMagicStoneDatas();
+        //PreLoadMagicStoneDatas();
     }
 
     private async UniTask CsvDownload()

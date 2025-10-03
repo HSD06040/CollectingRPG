@@ -1,7 +1,9 @@
+using Cysharp.Threading.Tasks;
 using Firebase.Database;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 public class RandomGachaSystem : MonoBehaviour
@@ -51,10 +53,20 @@ public class RandomGachaSystem : MonoBehaviour
 
     private void Awake()
     {
-        Init();
+        DataLoad().Forget();        
     }
 
     #region Init
+
+    private async UniTask DataLoad()
+    {
+        _charData ??= await Manager.Resources.LoadAsync<CharacterDatabase>("Database/CharacterDatabase");
+        _stoneDatabase ??= await Manager.Resources.LoadAsync<MagicStoneDatabase>("Database/MagicStoneDatabase");
+        _charProb ??= await Manager.Resources.LoadAsync<ItemProbabilitySO>("Data/CharProbability");
+        _stoneProb ??= await Manager.Resources.LoadAsync<MagicStoneGachaSO>("Data/MagicStoneGachaSO");
+
+        Init();
+    }
 
     private void Init()
     {
