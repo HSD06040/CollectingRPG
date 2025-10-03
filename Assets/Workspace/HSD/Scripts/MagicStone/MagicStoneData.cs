@@ -23,6 +23,7 @@ public abstract class MagicStoneData : ScriptableObject
 
     public MagicStoneUpgradeData UpgradeData;
     public MagicStoneLevelUpData LevelUpData;
+    public MagicStoneUpgradeProbData UpgradeProbData;
 
     public void Init()
     {

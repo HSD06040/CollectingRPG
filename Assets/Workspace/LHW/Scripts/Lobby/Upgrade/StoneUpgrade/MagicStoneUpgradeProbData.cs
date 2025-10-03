@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +6,18 @@ using UnityEngine;
 public class MagicStoneUpgradeProbData : ScriptableObject
 {
     public List<MagicStoneLevelGrowth> StoneUpgradeProbs;
+
+    public List<SubGradeProb> GetCurrentLevelProbData(int level)
+    {
+        MagicStoneLevelGrowth levelGrowth = StoneUpgradeProbs.Find(l => l.Level == level);
+        if (levelGrowth.Equals(default(MagicStoneLevelGrowth)))
+        {
+            Debug.LogWarning($"[MagicStoneUpgradeProbData] 해당 Level({level}) 데이터가 없음");
+            return null;
+        }
+
+        return levelGrowth.GradeProbs;
+    }
 }
 
 [Serializable]
