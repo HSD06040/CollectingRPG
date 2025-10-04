@@ -85,7 +85,6 @@ namespace Map
                     {
                         StageShopPanel.Instance.OpenShop();
                     }
-
                     break;
                 case NodeType.Boss:
                     break;
