@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -11,7 +12,6 @@ public class UpgradeStonePopupUI : MonoBehaviour
     [SerializeField] private TMP_Text _stoneLevelText;
     [SerializeField] private TMP_Text _stoneNameText;
     [SerializeField] private TMP_Text _stoneDescriptionText;
-    [SerializeField] private TMP_Text _stoneProbableAddText;
     [SerializeField] private TMP_Text[] _stoneProbleText;
 
     [Header("Level Up Button UI")]
@@ -71,7 +71,13 @@ public class UpgradeStonePopupUI : MonoBehaviour
 
     private void UpdateStoneProbable()
     {
-        // 마법석 현재 적용 확률 표시
+        List<SubGradeProb> probs = _currentMagicStoneUnit.Data.UpgradeProbData.
+            GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
+        
+        for(int i = 0; i < _stoneProbleText.Length; i++)
+        {
+            _stoneProbleText[i].text = $"{probs[i].Probable.ToString()}%";
+        }
     }
 
     private void LevelUpButtonUpdate()
