@@ -9,9 +9,15 @@ public class DataManager : Singleton<DataManager>
     public Dictionary<string, UnitData> UnitDataDic;    
     public UnitData[] EnemyUnitDatas;
     public UnitData[] PlayerUnitDatas;
-    public SynergyDatabase SynergyDB;
-    public UnitSpawnChanceData UnitSpawnChanceData;
 
+    // 시너지
+    public SynergyDatabase SynergyDB;
+
+    // 인게임
+    public UnitSpawnChanceData UnitSpawnChanceData;
+    public CharacterSellAmountData CharacterSellAmountData;
+    
+    // 애니메이션 ㄷ이터
     public AnimationManager AnimationManager = new();
 
     // 마법석 데이터 임시로 추가
@@ -41,10 +47,12 @@ public class DataManager : Singleton<DataManager>
         await Manager.Resources.SpriteLoadLable("SkillIcon");
 
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
+        CharacterSellAmountData = await Addressables.LoadAssetAsync<CharacterSellAmountData>("Data/CharacterSellAmountData");
+
         await AnimationManager.Init();
         await PreLoadData();
         await CsvDownload();
-        PreLoadMagicStoneDatas();
+        //PreLoadMagicStoneDatas();
     }
 
     private async UniTask CsvDownload()

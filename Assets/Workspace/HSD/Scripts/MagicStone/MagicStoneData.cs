@@ -176,6 +176,24 @@ public abstract class MagicStoneData : ScriptableObject
             }
         }
     }
+
+    protected void ApplyStunSingle(UnitBase unit)
+    {
+        unit.StatusController.Stun(Value);
+    }
+
+    protected void ApplyStunMultiple(GameObject[] objs)
+    {
+        if (objs == null) return;
+        foreach (var obj in objs)
+        {
+            UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
+            if (unit != null)
+            {
+                ApplyStunSingle(unit);
+            }
+        }
+    }
     #endregion
 
     #region SpawnEffect

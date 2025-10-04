@@ -118,6 +118,9 @@ public class CsvDownloader
                 continue;
             }
 
+            Debug.Log($"Setting up UnitData ID: {id}, Name: {unitData.Name}");
+            Debug.Log($"Grade is {row[1]}");
+
             unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.NORMAL;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
             unitData.Name = row[3];
