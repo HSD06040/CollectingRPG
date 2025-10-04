@@ -9,19 +9,16 @@ namespace Map
     {
         public static EventPanel Instance;
 
-        [Header("UI References")] 
-        public GameObject _eventPanelUI;
+        [Header("UI References")] public GameObject _eventPanelUI;
         public TMP_Text _titleText;
         public TMP_Text _descriptionText;
         public CanvasGroup _descriptionCanvasGroup;
-        
-        [Header("Choice Buttons")]
-        public Button _yesButton;
+
+        [Header("Choice Buttons")] public Button _yesButton;
         public Button _nvmButton;
         public Button _continueButton;
 
-        [Header("Fade Settings")]
-        public float _fadeDuration = 0.5f;
+        [Header("Fade Settings")] public float _fadeDuration = 0.5f;
 
         private EventData _currentEvent;
 
@@ -69,7 +66,7 @@ namespace Map
 
             _titleText.text = eventData._eventTitle;
             _descriptionText.text = eventData._eventDescription;
-            
+
             _yesButton.gameObject.SetActive(true);
             _nvmButton.gameObject.SetActive(true);
             _continueButton.gameObject.SetActive(false);
@@ -99,12 +96,12 @@ namespace Map
             yield return StartCoroutine(FadeOut());
 
             EventOutcome outcome;
-            
+
             if (acceptChallenge)
             {
                 // Energy 소비
                 ConsumeEnergy(_currentEvent._energyCost);
-                
+
                 // 50% 확률로 성공/실패 결정
                 bool isSuccess = Random.Range(0f, 1f) < 0.5f;
                 outcome = isSuccess ? EventOutcome.Success : EventOutcome.Failure;
@@ -147,6 +144,7 @@ namespace Map
                 _descriptionCanvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / _fadeDuration);
                 yield return null;
             }
+
             _descriptionCanvasGroup.alpha = 0f;
         }
 
@@ -161,6 +159,7 @@ namespace Map
                 _descriptionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / _fadeDuration);
                 yield return null;
             }
+
             _descriptionCanvasGroup.alpha = 1f;
         }
 
@@ -177,10 +176,8 @@ namespace Map
         /// </summary>
         private void ApplyReward()
         {
-            
-                // TODO: 보상 시스템 연동해주시면 됩니당
-                // 마법석 , 은화 , 증강
-            
+            // TODO: 보상 시스템 연동해주시면 됩니당
+            // 마법석 , 은화 , 증강
         }
 
         /// <summary>
@@ -188,9 +185,7 @@ namespace Map
         /// </summary>
         private void ApplyPenalty()
         {
-           
-                // TODO: 패널티 시스템 연결
-           
+            // TODO: 패널티 시스템 연결
         }
 
         public void CloseEvent()
@@ -207,10 +202,10 @@ namespace Map
         {
             if (_yesButton != null)
                 _yesButton.onClick.RemoveAllListeners();
-            
+
             if (_nvmButton != null)
                 _nvmButton.onClick.RemoveAllListeners();
-            
+
             if (_continueButton != null)
                 _continueButton.onClick.RemoveAllListeners();
         }
