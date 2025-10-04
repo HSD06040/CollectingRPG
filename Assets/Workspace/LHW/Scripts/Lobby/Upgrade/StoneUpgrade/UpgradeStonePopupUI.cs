@@ -76,7 +76,7 @@ public class UpgradeStonePopupUI : MonoBehaviour
         
         for(int i = 0; i < _stoneProbleText.Length; i++)
         {
-            _stoneProbleText[i].text = probs[i].ToString();
+            _stoneProbleText[i].text = $"{probs[i].Probable.ToString()}%";
         }
     }
 
