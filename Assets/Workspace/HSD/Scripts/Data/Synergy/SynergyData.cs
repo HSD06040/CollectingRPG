@@ -12,6 +12,7 @@ public class SynergyLevelData
 public abstract class SynergyData : ScriptableObject
 {
     public Sprite Icon;
+    public Color SynergyColor;
     public string SynergyName;
     [TextArea]
     public string Description;

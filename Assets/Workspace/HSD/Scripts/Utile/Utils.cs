@@ -385,12 +385,12 @@ public static class Utils
 
     #region UI
     public static void SetupGridLayoutGroup(
-    this GridLayoutGroup gridLayoutGroup,
-    Transform content,
-    int columns,
-    int rows,
-    int offset = 10,
-    bool keepSquare = false)
+        this GridLayoutGroup gridLayoutGroup,
+        Transform content,
+        int columns,
+        int rows,
+        int offset = 10,
+        bool keepSquare = false)
     {
         RectTransform rectTransform = content as RectTransform;
         if (rectTransform == null) return;
@@ -403,32 +403,36 @@ public static class Utils
         float availableHeight = rectTransform.rect.height
                               - gridLayoutGroup.padding.top - gridLayoutGroup.padding.bottom;
 
+        float currentSpacingX = gridLayoutGroup.spacing.x;
+        float currentSpacingY = gridLayoutGroup.spacing.y;
+
         if (!keepSquare)
         {
-            // 기존 방식
-            float totalWidth = availableWidth - (gridLayoutGroup.spacing.x * (columns - 1));
-            float totalHeight = availableHeight - (gridLayoutGroup.spacing.y * (rows - 1));
+            float totalSpacingX = currentSpacingX * (columns - 1);
+            float totalSpacingY = currentSpacingY * (rows - 1);
 
-            float cellWidth = totalWidth / columns;
-            float cellHeight = totalHeight / rows;
+            float totalCellWidth = availableWidth - totalSpacingX;
+            float totalCellHeight = availableHeight - totalSpacingY;
+
+            float cellWidth = totalCellWidth / columns;
+            float cellHeight = totalCellHeight / rows;
 
             gridLayoutGroup.cellSize = new Vector2(cellWidth, cellHeight);
         }
         else
         {
-            // 정사각형 셀 크기
-            float cellWidth = availableWidth / columns;
-            float cellHeight = (availableHeight - (gridLayoutGroup.spacing.y * (rows - 1))) / rows;
-            float cellSize = Mathf.Min(cellWidth, cellHeight);
+            float maxPossibleCellWidth = (availableWidth - (currentSpacingX * (columns - 1))) / columns;
+            float maxPossibleCellHeight = (availableHeight - (currentSpacingY * (rows - 1))) / rows;
+
+            float cellSize = Mathf.Min(maxPossibleCellWidth, maxPossibleCellHeight);
 
             gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
 
-            // spacing.x 재계산
             float totalCellWidth = cellSize * columns;
             float remainingWidth = Mathf.Max(0, availableWidth - totalCellWidth);
-            float spacingX = columns > 1 ? remainingWidth / (columns - 1) : 0;
+            float spacingX = columns > 1 ? remainingWidth / (columns - 1) : currentSpacingX;
 
-            gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
+            gridLayoutGroup.spacing = new Vector2(spacingX, currentSpacingY);
         }
     }
     #endregion

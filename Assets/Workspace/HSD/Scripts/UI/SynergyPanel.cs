@@ -15,20 +15,20 @@ public class SynergyPanel : MonoBehaviour
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
     [SerializeField] int _offset;
 
-    private Dictionary<int, SynergySlot> _synergySlots = new(10);
+    private Dictionary<int, SynergySlot_New> _synergySlots = new(10);
     private int _currentPage;
     private int _maxPage;
 
     private void Start()
-    {
-        _gridLayoutGroup.SetupGridLayoutGroup(_content, 3, 2, _offset);
+    {        
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, 6, 1, _offset, true);
     }
 
     public void Init(SynergyDatabase db)
     {
         _synergySlotPrefab = Manager.Resources.Load<GameObject>(_synergySlotAddress);
 
-        CreateSynergtSlots(db); 
+        CreateSynergtSlots(db);
         SetActivate();
         _maxPage = _content.childCount / 6;
     }
@@ -49,7 +49,7 @@ public class SynergyPanel : MonoBehaviour
     {
         foreach (var data in db._synergyDataDic.Values)
         {
-            SynergySlot slot = Instantiate(_synergySlotPrefab, _content).GetComponent<SynergySlot>();
+            SynergySlot_New slot = Instantiate(_synergySlotPrefab, _content).GetComponent<SynergySlot_New>();
             slot.Init(data, 0, _synergyTooltip);
 
             if(data is ClassSynergyData classSynergy)
@@ -68,7 +68,7 @@ public class SynergyPanel : MonoBehaviour
 
     private void SetHiararchy()
     {
-        List<SynergySlot> slots = new List<SynergySlot>(_synergySlots.Values);
+        List<SynergySlot_New> slots = new List<SynergySlot_New>(_synergySlots.Values);
 
         slots.RemoveAll(s => s.ActiveCount <= 0);
 
