@@ -10,10 +10,14 @@ public class CharacterUpgradeUnit : MonoBehaviour
     [SerializeField] UnitData _unitData;
 
     [Header("UI")]
+    [SerializeField] private Image _cardImage;
     [SerializeField] private TMP_Text _charText;
     [SerializeField] private Image _characterImg;
     [SerializeField] private Image _roleSynergyImg;
     [SerializeField] private TMP_Text _levelText;
+
+    [Header("Reference")]
+    [SerializeField] private Sprite[] _gradeSprite;
 
     private UpgradeManager _manager;
 
@@ -65,6 +69,7 @@ public class CharacterUpgradeUnit : MonoBehaviour
     {
         if(_status == null) return;
 
+        _cardImage.sprite = _gradeSprite[(int)_status.Data.Grade];
         _charText.text = $"{_status.Data.Name}";
         _characterImg.sprite = _status.Data.Icon;
         if (Manager.Data.SynergyDB != null)
