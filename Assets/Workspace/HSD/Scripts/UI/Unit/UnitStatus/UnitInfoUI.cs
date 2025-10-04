@@ -9,12 +9,9 @@ public class UnitInfoUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] Image _unitIcon;
     [SerializeField] TMP_Text _unitNameText;
-    [SerializeField] TMP_Text _levelText;
-    [SerializeField] TMP_Text _powerText;
+    //[SerializeField] TMP_Text _powerText;
     [SerializeField] Image _synergyImage;
-    [SerializeField] TMP_Text _synergyNameText;
     [SerializeField] Image _classImage;
-    [SerializeField] TMP_Text _classNameText;
 
     [Header("HP_MP")]
     [SerializeField] Slider _hpSlider;
@@ -27,13 +24,19 @@ public class UnitInfoUI : MonoBehaviour
     [SerializeField] UnitStatusUI _unitStatusUI;
     [SerializeField] UnitSellOrAutoSelectionUI _unitSellOrAutoSelectionUI;
 
-    public void Setup(UnitStatus status, bool isUI, bool isSell)
+    public void Setup(UnitStatus status, bool isUI, bool isSell, bool isEnemy)
     {
         _unitNameText.text = status.Data.Name;
         _unitIcon.sprite = status.Data.Icon;
 
-        _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
-        _powerText.text = status.CombatPower.ToString();
+        //if(status.Data.UpgradeData != null)
+        //    _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
+        //else
+        //    _levelText.text = "0";
+
+        //_powerText.text = status.CombatPower.ToString();
+
+        // isEnemy로 분리
 
         _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.Synergy).Icon;
         _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.ClassSynergy).Icon;
@@ -48,7 +51,7 @@ public class UnitInfoUI : MonoBehaviour
         _mpSlider.value = stat.MaxMana;
         _mpText.text = $"{stat.MaxMana}/{stat.MaxMana}";
 
-        _unitSkillUI.Setup(status.Data.Skill);
+        _unitSkillUI.Setup(status);
         _unitStatusUI.Setup(stat);
 
         if(isSell)

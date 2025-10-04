@@ -25,6 +25,7 @@ public class AddressablesDownloader : MonoBehaviour
     public Action<long> OnNeedDownloading;
     public Action OnDontNeedDownloading;
     public Action OnDownloadEnded;
+    public static bool IsDownloaded = false;
 
     public void Check()
     {
@@ -63,6 +64,7 @@ public class AddressablesDownloader : MonoBehaviour
             else
             {
                 Debug.Log("[어드레서블] 다운로드할 파일이 없습니다. 모든 파일이 최신 상태입니다.");
+                IsDownloaded = true;
                 OnDontNeedDownloading?.Invoke();
             }
         }
@@ -126,6 +128,7 @@ public class AddressablesDownloader : MonoBehaviour
             await UniTask.WaitForSeconds(1f);
             OnDownloadEnded?.Invoke();
             IsDownloading = false;
+            IsDownloaded = true;
         }
     }
     private async UniTask DownloadLabel(AssetLabelReference label)
@@ -218,9 +221,10 @@ public class AddressablesDownloader : MonoBehaviour
 
         foreach (var label in LabelsToDownload)
         {
-            var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);
+            var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);  
             long labelSize = await sizeHandle.ToUniTask();
             totalSize += labelSize;
+            Debug.Log($"[어드레서블] '{label.labelString}' 라벨 다운로드 크기 {labelSize}...");
             Addressables.Release(sizeHandle);
         }
 

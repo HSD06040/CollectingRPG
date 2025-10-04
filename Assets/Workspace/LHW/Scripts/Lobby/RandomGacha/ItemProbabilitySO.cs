@@ -13,4 +13,12 @@ public class ProbableItems
 {
     public Grade ItemGrade;
     public float Probability;
+    public List<ProbablePiece> Pieces;
+}
+
+[Serializable]
+public class ProbablePiece
+{
+    public int PieceNum;
+    public float PieceProbability;
 }

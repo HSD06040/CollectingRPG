@@ -9,7 +9,7 @@ public class ToolTipController : MonoBehaviour
 
     public void CloseAll()
     {
-        UnitToolTip.Close();
+        UnitToolTip.ForceClose();
         SynergyToolTip.Close();
     }
 }

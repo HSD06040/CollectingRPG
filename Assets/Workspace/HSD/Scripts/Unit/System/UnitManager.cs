@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Map;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,10 +13,12 @@ public class UnitManager : MonoBehaviour
     [Header("Center")]
     [SerializeField] Transform _center;
 
-    [Header("BattleManager")]
+    [Header("Manager")]
+    [SerializeField] MapManager _mapManager;
     [SerializeField] BattleManager _battleManager;
 
     [Header("UI")]
+    public MapUIController MapUIController;
     [SerializeField] UnitUIManager _unitUIManager;
     [SerializeField] UI_UnitSlotController _unitSlotController;
 
@@ -23,18 +27,24 @@ public class UnitManager : MonoBehaviour
     public EnemyController EnemyController;
 
     [Header("Data")]
-    private UnitSpawnChanceData _unitSpawnChanceData;
-    [SerializeField] UnitData[] _unitDatas;
+    private UnitSpawnChanceData _unitSpawnChanceData;    
     [SerializeField] int _upgradeNeedCount = 3;
 
     private List<UnitBase> _spawnUnitList = new List<UnitBase>(10);
 
     private void Awake()
     {
+#if UNITY_EDITOR
         if (IsTest)
+        {
             CsvDownloader.OnDataSetupCompleted += InitAsync;
+            Manager.Data.InitAsync().Forget();
+        }
         else
             InitAsync();
+#else
+        InitAsync();
+#endif
     }
 
     private void OnDestroy()
@@ -45,23 +55,34 @@ public class UnitManager : MonoBehaviour
     private async void InitAsync()
     {
         if (IsTest)
+        {
             await Manager.Resources.LoadLabel("Stage");
+            await Manager.Data.StageGridData.SetGridData(1,1);
+        }
+
+        if (!InGameManager.Instance.IsOneBattle)
+        {
+            MapPlayerTracker.Instance.unitManager = this;
+            _mapManager.GenerateNewMap();
+        }
 
         _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();
 
         UnitController.Init();
         EnemyController.Init();
-        _unitSpawnChanceData.CalculateChances(0);
-        //_unitDatas = Manager.Data.UnitDataDic.Values.ToArray();
-        //_unitDatas = Manager.Data.EnemyUnitDatas;
-        _unitDatas = Manager.Data.PlayerUnitDatas;
 
         Subscribe();
 
         _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
         _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
+        PresetSetting();
+        _unitSpawnChanceData.CalculateChances(0);
+    }
+
+    private void PresetSetting()
+    {
         if (Manager.Data == null)
             return;
 
@@ -70,23 +91,30 @@ public class UnitManager : MonoBehaviour
         if (preset == null)
             return;
 
+        if (preset.Statuses[0] == null || preset.Statuses[0].Data == null)
+            return;
+
         for (int i = 0; i < preset.Statuses.Length; i++)
         {
             if (preset.Statuses[i].Data != null)
             {
-                AddSlotUnit(preset.Statuses[i], _unitSlotController.GetEmptySlot());
+                _unitSlotController.AddEmptySlotUnit(preset.Statuses[i]);
             }
         }
+
+        _unitSpawnChanceData.CurrentLeaderSynergy = preset.Statuses[0].Data.Synergy;
     }
 
     #region EventHandler
     private void Subscribe()
     {
+        BattleManager.OnSpawnUnit += _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
+        BattleManager.OnBattleEnded += MapPlayerTracker.OnEventEnded;
+        BattleManager.OnPlayerVictory += MapUIController.MapEnter;
         BattleManager.OnBattleStarted += ApplyHealAugment;
 
-        UnitController.OnUnitChanged += _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergyPanel.UpdateSynergySlot;
 
@@ -100,11 +128,13 @@ public class UnitManager : MonoBehaviour
 
     private void UnSubscrube()
     {
+        BattleManager.OnSpawnUnit -= _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
+        BattleManager.OnBattleEnded -= MapPlayerTracker.OnEventEnded;
+        BattleManager.OnPlayerVictory -= MapUIController.MapEnter;
         BattleManager.OnBattleStarted -= ApplyHealAugment;
 
-        UnitController.OnUnitChanged -= _unitUIManager.FightSlotController.Init;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergyPanel.UpdateSynergySlot;
 
@@ -147,7 +177,7 @@ public class UnitManager : MonoBehaviour
         if (UnitController.GetUnitsCount() == 0)
             return;
 
-        _unitUIManager.StandbyUIDeActive();
+        _unitUIManager.StandbyUIDeActive().Forget();
 
         FightRoutine().Forget();
     }
@@ -192,7 +222,7 @@ public class UnitManager : MonoBehaviour
 
     private void FightUISetup()
     {
-        _unitUIManager.BattleUISetting();
+        _unitUIManager.BattleUISetting().Forget();
 
         _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
         _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
@@ -208,15 +238,21 @@ public class UnitManager : MonoBehaviour
         EnemyController.EnemyStandby();
     }
 
-    public void StandbyGame()
+    public void GameStandby()
     {
         ClearSpawnUnit();
         EnemyController.ResetEnemy();
+        EnemyController.BattleParent.transform.position = Vector2.zero;
         UnitController.UnitStandbyAndSetSlotPosition();
-        _unitUIManager.StandbyUISetting();
+        UnitController.BattleParent.transform.position = Vector2.zero;
+        _unitUIManager.StandbyUISetting().Forget();
 
         _battleManager.GameStanby();
-    }
+        Camera.main.transform.position = new Vector3(0, 0, -10);
+        Camera.main.orthographicSize = 13;
+
+        MapUIController.MapExit();
+    }    
 
     private void UnitsIdle()
     {

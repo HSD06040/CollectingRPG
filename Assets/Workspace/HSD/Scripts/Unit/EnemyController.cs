@@ -17,14 +17,21 @@ public class EnemyController : MonoBehaviour
         _slotManager.Init();
         _unitGrid = new UnitBase[_slotManager.SlotCreater.Size.y, _slotManager.SlotCreater.Size.x];
 
-        SetUnit();
+        if(InGameManager.Instance.IsOneBattle)
+        {
+            SetUnit(_gridDataSO);
+        }
     }
 
-    public void SetUnit()
+    public void SetUnit(UnitGridDataSO gridData)
     {
+        _gridDataSO = gridData;
+
         foreach (var unitData in _gridDataSO.unitDatas)
         {
-            UnitSlot slot = _slotManager.GetUnitSlot(unitData.position + new Vector2Int(1, 1));
+            Vector2Int slotPosition = unitData.position + new Vector2Int(1, 1);
+
+            UnitSlot slot = _slotManager.GetUnitSlot(slotPosition);
 
             int x = unitData.position.x;
             int y = unitData.position.y;
@@ -32,17 +39,20 @@ public class EnemyController : MonoBehaviour
             GameObject obj = Instantiate(unitData.unitStatus.Data.UnitPrefab);
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
 
-            if(unitData.unitStatus == null)
-                Debug.Log($"UnitStatus is null at position {unitData.position}");
-            unit.Status = unitData.unitStatus;
+            if (unitData.unitStatus == null)
+            {
+                Debug.LogError($"UnitStatus is null at position {unitData.position}");
+                Destroy(obj);
+                continue;
+            }
 
+            unit.Status = unitData.unitStatus;
             unit.transform.position = slot.transform.position;
             unit.transform.SetParent(slot.transform);
             unit.TargetLayer = _targetLayer;
-            unit.SetBattleUnit();
-
             unit.gameObject.layer = LayerMask.NameToLayer("Enemy");
             unit.Init();
+            unit.SetBattleUnit(-slot.GetPos().y + 5);
 
             if (unit.transform.localScale.x < 0)
                 unit.transform.localScale = new Vector3(-unit.transform.localScale.x, unit.transform.localScale.y, unit.transform.localScale.z);
@@ -50,6 +60,7 @@ public class EnemyController : MonoBehaviour
             _unitGrid[y, x] = unit;
         }
     }
+
 
     public void EnemyFight()
     {
@@ -115,11 +126,20 @@ public class EnemyController : MonoBehaviour
 
     private void ClearAllEnemyUnits()
     {
+        if (_unitGrid == null)
+            return;
+
         foreach (var unit in _unitGrid)
         {
             if (unit != null)
             {
-                _slotManager.GetUnitSlot(unit).ClearSlot();
+                UnitSlot slot = _slotManager.GetUnitSlot(unit);
+
+                if (slot == null)
+                    return;
+
+                slot.ClearSlot();
+
                 Destroy(unit.gameObject);
             }
         }

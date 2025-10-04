@@ -60,12 +60,6 @@ public class TeamOrganizeManager : MonoBehaviour
     private void Start()
     {
         if (Manager.Data != null) _currentPreset = Manager.Data.PresetDB.PresetData[0].Statuses;
-        LoadData();
-    }
-
-    private async void LoadData()
-    {
-        await Manager.Resources.LoadLabel("Stage");
     }
 
     #region Event

@@ -53,6 +53,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
     #endregion
 
+    #region Settings
     public void Inject()
     {
         Anim = GetComponentInChildren<Animator>();
@@ -93,13 +94,16 @@ public class UnitBase : MonoBehaviour, IAttacker
         Anim.runtimeAnimatorController = Manager.Data.AnimationManager.GetAnimator(unitStatus.Data.AnimatiorData);
     }
 
-    public void SetBattleUnit()
+    public void SetBattleUnit(int line)
     {
         if(TriggerCol != null)
             TriggerCol.enabled = false;
 
         tag = "BattleUnit";
+        StatusController.UnitFXController.BattleSetting();
+        StatusController.UnitFXController.SortingLayer(line);
     }
+    #endregion
 
     #region Provider
     private void AddProviderComponents()

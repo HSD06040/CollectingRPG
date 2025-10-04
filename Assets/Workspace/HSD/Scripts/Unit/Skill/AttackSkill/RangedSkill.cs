@@ -28,7 +28,7 @@ public class RangedSkill : AttackSkill
         }
 
         projectile.Init(target, attacker.GetStatusController(), 
-            physicalPower, abilityPower, DamageType, attacker.TargetLayer, _projectileSpeed,
+            PhysicalPower, AbilityPower, DamageType, attacker.TargetLayer, _projectileSpeed,
             GetExplosionEffect(), _distance);
     }
 

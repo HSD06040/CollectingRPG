@@ -62,6 +62,9 @@ public class PartySelectPanelController : MonoBehaviour
     private async UniTask GameSceneInit()
     {
         await Manager.Resources.LoadLabel("Stage");
+
+        // 나중에 스테이지가 결정되고 스테이지 1-2 같은 데이터 들이 저장이 되면 바꿀 것
+        await Manager.Data.StageGridData.SetGridData(1, 1);
     }
 
     public void ArrangePreset()

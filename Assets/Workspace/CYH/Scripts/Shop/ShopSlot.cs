@@ -63,14 +63,15 @@ public class ShopSlot : MonoBehaviour
             _priceImage.sprite = _diaSprite;
         }
 
-        // 상점 첫번째 슬롯 가격 텍스트 위치
-        if (slot.IsFree)
+        // 상점 첫번째 슬롯/인앱결제 다이아 슬롯 가격 텍스트 위치
+        if (slot.IsFree || (slot.Type == ShopType.Diamond && !slot.IsFree))
         {
             _priceImage.gameObject.SetActive(false);
-            RectTransform rectTransform = _priceText.rectTransform;
-            Vector2 offset = rectTransform.offsetMin;
-            offset.x = 11f;
-            rectTransform.offsetMin = offset;
+
+            RectTransform rect = _priceText.GetComponent<RectTransform>();
+            Vector2 pos = rect.anchoredPosition;
+            pos.x = 11f;
+            rect.anchoredPosition = pos;
         }
 
         // 구매 횟수
@@ -96,7 +97,6 @@ public class ShopSlot : MonoBehaviour
             _itemObtainButton.interactable = true;
         }
     }
-
     public async void OnClickBuy()
     {
         if (_slotData.IsFree && _slotData.IsPurchased) return;
@@ -115,8 +115,6 @@ public class ShopSlot : MonoBehaviour
                 {
                     IAPManager.Instance.BuyProduct(_slotData.ItemId);
                     Debug.Log($"다이아몬드 {_slotData.Count}개 구매");
-                    //await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
-                    //await Manager.DB.AddDiamondAsync(int.Parse(_slotData.Count));
                 }
                 break;
             case ShopType.Gold:
@@ -131,8 +129,16 @@ public class ShopSlot : MonoBehaviour
                 {
                     Debug.Log($"골드 {_slotData.Count}개 구매");
                     Debug.Log($"다이아 {_slotData.ItemPrice}개 차감");
-                    await Manager.DB.SubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
-                    await Manager.DB.AddGoldAsync(int.Parse(_slotData.Count));
+                    bool success = await Manager.DB.TrySubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
+                    if (success)
+                    {
+                        await Manager.DB.AddGoldAsync(int.Parse(_slotData.Count));
+                    }
+                    else
+                    {
+                        Manager.Popup.ShowPopup("재화가 부족합니다.");
+                        return;
+                    }
                 }
                 break;
             case ShopType.Daily:
@@ -143,12 +149,32 @@ public class ShopSlot : MonoBehaviour
                 if (_slotData.IsGold)
                 {
                     Debug.Log($"골드 {_slotData.ItemPrice}개 차감");
-                    await Manager.DB.SubtractGoldAsync(int.Parse(_slotData.ItemPrice));
+                    bool success = await Manager.DB.TrySubtractGoldAsync(int.Parse(_slotData.ItemPrice));
+
+                    if (success)
+                    {
+                        // TODO: [CYH] 아이템 구매처리
+                    }
+                    else
+                    {
+                        Manager.Popup.ShowPopup("재화가 부족합니다.");
+                        return;
+                    }
                 }
                 else
                 {
                     Debug.Log($"다이아 {_slotData.ItemPrice}개 차감");
-                    await Manager.DB.SubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
+                    bool success = await Manager.DB.TrySubtractDiamondAsync(int.Parse(_slotData.ItemPrice));
+
+                    if (success)
+                    {
+                        // TODO: [CYH] 아이템 구매처리
+                    }
+                    else
+                    {
+                        Manager.Popup.ShowPopup("재화가 부족합니다.");
+                        return;
+                    }
                 }
                 break;
         }

@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 
 [CreateAssetMenu(fileName = "BuffSkill", menuName = "Data/Unit/Skill/BuffSkill")]
@@ -21,7 +20,7 @@ public class BuffSkill : UnitSkill
 
         if (TargetType == TargetType.Self)
         {
-            attacker.GetStatusController().ApplyEffect(BuffEffectData, abilityPower, name);
+            attacker.GetStatusController().ApplyEffect(BuffEffectData, AbilityPower, name);
             return;
         }
         
@@ -29,13 +28,13 @@ public class BuffSkill : UnitSkill
         {
             foreach (GameObject target in GetTargetFromTargetType(attacker))
             {
-                attacker.GetStatusController().ProvideEffect(BuffEffectData, abilityPower, 
+                attacker.GetStatusController().ProvideEffect(BuffEffectData, AbilityPower, 
                     name, ComponentProvider.Get<UnitBase>(target).StatusController);                
             }
         }
         else
         {
-            attacker.GetStatusController().ProvideEffect(BuffEffectData, abilityPower, 
+            attacker.GetStatusController().ProvideEffect(BuffEffectData, AbilityPower, 
                 name, ComponentProvider.Get<UnitBase>(GetTargetPrioty(attacker)).StatusController);            
         }
     }
@@ -57,6 +56,17 @@ public class BuffSkill : UnitSkill
             default:
                 return null;
         }
+    }
+
+    public override string GetCalculateValueString(UnitStatus status)
+    {
+        UnitStats stat = status.GetCurrentStat();
+        float value = stat.MagicDamage * (AbilityPower / 100);
+
+        if (BuffEffectData.StatType == StatType.CurHp || BuffEffectData.StatType == StatType.Shield)
+            return Mathf.RoundToInt(value).ToString();
+        else
+            return value.ToString("F1");
     }
 
     private GameObject GetTargetPrioty(IAttacker attacker)
