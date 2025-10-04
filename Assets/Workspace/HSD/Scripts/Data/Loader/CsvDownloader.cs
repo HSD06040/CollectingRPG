@@ -117,25 +117,11 @@ public class CsvDownloader
                 Debug.LogWarning($"UnitData with ID {id} not found.");
                 continue;
             }
-            
-            Grade grade = Grade.NORMAL;
-            switch (row[1])
-            {
-                case "NORMAL":
-                    grade = Grade.NORMAL;
-                    break;
-                case "RARE":
-                    grade = Grade.RARE;
-                    break;
-                case "UNIQUE":
-                    grade = Grade.UNIQUE;
-                    break;
-                case "LEGEND":
-                    grade = Grade.LEGEND;
-                    break;
-            }
 
-            unitData.Grade = grade;
+            Debug.Log($"Setting up UnitData ID: {id}, Name: {unitData.Name}");
+            Debug.Log($"Grade is {row[1]}");
+
+            unitData.Grade = Enum.TryParse(row[1], out Grade grade) ? grade : Grade.NORMAL;                        
             unitData.Cost = int.TryParse(row[2], out int cost) ? cost : 0;
             unitData.Name = row[3];
             unitData.Description = row[4];
