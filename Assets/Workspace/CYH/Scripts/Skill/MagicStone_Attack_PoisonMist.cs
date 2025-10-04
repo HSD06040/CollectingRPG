@@ -9,9 +9,16 @@ public class MagicStone_Attack_PoisonMist : MagicStoneData
 
     public override void UseMagicStone(Vector2 pos)
     {
-        SpawnEffect(pos);
+        Vector2 centerPos = Vector2.zero;
 
-        //ApplyTickDamageMultiple(GetMultipleTargets(pos), _tickDamageData);
+        foreach (var target in GetMultipleTargets(pos))
+        {
+            centerPos += (Vector2)target.transform.position;
+        }
+        centerPos /= GetMultipleTargets(pos).Length;
+
+        SpawnEffect(centerPos);
+
         foreach (var obj in GetMultipleTargets(pos))
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
@@ -19,7 +26,7 @@ public class MagicStone_Attack_PoisonMist : MagicStoneData
             {
                 ApplyTickDamageSingle(unit, _tickDamageData);
                 Debug.Log(
-                    $"PoisonMist 적용 대상: {unit.name}, " +
+                    $"PoisonMist 대상: {unit.name}, " +
                     $"틱당 피해량: {(int)Value}, " +
                     $"틱 수: {_tickDamageData.TickCount}, " +
                     $"틱 간격: {_tickDamageData.TickInterval}초"
