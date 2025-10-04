@@ -4,6 +4,7 @@ public class InGameManager : InGameSingleton<InGameManager>
 {
     public Property<int> Gold = new();
     public bool IsBattle = false;
+    public bool IsOneBattle = false;
     public int SpawnGold = 20;
     [SerializeField] int _startingGold = 100;
 
@@ -11,11 +12,13 @@ public class InGameManager : InGameSingleton<InGameManager>
     private void OnEnable()
     {
         BattleManager.OnBattleStarted += BattleStart;
+        BattleManager.OnGameStanby += BattleEnded;
     }
 
     private void OnDisable()
     {
         BattleManager.OnBattleStarted -= BattleStart;
+        BattleManager.OnGameStanby -= BattleEnded;
     }
 
     private void Start()
@@ -57,5 +60,9 @@ public class InGameManager : InGameSingleton<InGameManager>
     private void BattleStart()
     {
         IsBattle = true;
+    }
+    private void BattleEnded()
+    {
+        IsBattle = false;
     }
 }

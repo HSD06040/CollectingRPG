@@ -37,6 +37,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
             SetEnemyPosition();
         }
     }
+
     [SerializeField] float _xDragSensitivity;
     [SerializeField] float _xTweenDuration = .5f;
     private float _initialCameraX;
@@ -62,13 +63,9 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
 
     private void OnEnable()
     {
-        BattleManager.OnGameStanby += _slotPositionSetter.SetPositions;
+        BattleManager.OnGameStanby += () => MoveToPage(0);
     }
-
-    private void OnDisable()
-    {
-        BattleManager.OnGameStanby -= _slotPositionSetter.SetPositions;
-    }
+    
     #endregion    
 
     private void SetEnemyPosition()
@@ -156,7 +153,9 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
             _targetCameraX = Mathf.Clamp(targetX, _initialCameraX, _initialCameraX + XLimit);
 
             _cam.transform.DOMoveX(_targetCameraX, _xTweenDuration)
-            .OnComplete(OnCameraMoved);
+                .SetEase(Ease.OutQuad)
+                .SetUpdate(true)
+                .OnComplete(OnCameraMoved);
 
             _lastDragDeltaX = 0;
         }
@@ -199,6 +198,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
         {
             _content.DOAnchorPos(targetPos, _tweenDuration)
                 .SetEase(_easeType)
+                .SetUpdate(true)
                 .OnUpdate(() => SyncGameObjectsWithUI());
         }
     }
@@ -246,12 +246,16 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
     {
         float targetX = _initialCameraX + XLimit;
         _cam.transform.DOMoveX(targetX, 0.3f)
+            .SetEase(Ease.OutQuad)
+            .SetUpdate(true)
             .OnComplete(OnCameraMoved);
     }
 
     public void MoveToBattle()
     {
         _cam.transform.DOMoveX(_initialCameraX, 0.3f)
+            .SetEase(Ease.OutQuad)
+            .SetUpdate(true)
             .OnComplete(OnCameraMoved);
     }
 

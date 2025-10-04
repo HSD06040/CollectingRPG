@@ -14,11 +14,16 @@ public class DataManager : Singleton<DataManager>
 
     public AnimationManager AnimationManager = new();
 
+    // 마법석 데이터 임시로 추가
+    public Dictionary<string, MagicStoneData> MagicStoneDataDic;
+    public MagicStoneData[] MagicStoneDatas;
+
     // 프리셋 데이터 관련
     public PresetDatabase PresetDB { get; private set; } = new PresetDatabase();
 
     // 맵 데이터 관련
     public MapDatabase MapDB { get; private set; } = new MapDatabase();
+    public StageGridData StageGridData = new();
 
     // 추후 Init으로 뺄 예정
     public async UniTask InitAsync()
@@ -27,7 +32,6 @@ public class DataManager : Singleton<DataManager>
         MapDB.InitMapData();
         await InitData();
     }
-
     #region UniData
 
     public async UniTask InitData()
@@ -40,6 +44,7 @@ public class DataManager : Singleton<DataManager>
         await AnimationManager.Init();
         await PreLoadData();
         await CsvDownload();
+        PreLoadMagicStoneDatas();
     }
 
     private async UniTask CsvDownload()
@@ -93,6 +98,28 @@ public class DataManager : Singleton<DataManager>
     public UnitData GetUnitData(string unitName)
     {
         return UnitDataDic.TryGetValue(unitName, out var unitData) ? unitData : null;
+    }
+
+    #endregion
+
+    #region MagicStone
+
+    private void PreLoadMagicStoneDatas()
+    {
+        MagicStoneDataDic = new Dictionary<string, MagicStoneData>(MagicStoneDatas.Length);
+
+        foreach (var magicStoneData in MagicStoneDatas)
+        {
+            if (!MagicStoneDataDic.ContainsKey(magicStoneData.Name))
+                MagicStoneDataDic.Add(magicStoneData.Name, magicStoneData);
+
+            magicStoneData.Init();
+        }
+    }
+
+    public MagicStoneData GetMagicStoneData(string magicStoneName)
+    {
+        return MagicStoneDataDic.TryGetValue(magicStoneName, out var magicStoneData) ? magicStoneData : null;
     }
 
     #endregion

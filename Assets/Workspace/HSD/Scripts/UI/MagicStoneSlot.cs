@@ -7,9 +7,13 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private MagicStoneData _magicStoneData;
     public MagicStoneData MagicStoneData => _magicStoneData;
 
+    public event System.Action<MagicStoneSlot> OnCleared;
+
     [Header("UI")]
+    [SerializeField] private RectTransform _magicStone;
     [SerializeField] private Image _magicStoneIcon;
     [SerializeField] private Image _highlight;
+    private Image[] _images;
 
     [Header("Drag Settings")]
     private Transform _dropAreaPanel;
@@ -18,12 +22,15 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void Init(Transform dropArea)
     {
         _dropAreaPanel = dropArea;
+        _images = GetComponentsInChildren<Image>(true);
+        DragEnd();
     }
 
     public void ClearMagicStone()
     {
         _magicStoneData = null;
         MagicStoneUIUpdate();
+        OnCleared?.Invoke(this);
     }
 
     public void SetMagicStone(MagicStoneData magicStoneData)
@@ -36,11 +43,13 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     {
         if (MagicStoneData == null)
         {
+            gameObject.SetActive(false);
             _magicStoneIcon.color = Color.clear;
             _magicStoneIcon.sprite = null;
             return;
         }
 
+        gameObject.SetActive(true);
         _magicStoneIcon.color = Color.white;
         _magicStoneIcon.sprite = MagicStoneData.Icon;
     }
@@ -56,6 +65,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void OnBeginDrag(PointerEventData eventData)
     {
         _originalPos = _highlight.rectTransform.position;
+        DragStart();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -64,12 +74,12 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
         Vector3 worldPos;
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
-            _highlight.rectTransform,
+            _magicStone,
             eventData.position,
             eventData.pressEventCamera,
             out worldPos))
         {
-            _highlight.rectTransform.position = worldPos;
+            _magicStone.position = worldPos;
         }
 
         bool insideDropArea = RectTransformUtility.RectangleContainsScreenPoint(
@@ -94,8 +104,26 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             UseMagicStone(Camera.main.ScreenToWorldPoint(eventData.position));
         }
 
-        _highlight.rectTransform.position = _originalPos;
+        _magicStone.position = _originalPos;
 
         _highlight.enabled = false;
+
+        DragEnd();
+    }
+
+    private void DragStart()
+    {
+        foreach (var image in _images)
+        {
+            image.maskable = false;
+        }
+    }
+
+    private void DragEnd()
+    {
+        foreach (var image in _images)
+        {
+            image.maskable = true;
+        }
     }
 }

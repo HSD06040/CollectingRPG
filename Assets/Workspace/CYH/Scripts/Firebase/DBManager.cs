@@ -4,11 +4,13 @@ using Firebase.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class DBManager : Singleton<DBManager>
 {
     public CharDB charDB = new CharDB();
+    public MagicStoneDB magicStoneDB = new MagicStoneDB();
     public QuestDB questDB = new QuestDB();
     public ShopDB shopDB = new ShopDB();
 
@@ -148,6 +150,8 @@ public class DBManager : Singleton<DBManager>
         await charDB.InitializeCharacterUpgradeData();
         await charDB.LoadAllCharacterDatas();
         charDB.EventHandler();
+        await magicStoneDB.LoadAllMagicStoneDatas();
+        magicStoneDB.EventHandler();
 
         return data;
     }
