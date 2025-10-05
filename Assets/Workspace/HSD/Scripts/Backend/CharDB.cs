@@ -34,10 +34,7 @@ public class CharDB
 
         Debug.Log("업그레이드 데이터 Initial 시작");
         await UniTask.Yield();
-        Debug.Log("쉬기");
         var snapshot = await _characterReference.GetValueAsync();
-
-        Debug.Log("ddd");
 
         if (!snapshot.Exists || snapshot.ChildrenCount == 0)
         {
