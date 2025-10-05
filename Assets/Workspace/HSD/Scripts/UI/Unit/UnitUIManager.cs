@@ -21,6 +21,7 @@ public class UnitUIManager : MonoBehaviour
     public BattleUISwitch BattleUISwitch;
 
     [Header("Not Battle")]
+    public GradeChancePanel GradeChancePanel;
     public SynergyPanel SynergyPanel;
     public SynergyPanel SynergySlotPanel;
     public UnitCountPanel UnitCountPanel;

@@ -23,7 +23,7 @@ namespace Map
 
         private void Awake()
         {
-            Instance = this;
+            Instance = this;            
             OnEventEnded += Unlock;
         }        
 
@@ -74,7 +74,8 @@ namespace Map
         private static void EnterNode(MapNode mapNode)
         {
             Debug.Log("Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
-           
+            Manager.Data.StageGameData.CurrentFloor.Value++;
+
             switch (mapNode.Node.nodeType)
             {
                 case NodeType.MinorEnemy:

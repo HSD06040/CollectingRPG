@@ -17,7 +17,11 @@ public enum Synergy
     Length
 }
 #endregion
-
+public enum RewardType
+{
+    Diamond,
+    Coin
+}
 public enum SortingType
 {
     Grade,

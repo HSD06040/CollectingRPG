@@ -104,13 +104,30 @@ public class UnitSpawnChanceData : ScriptableObject
             _ => 0f
         };
     }
+
+    public UnitSpawnChance GetCurrentFloorChance(int floor)
+    {        
+        return UnitSpawnChances[floor];
+    }
 }
 
 [System.Serializable]
-public struct UnitSpawnChance // 10층까지의 가중치들
+public struct UnitSpawnChance
 {
     public float Normal;
     public float Rare;
     public float Unique;
     public float Legendary;
+
+    public float GetChance(Grade grade)
+    {
+        return grade switch
+        {
+            Grade.NORMAL => Normal,
+            Grade.RARE => Rare,
+            Grade.UNIQUE => Unique,
+            Grade.LEGEND => Legendary,
+            _ => 0f
+        };
+    }
 }

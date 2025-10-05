@@ -13,11 +13,15 @@ public class DataManager : Singleton<DataManager>
     // 시너지
     public SynergyDatabase SynergyDB;
 
+    // 스테이지 관련
+    public StageGameData StageGameData = new();
+    public StageDatas StageDatas = new();
+
     // 인게임
     public UnitSpawnChanceData UnitSpawnChanceData;
     public CharacterSellAmountData CharacterSellAmountData;
     
-    // 애니메이션 ㄷ이터
+    // 애니메이션 데이터
     public AnimationManager AnimationManager = new();
 
     // 마법석 데이터 임시로 추가

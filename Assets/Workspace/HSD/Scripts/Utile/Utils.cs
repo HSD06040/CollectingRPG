@@ -360,7 +360,12 @@ public static class Utils
 
     public static Color GetGradeColor(this UnitStatus status)
     {
-        return status.Data.Grade switch
+        return GetGradeColor(status.Data.Grade);
+    }
+
+    public static Color GetGradeColor(this Grade grade)
+    {
+        return grade switch
         {
             Grade.NORMAL => new Color(173f / 255f, 255f / 255f, 47f / 255f),
             Grade.RARE => new Color32(0x7B, 0x7B, 0xD9, 0xFF),

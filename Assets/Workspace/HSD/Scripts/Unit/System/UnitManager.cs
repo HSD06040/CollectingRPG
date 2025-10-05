@@ -27,11 +27,16 @@ public class UnitManager : MonoBehaviour
     public EnemyController EnemyController;
 
     [Header("Data")]
-    private UnitSpawnChanceData _unitSpawnChanceData;    
+    private UnitSpawnChanceData _unitSpawnChanceData;
+    private int _currentFloor => Manager.Data.StageGameData.CurrentFloor.Value;
     [SerializeField] int _upgradeNeedCount = 3;
 
     private List<UnitBase> _spawnUnitList = new List<UnitBase>(10);
 
+#if UNITY_EDITOR
+    [Range(1, 7)] public int _testRegionIndex = 1;
+    [Range(1, 4)] public int _testStageIndex = 1;        
+#endif
     private void Awake()
     {
 #if UNITY_EDITOR
@@ -53,11 +58,12 @@ public class UnitManager : MonoBehaviour
     }
 
     private async void InitAsync()
-    {
+    {        
         if (IsTest)
         {
             await Manager.Resources.LoadLabel("Stage");
-            await Manager.Data.StageGridData.SetGridData(1,1);
+            Manager.Data.StageGameData.SetStage(_testRegionIndex, _testStageIndex);
+            await Manager.Data.StageGridData.SetGridData();
         }
 
         if (!InGameManager.Instance.IsOneBattle)
@@ -74,11 +80,12 @@ public class UnitManager : MonoBehaviour
 
         Subscribe();
 
+        _unitUIManager.GradeChancePanel.Init(_unitSpawnChanceData);
         _unitUIManager.SynergyPanel.Init(Manager.Data.SynergyDB);
         _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
         PresetSetting();
-        _unitSpawnChanceData.CalculateChances(0);
+        Manager.Data.StageGameData.CurrentFloor.Value = 0;
     }
 
     private void PresetSetting()
@@ -115,6 +122,9 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnPlayerVictory += MapUIController.MapEnter;
         BattleManager.OnBattleStarted += ApplyHealAugment;
 
+        Manager.Data.StageGameData.CurrentFloor.AddEvent(_unitSpawnChanceData.CalculateChances);
+        Manager.Data.StageGameData.CurrentFloor.AddEvent(_unitUIManager.GradeChancePanel.SetGradeChance);
+
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged += _unitUIManager.SynergyPanel.UpdateSynergySlot;
 
@@ -134,6 +144,9 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnBattleEnded -= MapPlayerTracker.OnEventEnded;
         BattleManager.OnPlayerVictory -= MapUIController.MapEnter;
         BattleManager.OnBattleStarted -= ApplyHealAugment;
+
+        Manager.Data.StageGameData.CurrentFloor.RemoveEvent(_unitSpawnChanceData.CalculateChances);
+        Manager.Data.StageGameData.CurrentFloor.RemoveEvent(_unitUIManager.GradeChancePanel.SetGradeChance);
 
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergySlotPanel.UpdateSynergySlot;
         UnitController.SynergyController.OnSynergyChanged -= _unitUIManager.SynergyPanel.UpdateSynergySlot;
