@@ -38,16 +38,26 @@ public abstract class UnitSkill : ScriptableObject
         
         if (EffectSpawnType == EffectSpawnType.Target)
         {
-            Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(
-                    EffectAddress,
-                    attacker.GetTarget().gameObject.GetCenterPosition(),
-                    true
-                ), 
-            2f);
+            GameObject effect = Manager.Resources.Instantiate<GameObject>(EffectAddress, attacker.GetTarget().gameObject.GetCenterPosition(),true);
+
+            if (effect == null)
+            {
+                Debug.LogWarning($"[Effect] {EffectAddress} 프리팹을 찾을 수 없습니다.");
+                return;
+            }
+
+            Manager.Resources.Destroy(effect, 2f);
         }
         else
         {
             GameObject prefab = Manager.Resources.Load<GameObject>(EffectAddress);
+
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[Effect] {EffectAddress} 프리팹을 찾을 수 없습니다.");
+                return;
+            }
+
             GameObject obj = Manager.Resources.Instantiate(
                 prefab,
                 GetSpawnPoint(attacker),

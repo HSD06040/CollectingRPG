@@ -88,6 +88,19 @@ public class ChainLineAttacker : MonoBehaviour
         Vector2 spawnPos = GetSpawnPosition(_target.position);
 
         GameObject effect = Manager.Resources.Instantiate(_effect, spawnPos, true);
+
+        if(effect == null)
+        {
+            Debug.LogWarning("[ChainLineAttacker] 이펙트 프리팹을 찾을 수 없습니다.");
+            return;
+        }
+        if (_target == null)
+        {
+            Debug.LogWarning("[ChainLineAttacker] 타겟이 없습니다.");
+            Manager.Resources.Destroy(effect);
+            return;
+        }
+
         effect.transform.right = (_target.position - effect.transform.position).normalized;
 
         Vector3 scale = effect.transform.localScale;

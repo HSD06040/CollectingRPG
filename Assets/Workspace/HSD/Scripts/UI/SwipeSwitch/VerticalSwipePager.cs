@@ -154,8 +154,7 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
 
             _cam.transform.DOMoveX(_targetCameraX, _xTweenDuration)
                 .SetEase(Ease.OutQuad)
-                .SetUpdate(true)
-                .OnComplete(OnCameraMoved);
+                .SetUpdate(true);
 
             _lastDragDeltaX = 0;
         }
@@ -247,27 +246,13 @@ public class VerticalSwipePager : MonoBehaviour, IDragHandler, IEndDragHandler, 
         float targetX = _initialCameraX + XLimit;
         _cam.transform.DOMoveX(targetX, 0.3f)
             .SetEase(Ease.OutQuad)
-            .SetUpdate(true)
-            .OnComplete(OnCameraMoved);
+            .SetUpdate(true);
     }
 
     public void MoveToBattle()
     {
         _cam.transform.DOMoveX(_initialCameraX, 0.3f)
             .SetEase(Ease.OutQuad)
-            .SetUpdate(true)
-            .OnComplete(OnCameraMoved);
-    }
-
-    private void OnCameraMoved()
-    {
-        if (_cam.transform.position.x > XLimit / 2)
-        {
-            _switchButtonController.EnemySlotButtonSetting();
-        }
-        else
-        {
-            _switchButtonController.EnemyBattleSlotButtonSetting();
-        }
+            .SetUpdate(true);
     }
 }

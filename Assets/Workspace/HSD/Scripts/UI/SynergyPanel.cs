@@ -14,6 +14,8 @@ public class SynergyPanel : MonoBehaviour
     [SerializeField] SynergyToolTip _synergyTooltip;
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
     [SerializeField] int _offset;
+    [SerializeField] GameObject _nextButton;
+    [SerializeField] GameObject _prevButton;
 
     private Dictionary<int, SynergySlot_New> _synergySlots = new(10);
     private int _currentPage;
@@ -31,6 +33,8 @@ public class SynergyPanel : MonoBehaviour
         CreateSynergtSlots(db);
         SetActivate();
         _maxPage = _content.childCount / 6;
+
+        SetPageButton();
     }
 
     public void PageChange(int num)
@@ -43,6 +47,7 @@ public class SynergyPanel : MonoBehaviour
         _currentPage += num;
 
         SetActivate();
+        SetPageButton();
     }
 
     private void CreateSynergtSlots(SynergyDatabase db)
@@ -101,5 +106,18 @@ public class SynergyPanel : MonoBehaviour
             else
                 _content.GetChild(i).gameObject.SetActive(false);
         }
+    }
+
+    private void SetPageButton()
+    {
+        if (_currentPage <= 0)
+            _prevButton.SetActive(false);
+        else
+            _prevButton.SetActive(true);
+
+        if (_currentPage >= _maxPage)
+            _nextButton.SetActive(false);
+        else
+            _nextButton.SetActive(true);
     }
 }

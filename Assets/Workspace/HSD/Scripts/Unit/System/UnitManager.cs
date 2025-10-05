@@ -177,7 +177,7 @@ public class UnitManager : MonoBehaviour
         if (UnitController.GetUnitsCount() == 0)
             return;
 
-        _unitUIManager.StandbyUIDeActive().Forget();
+        _unitUIManager.StandbyUIDeActive();
 
         FightRoutine().Forget();
     }
@@ -221,8 +221,8 @@ public class UnitManager : MonoBehaviour
     }
 
     private void FightUISetup()
-    {
-        _unitUIManager.BattleUISetting().Forget();
+    {        
+        _unitUIManager.BattleUISetting();
 
         _unitUIManager.DamageMeterController.Init(UnitController.GetUnits());
         _unitUIManager.SkillPopUpController.Init(UnitController.GetUnits(), EnemyController.GetUnits());
@@ -245,7 +245,7 @@ public class UnitManager : MonoBehaviour
         EnemyController.BattleParent.transform.position = Vector2.zero;
         UnitController.UnitStandbyAndSetSlotPosition();
         UnitController.BattleParent.transform.position = Vector2.zero;
-        _unitUIManager.StandbyUISetting().Forget();
+        _unitUIManager.StandbyUISetting();
 
         _battleManager.GameStanby();
         Camera.main.transform.position = new Vector3(0, 0, -10);

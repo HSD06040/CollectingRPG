@@ -1,18 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SynergyActiveSlot : MonoBehaviour
 {
-    [SerializeField] GameObject _activePanel;
+    [SerializeField] Image _activePanel;
     
+    public void SetColor(Color synergyColor)
+    {
+        _activePanel.color = synergyColor;
+    }
+
     public void Active()
     {
-        _activePanel.SetActive(true);
+        _activePanel.gameObject.SetActive(true);
     }
 
     public void Deactive()
     {
-        _activePanel.SetActive(false);
+        _activePanel.gameObject.SetActive(false);
     }
 }

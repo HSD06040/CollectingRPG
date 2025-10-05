@@ -25,12 +25,18 @@ public class SynergySlot_New : MonoBehaviour, IPointerDownHandler
         _synergyToolTip = synergyToolTip;
         SetSynergyCount();
         UpdateUI(activeCount);
+        _synergyActiveSlot_Controller.Init(_synergyData.SynergyColor);
     }
 
     public void UpdateUI(int activeCount)
     {
         ActiveCount = activeCount;
-        _synergyColorSlot.color = _synergyData.SynergyColor;
+
+        if(activeCount <= 1)        
+            _synergyColorSlot.color = Color.gray;        
+        else
+            _synergyColorSlot.color = _synergyData.SynergyColor;
+
         _synergyActiveSlot_Controller.Active(_synergyData.CurrentUpgradeIdx + 1);
     }
 

@@ -6,6 +6,14 @@ public class SynergyActiveSlot_Controller : MonoBehaviour
 {
     [SerializeField] SynergyActiveSlot[] _synergyActiveSlots;
 
+    public void Init(Color synergyColor)
+    {
+        for (int i = 0; i < _synergyActiveSlots.Length; i++)
+        {
+            _synergyActiveSlots[i].SetColor(synergyColor);
+        }
+    }
+
     public void Active(int activeCount)
     {
         for (int i = 0; i < _synergyActiveSlots.Length; i++)
