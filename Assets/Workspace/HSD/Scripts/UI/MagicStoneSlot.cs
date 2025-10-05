@@ -1,6 +1,7 @@
 using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -13,6 +14,8 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private RectTransform _magicStone;
     [SerializeField] private Image _magicStoneIcon;
     [SerializeField] private Image _highlight;
+    [SerializeField] private TMP_Text _magicStoneName;
+    
     private Image[] _images;
 
     [Header("Drag Settings")]
@@ -46,12 +49,14 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             gameObject.SetActive(false);
             _magicStoneIcon.color = Color.clear;
             _magicStoneIcon.sprite = null;
+            _magicStoneName.text = string.Empty;
             return;
         }
 
         gameObject.SetActive(true);
         _magicStoneIcon.color = Color.white;
         _magicStoneIcon.sprite = MagicStoneData.Icon;
+        _magicStoneName.text = MagicStoneData.Name;
     }
 
     private void UseMagicStone(Vector2 pos)

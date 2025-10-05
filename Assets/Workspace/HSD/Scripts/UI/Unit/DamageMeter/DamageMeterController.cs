@@ -9,13 +9,15 @@ public class DamageMeterController : MonoBehaviour
     [SerializeField] Transform _content;
     [SerializeField] GridLayoutGroup _gridLayoutGroup;
     [SerializeField] DamageMeterSlot[] _damageMeterSlots;
+    [SerializeField] int _columns = 1;
+    [SerializeField] int _rows = 5;
     private List<DamageMeterSlot> _activeSlots = new List<DamageMeterSlot>();
     private CancellationTokenSource _cts;
     private int _unitCount;
 
     private void Start()
     {
-        _gridLayoutGroup.SetupGridLayoutGroup(_content, 1, 5, 10);
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, _columns, _rows, 10);
         DamageMeterSlot.OnDamaged += SortingDamageMeter;
     }
 

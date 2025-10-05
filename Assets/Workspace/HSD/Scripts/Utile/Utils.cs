@@ -448,7 +448,16 @@ public static class Utils
             MagicDamage = Mathf.RoundToInt(unitStats.MagicDamage * multiply),
 
             PhysicalDefense = Mathf.RoundToInt(unitStats.PhysicalDefense * multiply),
-            MagicDefense = Mathf.RoundToInt(unitStats.MagicDefense * multiply)
+            MagicDefense = Mathf.RoundToInt(unitStats.MagicDefense * multiply),
+
+            CritChance = Mathf.RoundToInt(unitStats.CritChance),
+            ManaGain = Mathf.RoundToInt(unitStats.ManaGain),
+            MaxMana = Mathf.RoundToInt(unitStats.MaxMana),
+            AttackSpeed = unitStats.AttackSpeed,
+            MoveSpeed = unitStats.MoveSpeed,
+
+            AttackRange = Mathf.RoundToInt(unitStats.AttackRange),
+            AttackCount = Mathf.RoundToInt(unitStats.AttackCount)
         };
     }
     #endregion
