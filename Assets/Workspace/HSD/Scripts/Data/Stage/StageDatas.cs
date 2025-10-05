@@ -7,6 +7,7 @@ using UnityEngine;
 public class StageDatas
 {
     private static readonly Dictionary<int, StageData> _stageDic = new Dictionary<int, StageData>();    
+    public int MaxStageCount => _stageDic.Count;
 
     public void Init()
     {
