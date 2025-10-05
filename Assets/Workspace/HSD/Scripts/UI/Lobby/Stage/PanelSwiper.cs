@@ -42,7 +42,21 @@ public class PanelSwiper : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         if (!_isDragging) return;
 
         Vector2 diff = eventData.position - _startDragPos;
-        _content.anchoredPosition = _contentStartPos + new Vector2(diff.x, 0);
+        Vector2 nextPos = _contentStartPos + new Vector2(diff.x, 0);
+
+        float minX = -_panelWidth * (_panelCount - 1);
+        float maxX = 0;
+
+        if (nextPos.x > maxX)
+        {
+            nextPos.x = maxX;
+        }
+        else if (nextPos.x < minX)
+        {
+            nextPos.x = minX;
+        }
+
+        _content.anchoredPosition = nextPos;
     }
 
     public async void OnEndDrag(PointerEventData eventData)

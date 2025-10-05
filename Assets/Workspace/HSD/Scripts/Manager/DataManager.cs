@@ -38,12 +38,13 @@ public class DataManager : Singleton<DataManager>
     // 추후 Init으로 뺄 예정
     public async UniTask InitAsync()
     {
+        StageDatas.Init().Forget();
         PresetDB.InitPresetData();
         MapDB.InitMapData();
         await InitData();
     }
-    #region UniData
 
+    #region UniData
     public async UniTask InitData()
     {
         await Manager.Resources.SpriteLoadLable("MonsterIcon");

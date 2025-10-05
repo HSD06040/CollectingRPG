@@ -10,6 +10,7 @@ public class StageRewardData
     public RewardData[] RewardDatas;
 }
 
+[Serializable]
 public struct RewardData
 {
     public RewardType RewardType;

@@ -8,6 +8,8 @@ public class StageData : ScriptableObject
 {
     private readonly Dictionary<int, bool> _clearProofDic = new Dictionary<int, bool>();
 
+    public string StageName;
+    [TextArea] public string StageDescription;
     public StageRewardData[] StageRewardDatas;
     [Range(1, 7)] public int RegionNumber;
     public int MaxStageNumber;
