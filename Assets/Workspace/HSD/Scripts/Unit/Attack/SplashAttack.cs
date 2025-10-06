@@ -14,7 +14,9 @@ public class SplashAttack : UnitAttackData
         base.Attack(attacker);
 
         GameObject effectPrefab = Manager.Resources.Load<GameObject>(EffectAddress);
+
         if (effectPrefab == null) return;
+        if (attacker.GetTarget() == null) return;
 
         GameObject effect = Manager.Resources.Instantiate(effectPrefab, attacker.GetTarget().position, true);
         Manager.Resources.Destroy(effect, 2);

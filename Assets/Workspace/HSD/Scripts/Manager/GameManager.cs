@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,7 +10,14 @@ public class GameManager : Singleton<GameManager>
     private static readonly int[] accelerates = { 1, 2, 4 };    
     public Property<float> CurrentAccelerate = new Property<float>();
     public Property<bool> IsPause = new Property<bool>();
-    private int _currentIdx = 0;
+    private int _currentIdx = 0;    
+
+    public async UniTask StageClearAsync(StageData stageData)
+    {
+        Manager.Data.StageGameData.GetStage(out int region, out int stage);
+
+        await Manager.DB.stageDB.SaveStageClearData(stageData, stage, true);
+    }
 
     public void NextAccelerate()
     {
