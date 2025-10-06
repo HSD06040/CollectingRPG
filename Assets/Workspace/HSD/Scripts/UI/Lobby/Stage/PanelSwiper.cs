@@ -9,6 +9,10 @@ public class PanelSwiper : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     [SerializeField] private float _snapDuration = 0.4f;
     [SerializeField] private Ease _easeType = Ease.OutCubic;
 
+    [Header("Swipe Sensitivity")]
+    [SerializeField, Range(0.1f, 1f)] private float _dragSensitivity = 0.5f;
+    [SerializeField, Range(0f, 200f)] private float _swipeThreshold = 100f;
+
     private RectTransform _content;
     private Vector2 _startDragPos;
     private Vector2 _contentStartPos;
@@ -41,34 +45,37 @@ public class PanelSwiper : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         if (!_isDragging) return;
 
-        Vector2 diff = eventData.position - _startDragPos;
+        Vector2 diff = (eventData.position - _startDragPos) * _dragSensitivity;
         Vector2 nextPos = _contentStartPos + new Vector2(diff.x, 0);
 
         float minX = -_panelWidth * (_panelCount - 1);
         float maxX = 0;
 
-        if (nextPos.x > maxX)
-        {
-            nextPos.x = maxX;
-        }
-        else if (nextPos.x < minX)
-        {
-            nextPos.x = minX;
-        }
-
+        nextPos.x = Mathf.Clamp(nextPos.x, minX, maxX);
         _content.anchoredPosition = nextPos;
     }
 
     public async void OnEndDrag(PointerEventData eventData)
     {
         if (_content == null) return;
-
         _isDragging = false;
 
-        float endPosX = _content.anchoredPosition.x;
-        int nearestIndex = Mathf.RoundToInt(-endPosX / _panelWidth);
-        nearestIndex = Mathf.Clamp(nearestIndex, 0, _panelCount - 1);
-        _currentIndex = nearestIndex;
+        float dragDelta = eventData.position.x - _startDragPos.x;
+
+        if (Mathf.Abs(dragDelta) > _swipeThreshold)
+        {
+            if (dragDelta > 0)
+                _currentIndex = Mathf.Max(0, _currentIndex - 1);
+            else
+                _currentIndex = Mathf.Min(_panelCount - 1, _currentIndex + 1);
+        }
+        else
+        {
+            // 스와이프가 짧으면 현재 패널로 스냅
+            float endPosX = _content.anchoredPosition.x;
+            int nearestIndex = Mathf.RoundToInt(-endPosX / _panelWidth);
+            _currentIndex = Mathf.Clamp(nearestIndex, 0, _panelCount - 1);
+        }
 
         await MoveToIndexAsync(_currentIndex);
     }

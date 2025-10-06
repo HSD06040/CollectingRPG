@@ -167,8 +167,8 @@ public class CsvDownloader
             int lastDigit = Mathf.Abs(id % 10);
 
             unitData.AddressableAddress = $"{synergyName}{lastDigit}";
-            unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
-            unitData.Skill.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_SkillIcon");
+            unitData.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_Icon");
+            unitData.Skill.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_SkillIcon");
 
             //#if UNITY_EDITOR
             //            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
@@ -220,7 +220,7 @@ public class CsvDownloader
             unitData.PerferredLine = Mathf.RoundToInt(stat.AttackRange / 1.5f);
             unitData.AddressableAddress = $"Monster_{unitData.ID}";
 
-            unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
+            unitData.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_Icon");
 
             unitData.UnitStats[0] = stat;
             unitData.UnitStats[1] = stat;
@@ -252,7 +252,7 @@ public class CsvDownloader
             skill.PhysicalPower = float.TryParse(row[6], out float power) ? power : 1;
             skill.AbilityPower = float.TryParse(row[7], out float abilityPower) ? abilityPower : 100;
 
-            skill.Icon = Manager.Resources.SpriteGet($"{skill.ID}_SkillIcon");
+            skill.Icon = Manager.Resources.SpriteLoad($"{skill.ID}_SkillIcon");
         }
     }
 

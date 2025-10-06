@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
-    private static readonly int[] accelerates = { 1, 2, 4 };    
+    private static readonly int[] accelerates = { 1, 2 };    
     public Property<float> CurrentAccelerate = new Property<float>();
     public Property<bool> IsPause = new Property<bool>();
     private int _currentIdx = 0;    

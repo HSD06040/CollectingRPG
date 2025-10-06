@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -47,9 +48,7 @@ public class DataManager : Singleton<DataManager>
     #region UniData
     public async UniTask InitData()
     {
-        await Manager.Resources.SpriteLoadLable("MonsterIcon");
-        await Manager.Resources.SpriteLoadLable("PlayerUnitIcon");
-        await Manager.Resources.SpriteLoadLable("SkillIcon");
+        await SpritesLoad();
 
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         CharacterSellAmountData = await Addressables.LoadAssetAsync<CharacterSellAmountData>("Data/CharacterSellAmountData");
@@ -60,7 +59,15 @@ public class DataManager : Singleton<DataManager>
         //PreLoadMagicStoneDatas();
     }
 
-    private async UniTask CsvDownload()
+    private static async UniTask SpritesLoad()
+    {
+        await Manager.Resources.SpriteLoadLable("MonsterIcon");
+        await Manager.Resources.SpriteLoadLable("PlayerUnitIcon");
+        await Manager.Resources.SpriteLoadLable("SkillIcon");
+        await Manager.Resources.SpriteLoadLable("LobbySprite");
+    }
+
+    private static async UniTask CsvDownload()
     {
         CsvLoadData data = await Addressables.LoadAssetAsync<CsvLoadData>("Data/CsvLoadData");
         CsvDownloader csvDownloader = new CsvDownloader(data);
