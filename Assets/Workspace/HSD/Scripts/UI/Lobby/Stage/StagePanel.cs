@@ -5,6 +5,11 @@ using UnityEngine.UI;
 
 public class StagePanel : MonoBehaviour
 {
+    [Header("Instantiate")]
+    [SerializeField] GameObject _stageButtonPrefab;
+    [SerializeField] RectTransform _content;    
+    [Space]
+
     [SerializeField] StageSelectButton[] _stageButtons;
     [SerializeField] Image _stageImage;
     [SerializeField] TMP_Text _stageName;
@@ -22,13 +27,18 @@ public class StagePanel : MonoBehaviour
         _stageData = stageData;
 
         //_applyButton.onClick.AddListener(); !확인 버튼 클릭 시 추가필요!
+        _stageButtons = new StageSelectButton[4];
 
-        for (int i = 0; i < _stageButtons.Length; i++)
+        for (int i = 0; i < 4; i++)
         {
+            int index = i + 1;
             int region = stageData.RegionNumber;
             int stage = i + 1;
 
-            _stageButtons[i].Init(() => SetStage(stageData.RegionNumber, i + 1), stageData.RegionNumber, i + 1);            
+            StageSelectButton button = Instantiate(_stageButtonPrefab, _content).GetComponent<StageSelectButton>();
+            _stageButtons[i] = button;
+
+            button.Init(() => SetStage(region, index, button), region, index);
         }
 
         StageClearCheck();
@@ -64,8 +74,13 @@ public class StagePanel : MonoBehaviour
         }
     }
 
-    private void SetStage(int region, int stage)
+    private void SetStage(int region, int stage, StageSelectButton stageSelectButton)
     {
+        if(StagePanelController.StageSelectButton != null)
+            StagePanelController.StageSelectButton.DeSelect();
+
         Manager.Data.StageGameData.SetStage(region, stage);
+
+        StagePanelController.StageSelectButton = stageSelectButton;
     }
 }

@@ -6,11 +6,13 @@ using UnityEngine.UI;
 
 public class StagePanelController : MonoBehaviour
 {
-    [SerializeField] StagePanel[] _stagePanels;
+    [SerializeField] GameObject _stagePanelPrefab;
+    [SerializeField] int _stagePanelCount;
     [SerializeField] PanelSwiper _swiper;
     [SerializeField] RectTransform _content;
     [SerializeField] Button _closeButton;
-    [SerializeField] Button _applyButton;
+    [SerializeField] Button _applyButton;    
+    public static StageSelectButton StageSelectButton;
 
     private RectTransform _rectTransform;
 
@@ -34,16 +36,19 @@ public class StagePanelController : MonoBehaviour
     {
         _rectTransform = (RectTransform)transform;
 
-        for (int i = 0; i < _stagePanels.Length; i++)
+        for (int i = 0; i < _stagePanelCount; i++)
         {
-            _stagePanels[i].Init(Manager.Data.StageDatas.GetStage(i + 1));
-            SetPosition((RectTransform)_stagePanels[i].transform, i);
+            StagePanel _stagePanel = Instantiate(_stagePanelPrefab, _content).GetComponent<StagePanel>();
+            _stagePanel.Init(Manager.Data.StageDatas.GetStage(i + 1));
+            SetPosition((RectTransform)_stagePanel.transform, i);
         }
 
-        _swiper.Init(_content, _stagePanels.Length);
+        _swiper.Init(_content, _stagePanelCount);
 
         _closeButton.onClick.AddListener(Close);
         //_applyButton.onClick.AddListener(() => Debug.Log("Apply"));
+
+        Canvas.ForceUpdateCanvases();
     }
 
     private void SetPosition(RectTransform rectTransform, int idx)
