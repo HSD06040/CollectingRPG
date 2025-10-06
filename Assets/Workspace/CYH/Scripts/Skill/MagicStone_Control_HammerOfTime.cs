@@ -14,7 +14,7 @@ public class MagicStone_Contrl_HammerOfTime : MagicStoneData
     {
         Vector2 spawnPos = new Vector2(_hammerSpawnX, _hammerSpawnY);
 
-        GameObject hammer = SpawnEffect(spawnPos, _hammerEffectAddress);
+        GameObject hammer = SpawnHammerEffect(spawnPos, _hammerEffectAddress);
         HammerEvent hammerEffect = hammer.GetComponent<HammerEvent>();
 
         if (_swingLeft)
@@ -32,19 +32,34 @@ public class MagicStone_Contrl_HammerOfTime : MagicStoneData
                 {
                     if (enemy == null) continue;
                     Vector2 headPos = (Vector2)enemy.transform.position + Vector2.up * _stunEffectOffsetY;
-                    GameObject stunEffect = SpawnEffect(headPos, Address);
+                    SpawnStunEffect(headPos, Address);
                 }
             };
         }
     }
 
-    protected GameObject SpawnEffect(Vector2 pos, string address)
+    private GameObject SpawnHammerEffect(Vector2 pos, string address)
     {
+        if (string.IsNullOrEmpty(Address))
+            return null;
+
         GameObject effect = Manager.Resources.Instantiate<GameObject>(address, pos, true);
 
-        if (effect == null) return null;
+        if (effect == null) 
+            return null;
 
         return effect;
     }
 
+    private void SpawnStunEffect(Vector2 pos, string address)
+    {
+        if (string.IsNullOrEmpty(Address))
+            return;
+
+        GameObject effect = Manager.Resources.Instantiate<GameObject>(address, pos, true);
+
+        if (effect == null) return;
+
+        Manager.Resources.Destroy(effect, EffectDuration);
+    }
 }
