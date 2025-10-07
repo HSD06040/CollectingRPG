@@ -64,6 +64,7 @@ public class MagicStoneController : InGameSingleton<MagicStoneController>
                 slot.SetMagicStone(magicStoneData);
                 _activeSlots.Add(slot);
                 RefreshSlotOrder();
+                return;
             }
         }
     }

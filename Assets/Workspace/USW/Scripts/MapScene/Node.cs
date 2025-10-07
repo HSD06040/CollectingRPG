@@ -16,6 +16,7 @@ namespace Map
         public readonly string blueprintName;
         public Vector2 position;
         public UnitGridDataSO gridData;
+        public EventData eventData;
 
         public Node(NodeType nodeType, string blueprintName, Vector2Int point)
         {

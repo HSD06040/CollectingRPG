@@ -194,7 +194,7 @@ namespace Map
 
             if (MapPlayerTracker.Instance != null)
             {
-                MapPlayerTracker.Instance.Locked = false;
+                MapPlayerTracker.OnEventEnded?.Invoke();
             }
         }
 

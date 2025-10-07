@@ -38,6 +38,9 @@ public abstract class UnitSkill : ScriptableObject
         
         if (EffectSpawnType == EffectSpawnType.Target)
         {
+            if (attacker.GetTarget() == null)
+                return;
+
             GameObject effect = Manager.Resources.Instantiate<GameObject>(EffectAddress, attacker.GetTarget().gameObject.GetCenterPosition(),true);
 
             if (effect == null)

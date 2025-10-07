@@ -111,6 +111,11 @@ namespace map
         {
             await ((RectTransform)shopPanelUI.transform).DOAnchorPos(_end, _duration).SetEase(_upEase).SetUpdate(true).AsyncWaitForCompletion();
             shopPanelUI.SetActive(false);
+
+            if (MapPlayerTracker.Instance != null)
+            {
+                MapPlayerTracker.OnEventEnded?.Invoke();
+            }
         }
 
         private async UniTask MoveDown()

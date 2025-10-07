@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Map;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -40,8 +41,8 @@ public class DataManager : Singleton<DataManager>
     // 맵 데이터 관련
     public MapDatabase MapDB { get; private set; } = new MapDatabase();
     public StageGridData StageGridData = new();
+    public EventData[] EventDatas;
 
-    // 추후 Init으로 뺄 예정
     public async UniTask InitAsync()
     {
         StageDatas.Init().Forget();
@@ -94,9 +95,15 @@ public class DataManager : Singleton<DataManager>
         tasks.Add(PreLoadUnitDatas());
         tasks.Add(PreLoadMagicStoneDatas());
         tasks.Add(PreLoadAugmentDatas());
+        tasks.Add(PreLoadEventDatas());
 
         await UniTask.WhenAll(tasks);
     }        
+
+    private async UniTask PreLoadEventDatas()
+    {
+        EventDatas = await Manager.Resources.LoadAll<EventData>("EventData");
+    }
 
     private async UniTask PreLoadAugmentDatas()
     {

@@ -85,7 +85,7 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
         PresetSetting();
-        Manager.Data.StageGameData.CurrentFloor.Value = 0;
+        Manager.Data.StageGameData.CurrentFloor.Value = -1;
     }
 
     private void PresetSetting()

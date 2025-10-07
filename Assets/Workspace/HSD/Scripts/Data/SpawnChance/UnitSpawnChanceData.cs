@@ -22,6 +22,9 @@ public class UnitSpawnChanceData : ScriptableObject
     {
         _cachedChances.Clear();
 
+        if (currentFloor == -1)
+            return;
+
         UnitData[] allUnits = Manager.Data.PlayerUnitDatas;
         UnitSpawnChance floorChance = UnitSpawnChances[currentFloor];
 
