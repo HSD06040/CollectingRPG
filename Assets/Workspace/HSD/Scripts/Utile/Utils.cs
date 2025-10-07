@@ -440,6 +440,48 @@ public static class Utils
             gridLayoutGroup.spacing = new Vector2(spacingX, currentSpacingY);
         }
     }
+    public static void SetupGridLayoutGroup(
+    this GridLayoutGroup gridLayoutGroup,
+    Transform content,
+    int columns,
+    int rows,
+    Vector2 cellSize,
+    int offset = 10,
+    bool centerContent = true)
+    {
+        if (content is not RectTransform rectTransform) return;
+
+        gridLayoutGroup.cellSize = cellSize;
+        gridLayoutGroup.padding = new RectOffset(offset, offset, offset, offset);
+
+        float availableWidth = rectTransform.rect.width - offset * 2;
+        float availableHeight = rectTransform.rect.height - offset * 2;
+
+        float totalCellsWidth = cellSize.x * columns;
+        float totalCellsHeight = cellSize.y * rows;
+
+        float spacingX = columns > 1 ? (availableWidth - totalCellsWidth) / (columns - 1) : 0f;
+        float spacingY = rows > 1 ? (availableHeight - totalCellsHeight) / (rows - 1) : 0f;
+
+        spacingX = Mathf.Max(0f, spacingX);
+        spacingY = Mathf.Max(0f, spacingY);
+
+        gridLayoutGroup.spacing = new Vector2(spacingX, spacingY);
+
+        if (centerContent)
+        {
+            float usedWidth = totalCellsWidth + spacingX * (columns - 1);
+            float usedHeight = totalCellsHeight + spacingY * (rows - 1);
+
+            float leftoverX = Mathf.Max(0, (availableWidth - usedWidth) / 2f);
+            float leftoverY = Mathf.Max(0, (availableHeight - usedHeight) / 2f);
+
+            gridLayoutGroup.padding.left = offset + Mathf.RoundToInt(leftoverX);
+            gridLayoutGroup.padding.right = offset + Mathf.RoundToInt(leftoverX);
+            gridLayoutGroup.padding.top = offset + Mathf.RoundToInt(leftoverY);
+            gridLayoutGroup.padding.bottom = offset + Mathf.RoundToInt(leftoverY);
+        }
+    }
     #endregion
 
     #region Status

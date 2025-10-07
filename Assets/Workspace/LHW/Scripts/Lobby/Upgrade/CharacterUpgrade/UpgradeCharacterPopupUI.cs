@@ -162,8 +162,8 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
         Debug.Log("CosSprite Update");
         if (Manager.Data.SynergyDB != null)
         {
-            _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.Synergy).Icon;
-            _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.ClassSynergy).Icon;
+            _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.Synergy).ActiveIcon;
+            _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.ClassSynergy).ActiveIcon;
         }
     }
 

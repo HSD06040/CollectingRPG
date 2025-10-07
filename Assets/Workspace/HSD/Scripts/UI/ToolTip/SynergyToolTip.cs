@@ -33,7 +33,7 @@ public class SynergyToolTip : ToolTip
 
     private void Setup(SynergyData synergyData)
     {
-        _icon.sprite = synergyData.Icon;
+        _icon.sprite = synergyData.ActiveIcon;
         _synergyName.text = synergyData.SynergyName;
         _description.text = synergyData.Description;
 

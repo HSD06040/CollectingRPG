@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class SynergySlot_New : MonoBehaviour, IPointerDownHandler
 {
     [SerializeField] Image _icon;
-    [SerializeField] Image _synergyColorSlot;
     [SerializeField] SynergyActiveSlot_Controller _synergyActiveSlot_Controller;
 
     private SynergyData _synergyData;
@@ -21,7 +20,7 @@ public class SynergySlot_New : MonoBehaviour, IPointerDownHandler
     public void Init(SynergyData data, int activeCount, SynergyToolTip synergyToolTip)
     {
         _synergyData = data;
-        _icon.sprite = data.Icon;
+        _icon.sprite = data.ActiveIcon;
         _synergyToolTip = synergyToolTip;
         SetSynergyCount();
         UpdateUI(activeCount);
@@ -32,10 +31,14 @@ public class SynergySlot_New : MonoBehaviour, IPointerDownHandler
     {
         ActiveCount = activeCount;
 
-        if(activeCount <= 1)        
-            _synergyColorSlot.color = Color.gray;        
+        if(activeCount <= 1)
+        {
+            _icon.sprite = _synergyData.DeActiveIcon;
+        }
         else
-            _synergyColorSlot.color = _synergyData.SynergyColor;
+        {
+            _icon.sprite = _synergyData.ActiveIcon;
+        }
 
         _synergyActiveSlot_Controller.Active(_synergyData.CurrentUpgradeIdx + 1);
     }

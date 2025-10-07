@@ -23,7 +23,7 @@ public class SynergySlot : MonoBehaviour, IPointerDownHandler
     public void Init(SynergyData data, int activeCount, SynergyToolTip synergyToolTip)
     {        
         _synergyData = data;
-        _icon.sprite = data.Icon;
+        _icon.sprite = data.ActiveIcon;
         _synergyName.text = data.SynergyName;
         _synergyToolTip = synergyToolTip;
         SetSynergyCount();

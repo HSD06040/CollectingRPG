@@ -23,7 +23,7 @@ public class SynergyPanel : MonoBehaviour
 
     private void Start()
     {        
-        _gridLayoutGroup.SetupGridLayoutGroup(_content, 6, 1, _offset, true);
+        _gridLayoutGroup.SetupGridLayoutGroup(_content, 6, 1, _gridLayoutGroup.cellSize, _offset, true);
     }
 
     public void Init(SynergyDatabase db)
@@ -67,7 +67,7 @@ public class SynergyPanel : MonoBehaviour
     public void UpdateSynergySlot(int synergy, int activeCount)
     {
         _synergySlots[synergy].UpdateUI(activeCount);
-        SetHiararchy();
+        //SetHiararchy();
     }
     
 
