@@ -29,16 +29,20 @@ public class ItemListPanel_MagicStone : ItemListPanel
 
             int price = Manager.Data.PriceDatas.GetMagicStonePrice(magicStoneData.Grade);
 
-            _itemSlot_MagicStone[index].SetMagicStoneItem(magicStoneData);
+            ItemSlot_MagicStone itemSlot_MagicStone = _itemSlot_MagicStone[index];
+            itemSlot_MagicStone.SetMagicStoneItem(magicStoneData);
 
             _pricePanel.AddListenerButton(index,
-                () => Buy(magicStoneData, price, () => _pricePanel.Close(index)),
+                () => Buy(itemSlot_MagicStone, magicStoneData, price, () => _pricePanel.Close(index)),
                 price);
+
+            _pricePanel.SetPosition(index, (RectTransform)itemSlot_MagicStone.transform);
+            itemSlot_MagicStone.ResetSoldOut();
         }
     }
 
 
-    private void Buy(MagicStoneData magicStoneData, int price, Action closeAction)
+    private void Buy(ItemSlot slot, MagicStoneData magicStoneData, int price, Action closeAction)
     {
         if (MagicStoneController.Instance.IsFull())
         {
@@ -49,6 +53,7 @@ public class ItemListPanel_MagicStone : ItemListPanel
         if (InGameManager.Instance.SpendGold(price))
         {
             closeAction?.Invoke();
+            slot.SoldOut();
             MagicStoneController.Instance.TrySetMagicStone(magicStoneData);
         }
         else

@@ -90,10 +90,10 @@ public class DataManager : Singleton<DataManager>
     {
         List<UniTask> tasks = new List<UniTask>();
 
-        tasks[0] = PreLoadSynergyDB();
-        tasks[1] = PreLoadUnitDatas();
-        tasks[2] = PreLoadMagicStoneDatas();
-        tasks[3] = PreLoadAugmentDatas();
+        tasks.Add(PreLoadSynergyDB());
+        tasks.Add(PreLoadUnitDatas());
+        tasks.Add(PreLoadMagicStoneDatas());
+        tasks.Add(PreLoadAugmentDatas());
 
         await UniTask.WhenAll(tasks);
     }        

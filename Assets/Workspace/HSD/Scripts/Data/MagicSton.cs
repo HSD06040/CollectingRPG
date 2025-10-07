@@ -7,7 +7,7 @@ using UnityEngine;
 public class MagicSton : ScriptableObject
 {
     public MagicStoneData[] MagicStoneDatas;
-    public int Level;
+    public int Level = 1;
 
     public MagicStoneData GetMagicStone()
     {

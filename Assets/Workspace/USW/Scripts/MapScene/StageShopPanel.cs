@@ -12,6 +12,10 @@ namespace map
         public GameObject shopPanelUI; // Inspector에서 실제 패널 연결
         public Button _backButton;
 
+        [Header("ItemListPanel")]
+        [SerializeField] ItemListPanel_Agument _itemListPanel_Augment;
+        [SerializeField] ItemListPanel_MagicStone _itemListPanel_MagicStone;
+
         private void Awake()
         {
             Instance = this;
@@ -32,6 +36,7 @@ namespace map
             }
         }
 
+        [ContextMenu("OpenShop")]
         public void OpenShop()
         {
             Debug.Log("OpenShop called!");
@@ -39,6 +44,7 @@ namespace map
             {
                 shopPanelUI.SetActive(true);
                 Debug.Log("Shop panel activated!");
+                SetupItems();
             }
             else
             {
@@ -65,6 +71,12 @@ namespace map
             {
                 _backButton.onClick.RemoveListener(CloseShop);
             }
+        }
+
+        private void SetupItems()
+        {
+            _itemListPanel_Augment.SettingItmes();
+            _itemListPanel_MagicStone.SettingItmes();
         }
     }
 }

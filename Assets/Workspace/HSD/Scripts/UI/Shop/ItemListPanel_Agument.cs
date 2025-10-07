@@ -27,21 +27,26 @@ public class ItemListPanel_Agument : ItemListPanel
 
             int price = Manager.Data.PriceDatas.GetAugumentPrice(augmentData.Grade);
 
-            _itemSlot_Augments[index].SetAugmentItem(augmentData);
+            ItemSlot_Augment itemSlot_Augment = _itemSlot_Augments[index];
+            itemSlot_Augment.SetAugmentItem(augmentData);
 
             _pricePanel.AddListenerButton(
                 index,
-                () => Buy(augmentData, price, () => _pricePanel.Close(index)),
+                () => Buy(itemSlot_Augment, augmentData, price, () => _pricePanel.Close(index)),
                 price
             );
+
+            _pricePanel.SetPosition(index, (RectTransform)itemSlot_Augment.transform);
+            itemSlot_Augment.ResetSoldOut();
         }
     }
 
-    private void Buy(AUGData augmentData, int price, Action buttonCloseAction)
+    private void Buy(ItemSlot slot, AUGData augmentData, int price, Action buttonCloseAction)
     {
         if(InGameManager.Instance.SpendGold(price))
         {
             buttonCloseAction?.Invoke();
+            slot.SoldOut();
             AugmentManager.Instance.SelectAugment(augmentData);
         }
         else
