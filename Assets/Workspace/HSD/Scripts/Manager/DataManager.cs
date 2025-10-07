@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -13,11 +14,15 @@ public class DataManager : Singleton<DataManager>
     // 시너지
     public SynergyDatabase SynergyDB;
 
+    // 스테이지 관련
+    public StageGameData StageGameData = new();
+    public StageDatas StageDatas = new();
+
     // 인게임
     public UnitSpawnChanceData UnitSpawnChanceData;
     public CharacterSellAmountData CharacterSellAmountData;
     
-    // 애니메이션 ㄷ이터
+    // 애니메이션 데이터
     public AnimationManager AnimationManager = new();
 
     // 마법석 데이터 임시로 추가
@@ -34,17 +39,16 @@ public class DataManager : Singleton<DataManager>
     // 추후 Init으로 뺄 예정
     public async UniTask InitAsync()
     {
+        StageDatas.Init().Forget();
         PresetDB.InitPresetData();
         MapDB.InitMapData();
         await InitData();
     }
-    #region UniData
 
+    #region UniData
     public async UniTask InitData()
     {
-        await Manager.Resources.SpriteLoadLable("MonsterIcon");
-        await Manager.Resources.SpriteLoadLable("PlayerUnitIcon");
-        await Manager.Resources.SpriteLoadLable("SkillIcon");
+        await SpritesLoad();
 
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         CharacterSellAmountData = await Addressables.LoadAssetAsync<CharacterSellAmountData>("Data/CharacterSellAmountData");
@@ -55,7 +59,15 @@ public class DataManager : Singleton<DataManager>
         //PreLoadMagicStoneDatas();
     }
 
-    private async UniTask CsvDownload()
+    private static async UniTask SpritesLoad()
+    {
+        await Manager.Resources.SpriteLoadLable("MonsterIcon");
+        await Manager.Resources.SpriteLoadLable("PlayerUnitIcon");
+        await Manager.Resources.SpriteLoadLable("SkillIcon");
+        await Manager.Resources.SpriteLoadLable("LobbySprite");
+    }
+
+    private static async UniTask CsvDownload()
     {
         CsvLoadData data = await Addressables.LoadAssetAsync<CsvLoadData>("Data/CsvLoadData");
         CsvDownloader csvDownloader = new CsvDownloader(data);

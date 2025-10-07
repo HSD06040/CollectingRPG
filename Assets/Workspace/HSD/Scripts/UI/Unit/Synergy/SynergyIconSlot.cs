@@ -16,7 +16,7 @@ public class SynergyIconSlot : MonoBehaviour, IPointerDownHandler
     public void Init(SynergyData data, SynergyToolTip synergyToolTip)
     {
         _synergyData = data;
-        _icon.sprite = data.Icon;
+        _icon.sprite = data.ActiveIcon;
         _synergyToolTip = synergyToolTip;
 
         UpdateIcon(0);

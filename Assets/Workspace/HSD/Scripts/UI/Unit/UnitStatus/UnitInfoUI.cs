@@ -38,8 +38,8 @@ public class UnitInfoUI : MonoBehaviour
 
         // isEnemy로 분리
 
-        _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.Synergy).Icon;
-        _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.ClassSynergy).Icon;
+        _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.Synergy).ActiveIcon;
+        _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.ClassSynergy).ActiveIcon;
 
         UnitStats stat = status.GetCurrentStat();
 

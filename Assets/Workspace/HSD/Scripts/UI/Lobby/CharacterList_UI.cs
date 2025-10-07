@@ -18,7 +18,7 @@ public class CharacterList_UI : MonoBehaviour
         _synergyName.text = synergyName;
         if (Manager.Data.SynergyDB != null)
         {
-            _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)synergyUnits[0].Synergy).Icon;
+            _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)synergyUnits[0].Synergy).ActiveIcon;
         }
 
         _synergyUnits = new CharacterUnit[synergyUnits.Length];

@@ -74,7 +74,7 @@ public class CharacterUpgradeUnit : MonoBehaviour
         _characterImg.sprite = _status.Data.Icon;
         if (Manager.Data.SynergyDB != null)
         {
-            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).Icon;
+            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).ActiveIcon;
         }
         _levelText.text = $"Lv.{_status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel}";
     }

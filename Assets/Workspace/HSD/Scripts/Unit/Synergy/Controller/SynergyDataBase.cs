@@ -9,7 +9,7 @@ public class SynergyDatabase : ScriptableObject
     public readonly Dictionary<int, SynergyData> _synergyDataDic = new Dictionary<int, SynergyData>(128);
 
     [SerializeField] UnitSynergyData[] _unitSynergyDatas;
-    [SerializeField] ClassSynergyData[] _classSynergyDatas;
+    [SerializeField] ClassSynergyData[] _classSynergyDatas;    
 
     public void Init()
     {        

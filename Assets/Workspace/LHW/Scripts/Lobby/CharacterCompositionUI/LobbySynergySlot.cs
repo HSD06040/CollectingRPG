@@ -13,7 +13,7 @@ public class LobbySynergySlot : MonoBehaviour
     public void Init(SynergyData data, int activeCount)
     {        
         _synergyData = data;
-        _icon.sprite = data.Icon;
+        _icon.sprite = data.ActiveIcon;
         SetSynergyCount();
         UpdateUI(activeCount);
     }

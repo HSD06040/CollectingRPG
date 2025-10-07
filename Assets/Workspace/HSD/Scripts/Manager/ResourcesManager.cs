@@ -54,7 +54,7 @@ public class ResourcesManager : Singleton<ResourcesManager>
     #endregion
 
     #region Sprite
-    public Sprite SpriteGet(string address)
+    public Sprite SpriteLoad(string address)
     {
         if(!_sprites.ContainsKey(address))
         {

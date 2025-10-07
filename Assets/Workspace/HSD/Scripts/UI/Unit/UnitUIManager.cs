@@ -18,55 +18,56 @@ public class UnitUIManager : MonoBehaviour
     public HpMeterController HpMeterController;
     public SkillPopUpController SkillPopUpController;
     public UnitHealthBarManager UnitHealthBarManager;
+    public BattleUISwitch BattleUISwitch;
 
     [Header("Not Battle")]
+    public GradeChancePanel GradeChancePanel;
     public SynergyPanel SynergyPanel;
-    public SynergySlotPanel SynergySlotPanel;
+    public SynergyPanel SynergySlotPanel;
     public UnitCountPanel UnitCountPanel;
     public UnitTotalPowerPanel[] UnitTotalPowerPanel;
 
-    public async UniTask BattleUISetting()
+    public void BattleUISetting()
     {
-        await UIFadeOut(_notBattleUI);
-
-        await UIFadeIn(_battleUI);
+        UIFadeIn(_battleUI);
+        BattleUISwitch.Init();
     }
 
-    public async UniTask StandbyUISetting()
+    public void StandbyUISetting()
     {
         UnitHealthBarManager.Clear();
 
-        await UIFadeOut(_battleUI);
+        UIFadeOut(_battleUI);
 
         _fightButton.gameObject.SetActive(true);
 
-        await UIFadeIn(_notBattleUI);
+        UIFadeIn(_notBattleUI);
     }
 
-    public async UniTask StandbyUIDeActive()
+    public void StandbyUIDeActive()
     {
-        await UIFadeOut(_notBattleUI);
+        UIFadeOut(_notBattleUI);
 
         _fightButton.gameObject.SetActive(false);
     }
 
-    private async UniTask UIFadeIn(CanvasGroup canvasGroup)
+    private void UIFadeIn(CanvasGroup canvasGroup)
     {
         canvasGroup.alpha = 0f;
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
 
-        await canvasGroup.DOFade(1f, _fadeDuration).AsyncWaitForCompletion();
+        canvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true);;
 
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
     }
 
-    private async UniTask UIFadeOut(CanvasGroup canvasGroup)
+    private void UIFadeOut(CanvasGroup canvasGroup)
     {
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
 
-        await canvasGroup.DOFade(0f, _fadeDuration).AsyncWaitForCompletion();
+        canvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true);
     }
 }

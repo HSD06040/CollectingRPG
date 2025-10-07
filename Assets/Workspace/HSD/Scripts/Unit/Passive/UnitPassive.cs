@@ -326,6 +326,9 @@ public class UnitPassive
             return;
         }
 
+        if (_owner.Target == null)
+            return;
+
         GameObject attackObj = effect.SpawnPositionType == SpawnPositionType.Self ?
             Manager.Resources.Instantiate(effect.AttackPrefab, _owner.transform.position, Quaternion.identity, true) :
             Manager.Resources.Instantiate(effect.AttackPrefab, _owner.Target.position, Quaternion.identity, true);

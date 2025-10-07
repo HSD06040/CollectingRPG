@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEngine.GraphicsBuffer;
 
 public class SynergyToolTip : ToolTip
 {
@@ -32,12 +33,15 @@ public class SynergyToolTip : ToolTip
 
     private void Setup(SynergyData synergyData)
     {
-        _icon.sprite = synergyData.Icon;
+        _icon.sprite = synergyData.ActiveIcon;
         _synergyName.text = synergyData.SynergyName;
         _description.text = synergyData.Description;
 
         _effectDescription.color = Color.gray;
         _effectDescription.text = GetEffectDescription(synergyData);
+
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)transform);
     }
 
     private string GetEffectDescription(SynergyData synergyData)

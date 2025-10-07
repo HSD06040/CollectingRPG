@@ -17,7 +17,7 @@ public class UpgradeSynergyTextUI : MonoBehaviour
             _synergyText.text = _character.Status.Data.Synergy.ToString();
             if (Manager.Data.SynergyDB != null)
             {
-                _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_character.Status.Data.Synergy).Icon;
+                _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_character.Status.Data.Synergy).ActiveIcon;
             }
         }
     }

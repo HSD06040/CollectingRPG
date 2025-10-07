@@ -63,8 +63,7 @@ public class PartySelectPanelController : MonoBehaviour
     {
         await Manager.Resources.LoadLabel("Stage");
 
-        // 나중에 스테이지가 결정되고 스테이지 1-2 같은 데이터 들이 저장이 되면 바꿀 것
-        await Manager.Data.StageGridData.SetGridData(1, 1);
+        await Manager.Data.StageGridData.SetGridData();
     }
 
     public void ArrangePreset()

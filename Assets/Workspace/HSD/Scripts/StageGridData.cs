@@ -15,8 +15,9 @@ public class StageGridData
     private int _minorCurrentIndex = 0;
     private int _eliteCurrentIndex = 0;    
 
-    public async UniTask SetGridData(int region, int stage)
+    public async UniTask SetGridData()
     {
+        Manager.Data.StageGameData.GetStage(out int region, out int stage);
         await Manager.Resources.LoadLabel($"Stage{region}");
 
         _minorEnemyGridDatas = await Manager.Resources.LoadAll<UnitGridDataSO>($"Stage{region}_Minor");

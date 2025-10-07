@@ -11,9 +11,10 @@ public class BattleUISwitch : MonoBehaviour
     [SerializeField] Ease _upEase = Ease.OutElastic;
     [SerializeField] Ease _downEase = Ease.InElastic;
     [SerializeField] float _duration = 0.5f;
+    [SerializeField] float _delay = 0.2f;
     [SerializeField] float _offsetY = 500f;
 
-    private BattleUIType battleUIType = BattleUIType.MagicStone;
+    private BattleUIType battleUIType = BattleUIType.Meter;
 
     private bool _isMoving = false;
     private Vector2 _upPosition;
@@ -33,8 +34,16 @@ public class BattleUISwitch : MonoBehaviour
 
         _magicStonePanel.anchoredPosition = _upPosition;
         _meterPanel.anchoredPosition = _downPosition;
+    }
 
-        UISetting().Forget();
+    public void Init()
+    {
+        battleUIType = BattleUIType.Meter;
+
+        _magicStonePanel.anchoredPosition = _downPosition;
+        _meterPanel.anchoredPosition = _downPosition;
+
+        MoveUp(_meterPanel).Forget();
     }
 
     public void SwitchUI()
@@ -61,16 +70,18 @@ public class BattleUISwitch : MonoBehaviour
 
     private async UniTask UISetting()
     {
+        _isMoving = true;
+
         if (battleUIType == BattleUIType.MagicStone)
         {
             MoveDown(_meterPanel).Forget();
-            await UniTask.WaitForSeconds(_duration);
+            await UniTask.WaitForSeconds(_delay);
             MoveUp(_magicStonePanel).Forget();
         }
         else
         {
             MoveDown(_magicStonePanel).Forget();
-            await UniTask.WaitForSeconds(_duration);
+            await UniTask.WaitForSeconds(_delay);
             MoveUp(_meterPanel).Forget();
         }
 
@@ -79,8 +90,6 @@ public class BattleUISwitch : MonoBehaviour
 
     private async UniTask MoveUp(RectTransform rectTransform)
     {
-        _isMoving = true;
-
         await rectTransform.DOAnchorPos(_upPosition, _duration)
             .SetEase(_upEase)
             .SetLink(gameObject)            
@@ -89,8 +98,6 @@ public class BattleUISwitch : MonoBehaviour
 
     private async UniTask MoveDown(RectTransform rectTransform)
     {
-        _isMoving = true;
-
         await rectTransform.DOAnchorPos(_downPosition, _duration)
             .SetEase(_downEase)
             .SetLink(gameObject) 
