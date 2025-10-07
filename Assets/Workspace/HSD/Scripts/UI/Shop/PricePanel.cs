@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
 public class PricePanel : MonoBehaviour
@@ -15,15 +16,27 @@ public class PricePanel : MonoBehaviour
     {
         _buyButtons[index].Button.onClick.RemoveAllListeners();
         _buyButtons[index].Button.onClick.AddListener(buyAction);
-        _buyButtons[index]._priceAmountText.text = Utils.ToAbbreviation(price);
+        _buyButtons[index].PriceAmountText.text = Utils.ToAbbreviation(price);
         Show(index);
     }
 
     public void SetPosition(int index, RectTransform rectTransform)
     {
-        Vector3 pos = _buyButtons[index].transform.position;
-        pos.x = rectTransform.position.x;
-        _buyButtons[index].transform.position = pos;
+        RectTransform buttonRect = (RectTransform)_buyButtons[index].Button.transform;
+
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(null, _buyButtons[index].transform.position);
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            buttonRect.parent as RectTransform,
+            screenPoint,
+            null,
+            out Vector2 localPoint
+        );
+
+
+        Vector2 anchoredPos = buttonRect.anchoredPosition;
+        anchoredPos.x = localPoint.x;
+        buttonRect.anchoredPosition = anchoredPos;
     }
 
     public void Close(int index)
