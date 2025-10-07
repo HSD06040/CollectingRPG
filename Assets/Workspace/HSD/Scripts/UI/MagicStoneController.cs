@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MagicStonePanel : MonoBehaviour
+public class MagicStoneController : InGameSingleton<MagicStoneController>
 {
     [SerializeField] MagicStoneSlot[] _magicStoneSlots;
     [SerializeField] Transform _dropArea;

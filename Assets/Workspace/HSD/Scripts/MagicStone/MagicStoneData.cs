@@ -5,6 +5,7 @@ public abstract class MagicStoneData : ScriptableObject
     public Sprite Icon;
     public string Name;
     public SubGrade Grade;
+    public MagicStoneType Type;
     [TextArea]
     public string Description;
     public GameObject Prefab => Manager.Resources.Load<GameObject>(Address);

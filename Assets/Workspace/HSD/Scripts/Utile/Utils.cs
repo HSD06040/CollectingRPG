@@ -386,6 +386,18 @@ public static class Utils
         };
     }
 
+    public static string GetMagicStonTypeKorean(this MagicStoneType magicStoneType)
+    {
+        return magicStoneType switch
+        {
+            MagicStoneType.Attack => "공격형",
+            MagicStoneType.Defense => "방어형",
+            MagicStoneType.Support => "지원형",
+            MagicStoneType.Control => "제어형",
+            _ => "알 수 없음"
+        };
+    }
+
     #endregion
 
     #region UI

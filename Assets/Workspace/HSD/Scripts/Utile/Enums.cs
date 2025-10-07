@@ -39,6 +39,14 @@ public enum SubGrade
 }
 
 #region Type
+public enum MagicStoneType
+{
+    Attack,
+    Defense,
+    Support,
+    Control
+}
+
 public enum BuffEffect
 {
     Shield,

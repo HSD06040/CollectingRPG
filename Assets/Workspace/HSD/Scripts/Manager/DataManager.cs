@@ -28,6 +28,7 @@ public class DataManager : Singleton<DataManager>
     // 마법석 데이터 임시로 추가
     public Dictionary<string, MagicStoneData> MagicStoneDataDic;
     public MagicStoneData[] MagicStoneDatas;
+    public MagicStonLevelChanceData MagicStonLevelChanceData;
 
     // 프리셋 데이터 관련
     public PresetDatabase PresetDB { get; private set; } = new PresetDatabase();
@@ -52,6 +53,7 @@ public class DataManager : Singleton<DataManager>
 
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         CharacterSellAmountData = await Addressables.LoadAssetAsync<CharacterSellAmountData>("Data/CharacterSellAmountData");
+        MagicStonLevelChanceData = await Addressables.LoadAssetAsync<MagicStonLevelChanceData>("Data/MagicStoneLevelChanceData");        
 
         await AnimationManager.Init();
         await PreLoadData();
