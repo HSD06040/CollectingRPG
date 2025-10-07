@@ -44,7 +44,7 @@ public class MagicStonLevelChanceData : ScriptableObject
         float totalChance = 0f;
         foreach (var chance in chances)
         {
-            totalChance += chance.SuccessChance;
+            totalChance += chance.Chance;
         }
 
         float randomValue = Random.Range(0f, totalChance);
@@ -52,7 +52,7 @@ public class MagicStonLevelChanceData : ScriptableObject
 
         foreach (var chance in chances)
         {
-            cumulative += chance.SuccessChance;
+            cumulative += chance.Chance;
             if (randomValue <= cumulative)
             {
                 return chance.Grade;
@@ -66,12 +66,12 @@ public class MagicStonLevelChanceData : ScriptableObject
 [System.Serializable]
 public class MagicStonLevelChances
 {
-    public MagicStonLevelChance[] MagicStonLevelChanceDatas;
+    public SubGradeChanceData[] MagicStonLevelChanceDatas;
 }
 
 [System.Serializable]
-public class MagicStonLevelChance
+public class SubGradeChanceData
 {
     public SubGrade Grade;
-    public float SuccessChance;
+    public float Chance;
 }

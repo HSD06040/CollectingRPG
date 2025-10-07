@@ -14,4 +14,9 @@ public abstract class ItemSlot : MonoBehaviour
         _itemNameText.text = itemName;
         _itemIcon.sprite = itemIcon;
     }
+
+    public void Close()
+    {
+        gameObject.SetActive(false);
+    }
 }

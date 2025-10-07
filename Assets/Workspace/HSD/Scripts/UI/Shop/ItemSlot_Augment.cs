@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class ItemSlot_Augment : ItemSlot
 {
-    private AugmentData _augmentData;
+    private AUGData _augmentData;
 
-    public void SetAugmentItem(string itemName, Sprite itemIcon, AugmentData augmentData)
+    public void SetAugmentItem(AUGData augmentData)
     {
-        base.SetItem(itemName, itemIcon);
+        base.SetItem(augmentData.Name, augmentData.Icon);
         _augmentData = augmentData;
-    }    
+    }
 }

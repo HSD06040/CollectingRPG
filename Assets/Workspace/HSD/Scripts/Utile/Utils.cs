@@ -317,7 +317,7 @@ public static class Utils
             return $"{(value / 1_000f).ToString("0.#")}k";
 
         return value.ToString();
-    }
+    }    
 
     private static StringBuilder sb = new StringBuilder();
 

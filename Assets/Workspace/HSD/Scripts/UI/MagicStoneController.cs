@@ -45,20 +45,27 @@ public class MagicStoneController : InGameSingleton<MagicStoneController>
         }
     }
 
-    public bool TrySetMagicStone(MagicStoneData magicStoneData)
+    public bool IsFull()
     {
         foreach (var slot in _magicStoneSlots)
         {
+            if (slot.MagicStoneData == null)
+                return false;
+        }
+        return true;
+    }
+
+    public void TrySetMagicStone(MagicStoneData magicStoneData)
+    {
+        foreach (var slot in _magicStoneSlots)
+        {            
             if (slot.MagicStoneData == null)
             {
                 slot.SetMagicStone(magicStoneData);
                 _activeSlots.Add(slot);
                 RefreshSlotOrder();
-                return true;
             }
         }
-
-        return false;
     }
 
     public void SetMagicStone(int idx, MagicStoneData magicStoneData)
