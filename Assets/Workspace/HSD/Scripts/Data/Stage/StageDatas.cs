@@ -21,7 +21,12 @@ public class StageDatas
         }
     }
 
-    public RewardData[] GetStageReward(int region, int stage)
+    public OutGameRewardData[] GetFirstStageReward(int region, int stage)
+    {
+        return GetStage(region).GetStageFirstReward(stage);
+    }
+
+    public OutGameRewardData[] GetStageReward(int region, int stage)
     {
         return GetStage(region).GetStageReward(stage);
     }

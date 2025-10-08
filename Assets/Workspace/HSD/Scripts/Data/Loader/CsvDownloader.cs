@@ -12,7 +12,10 @@ public enum CsvType
     PlayerUnit,
     MonsterSkillData,
     Monster,
-    PlayerSkillData,    
+    PlayerSkillData,
+    StageFirstReward,
+    StageReward,
+    Floor
 }
 
 public class CsvDownloader
@@ -97,6 +100,12 @@ public class CsvDownloader
                 return MonsterSetup;
             case CsvType.MonsterSkillData:
                 return MonsterSkillSetup;
+            case CsvType.StageFirstReward:
+                return StageFirstRewardSetup;
+            case CsvType.StageReward:
+                return StageRewardSetup;
+            case CsvType.Floor:
+                return FloorRewardSetup;
             default:
                 Debug.LogError($"알 수 없는 CSV 이름: {csvType.ToString()}");
                 return null;
@@ -300,6 +309,94 @@ public class CsvDownloader
         }
     }
 
+    private void StageFirstRewardSetup(string[][] data)
+    {        
+        foreach (var row in data)
+        {
+            string[] numbers = row[0].Split('-');
+
+            int region = int.Parse(numbers[0]);
+            int stage = int.Parse(numbers[1]);
+
+            StageRewardData[] stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas;
+
+            if (stageRewardDatas == null)
+            {
+                Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas = new StageRewardData[4];
+                stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas;
+            }
+
+            OutGameRewardData[] outGameRewardDatas = new OutGameRewardData[3];
+
+            outGameRewardDatas[0].RewardType = OutGameRewardType.Gold;
+            outGameRewardDatas[0].Amount = int.TryParse(row[1], out int gold) ? gold : 0;
+
+            outGameRewardDatas[1].RewardType = OutGameRewardType.Diamond;
+            outGameRewardDatas[1].Amount = int.TryParse(row[2], out int diamond) ? diamond : 0;
+
+            outGameRewardDatas[2].RewardType = OutGameRewardType.Exp;
+            outGameRewardDatas[2].Amount = int.TryParse(row[3], out int exp) ? exp : 0;
+
+            stageRewardDatas[stage-1].StageNumber = stage;
+            stageRewardDatas[stage-1].RewardDatas = outGameRewardDatas;
+        }
+    }
+
+    private void StageRewardSetup(string[][] data)
+    {
+        foreach (var row in data)
+        {
+            string[] numbers = row[0].Split('-');
+
+            int region = int.Parse(numbers[0]);
+            int stage = int.Parse(numbers[1]);
+
+            StageRewardData[] stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageRewardDatas;
+
+            if (stageRewardDatas == null)
+            {
+                Manager.Data.StageDatas.GetStage(region).StageRewardDatas = new StageRewardData[4];
+                stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageRewardDatas;
+            }
+
+            OutGameRewardData[] outGameRewardDatas = new OutGameRewardData[3];
+
+            outGameRewardDatas[0].RewardType = OutGameRewardType.Gold;
+            outGameRewardDatas[0].Amount = int.TryParse(row[1], out int gold) ? gold : 0;
+
+            outGameRewardDatas[1].RewardType = OutGameRewardType.Diamond;
+            outGameRewardDatas[1].Amount = int.TryParse(row[2], out int diamond) ? diamond : 0;
+
+            outGameRewardDatas[2].RewardType = OutGameRewardType.Exp;
+            outGameRewardDatas[2].Amount = int.TryParse(row[3], out int exp) ? exp : 0;
+
+            stageRewardDatas[stage-1].StageNumber = stage;
+            stageRewardDatas[stage-1].RewardDatas = outGameRewardDatas;
+        }
+    }
+
+    private void FloorRewardSetup(string[][] data)
+    {
+        int count = 0;
+        foreach (var row in data)
+        {
+            int floor = int.Parse(row[0]);
+
+            StageFloorRewardData stageFloorRewardData = new StageFloorRewardData();
+
+            stageFloorRewardData.Floor = floor;
+
+            stageFloorRewardData.StageFloorRewardTypes[0].RewardType = InGameRewardType.Energy;
+            stageFloorRewardData.StageFloorRewardTypes[0].Amount = int.TryParse(row[1], out int energy) ? energy : 0;
+
+            stageFloorRewardData.StageFloorRewardTypes[1].RewardType = InGameRewardType.Silver;
+            stageFloorRewardData.StageFloorRewardTypes[1].Amount = int.TryParse(row[2], out int silver) ? silver : 0;
+
+            Manager.Data.StageGameData.FloorRewardDatas[count] = stageFloorRewardData;
+
+            count++;
+        }
+    }
 
     //private void CreateMonsterUnitData(string[][] data)
     //{

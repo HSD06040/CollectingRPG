@@ -14,9 +14,9 @@ namespace Map
         public TMP_Text _descriptionText;
         public CanvasGroup _descriptionCanvasGroup;
 
-        [Header("Choice Buttons")] public Button _yesButton;
+        [Header("Choice Buttons")] 
+        public Button _yesButton;
         public Button _nvmButton;
-        public Button _continueButton;
 
         [Header("Fade Settings")] public float _fadeDuration = 0.5f;
 
@@ -43,12 +43,6 @@ namespace Map
             {
                 _nvmButton.onClick.AddListener(() => OnChoiceSelected(false));
             }
-
-            if (_continueButton != null)
-            {
-                _continueButton.onClick.AddListener(CloseEvent);
-                _continueButton.gameObject.SetActive(false);
-            }
         }
 
         /// <summary>
@@ -69,7 +63,6 @@ namespace Map
 
             _yesButton.gameObject.SetActive(true);
             _nvmButton.gameObject.SetActive(true);
-            _continueButton.gameObject.SetActive(false);
 
             if (_descriptionCanvasGroup != null)
             {
@@ -129,8 +122,6 @@ namespace Map
             }
 
             yield return StartCoroutine(FadeIn());
-
-            _continueButton.gameObject.SetActive(true);
         }
 
         private IEnumerator FadeOut()
@@ -205,9 +196,6 @@ namespace Map
 
             if (_nvmButton != null)
                 _nvmButton.onClick.RemoveAllListeners();
-
-            if (_continueButton != null)
-                _continueButton.onClick.RemoveAllListeners();
         }
     }
 }

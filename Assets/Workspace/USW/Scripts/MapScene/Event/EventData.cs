@@ -23,7 +23,7 @@ namespace Map
         [Header("Success ")]
         [TextArea(3, 10)]
         public string _successText;
-        public RewardData _successReward; // 성공 시 보상 
+        public OutGameRewardData _successReward; // 성공 시 보상 
         
         [Header("Failure ")]
         [TextArea(3, 10)]

@@ -7,12 +7,12 @@ using UnityEngine;
 public class StageRewardData
 {
     public int StageNumber;
-    public RewardData[] RewardDatas;
+    public OutGameRewardData[] RewardDatas;
 }
 
 [Serializable]
-public struct RewardData
+public struct OutGameRewardData
 {
-    public RewardType RewardType;
+    public OutGameRewardType RewardType;
     public int Amount;
 }
