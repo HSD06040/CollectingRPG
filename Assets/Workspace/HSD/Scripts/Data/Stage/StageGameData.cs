@@ -35,10 +35,11 @@ public class StageGameData
 
     public StageInGameRewardType[] GetCurrentFloorReward()
     {
-        if (!_floorRewardDic.ContainsKey(CurrentFloor.Value))
+        int idx = CurrentFloor.Value + 1;
+        if (!_floorRewardDic.ContainsKey(idx))
             Init();
 
-        return GetFloorReward(CurrentFloor.Value);
+        return GetFloorReward(idx);
     }
 
     private void Init()

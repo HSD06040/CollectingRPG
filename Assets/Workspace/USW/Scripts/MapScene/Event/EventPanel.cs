@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -10,20 +11,33 @@ namespace Map
     public class EventPanel : MonoBehaviour
     {
         public static EventPanel Instance;
-        public EventRewardChanceData[] EventRewardChances;
+        public EventRewardChanceData[] EventRewardChances;        
 
-        [Header("UI References")] public GameObject _eventPanelUI;
+        [Header("UI References")] 
+        public GameObject _eventPanelUI;
         public TMP_Text _titleText;
         public TMP_Text _descriptionText;
+        public CanvasGroup _eventPanelGroup;
         public CanvasGroup _descriptionCanvasGroup;
 
         [Header("Choice Buttons")] 
         public Button _yesButton;
         public Button _nvmButton;
 
-        [Header("Fade Settings")] public float _fadeDuration = 0.5f;
+        [Header("Fade Settings")] 
+        public float _fadeDuration = 0.5f;
 
         private EventData _currentEvent;
+
+#if UNITY_EDITOR
+        [Header("Test")]
+        [SerializeField] EventData _testEventData;
+        [Button]
+        private void TestShow()
+        {
+            ShowEvent(_testEventData);
+        }
+#endif
 
         private void Awake()
         {
@@ -57,20 +71,12 @@ namespace Map
             {
                 return;
             }
-
-            _currentEvent = eventData;
             _eventPanelUI.SetActive(true);
+            _currentEvent = eventData;
+            _eventPanelGroup.FadeIn(_fadeDuration).Forget();
 
             _titleText.text = eventData._eventTitle;
             _descriptionText.text = eventData._eventDescription;
-
-            _yesButton.gameObject.SetActive(true);
-            _nvmButton.gameObject.SetActive(true);
-
-            if (_descriptionCanvasGroup != null)
-            {
-                _descriptionCanvasGroup.alpha = 1f;
-            }
         }
 
         /// <summary>
@@ -78,8 +84,7 @@ namespace Map
         /// </summary>
         private void OnChoiceSelected(bool acceptChallenge)
         {
-            _yesButton.gameObject.SetActive(false);
-            _nvmButton.gameObject.SetActive(false);
+            _descriptionCanvasGroup.interactable = false;
 
             ShowResultWithFade(acceptChallenge).Forget();
         }
@@ -89,52 +94,29 @@ namespace Map
         /// </summary>
         private async UniTask ShowResultWithFade(bool acceptChallenge)
         {
-            await FadeOut();
+            EventOutcome outcome = acceptChallenge ? EventOutcome.Success : EventOutcome.Declined;
 
-            EventOutcome outcome;
-
-            if (acceptChallenge)
+            string nextText = outcome switch
             {
-                // Energy 소비
-                ConsumeEnergy(_currentEvent._energyCost);
+                EventOutcome.Success => _currentEvent._successText,
+                EventOutcome.Declined => _currentEvent._declinedText,
+                _ => ""
+            };
 
-                // 50% 확률로 성공/실패 결정
-                bool isSuccess = Random.Range(0f, 1f) < 0.5f;
-                outcome = isSuccess ? EventOutcome.Success : EventOutcome.Failure;
-            }
-            else
-            {
-                outcome = EventOutcome.Declined;
-            }
+            await _descriptionText.DOFade(0f, _fadeDuration).AsyncWaitForCompletion();
 
-            // Switch로 결과 처리
-            switch (outcome)
-            {
-                case EventOutcome.Success:
-                    _descriptionText.text = _currentEvent._successText;
-                    ApplyReward();
-                    break;
+            _descriptionText.text = nextText;
 
-                case EventOutcome.Failure:
-                    _descriptionText.text = _currentEvent._failureText;
-                    break;
+            await _descriptionText.DOFade(1f, _fadeDuration).AsyncWaitForCompletion();
 
-                case EventOutcome.Declined:
-                    _descriptionText.text = _currentEvent._declinedText;
-                    break;
-            }
+            await UniTask.WaitForSeconds(_fadeDuration, true);
 
-            await FadeIn();            
-        }
+            if (outcome == EventOutcome.Success)
+                ApplyReward();
 
-        private async UniTask FadeOut()
-        {
-            await _descriptionCanvasGroup.FadeIn(_fadeDuration);
-        }
+            await UniTask.WaitForSeconds(1, true);
+            await _eventPanelGroup.FadeOut(_fadeDuration);
 
-        private async UniTask FadeIn()
-        {
-            await _descriptionCanvasGroup.FadeIn(_fadeDuration);
             CloseEvent();
         }
 
@@ -155,7 +137,7 @@ namespace Map
 
             foreach (var rewardChance in EventRewardChances)
             {
-                if (Random.Range(0f, 1f) < rewardChance.Chance)
+                if (Random.Range(0f, 100f) < rewardChance.Chance)
                 {
                     stageRewards.Add(rewardChance.stageInGameRewardType);
                 }

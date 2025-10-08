@@ -26,7 +26,19 @@ public class BattleManager : MonoBehaviour
 
     [Header("UnitCount")]
     private int _playerUnitCount;
-    private int _enemyUnitCount;    
+    private int _enemyUnitCount;
+
+    private readonly HashSet<UnitStatusController> _processedDeadUnits = new();
+
+    private void OnEnable()
+    {
+        OnSpawnUnit += SpawnUnit;
+    }
+
+    private void OnDisable()
+    {
+        OnSpawnUnit -= SpawnUnit;
+    }
 
     private void OnDestroy()
     {
@@ -42,6 +54,8 @@ public class BattleManager : MonoBehaviour
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
     {
+        _processedDeadUnits.Clear();
+
         UnitBase[] notNullPlayerUnits = GetNotNullUnits(playerUnits);
         UnitBase[] notNullEnemyUnits = GetNotNullUnits(enemyUnits);
 
@@ -50,14 +64,6 @@ public class BattleManager : MonoBehaviour
 
         _playerUnitCount = notNullPlayerUnits.Length;
         _enemyUnitCount = notNullEnemyUnits.Length;
-
-        OnSpawnUnit += SpawnUnit;
-    }
-
-    private void SpawnUnit(UnitBase unit)
-    {
-        _playerUnitCount++;
-        unit.StatusController.OnUnitDied += CheckBattleEnded;
     }
 
     public void BattleStart()
@@ -74,6 +80,11 @@ public class BattleManager : MonoBehaviour
     {
         if (!statusCon.IsDead) return;
 
+        if (_processedDeadUnits.Contains(statusCon))
+            return;
+
+        _processedDeadUnits.Add(statusCon);
+
         if (_playerLayer.Contain(statusCon.gameObject.layer))
         {
             _playerUnitCount--;
@@ -82,6 +93,7 @@ public class BattleManager : MonoBehaviour
         {
             _enemyUnitCount--;
         }
+
         Debug.Log($"플레이어 유닛 수: {_playerUnitCount}, 적 유닛 수: {_enemyUnitCount}");
         statusCon.OnUnitDied -= CheckBattleEnded;
         _lastTargetPos = statusCon.transform.position;
@@ -116,11 +128,24 @@ public class BattleManager : MonoBehaviour
 
     private void RegisterEvent(UnitBase[] units)
     {
-        for (int i = 0; i < units.Length; i++)
+        foreach (var unit in units)
         {
-            units[i].StatusController.OnUnitDied += CheckBattleEnded;
+            if (unit == null) continue;
+
+            unit.StatusController.OnUnitDied -= CheckBattleEnded;
+            unit.StatusController.OnUnitDied += CheckBattleEnded;
         }
-    }    
+    }
+
+    private void SpawnUnit(UnitBase unit)
+    {
+        if (unit == null) return;
+
+        _playerUnitCount++;
+
+        unit.StatusController.OnUnitDied -= CheckBattleEnded;
+        unit.StatusController.OnUnitDied += CheckBattleEnded;
+    }
 
     private void GameEnd(bool isPlayerWin)
     {
