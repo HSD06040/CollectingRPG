@@ -1,119 +1,149 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using Cysharp.Threading.Tasks;
 
-public class GachaPanelSlide : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class PanelSwitcher : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    [Header("Panels")]
+    public GameObject[] panels;
+    public Animator[] panelAnimators;
     
-    [Header("Panel Settings")]
-    public RectTransform panelContainer; 
-    public RectTransform[] panels; 
-    
-    [Header("Animation Settings")]
-    public float transitionSpeed = 10f; 
-    public float swipeThreshold = 50f; 
-    
-    [Header("Navigation Buttons (Optional)")]
+    [Header("Navigation Buttons")]
     public Button leftButton;
     public Button rightButton;
     
-    private int currentPanel = 0;
-    private Vector2 panelLocation;
-    private bool isDragging = false;
+    [Header("Swipe Settings")]
+    public float swipeThreshold = 50f;
+    
+    [Header("Animation Settings")]
+    public string showAnimationName = "GachaPanel";
+    public string hideAnimationName = "GachaPanel2";
+    public float animationDelay = 0.3f;
+    
+    private int currentPanelIndex = 0;
+    private bool isTransitioning = false;
     private Vector2 dragStartPos;
-    private float panelWidth;
 
     void Start()
     {
-        panelWidth = GetComponent<RectTransform>().rect.width;
-        
         if (leftButton != null)
-            leftButton.onClick.AddListener(() => MovePanel(-1));
+            leftButton.onClick.AddListener(PreviousPanel);
         if (rightButton != null)
-            rightButton.onClick.AddListener(() => MovePanel(1));
+            rightButton.onClick.AddListener(NextPanel);
         
-        UpdatePanelPosition(false);
+        InitializePanels();
     }
 
-    void Update()
+    void InitializePanels()
     {
-        if (!isDragging)
+        for (int i = 0; i < panels.Length; i++)
         {
-            Vector2 targetPosition = new Vector2(-currentPanel * panelWidth, 0);
-            panelContainer.anchoredPosition = Vector2.Lerp(
-                panelContainer.anchoredPosition,
-                targetPosition,
-                Time.deltaTime * transitionSpeed
-            );
+            panels[i].SetActive(i == currentPanelIndex);
         }
+        UpdateButtonStates();
     }
 
-    
-    public void MovePanel(int direction)
+    public void OnBeginDrag(PointerEventData eventData)
     {
-        int newPanel = Mathf.Clamp(currentPanel + direction, 0, panels.Length - 1);
-        if (newPanel != currentPanel)
-        {
-            currentPanel = newPanel;
-            UpdatePanelPosition(true);
-        }
+        if (isTransitioning) return;
+        dragStartPos = eventData.position;
     }
 
-   
-    public void GoToPanel(int index)
+    public void OnDrag(PointerEventData eventData)
     {
-        currentPanel = Mathf.Clamp(index, 0, panels.Length - 1);
-        UpdatePanelPosition(true);
     }
 
-    
-    public void OnBeginDrag(PointerEventData data)
+    public void OnEndDrag(PointerEventData eventData)
     {
-        isDragging = true;
-        dragStartPos = data.position;
-    }
-
-    
-    public void OnDrag(PointerEventData data)
-    {
-        float difference = data.position.x - dragStartPos.x;
-        Vector2 targetPos = new Vector2(-currentPanel * panelWidth + difference, 0);
-        panelContainer.anchoredPosition = targetPos;
-    }
-
-    // 드래그 종료
-    public void OnEndDrag(PointerEventData data)
-    {
-        isDragging = false;
-        float difference = data.position.x - dragStartPos.x;
+        if (isTransitioning) return;
         
-        // 스와이프 거리에 따라 패널 전환
-        if (Mathf.Abs(difference) > swipeThreshold)
+        float dragDistance = eventData.position.x - dragStartPos.x;
+        
+        if (Mathf.Abs(dragDistance) > swipeThreshold)
         {
-            if (difference > 0)
-                MovePanel(-1); 
+            if (dragDistance > 0)
+            {
+                PreviousPanel();
+            }
             else
-                MovePanel(1); 
-        }
-        else
-        {
-            UpdatePanelPosition(true);
+            {
+                NextPanel();
+            }
         }
     }
 
-    private void UpdatePanelPosition(bool animate)
+    public void PreviousPanel()
     {
-        Vector2 targetPosition = new Vector2(-currentPanel * panelWidth, 0);
+        if (currentPanelIndex > 0 && !isTransitioning)
+        {
+            ShowPanel(currentPanelIndex - 1);
+        }
+    }
+
+    public void NextPanel()
+    {
+        if (currentPanelIndex < panels.Length - 1 && !isTransitioning)
+        {
+            ShowPanel(currentPanelIndex + 1);
+        }
+    }
+
+    public void ShowPanel(int index)
+    {
+        if (index < 0 || index >= panels.Length || isTransitioning) return;
         
-        if (!animate)
-        {
-            panelContainer.anchoredPosition = targetPosition;
-        }
+        TransitionToPanel(index).Forget();
     }
 
-    // 현재 패널 인덱스 반환
-    public int GetCurrentPanel()
+    async UniTask TransitionToPanel(int newIndex)
     {
-        return currentPanel;
+        isTransitioning = true;
+        
+        if (currentPanelIndex < panelAnimators.Length && panelAnimators[currentPanelIndex] != null)
+        {
+            panelAnimators[currentPanelIndex].Play(hideAnimationName);
+        }
+        
+        await UniTask.Delay((int)(animationDelay * 1000));
+        
+        panels[currentPanelIndex].SetActive(false);
+        panels[newIndex].SetActive(true);
+        currentPanelIndex = newIndex;
+        
+        if (currentPanelIndex < panelAnimators.Length && panelAnimators[currentPanelIndex] != null)
+        {
+            panelAnimators[currentPanelIndex].Play(showAnimationName);
+        }
+        
+        UpdateButtonStates();
+        
+        await UniTask.Delay((int)(animationDelay * 1000));
+        isTransitioning = false;
+    }
+
+    void UpdateButtonStates()
+    {
+        if (leftButton != null)
+            leftButton.interactable = currentPanelIndex > 0;
+        
+        if (rightButton != null)
+            rightButton.interactable = currentPanelIndex < panels.Length - 1;
+    }
+
+    public int GetCurrentPanelIndex()
+    {
+        return currentPanelIndex;
+    }
+    
+    public void JumpToPanel(int index)
+    {
+        if (index < 0 || index >= panels.Length) return;
+        
+        panels[currentPanelIndex].SetActive(false);
+        currentPanelIndex = index;
+        panels[currentPanelIndex].SetActive(true);
+        
+        UpdateButtonStates();
     }
 }
