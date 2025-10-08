@@ -13,6 +13,8 @@ public class BattleManager : MonoBehaviour
     public static event Action OnBattleStarted;
     public static event Action OnBattleEnded;
     public static event Action OnGameStanby;
+    public static event Action OnGameEnded;
+
     public static Action<UnitBase> OnSpawnUnit;
 
     [SerializeField] LayerMask _playerLayer;
@@ -127,6 +129,12 @@ public class BattleManager : MonoBehaviour
     {
         Manager.Game.CameraDoMove(_lastTargetPos, _cameraZoomDuration, 5).Forget();
         await Manager.Game.SlowMotionAsync(.1f, 2);
+
+        if(Manager.Data.StageGameData.CurrentFloor.Value == 9)
+        {
+            OnGameEnded?.Invoke();
+            return;
+        }
 
         if(isPlayerWin)
         {

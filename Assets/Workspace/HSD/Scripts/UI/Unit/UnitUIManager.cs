@@ -29,7 +29,7 @@ public class UnitUIManager : MonoBehaviour
 
     public void BattleUISetting()
     {
-        UIFadeIn(_battleUI);
+        _battleUI.FadeIn(_fadeDuration).Forget();
         BattleUISwitch.Init();
     }
 
@@ -37,37 +37,17 @@ public class UnitUIManager : MonoBehaviour
     {
         UnitHealthBarManager.Clear();
 
-        UIFadeOut(_battleUI);
+        _battleUI.FadeOut(_fadeDuration).Forget();        
 
         _fightButton.gameObject.SetActive(true);
 
-        UIFadeIn(_notBattleUI);
+        _notBattleUI.FadeIn(_fadeDuration).Forget();
     }
 
     public void StandbyUIDeActive()
     {
-        UIFadeOut(_notBattleUI);
+        _notBattleUI.FadeOut(_fadeDuration).Forget();
 
         _fightButton.gameObject.SetActive(false);
-    }
-
-    private void UIFadeIn(CanvasGroup canvasGroup)
-    {
-        canvasGroup.alpha = 0f;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
-
-        canvasGroup.DOFade(1f, _fadeDuration).SetUpdate(true);;
-
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.interactable = true;
-    }
-
-    private void UIFadeOut(CanvasGroup canvasGroup)
-    {
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
-
-        canvasGroup.DOFade(0f, _fadeDuration).SetUpdate(true);
     }
 }

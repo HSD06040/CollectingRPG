@@ -382,7 +382,7 @@ public class CsvDownloader
         {
             int floor = int.Parse(row[0]);
 
-            StageFloorRewardData stageFloorRewardData = new StageFloorRewardData();
+            StageInGameRewardData stageFloorRewardData = new StageInGameRewardData();
 
             stageFloorRewardData.Floor = floor;
 

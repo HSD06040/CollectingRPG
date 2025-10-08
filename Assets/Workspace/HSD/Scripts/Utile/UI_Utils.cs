@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public static class UI_Utils
@@ -33,5 +35,25 @@ public static class UI_Utils
         .SetEase(ease)
         .SetId("Value")
         .SetTarget(text);
-    }   
+    }
+
+    public async static UniTask FadeIn(this CanvasGroup canvasGroup, float fadeDuration)
+    {
+        canvasGroup.alpha = 0f;
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
+
+        await canvasGroup.DOFade(1f, fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.interactable = true;
+    }
+
+    public async static UniTask FadeOut(this CanvasGroup canvasGroup, float fadeDuration)
+    {
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.interactable = false;
+
+        await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+    }
 }

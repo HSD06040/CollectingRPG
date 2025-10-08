@@ -36,6 +36,12 @@ public class StageDatas
         return _stageDic[region];
     }
 
+    public StageData GetCurrentStage(out int stage)
+    {
+        Manager.Data.StageGameData.GetStage(out int region, out stage);
+        return GetStage(region);
+    }
+
     public bool CheckOpened(int region, int stage)
     {
         if (region == 1 && stage == 1)

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +9,7 @@ namespace Map
     public class EventPanel : MonoBehaviour
     {
         public static EventPanel Instance;
+        public EventRewardChanceData[] EventRewardChances;
 
         [Header("UI References")] public GameObject _eventPanelUI;
         public TMP_Text _titleText;
@@ -167,8 +169,24 @@ namespace Map
         /// </summary>
         private void ApplyReward()
         {
-            // TODO: 보상 시스템 연동해주시면 됩니당
-            // 마법석 , 은화 , 증강
+            List<StageInGameRewardType> stageRewards = new List<StageInGameRewardType>();
+
+            foreach (var rewardChance in EventRewardChances)
+            {
+                if (Random.Range(0f, 1f) < rewardChance.Chance)
+                {
+                    stageRewards.Add(rewardChance.stageInGameRewardType);
+                }
+            }
+
+            if (stageRewards.Count > 0)
+            {
+                UIManager.Instance.Reward_UI.Show(stageRewards.ToArray());
+            }
+            else
+            {
+
+            }
         }
 
         /// <summary>

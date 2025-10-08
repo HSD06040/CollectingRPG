@@ -9,8 +9,8 @@ public class StageGameData
     private int _currentRegion;
     private int _currentStage;
     public Property<int> CurrentFloor = new();
-    public StageFloorRewardData[] FloorRewardDatas = new StageFloorRewardData[9];
-    private static readonly Dictionary<int, StageFloorRewardType[]> _floorRewardDic = new Dictionary<int, StageFloorRewardType[]>();
+    public StageInGameRewardData[] FloorRewardDatas = new StageInGameRewardData[9];
+    private static readonly Dictionary<int, StageInGameRewardType[]> _floorRewardDic = new Dictionary<int, StageInGameRewardType[]>();
 
     #region Stage
     public void SetStage(int region, int stage)
@@ -25,7 +25,7 @@ public class StageGameData
     }
     #endregion
 
-    public StageFloorRewardType[] GetFloorReward(int floor)
+    public StageInGameRewardType[] GetFloorReward(int floor)
     {
         if (!_floorRewardDic.ContainsKey(floor))
             Init();
@@ -46,23 +46,23 @@ public class StageGameData
 }
 
 [Serializable]
-public class StageFloorRewardData
+public class StageInGameRewardData
 {
     public int Floor;
-    public StageFloorRewardType[] StageFloorRewardTypes;
+    public StageInGameRewardType[] StageFloorRewardTypes;
 
-    public StageFloorRewardData()
+    public StageInGameRewardData()
     {
-        StageFloorRewardTypes = new StageFloorRewardType[2]
+        StageFloorRewardTypes = new StageInGameRewardType[2]
         {
-            new StageFloorRewardType(),
-            new StageFloorRewardType()
+            new StageInGameRewardType(),
+            new StageInGameRewardType()
         };
     }
 }
 
 [Serializable]
-public class StageFloorRewardType
+public class StageInGameRewardType
 {
     public InGameRewardType RewardType;
     public int Amount;
