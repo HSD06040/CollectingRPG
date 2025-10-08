@@ -33,6 +33,14 @@ public class StageGameData
         return _floorRewardDic.ContainsKey(floor) ? _floorRewardDic[floor] : null;
     }
 
+    public StageInGameRewardType[] GetCurrentFloorReward()
+    {
+        if (!_floorRewardDic.ContainsKey(CurrentFloor.Value))
+            Init();
+
+        return GetFloorReward(CurrentFloor.Value);
+    }
+
     private void Init()
     {
         foreach (var reward in FloorRewardDatas)
@@ -66,4 +74,5 @@ public class StageInGameRewardType
 {
     public InGameRewardType RewardType;
     public int Amount;
+    public MagicStoneData MagicStoneData;
 }

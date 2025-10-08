@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -337,8 +338,24 @@ public class CsvDownloader
             outGameRewardDatas[2].RewardType = OutGameRewardType.Exp;
             outGameRewardDatas[2].Amount = int.TryParse(row[3], out int exp) ? exp : 0;
 
-            stageRewardDatas[stage-1].StageNumber = stage;
-            stageRewardDatas[stage-1].RewardDatas = outGameRewardDatas;
+            int idx = stage - 1;
+            Debug.Log(row[0]);
+
+            // 배열이 null이면 새로 생성
+            if (stageRewardDatas == null || stageRewardDatas.Length < 4)
+            {
+                stageRewardDatas = new StageRewardData[4];
+                Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas = stageRewardDatas;
+            }
+
+            // 해당 인덱스에 객체가 없으면 초기화
+            if (stageRewardDatas[idx] == null)
+            {
+                stageRewardDatas[idx] = new StageRewardData();
+            }
+
+            stageRewardDatas[idx].StageNumber = stage;
+            stageRewardDatas[idx].RewardDatas = outGameRewardDatas;
         }
     }
 

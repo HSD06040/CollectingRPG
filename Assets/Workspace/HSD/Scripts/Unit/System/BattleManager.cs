@@ -36,6 +36,8 @@ public class BattleManager : MonoBehaviour
         OnPlayerVictory = null;
         OnPlayerDefeat = null;
         OnGameStanby = null;
+        OnGameEnded = null; 
+        OnSpawnUnit = null;
     }
 
     public void Init(UnitBase[] playerUnits, UnitBase[] enemyUnits)
@@ -143,6 +145,7 @@ public class BattleManager : MonoBehaviour
         else
         {
             OnPlayerDefeat?.Invoke();
+            return;
         }
 
         OnBattleEnded?.Invoke();

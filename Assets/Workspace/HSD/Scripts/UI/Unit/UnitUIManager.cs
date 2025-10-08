@@ -10,6 +10,7 @@ public class UnitUIManager : MonoBehaviour
     [SerializeField] Button _fightButton;
     [SerializeField] CanvasGroup _battleUI;
     [SerializeField] CanvasGroup _notBattleUI;
+    [SerializeField] CanvasGroup _chestUI;
 
     [SerializeField] private float _fadeDuration = 0.3f;
 
@@ -30,6 +31,8 @@ public class UnitUIManager : MonoBehaviour
     public void BattleUISetting()
     {
         _battleUI.FadeIn(_fadeDuration).Forget();
+        _chestUI.FadeIn(_fadeDuration).Forget();
+
         BattleUISwitch.Init();
     }
 
@@ -37,7 +40,8 @@ public class UnitUIManager : MonoBehaviour
     {
         UnitHealthBarManager.Clear();
 
-        _battleUI.FadeOut(_fadeDuration).Forget();        
+        _battleUI.FadeOut(_fadeDuration).Forget();
+        _chestUI.FadeOut(_fadeDuration).Forget();
 
         _fightButton.gameObject.SetActive(true);
 

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,33 @@ public class Reward_Controller
     public void GetFirstReward(StageData stageData, int stage)
     {
         GetStageFirstRewardAsync(stageData, stage).Forget();
+    }
+
+    public void GetCurrentFloorReward()
+    {
+        StageInGameRewardType[] source = Manager.Data.StageGameData.GetCurrentFloorReward();
+        StageInGameRewardType[] stageInGameRewardTypes = new StageInGameRewardType[source.Length];
+        Array.Copy(source, stageInGameRewardTypes, source.Length);
+
+        foreach (var reward in stageInGameRewardTypes)
+        {
+            switch (reward.RewardType)
+            {
+                case InGameRewardType.Silver:
+                    InGameManager.Instance.AddSilver(reward.Amount);
+                    break;
+                case InGameRewardType.Energy:
+                    InGameManager.Instance.AddEnergy(reward.Amount);
+                    break;
+                case InGameRewardType.MagicStone:
+                    MagicStoneData magicStoneData = Manager.Data.GetRandomMagicStoneData();
+                    MagicStoneController.Instance.TrySetMagicStone(magicStoneData);
+                    reward.MagicStoneData = magicStoneData;
+                    break;
+            }
+        }
+
+        UIManager.Instance.Reward_UI.Show(stageInGameRewardTypes);
     }
 
     private async UniTask GetStageFirstRewardAsync(StageData stageData, int stage)

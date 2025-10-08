@@ -7,13 +7,13 @@ public class GoldPanel : MonoBehaviour
 
     private void OnEnable()
     {
-        InGameManager.Instance.Gold.AddEvent(GoldTextUpdate);
-        GoldTextUpdate(InGameManager.Instance.Gold.Value);
+        InGameManager.Instance.Silver.AddEvent(GoldTextUpdate);
+        GoldTextUpdate(InGameManager.Instance.Silver.Value);
     }
 
     private void OnDisable()
     {
-        InGameManager.Instance?.Gold.RemoveEvent(GoldTextUpdate);
+        InGameManager.Instance?.Silver.RemoveEvent(GoldTextUpdate);
     }
 
     private void GoldTextUpdate(int amount)

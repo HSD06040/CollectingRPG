@@ -6,6 +6,7 @@ public class BattleUISwitch : MonoBehaviour
 {
     enum BattleUIType { MagicStone, Meter }
 
+    [SerializeField] GameObject _openChest;
     [SerializeField] RectTransform _magicStonePanel;
     [SerializeField] RectTransform _meterPanel;
     [SerializeField] Ease _upEase = Ease.OutElastic;
@@ -18,7 +19,7 @@ public class BattleUISwitch : MonoBehaviour
 
     private bool _isMoving = false;
     private Vector2 _upPosition;
-    private Vector2 _downPosition;
+    private Vector2 _downPosition;    
 
 #if UNITY_EDITOR
     [Button("UI 변경하기")]
@@ -44,6 +45,7 @@ public class BattleUISwitch : MonoBehaviour
         _meterPanel.anchoredPosition = _downPosition;
 
         MoveUp(_meterPanel).Forget();
+        _openChest.SetActive(true);
     }
 
     public void SwitchUI()
@@ -76,12 +78,14 @@ public class BattleUISwitch : MonoBehaviour
         {
             MoveDown(_meterPanel).Forget();
             await UniTask.WaitForSeconds(_delay);
+            _openChest.SetActive(false);
             MoveUp(_magicStonePanel).Forget();
         }
         else
         {
             MoveDown(_magicStonePanel).Forget();
             await UniTask.WaitForSeconds(_delay);
+            _openChest.SetActive(true);
             MoveUp(_meterPanel).Forget();
         }
 

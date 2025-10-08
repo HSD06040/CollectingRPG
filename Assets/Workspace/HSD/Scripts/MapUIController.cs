@@ -6,7 +6,8 @@ public class MapUIController : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] float _duration = 0.5f;
-    [SerializeField] Ease _ease = Ease.InBack;
+    [SerializeField] Ease _downEase = Ease.OutBack;
+    [SerializeField] Ease _upEase = Ease.InBack;
 
     private RectTransform _rectTransform;
 
@@ -63,14 +64,14 @@ public class MapUIController : MonoBehaviour
     private async UniTask MapEnterAnimation()
     {
         await _rectTransform.DOAnchorPosY(_downY, _duration)
-            .SetEase(_ease)
+            .SetEase(_downEase)
             .AsyncWaitForCompletion();
     }
 
     private async UniTask MapExitAnimation()
     {
         await _rectTransform.DOAnchorPosY(_upY, _duration)
-            .SetEase(_ease)
+            .SetEase(_upEase)
             .AsyncWaitForCompletion();
     }
 }

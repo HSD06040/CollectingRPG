@@ -127,7 +127,8 @@ public class Reward_UI : MonoBehaviour
         return rewardData.RewardType switch
         {
             InGameRewardType.Silver => Manager.Resources.SpriteLoad("Silver"),
-            InGameRewardType.Energy => Manager.Resources.SpriteLoad("Energy"),            
+            InGameRewardType.Energy => Manager.Resources.SpriteLoad("Energy"),
+            InGameRewardType.MagicStone => rewardData.MagicStoneData != null ? rewardData.MagicStoneData.Icon : null,
             _ => null,
         };
     }

@@ -43,7 +43,7 @@ public static class UI_Utils
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
 
-        await canvasGroup.DOFade(1f, fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+        await canvasGroup.DOFade(1f, fadeDuration).SetUpdate(true).SetEase(Ease.Linear).AsyncWaitForCompletion();
 
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
@@ -54,6 +54,6 @@ public static class UI_Utils
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
 
-        await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).AsyncWaitForCompletion();
+        await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).SetEase(Ease.Linear).AsyncWaitForCompletion();
     }
 }

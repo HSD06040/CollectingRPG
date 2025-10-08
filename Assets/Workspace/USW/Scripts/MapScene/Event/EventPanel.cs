@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -80,15 +81,15 @@ namespace Map
             _yesButton.gameObject.SetActive(false);
             _nvmButton.gameObject.SetActive(false);
 
-            StartCoroutine(ShowResultWithFade(acceptChallenge));
+            ShowResultWithFade(acceptChallenge).Forget();
         }
 
         /// <summary>
         /// Fade 연출과 함께 결과 표시
         /// </summary>
-        private IEnumerator ShowResultWithFade(bool acceptChallenge)
+        private async UniTask ShowResultWithFade(bool acceptChallenge)
         {
-            yield return StartCoroutine(FadeOut());
+            await FadeOut();
 
             EventOutcome outcome;
 
@@ -123,37 +124,18 @@ namespace Map
                     break;
             }
 
-            yield return StartCoroutine(FadeIn());
+            await FadeIn();            
         }
 
-        private IEnumerator FadeOut()
+        private async UniTask FadeOut()
         {
-            if (_descriptionCanvasGroup == null) yield break;
-
-            float elapsed = 0f;
-            while (elapsed < _fadeDuration)
-            {
-                elapsed += Time.deltaTime;
-                _descriptionCanvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / _fadeDuration);
-                yield return null;
-            }
-
-            _descriptionCanvasGroup.alpha = 0f;
+            await _descriptionCanvasGroup.FadeIn(_fadeDuration);
         }
 
-        private IEnumerator FadeIn()
+        private async UniTask FadeIn()
         {
-            if (_descriptionCanvasGroup == null) yield break;
-
-            float elapsed = 0f;
-            while (elapsed < _fadeDuration)
-            {
-                elapsed += Time.deltaTime;
-                _descriptionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / _fadeDuration);
-                yield return null;
-            }
-
-            _descriptionCanvasGroup.alpha = 1f;
+            await _descriptionCanvasGroup.FadeIn(_fadeDuration);
+            CloseEvent();
         }
 
         /// <summary>
@@ -185,7 +167,7 @@ namespace Map
             }
             else
             {
-
+                UIManager.Instance.MessagePopup.Show("아무런 보상도 획득하지 못했습니다...");
             }
         }
 

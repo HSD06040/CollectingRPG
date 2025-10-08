@@ -47,13 +47,13 @@ public class UnitSellOrAutoSelectionUI : UIBase
 
     private void SellBattleUnit()
     {
-        InGameManager.Instance.AddGold(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
+        InGameManager.Instance.AddSilver(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
         _unitManager.UnitController.RemoveUnit(_currentUnit);
     }
 
     private void SellUI()
     {
-        InGameManager.Instance.AddGold(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
+        InGameManager.Instance.AddSilver(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
         _unitManager.UnitController.UISlotController.ClearSlot(_currentUnit);
     }
 
