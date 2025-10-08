@@ -8,6 +8,7 @@ public class MagicStoneUpgradeUnit : MonoBehaviour
     [SerializeField] private Image _stoneIcon;
     [SerializeField] private TMP_Text _levelText;
     [SerializeField] private TMP_Text _nameText;
+    [SerializeField] private Image _pieceGauge;
 
     private UpgradeManager _manager;
     private MagicStoneData _data;
@@ -55,5 +56,24 @@ public class MagicStoneUpgradeUnit : MonoBehaviour
         _stoneIcon.sprite = _data.Icon;
         _levelText.text = $"LV.{_data.UpgradeData.CurrentUpgradeData.UpgradeLevel}";
         _nameText.text = _data.Name;
+
+        GaugeUpdate();
+    }
+
+    private void GaugeUpdate()
+    {
+        int requirePiece = _data.UpgradeData.GetRequiredPiece();
+        if (_data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
+        {
+            _pieceGauge.fillAmount = 0;
+        }
+        else if (_data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        {
+            _pieceGauge.fillAmount = (float)_data.UpgradeData.CurrentUpgradeData.CurrentPieces / 5;
+        }
+        else
+        {
+            _pieceGauge.fillAmount = (float)_data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
+        }
     }
 }
