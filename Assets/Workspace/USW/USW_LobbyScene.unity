@@ -9835,6 +9835,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5928237605199461257, guid: a2105c9af1ad6314fbb4b9b0019195dc,
+        type: 3}
+      propertyPath: _stageButtons.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8191110705860927198, guid: a2105c9af1ad6314fbb4b9b0019195dc,
         type: 3}
       propertyPath: m_Pivot.x
@@ -12663,6 +12668,7 @@ GameObject:
   - component: {fileID: 1340908409}
   - component: {fileID: 1340908413}
   - component: {fileID: 1340908411}
+  - component: {fileID: 1340908414}
   m_Layer: 5
   m_Name: Chapter
   m_TagString: Untagged
@@ -12742,6 +12748,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1340908408}
   m_CullTransparentMesh: 0
+--- !u!114 &1340908414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1340908408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 199329056f4132c45b24ec04aec8dd13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gatePreviewImage: {fileID: 1597046573}
 --- !u!1 &1349029912
 GameObject:
   m_ObjectHideFlags: 0
@@ -16580,8 +16599,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -27.8, y: 6.34}
-  m_SizeDelta: {x: 90, y: 100}
+  m_AnchoredPosition: {x: -26.9, y: 11.15}
+  m_SizeDelta: {x: 81.6, y: 106.2}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1844074720
 MonoBehaviour:
@@ -16603,9 +16622,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -66295132, guid: dc49d52cf6e97f040a69a39e628e3204, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c209733720dd88444999425d505fc786, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -20304,13 +20323,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf4db0bced51265469b9d61d08770ed1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  datas:
-  - {fileID: 11400000, guid: 00725a36346507140b309fc7b2b9c0f6, type: 2}
-  - {fileID: 11400000, guid: d58216fb91a435146ad5f226e367b02c, type: 2}
-  - {fileID: 11400000, guid: 58b30bbaaf978064cabd9a1bab1b2980, type: 2}
-  - {fileID: 11400000, guid: c5c565e6149ec27419fdf97b6928b1a6, type: 2}
-  - {fileID: 11400000, guid: 2b0628bc8a28ee54697b10ebb0c7b0c7, type: 2}
-  - {fileID: 11400000, guid: 7063614338f93d74db3d1934322763e8, type: 2}
 --- !u!1 &592272457128629176
 GameObject:
   m_ObjectHideFlags: 0
@@ -35342,7 +35354,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _charData: {fileID: 11400000, guid: df8926881b7d2284aa174e0b1c4ed3dd, type: 2}
   _charProb: {fileID: 11400000, guid: 907f2b18eeb6c374d80982df7c0669de, type: 2}
-  _stoneDatabase: {fileID: 11400000, guid: cdbd2b80f3fe44440952f9398315a709, type: 2}
   _stoneProb: {fileID: 11400000, guid: dbfb5945078e5a948acc7903728794d3, type: 2}
   _resultUI: {fileID: 1855172367002336595}
   _characterGachaButton: {fileID: 4423561504839503920}
