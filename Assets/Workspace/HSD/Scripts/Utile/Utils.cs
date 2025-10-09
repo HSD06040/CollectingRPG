@@ -317,7 +317,7 @@ public static class Utils
             return $"{(value / 1_000f).ToString("0.#")}k";
 
         return value.ToString();
-    }
+    }    
 
     private static StringBuilder sb = new StringBuilder();
 
@@ -383,6 +383,18 @@ public static class Utils
             1 => new Color32(0xC7, 0x40, 0x40, 0xFF), // Elite : 단색 빨강
             0 => new Color32(0xB0, 0xB0, 0xB0, 0xFF), // Normal : 단색 회색
             _ => Color.grey
+        };
+    }
+
+    public static string GetMagicStonTypeKorean(this MagicStoneType magicStoneType)
+    {
+        return magicStoneType switch
+        {
+            MagicStoneType.Attack => "공격형",
+            MagicStoneType.Defense => "방어형",
+            MagicStoneType.Support => "지원형",
+            MagicStoneType.Control => "제어형",
+            _ => "알 수 없음"
         };
     }
 

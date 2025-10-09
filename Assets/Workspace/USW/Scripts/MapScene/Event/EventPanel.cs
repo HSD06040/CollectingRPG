@@ -1,4 +1,7 @@
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,19 +11,33 @@ namespace Map
     public class EventPanel : MonoBehaviour
     {
         public static EventPanel Instance;
+        public EventRewardChanceData[] EventRewardChances;        
 
-        [Header("UI References")] public GameObject _eventPanelUI;
+        [Header("UI References")] 
+        public GameObject _eventPanelUI;
         public TMP_Text _titleText;
         public TMP_Text _descriptionText;
+        public CanvasGroup _eventPanelGroup;
         public CanvasGroup _descriptionCanvasGroup;
 
-        [Header("Choice Buttons")] public Button _yesButton;
+        [Header("Choice Buttons")] 
+        public Button _yesButton;
         public Button _nvmButton;
-        public Button _continueButton;
 
-        [Header("Fade Settings")] public float _fadeDuration = 0.5f;
+        [Header("Fade Settings")] 
+        public float _fadeDuration = 0.5f;
 
         private EventData _currentEvent;
+
+#if UNITY_EDITOR
+        [Header("Test")]
+        [SerializeField] EventData _testEventData;
+        [Button]
+        private void TestShow()
+        {
+            ShowEvent(_testEventData);
+        }
+#endif
 
         private void Awake()
         {
@@ -43,12 +60,6 @@ namespace Map
             {
                 _nvmButton.onClick.AddListener(() => OnChoiceSelected(false));
             }
-
-            if (_continueButton != null)
-            {
-                _continueButton.onClick.AddListener(CloseEvent);
-                _continueButton.gameObject.SetActive(false);
-            }
         }
 
         /// <summary>
@@ -60,21 +71,12 @@ namespace Map
             {
                 return;
             }
-
-            _currentEvent = eventData;
             _eventPanelUI.SetActive(true);
+            _currentEvent = eventData;
+            _eventPanelGroup.FadeIn(_fadeDuration).Forget();
 
             _titleText.text = eventData._eventTitle;
             _descriptionText.text = eventData._eventDescription;
-
-            _yesButton.gameObject.SetActive(true);
-            _nvmButton.gameObject.SetActive(true);
-            _continueButton.gameObject.SetActive(false);
-
-            if (_descriptionCanvasGroup != null)
-            {
-                _descriptionCanvasGroup.alpha = 1f;
-            }
         }
 
         /// <summary>
@@ -82,85 +84,40 @@ namespace Map
         /// </summary>
         private void OnChoiceSelected(bool acceptChallenge)
         {
-            _yesButton.gameObject.SetActive(false);
-            _nvmButton.gameObject.SetActive(false);
+            _descriptionCanvasGroup.interactable = false;
 
-            StartCoroutine(ShowResultWithFade(acceptChallenge));
+            ShowResultWithFade(acceptChallenge).Forget();
         }
 
         /// <summary>
         /// Fade 연출과 함께 결과 표시
         /// </summary>
-        private IEnumerator ShowResultWithFade(bool acceptChallenge)
+        private async UniTask ShowResultWithFade(bool acceptChallenge)
         {
-            yield return StartCoroutine(FadeOut());
+            EventOutcome outcome = acceptChallenge ? EventOutcome.Success : EventOutcome.Declined;
 
-            EventOutcome outcome;
-
-            if (acceptChallenge)
+            string nextText = outcome switch
             {
-                // Energy 소비
-                ConsumeEnergy(_currentEvent._energyCost);
+                EventOutcome.Success => _currentEvent._successText,
+                EventOutcome.Declined => _currentEvent._declinedText,
+                _ => ""
+            };
 
-                // 50% 확률로 성공/실패 결정
-                bool isSuccess = Random.Range(0f, 1f) < 0.5f;
-                outcome = isSuccess ? EventOutcome.Success : EventOutcome.Failure;
-            }
-            else
-            {
-                outcome = EventOutcome.Declined;
-            }
+            await _descriptionText.DOFade(0f, _fadeDuration).AsyncWaitForCompletion();
 
-            // Switch로 결과 처리
-            switch (outcome)
-            {
-                case EventOutcome.Success:
-                    _descriptionText.text = _currentEvent._successText;
-                    ApplyReward();
-                    break;
+            _descriptionText.text = nextText;
 
-                case EventOutcome.Failure:
-                    _descriptionText.text = _currentEvent._failureText;
-                    break;
+            await _descriptionText.DOFade(1f, _fadeDuration).AsyncWaitForCompletion();
 
-                case EventOutcome.Declined:
-                    _descriptionText.text = _currentEvent._declinedText;
-                    break;
-            }
+            await UniTask.WaitForSeconds(_fadeDuration, true);
 
-            yield return StartCoroutine(FadeIn());
+            if (outcome == EventOutcome.Success)
+                ApplyReward();
 
-            _continueButton.gameObject.SetActive(true);
-        }
+            await UniTask.WaitForSeconds(1, true);
+            await _eventPanelGroup.FadeOut(_fadeDuration);
 
-        private IEnumerator FadeOut()
-        {
-            if (_descriptionCanvasGroup == null) yield break;
-
-            float elapsed = 0f;
-            while (elapsed < _fadeDuration)
-            {
-                elapsed += Time.deltaTime;
-                _descriptionCanvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / _fadeDuration);
-                yield return null;
-            }
-
-            _descriptionCanvasGroup.alpha = 0f;
-        }
-
-        private IEnumerator FadeIn()
-        {
-            if (_descriptionCanvasGroup == null) yield break;
-
-            float elapsed = 0f;
-            while (elapsed < _fadeDuration)
-            {
-                elapsed += Time.deltaTime;
-                _descriptionCanvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsed / _fadeDuration);
-                yield return null;
-            }
-
-            _descriptionCanvasGroup.alpha = 1f;
+            CloseEvent();
         }
 
         /// <summary>
@@ -176,8 +133,24 @@ namespace Map
         /// </summary>
         private void ApplyReward()
         {
-            // TODO: 보상 시스템 연동해주시면 됩니당
-            // 마법석 , 은화 , 증강
+            List<StageInGameRewardType> stageRewards = new List<StageInGameRewardType>();
+
+            foreach (var rewardChance in EventRewardChances)
+            {
+                if (Random.Range(0f, 100f) < rewardChance.Chance)
+                {
+                    stageRewards.Add(rewardChance.stageInGameRewardType);
+                }
+            }
+
+            if (stageRewards.Count > 0)
+            {
+                UIManager.Instance.Reward_UI.Show(stageRewards.ToArray());
+            }
+            else
+            {
+                UIManager.Instance.MessagePopup.Show("아무런 보상도 획득하지 못했습니다...");
+            }
         }
 
         /// <summary>
@@ -194,7 +167,7 @@ namespace Map
 
             if (MapPlayerTracker.Instance != null)
             {
-                MapPlayerTracker.Instance.Locked = false;
+                MapPlayerTracker.OnEventEnded?.Invoke();
             }
         }
 
@@ -205,9 +178,6 @@ namespace Map
 
             if (_nvmButton != null)
                 _nvmButton.onClick.RemoveAllListeners();
-
-            if (_continueButton != null)
-                _continueButton.onClick.RemoveAllListeners();
         }
     }
 }

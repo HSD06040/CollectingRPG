@@ -86,8 +86,10 @@ namespace Map
                     case NodeType.EliteEnemy:
                     case NodeType.Boss:
                         node.gridData = Manager.Data.StageGridData.GetGridData(node.nodeType);
-                    break;
-
+                        break;
+                    case NodeType.Event:
+                        node.eventData = Manager.Data.EventDatas[Random.Range(0, Manager.Data.EventDatas.Length)];
+                        break;
                     default:
                         break;
                 }

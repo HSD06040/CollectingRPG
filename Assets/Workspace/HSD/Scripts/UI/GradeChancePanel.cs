@@ -15,6 +15,9 @@ public class GradeChancePanel : MonoBehaviour
 
     public void SetGradeChance(int floor)
     {
+        if (floor == -1)
+            return;
+
         for (int i = 0; i < _gradeChanceSlots.Length; i++)
         {
             Grade grade = (Grade)i;

@@ -10,24 +10,57 @@ public class StageData : ScriptableObject
 
     public string StageName;
     [TextArea] public string StageDescription;
-    public StageRewardData[] StageRewardDatas;
+    public StageRewardData[] StageFirstRewardDatas = new StageRewardData[4];
+    public StageRewardData[] StageRewardDatas = new StageRewardData[4];
     [Range(1, 7)] public int RegionNumber;
     public int MaxStageNumber;
     public Sprite RegionImage;
     public GameObject Map;
 
-    private static readonly Dictionary<int, RewardData[]> _rewardDic = new Dictionary<int, RewardData[]>();
+    private static readonly Dictionary<int, OutGameRewardData[]> _firstRewardDic = new Dictionary<int, OutGameRewardData[]>();
+    private static readonly Dictionary<int, OutGameRewardData[]> _rewardDic = new Dictionary<int, OutGameRewardData[]>();
 
-    public RewardData[] GetStageReward(int stageNumber)
+    public OutGameRewardData[] GetStageFirstReward(int stageNumber)
+    {
+        if (_clearProofDic.TryGetValue(stageNumber, out bool stageClear))
+        {
+            if (stageClear)
+            {
+                Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 이미 클리어 되어 보상 불가");
+                return null;
+            }
+        }        
+
+        if (!_firstRewardDic.ContainsKey(stageNumber))
+        {
+            InitFistReward();
+        }
+
+        SetClearProof(stageNumber, true);
+        return _firstRewardDic[stageNumber];
+    }
+
+    public OutGameRewardData[] GetStageReward(int stageNumber)
     {
         if (!_rewardDic.ContainsKey(stageNumber))
         {
-            Init();
+            InitReward();
         }
         return _rewardDic[stageNumber];
     }
 
-    private void Init()
+    private void InitFistReward()
+    {
+        foreach (var reward in StageFirstRewardDatas)
+        {
+            if (!_firstRewardDic.ContainsKey(reward.StageNumber))
+            {
+                _firstRewardDic.Add(reward.StageNumber, reward.RewardDatas);
+            }
+        }
+    }
+
+    private void InitReward()
     {
         foreach (var reward in StageRewardDatas)
         {

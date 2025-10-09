@@ -11,7 +11,7 @@ namespace Map
         public bool lockAfterSelecting = false;
         public float enterNodeDelay = 1f;
         public MapManager mapManager;        
-        public UnitManager unitManager;
+        public UnitManager unitManager;       
         public MapView view;
 
         public static MapPlayerTracker Instance;
@@ -98,6 +98,13 @@ namespace Map
                     }
                     break;                                   
                 case NodeType.Event:
+                    if(Instance != null)
+                        Instance.Locked = true;
+
+                    if(EventPanel.Instance != null)
+                    {
+                        EventPanel.Instance.ShowEvent(mapNode.Node.eventData);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

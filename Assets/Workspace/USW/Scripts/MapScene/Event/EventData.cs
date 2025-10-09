@@ -23,12 +23,7 @@ namespace Map
         [Header("Success ")]
         [TextArea(3, 10)]
         public string _successText;
-        public int _successReward; // 성공 시 보상 
-        
-        [Header("Failure ")]
-        [TextArea(3, 10)]
-        public string _failureText;
-        public int _failurePenalty; // 실패 시 추가 패널티 
+        public OutGameRewardData _successReward; // 성공 시 보상 
         
         [Header("Declined (Nvm 선택)")]
         [TextArea(3, 10)]

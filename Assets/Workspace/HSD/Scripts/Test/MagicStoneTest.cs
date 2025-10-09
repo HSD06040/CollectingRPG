@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MagicStoneTest : MonoBehaviour
 {
-    [SerializeField] MagicStonePanel _magicStonePanel;
+    [SerializeField] MagicStoneController _magicStonePanel;
     [SerializeField] MagicStoneData _testData;
 
 #if UNITY_EDITOR

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Map;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -21,13 +22,18 @@ public class DataManager : Singleton<DataManager>
     // 인게임
     public UnitSpawnChanceData UnitSpawnChanceData;
     public CharacterSellAmountData CharacterSellAmountData;
-    
+    public AugmentChanceData AugmentChanceData;
+    public PriceDatas PriceDatas;
+    public AUGData[] AugmentDatas;
+
     // 애니메이션 데이터
     public AnimationManager AnimationManager = new();
 
     // 마법석 데이터 임시로 추가
     public Dictionary<string, MagicStoneData> MagicStoneDataDic;
     public MagicStoneData[] MagicStoneDatas;
+    public MagicSton[] MagicStones;
+    public MagicStonLevelChanceData MagicStonLevelChanceData;
 
     // 프리셋 데이터 관련
     public PresetDatabase PresetDB { get; private set; } = new PresetDatabase();
@@ -35,8 +41,8 @@ public class DataManager : Singleton<DataManager>
     // 맵 데이터 관련
     public MapDatabase MapDB { get; private set; } = new MapDatabase();
     public StageGridData StageGridData = new();
+    public EventData[] EventDatas;
 
-    // 추후 Init으로 뺄 예정
     public async UniTask InitAsync()
     {
         StageDatas.Init().Forget();
@@ -45,13 +51,13 @@ public class DataManager : Singleton<DataManager>
         await InitData();
     }
 
-    #region UniData
     public async UniTask InitData()
     {
         await SpritesLoad();
 
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         CharacterSellAmountData = await Addressables.LoadAssetAsync<CharacterSellAmountData>("Data/CharacterSellAmountData");
+        MagicStonLevelChanceData = await Addressables.LoadAssetAsync<MagicStonLevelChanceData>("Data/MagicStoneLevelChanceData");        
 
         await AnimationManager.Init();
         await PreLoadData();
@@ -75,14 +81,35 @@ public class DataManager : Singleton<DataManager>
         csvDownloader.DownloadDataAsync().Forget();
     }
 
+    public UnitData GetUnitData(string unitName)
+    {
+        return UnitDataDic.TryGetValue(unitName, out var unitData) ? unitData : null;
+    }
+
+    #region PreLoadData
     private async UniTask PreLoadData()
     {
-        UniTask[] tasks = new UniTask[2];
+        List<UniTask> tasks = new List<UniTask>();
 
-        tasks[0] = PreLoadSynergyDB();
-        tasks[1] = PreLoadUnitDatas();
+        tasks.Add(PreLoadSynergyDB());
+        tasks.Add(PreLoadUnitDatas());
+        tasks.Add(PreLoadMagicStoneDatas());
+        tasks.Add(PreLoadAugmentDatas());
+        tasks.Add(PreLoadEventDatas());
 
         await UniTask.WhenAll(tasks);
+    }        
+
+    private async UniTask PreLoadEventDatas()
+    {
+        EventDatas = await Manager.Resources.LoadAll<EventData>("EventData");
+    }
+
+    private async UniTask PreLoadAugmentDatas()
+    {
+        AugmentDatas = await Manager.Resources.LoadAll<AUGData>("AugmentData");
+        AugmentChanceData = await Addressables.LoadAssetAsync<AugmentChanceData>("Data/AugmentChanceData");
+        PriceDatas = await Addressables.LoadAssetAsync<PriceDatas>("Data/PriceDatas");
     }
 
     private async UniTask PreLoadUnitDatas()
@@ -115,32 +142,38 @@ public class DataManager : Singleton<DataManager>
         SynergyDB.Init();
     }
 
-    public UnitData GetUnitData(string unitName)
-    {
-        return UnitDataDic.TryGetValue(unitName, out var unitData) ? unitData : null;
-    }
-
-    #endregion
-
     #region MagicStone
 
-    private void PreLoadMagicStoneDatas()
+    //private void PreLoadMagicStoneDatas()
+    //{
+    //    MagicStoneDataDic = new Dictionary<string, MagicStoneData>(MagicStoneDatas.Length);
+
+    //    foreach (var magicStoneData in MagicStoneDatas)
+    //    {
+    //        if (!MagicStoneDataDic.ContainsKey(magicStoneData.Name))
+    //            MagicStoneDataDic.Add(magicStoneData.Name, magicStoneData);
+
+    //        magicStoneData.Init();
+    //    }
+    //}
+
+    private async UniTask PreLoadMagicStoneDatas()
     {
-        MagicStoneDataDic = new Dictionary<string, MagicStoneData>(MagicStoneDatas.Length);
-
-        foreach (var magicStoneData in MagicStoneDatas)
-        {
-            if (!MagicStoneDataDic.ContainsKey(magicStoneData.Name))
-                MagicStoneDataDic.Add(magicStoneData.Name, magicStoneData);
-
-            magicStoneData.Init();
-        }
+        MagicStones = await Manager.Resources.LoadAll<MagicSton>("MagicStone");
     }
 
     public MagicStoneData GetMagicStoneData(string magicStoneName)
     {
         return MagicStoneDataDic.TryGetValue(magicStoneName, out var magicStoneData) ? magicStoneData : null;
     }
+    public MagicStoneData GetRandomMagicStoneData()
+    {
+        if (MagicStoneDatas.Length == 0)
+            return null;
 
+        return MagicStoneDatas[Random.Range(0, MagicStoneDatas.Length)];
+    }
     #endregion
+
+#endregion
 }

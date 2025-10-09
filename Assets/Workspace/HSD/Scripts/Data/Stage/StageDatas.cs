@@ -21,7 +21,12 @@ public class StageDatas
         }
     }
 
-    public RewardData[] GetStageReward(int region, int stage)
+    public OutGameRewardData[] GetFirstStageReward(int region, int stage)
+    {
+        return GetStage(region).GetStageFirstReward(stage);
+    }
+
+    public OutGameRewardData[] GetStageReward(int region, int stage)
     {
         return GetStage(region).GetStageReward(stage);
     }
@@ -29,6 +34,12 @@ public class StageDatas
     public StageData GetStage(int region)
     {        
         return _stageDic[region];
+    }
+
+    public StageData GetCurrentStage(out int stage)
+    {
+        Manager.Data.StageGameData.GetStage(out int region, out stage);
+        return GetStage(region);
     }
 
     public bool CheckOpened(int region, int stage)

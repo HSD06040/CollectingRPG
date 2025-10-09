@@ -85,7 +85,7 @@ public class UnitManager : MonoBehaviour
         _unitUIManager.SynergySlotPanel.Init(Manager.Data.SynergyDB);
 
         PresetSetting();
-        Manager.Data.StageGameData.CurrentFloor.Value = 0;
+        Manager.Data.StageGameData.CurrentFloor.Value = -1;
     }
 
     private void PresetSetting()
@@ -119,7 +119,6 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
         BattleManager.OnBattleEnded += MapPlayerTracker.OnEventEnded;
-        BattleManager.OnPlayerVictory += MapUIController.MapEnter;
         BattleManager.OnBattleStarted += ApplyHealAugment;
 
         Manager.Data.StageGameData.CurrentFloor.AddEvent(_unitSpawnChanceData.CalculateChances);
@@ -142,7 +141,6 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
         BattleManager.OnBattleEnded -= MapPlayerTracker.OnEventEnded;
-        BattleManager.OnPlayerVictory -= MapUIController.MapEnter;
         BattleManager.OnBattleStarted -= ApplyHealAugment;
 
         Manager.Data.StageGameData.CurrentFloor.RemoveEvent(_unitSpawnChanceData.CalculateChances);
@@ -290,7 +288,7 @@ public class UnitManager : MonoBehaviour
             return;
         }
 
-        if (!InGameManager.Instance.SpendGold(InGameManager.Instance.SpawnGold))
+        if (!InGameManager.Instance.SpendEnergy(InGameManager.Instance.SpawnEnergy))
         {
             Debug.Log("골드가 부족합니다.");
             return;
