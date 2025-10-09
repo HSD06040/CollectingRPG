@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -14,6 +14,7 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
     [SerializeField] private Image _stoneIcon;
     [SerializeField] private TMP_Text _stoneLevelText;
     [SerializeField] private TMP_Text _stoneNameText;
+    [SerializeField] private TMP_Text _stoneEffectText;
     [SerializeField] private TMP_Text _stoneDescriptionText;
 
     [Header("StoneProbable")]
@@ -61,6 +62,7 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
     private void UpdateUI()
     {
         UpdateStoneInfo();
+        UpdateStoneDescriptionInfo();
         UpdateStoneProbable();
         PieceGaugeUpdate();
         LevelUpButtonUIUpdate();
@@ -71,8 +73,39 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
         _stoneIcon.sprite = _currentMagicStoneUnit.Data.Icon;
         _stoneNameText.text = _currentMagicStoneUnit.Data.Name;
         _stoneLevelText.text = $"Lv.{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel}";
+    }
+
+    private void UpdateStoneDescriptionInfo()
+    {
+        MagicStoneData silver = _currentMagicStoneUnit.Data.GetMagicStone(SubGrade.SILVER);
+        MagicStoneData gold = _currentMagicStoneUnit.Data.GetMagicStone(SubGrade.GOLD);
+        MagicStoneData prism = _currentMagicStoneUnit.Data.GetMagicStone(SubGrade.PRISM);
+        _stoneEffectText.text = $"등급별 변화량 : <color=#7E6BA2>{silver.Value}</color>/<color=#7E6BA2>{gold.Value}</color>/<color=#7E6BA2>{prism.Value}</color>";
         _stoneDescriptionText.text = _currentMagicStoneUnit.Data.Description;
     }
+
+    /*
+    private string ReturnTargetType(MagicStoneData data)
+    {
+        string targetType = "";
+        switch (data.TargetType)
+        {
+            case TargetType.Ally: targetType = "아군 전체에"; break;
+            case TargetType.Enemy: targetType = "적에게"; break;
+            case TargetType.Self: targetType = "자신에게"; break;
+            case TargetType.Boss: targetType = "보스에게"; break;
+            case TargetType.RandomEnemy: targetType = "랜덤한 적에"; break;
+        }
+        return targetType;
+    }
+    
+    private string ReturnStatType(MagicStoneData data)
+    {
+        string statType = "";
+
+        return statType;
+    }
+    */
 
     private void UpdateStoneProbable()
     {
@@ -110,13 +143,13 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
     }
 
     private void PieceGaugeUpdate()
-    {        
-        if(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+    {
+        if (_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
             _pieceGauge.fillAmount = (float)_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / 5;
             _pieceText.text = $"{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/5";
         }
-        else if(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel < 10)
+        else if (_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel < 10)
         {
             int requirePiece = _currentMagicStoneUnit.Data.UpgradeData.GetRequiredPiece();
             _pieceGauge.fillAmount = (float)_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
@@ -137,7 +170,7 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
             _openPieceText.gameObject.SetActive(true);
             _levelUpUI.gameObject.SetActive(false);
         }
-        else if(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel < 10)
+        else if (_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel < 10)
         {
             int requireGold = _currentMagicStoneUnit.Data.UpgradeData.GetRequiredGold();
             _goldText.text = requireGold.ToString();
@@ -175,14 +208,14 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(_currentMagicStoneUnit.Data);
+            //await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(_currentMagicStoneUnit.Data);
             OnMagicStoneStatusChanged?.Invoke();
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if(eventData.pointerEnter.gameObject == _backgroundPanel)
+        if (eventData.pointerEnter.gameObject == _backgroundPanel)
         {
             gameObject.SetActive(false);
         }

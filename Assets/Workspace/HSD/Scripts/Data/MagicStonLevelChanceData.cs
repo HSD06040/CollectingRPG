@@ -13,7 +13,7 @@ public class MagicStonLevelChanceData : ScriptableObject
     {
         for (int i = 0; i < MagicStonLevelsChanceDatas.Length; i++)
         {
-            int level = i + 1;
+            int level = i;
             if (!_magicStonLevelChanceDic.ContainsKey(level))
             {
                 _magicStonLevelChanceDic.Add(level, MagicStonLevelsChanceDatas[i]);
