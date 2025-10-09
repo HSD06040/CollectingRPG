@@ -186,59 +186,11 @@ public class WaveTextManager : MonoBehaviour
         }
     }
     
-    public void StartCompleteWaveEffect()
-    {
-        // 펀치 효과 제거, 웨이브 속도만 증가
-        if (waveTween != null)
-        {
-            waveTween.Kill();
-        }
-        
-        // 더 빠른 웨이브 효과로 변경
-        waveTween = DOTween.To(() => 0f, x => UpdateSequentialWave(x), 360f, waveSpeed * 1.5f)
-            .SetLoops(-1, LoopType.Incremental)
-            .SetEase(Ease.Linear);
-    }
     
-    public void StopWaveEffect()
-    {
-        isWaveActive = false;
-        
-        if (waveTween != null)
-        {
-            waveTween.Kill();
-            waveTween = null;
-        }
-        
-        // 텍스트를 원래 상태로 복원
-        if (originalVertices != null)
-        {
-            textDisplay.ForceMeshUpdate();
-            var textInfo = textDisplay.textInfo;
-            
-            if (textInfo.meshInfo.Length > 0)
-            {
-                var meshInfo = textInfo.meshInfo[0];
-                if (originalVertices.Length == meshInfo.vertices.Length)
-                {
-                    System.Array.Copy(originalVertices, meshInfo.vertices, originalVertices.Length);
-                    meshInfo.mesh.vertices = meshInfo.vertices;
-                    textDisplay.UpdateGeometry(meshInfo.mesh, 0);
-                }
-            }
-        }
-    }
-    
-    // 웨이브 방향 변경
-    public void ChangeWaveDirection(WaveDirection newDirection)
-    {
-        waveDirection = newDirection;
-    }
 
     void OnDestroy()
     {
         if (dialogueSequence != null)
             dialogueSequence.Kill();
-        StopWaveEffect();
     }
 }
