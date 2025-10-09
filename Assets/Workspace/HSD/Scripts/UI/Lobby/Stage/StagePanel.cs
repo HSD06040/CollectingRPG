@@ -15,7 +15,7 @@ public class StagePanel : MonoBehaviour
     [SerializeField] TMP_Text _stageName;
     [SerializeField] TMP_Text _stageDescription;
     private StageData _stageData;
-
+    
     private void OnEnable()
     {
         StageOpenCheck();
@@ -80,7 +80,10 @@ public class StagePanel : MonoBehaviour
             StagePanelController.StageSelectButton.DeSelect();
 
         Manager.Data.StageGameData.SetStage(region, stage);
+        
+        StageSelectionEvents.SelectStage(region, stage);
 
         StagePanelController.StageSelectButton = stageSelectButton;
     }
+    
 }

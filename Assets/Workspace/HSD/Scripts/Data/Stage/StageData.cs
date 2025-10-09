@@ -15,6 +15,7 @@ public class StageData : ScriptableObject
     [Range(1, 7)] public int RegionNumber;
     public int MaxStageNumber;
     public Sprite RegionImage;
+    public Sprite RegionPreviewSprite;
     public GameObject Map;
 
     private static readonly Dictionary<int, OutGameRewardData[]> _firstRewardDic = new Dictionary<int, OutGameRewardData[]>();
@@ -87,6 +88,10 @@ public class StageData : ScriptableObject
     public bool HasClearProof(int stageNumber)
     {
         return _clearProofDic.GetValueOrDefault(stageNumber, false);
+    }
+    public Sprite GetStagePreviewSprite(int stageNumber)
+    {
+        return RegionPreviewSprite;
     }
 }
 
