@@ -27,7 +27,7 @@ public class GachaResultUI : MonoBehaviour, IPointerClickHandler
         slot.UpdateUI(data.Icon, amount);
     }
 
-    public void StoneGachaUpdate(MagicStoneData data, int index, string amount)
+    public void StoneGachaUpdate(MagicStone data, int index, string amount)
     {
         if (_slots[index] == null)
         {

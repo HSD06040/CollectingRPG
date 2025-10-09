@@ -13,7 +13,6 @@ public class RandomGachaSystem : MonoBehaviour
     [SerializeField] private CharacterDatabase _charData;
     [SerializeField] private ItemProbabilitySO _charProb;
     // 마법석
-    [SerializeField] private MagicStoneDatabase _stoneDatabase;
     [SerializeField] private MagicStoneGachaSO _stoneProb;
     // UI
     [SerializeField] private GachaResultUI _resultUI;
@@ -61,7 +60,6 @@ public class RandomGachaSystem : MonoBehaviour
     private async UniTask DataLoad()
     {
         _charData ??= await Manager.Resources.LoadAsync<CharacterDatabase>("Database/CharacterDatabase");
-        _stoneDatabase ??= await Manager.Resources.LoadAsync<MagicStoneDatabase>("Database/MagicStoneDatabase");
         _charProb ??= await Manager.Resources.LoadAsync<ItemProbabilitySO>("Data/CharProbability");
         _stoneProb ??= await Manager.Resources.LoadAsync<MagicStoneGachaSO>("Data/MagicStoneGachaSO");
 
@@ -482,11 +480,10 @@ public class RandomGachaSystem : MonoBehaviour
             return true;
         }
     }
-    private bool IsOveredPieceUpperLimit(MagicStoneData data, int inputPiece, out int overPiece)
+    private bool IsOveredPieceUpperLimit(MagicStone data, int inputPiece, out int overPiece)
     {
-        SubGrade grade = data.Grade;
         int level = data.UpgradeData.CurrentUpgradeData.UpgradeLevel;
-        int requirePiece = data.LevelUpData.GetCumulativePiece(level);
+        int requirePiece = Manager.Data.MagicStoneLevelChanceData.MagicStoneLevelUpData.GetCumulativePiece(level);
 
         if (data.UpgradeData.CurrentUpgradeData.CurrentPieces + inputPiece < requirePiece)
         {
@@ -563,8 +560,8 @@ public class RandomGachaSystem : MonoBehaviour
 
     private async void MagicStoneSelection(int index)
     {
-        int pickedStone = UnityEngine.Random.Range(0, _stoneDatabase.MagicStoneDatas.Count);
-        MagicStoneData data = _stoneDatabase.MagicStoneDatas[pickedStone];
+        int pickedStone = UnityEngine.Random.Range(0, Manager.Data.MagicStones.Length);
+        MagicStone data = Manager.Data.MagicStones[pickedStone];
 
         int pieces = _magicStonePieceRandom.GetRandomItem();
 

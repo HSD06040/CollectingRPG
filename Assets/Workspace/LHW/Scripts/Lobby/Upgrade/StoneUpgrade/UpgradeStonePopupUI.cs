@@ -71,12 +71,11 @@ public class UpgradeStonePopupUI : MonoBehaviour
 
     private void UpdateStoneProbable()
     {
-        List<SubGradeProb> probs = _currentMagicStoneUnit.Data.UpgradeProbData.
-            GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
+        MagicStoneLevelChances probs = Manager.Data.MagicStoneLevelChanceData.GetMagicStoneLevelChances(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);            
         
         for(int i = 0; i < _stoneProbleText.Length; i++)
         {
-            _stoneProbleText[i].text = $"{probs[i].Probable.ToString()}%";
+            _stoneProbleText[i].text = $"{probs.MagicStonLevelChanceDatas[i].Chance.ToString()}%";
         }
     }
 

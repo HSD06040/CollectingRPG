@@ -30,10 +30,10 @@ public class DataManager : Singleton<DataManager>
     public AnimationManager AnimationManager = new();
 
     // 마법석 데이터 임시로 추가
-    public Dictionary<string, MagicStoneData> MagicStoneDataDic;
+    public Dictionary<string, MagicStone> MagicStoneDic;
     public MagicStoneData[] MagicStoneDatas;
-    public MagicSton[] MagicStones;
-    public MagicStonLevelChanceData MagicStonLevelChanceData;
+    public MagicStone[] MagicStones;
+    public MagicStonLevelChanceData MagicStoneLevelChanceData;
 
     // 프리셋 데이터 관련
     public PresetDatabase PresetDB { get; private set; } = new PresetDatabase();
@@ -57,7 +57,7 @@ public class DataManager : Singleton<DataManager>
 
         UnitSpawnChanceData = await Addressables.LoadAssetAsync<UnitSpawnChanceData>("Data/UnitSpawnChanceData");
         CharacterSellAmountData = await Addressables.LoadAssetAsync<CharacterSellAmountData>("Data/CharacterSellAmountData");
-        MagicStonLevelChanceData = await Addressables.LoadAssetAsync<MagicStonLevelChanceData>("Data/MagicStoneLevelChanceData");        
+        MagicStoneLevelChanceData = await Addressables.LoadAssetAsync<MagicStonLevelChanceData>("Data/MagicStoneLevelChanceData");        
 
         await AnimationManager.Init();
         await PreLoadData();
@@ -159,12 +159,26 @@ public class DataManager : Singleton<DataManager>
 
     private async UniTask PreLoadMagicStoneDatas()
     {
-        MagicStones = await Manager.Resources.LoadAll<MagicSton>("MagicStone");
+        MagicStones = await Manager.Resources.LoadAll<MagicStone>("MagicStone");
+
+        foreach (var magicStone in MagicStones)
+        {
+            magicStone.Init();
+        }
     }
 
-    public MagicStoneData GetMagicStoneData(string magicStoneName)
+    public MagicStone GetMagicStoneData(string magicStoneName)
     {
-        return MagicStoneDataDic.TryGetValue(magicStoneName, out var magicStoneData) ? magicStoneData : null;
+        if(!MagicStoneDic.ContainsKey(magicStoneName))
+        {
+            foreach (var data in MagicStones)
+            {
+                if(!MagicStoneDic.ContainsKey(data.Name))
+                    MagicStoneDic.Add(data.Name, data);
+            }
+        }
+
+        return MagicStoneDic.TryGetValue(magicStoneName, out var magicStoneData) ? magicStoneData : null;
     }
     public MagicStoneData GetRandomMagicStoneData()
     {

@@ -17,13 +17,13 @@ public class MagicStoneDB : MonoBehaviour
     {
         _characterReference = FirebaseManager.DataReference.Child("UserData").Child(_uid).Child("MagicStoneData");
 
-        foreach (var charData in Manager.Data.MagicStoneDataDic.Values)
+        foreach (var charData in Manager.Data.MagicStones)
         {
             await SaveMagicStoneUpgradeData(charData);
         }
     }
 
-    public async UniTask SaveMagicStoneUpgradeData(MagicStoneData charData)
+    public async UniTask SaveMagicStoneUpgradeData(MagicStone charData)
     {
         _characterReference = FirebaseManager.DataReference.Child("UserData").Child(_uid).Child("MagicStoneData");
 
