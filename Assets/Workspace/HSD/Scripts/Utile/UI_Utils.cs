@@ -51,10 +51,10 @@ public static class UI_Utils
 
     public async static UniTask FadeOut(this CanvasGroup canvasGroup, float fadeDuration)
     {
+        await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).SetEase(Ease.Linear).AsyncWaitForCompletion();
+
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
-
-        await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).SetEase(Ease.Linear).AsyncWaitForCompletion();
     }
 
     public static void Reset(this CanvasGroup canvasGroup)

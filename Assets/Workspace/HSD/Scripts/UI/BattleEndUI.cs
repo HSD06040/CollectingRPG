@@ -13,6 +13,7 @@ public class BattleEndUI : MonoBehaviour
     [SerializeField] Button _applyButton;
     [SerializeField] TMP_Text _applyButtonText;
     [SerializeField] CanvasGroup _canvasGroup;
+    [SerializeField] AugmentPanel _augmentPanel;
 
     private void Awake()
     {
@@ -45,7 +46,7 @@ public class BattleEndUI : MonoBehaviour
         _applyButton.onClick.AddListener(MapPlayerTracker.Instance.unitManager.MapUIController.MapEnter);
         _applyButton.onClick.AddListener(ClosePopup);
         
-        Manager.Game.Reward_Controller.GetCurrentFloorReward();
+        Manager.Game.Reward_Controller.GetCurrentFloorReward(_augmentPanel.Show);
     }
 
     private void ShowGameEndPopup()

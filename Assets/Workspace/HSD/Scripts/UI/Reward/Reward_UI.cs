@@ -1,12 +1,15 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using DG.Tweening.Core.Easing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Reward_UI : MonoBehaviour
 {
-    // 애니메이션 필요
+    [SerializeField] Button _closeButton;
     [SerializeField] CanvasGroup _rewardSlotGroup;
     [SerializeField] CanvasGroup _rewardGroup;
     [SerializeField] Transform _content;
@@ -66,8 +69,10 @@ public class Reward_UI : MonoBehaviour
         PlayShowAnimation().Forget();
     }
 
-    public void Show(StageInGameRewardType[] inGameRewardDatas)
+    public void Show(StageInGameRewardType[] inGameRewardDatas, UnityAction action = null)
     {
+        ButtonEventSubcribe(action);
+
         int count = 0;
         for (int i = 0; i < inGameRewardDatas.Length; i++)
         {
@@ -88,6 +93,7 @@ public class Reward_UI : MonoBehaviour
 
     public void Close()
     {
+        _closeButton.interactable = false;
         PlayHideAnimation().Forget();
     }
 
@@ -125,5 +131,20 @@ public class Reward_UI : MonoBehaviour
             InGameRewardType.MagicStone => rewardData.MagicStoneData != null ? rewardData.MagicStoneData.Icon : null,
             _ => null,
         };
+    }
+
+    private void ButtonEventSubcribe(UnityAction unityAction)
+    {
+        _closeButton.interactable = true;
+        _closeButton.onClick.RemoveAllListeners();
+
+        if (unityAction == null)
+        {
+            _closeButton.onClick.AddListener(Close);
+            return;   
+        }
+
+        _closeButton.onClick.AddListener(unityAction);
+        _closeButton.onClick.AddListener(Close);
     }
 }

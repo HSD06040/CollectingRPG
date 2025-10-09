@@ -15,7 +15,7 @@ namespace map
         public Button _backButton;
 
         [Header("ItemListPanel")]
-        [SerializeField] ItemListPanel_Agument _itemListPanel_Augment;
+        [SerializeField] ItemListPanel_Augment _itemListPanel_Augment;
         [SerializeField] ItemListPanel_MagicStone _itemListPanel_MagicStone;
 
         [Header("AnimationSetting")]

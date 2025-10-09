@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Reward_Controller
 {
@@ -16,7 +17,7 @@ public class Reward_Controller
         GetStageFirstRewardAsync(stageData, stage).Forget();
     }
 
-    public void GetCurrentFloorReward()
+    public void GetCurrentFloorReward(UnityAction action = null)
     {
         StageInGameRewardType[] source = Manager.Data.StageGameData.GetCurrentFloorReward();
         StageInGameRewardType[] stageInGameRewardTypes = new StageInGameRewardType[source.Length];
@@ -40,7 +41,7 @@ public class Reward_Controller
             }
         }
 
-        UIManager.Instance.Reward_UI.Show(stageInGameRewardTypes);
+        UIManager.Instance.Reward_UI.Show(stageInGameRewardTypes, action);
     }
 
     private async UniTask GetStageFirstRewardAsync(StageData stageData, int stage)
