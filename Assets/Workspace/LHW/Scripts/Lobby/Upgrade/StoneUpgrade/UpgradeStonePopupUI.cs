@@ -208,7 +208,7 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
         }
         else
         {
-            await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(_currentMagicStoneUnit.Data);
+            //await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(_currentMagicStoneUnit.Data);
             OnMagicStoneStatusChanged?.Invoke();
         }
     }
