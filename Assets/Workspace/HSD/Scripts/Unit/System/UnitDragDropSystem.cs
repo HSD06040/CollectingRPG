@@ -1,13 +1,21 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class UnitDragDropSystem : MonoBehaviour
 {
-    public static bool IsDragging;    
+    public static bool IsDragging;
     public ToolTipController ToolTipController;
+
+    [Header("Press Settings")]
+    [SerializeField] private float _dragThreshold = 0.3f; // 이 시간 이상 누르면 드래그 시작
+    private float _currentPressTime;
+    private bool _isPressing;
+    private bool _dragStarted;
+    private bool _isUI;
+    private Vector2 _pressStartPosition;
+    private GameObject _pressedObject; // 누른 대상 오브젝트
 
     private GameObject _currentUnit;
     private UnitBase _currentUnitBase;
@@ -26,7 +34,12 @@ public class UnitDragDropSystem : MonoBehaviour
         // --- 에디터/PC 전용 입력 ---
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
-            HandleClick();
+            StartPress(Input.mousePosition);
+        }
+
+        if (_isPressing && Input.GetMouseButton(0))
+        {
+            UpdatePress(Input.mousePosition);
         }
 
         if (IsDragging && _currentUnit != null && Input.GetMouseButton(0))
@@ -34,9 +47,20 @@ public class UnitDragDropSystem : MonoBehaviour
             DragUnit(Input.mousePosition);
         }
 
-        if (Input.GetMouseButtonUp(0) && IsDragging)
+        if (Input.GetMouseButtonUp(0))
         {
-            ReleaseUnit();
+            if (_isPressing && !_dragStarted)
+            {
+                // 드래그 시작 전에 뗐다면 짧은 클릭으로 처리
+                HandleShortClick();
+            }
+
+            if (IsDragging)
+            {
+                ReleaseUnit();
+            }
+
+            EndPress();
         }
 
 #elif UNITY_ANDROID
@@ -46,7 +70,12 @@ public class UnitDragDropSystem : MonoBehaviour
 
             if (touch.phase == TouchPhase.Began)
             {
-                HandleClick();
+                StartPress(touch.position);
+            }
+
+            if (_isPressing && (touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved))
+            {
+                UpdatePress(touch.position);
             }
 
             if (IsDragging && _currentUnit != null && touch.phase == TouchPhase.Moved)
@@ -60,58 +89,167 @@ public class UnitDragDropSystem : MonoBehaviour
                 {
                     ReleaseUnit();
                 }
+                else if (_isPressing)
+                {
+                    HandleShortClick();
+                }
+                EndPress();
             }
         }
 #endif
     }
 
-    private void HandleClick()
+    private void StartPress(Vector2 inputPosition)
     {
-        ToolTipController.UnitToolTip.Close();   
+        _isPressing = true;
+        _currentPressTime = 0f;
+        _dragStarted = false;
+        _pressStartPosition = inputPosition;
+        _pressedObject = null;
+        _isUI = false;
 
-        ToolTipController.SynergyToolTip.Close();
-        Vector2 worldMouse = GetWorldMouse();
+        Vector2 worldMouse = GetWorldMouseFromScreenPosition(inputPosition);
         RaycastHit2D[] hits = Physics2D.RaycastAll(worldMouse, Vector2.zero);
 
-        if (hits.Length == 0)
-            return;
-
-        bool isInteractable = false;
-        bool isSetUnit = false;
-        bool isEnemy = false;
-
-        for (int i = 0; i < hits.Length; i++)
+        if (hits.Length > 0)
         {
-            if(hits[i].collider != null && hits[i].collider.CompareTag("Unit"))
+            for (int i = 0; i < hits.Length; i++)
             {
-                isEnemy = ComponentProvider.Get<UnitBase>(hits[i].collider.gameObject).GetAllyLayerMask().Contain(LayerMask.NameToLayer("Enemy"));
-            }
-
-            if (hits[i].collider != null && hits[i].collider.CompareTag("UnitTrigger"))
-            {
-                if (isSetUnit) return;
-
-                isInteractable = true;
-                isSetUnit = true;
-                SetUnit(hits[i].collider.gameObject);  
-            }
-            else if (hits[i].collider != null && hits[i].collider.CompareTag("BattleUnit"))
-            {
-                isInteractable = true;
-                ToolTipController.UnitToolTip.Show(
-                    ComponentProvider.Get<UnitBase>(hits[i].collider.gameObject).Status
-                    , false, false, isEnemy);
-
-                ToolTipController.SynergyToolTip.Close();
+                if (hits[i].collider != null)
+                {
+                    if (hits[i].collider.CompareTag("UnitTrigger") ||
+                        hits[i].collider.CompareTag("Unit") ||
+                        hits[i].collider.CompareTag("BattleUnit"))
+                    {
+                        _pressedObject = hits[i].collider.gameObject;
+                        return;
+                    }
+                }
             }
         }
-
-        if (!isInteractable)
+        else
         {
-            ToolTipController.UnitToolTip.Close();
-            ToolTipController.SynergyToolTip.Close();
+            PointerEventData pointerData = new PointerEventData(EventSystem.current)
+            {
+                position = Input.mousePosition
+            };
+
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(pointerData, results);
+
+            foreach (var result in results)
+            {
+                if (!result.gameObject.CompareTag("Slot"))
+                    continue;
+
+                _isUI = true;
+                _pressedObject = result.gameObject;
+                break;
+            }
         }
     }
+
+    /// <summary>
+    /// 누르기 업데이트 (시간 체크 및 드래그 시작 판단)
+    /// </summary>
+    private void UpdatePress(Vector2 currentPosition)
+    {
+        if (!_isPressing || _dragStarted)
+            return;
+
+        _currentPressTime += Time.deltaTime;
+
+        if (_currentPressTime >= _dragThreshold)
+        {
+            _dragStarted = true;
+            StartDrag();
+        }
+    }
+
+    /// <summary>
+    /// 드래그 시작
+    /// </summary>
+    private void StartDrag()
+    {
+        if (_pressedObject == null)
+            return;
+
+        if (!_isUI)
+        {
+            if (_pressedObject.CompareTag("UnitTrigger") ||
+            _pressedObject.CompareTag("Unit") ||
+            _pressedObject.CompareTag("BattleUnit"))
+            {
+                SetUnit(_pressedObject);
+            }
+        }
+        else
+        {
+            _pressedObject.GetComponent<UI_UnitSlot>().OnBeginDrag();
+        }
+    }
+
+    /// <summary>
+    /// 짧은 클릭 처리 (UnitPanel 표시)
+    /// </summary>
+    private void HandleShortClick()
+    {
+        if (_pressedObject != null)
+        {
+            bool isEnemy = false;
+
+            if (_pressedObject.CompareTag("Unit") || _pressedObject.CompareTag("UnitTrigger"))
+            {
+                UnitBase unitBase = _pressedObject.GetComponentInParent<UnitBase>();
+                if (unitBase != null)
+                {
+                    isEnemy = unitBase.GetAllyLayerMask().Contain(LayerMask.NameToLayer("Enemy"));
+
+                    ToolTipController.UnitToolTip.Show(
+                        unitBase.Status,
+                        false,
+                        true,
+                        isEnemy
+                    );
+
+                    ToolTipController.SynergyToolTip.Close();
+                }
+            }
+            else if (_pressedObject.CompareTag("BattleUnit"))
+            {
+                UnitBase unitBase = ComponentProvider.Get<UnitBase>(_pressedObject);
+                if (unitBase != null)
+                {
+                    isEnemy = unitBase.GetAllyLayerMask().Contain(LayerMask.NameToLayer("Enemy"));
+
+                    ToolTipController.UnitToolTip.Show(
+                        unitBase.Status,
+                        false,
+                        false,
+                        isEnemy
+                    );
+
+                    ToolTipController.SynergyToolTip.Close();
+                }
+            }
+            return;
+        }
+
+        ToolTipController.UnitToolTip.Close();
+        ToolTipController.SynergyToolTip.Close();
+    }
+
+    /// <summary>
+    /// 누르기 종료
+    /// </summary>
+    private void EndPress()
+    {
+        _isPressing = false;
+        _currentPressTime = 0f;
+        _dragStarted = false;
+        _pressedObject = null;
+    }
+
     private void DragUnit(Vector3 inputPosition)
     {
         inputPosition.z = -Camera.main.transform.position.z;
@@ -119,6 +257,7 @@ public class UnitDragDropSystem : MonoBehaviour
 
         _currentUnitBase.transform.position = mouseWorldPos + _offset;
     }
+
     private void ReleaseUnit()
     {
         bool isSlot;
@@ -138,6 +277,7 @@ public class UnitDragDropSystem : MonoBehaviour
 
         Clear();
     }
+
     private void CheckUISlot(out bool isSlot)
     {
         PointerEventData pointerData = new PointerEventData(EventSystem.current)
@@ -146,16 +286,15 @@ public class UnitDragDropSystem : MonoBehaviour
         };
 
         List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(pointerData, results);  
+        EventSystem.current.RaycastAll(pointerData, results);
 
         isSlot = false;
         foreach (var result in results)
         {
             if (!result.gameObject.CompareTag("Slot"))
-                return;
+                continue;
 
-            var dropHandler = result.gameObject.GetComponent<UI_UnitSlot>();
-            if (dropHandler != null)
+            if (result.gameObject.TryGetComponent<UI_UnitSlot>(out var dropHandler))
             {
                 dropHandler.OnDrop(pointerData);
 
@@ -203,6 +342,13 @@ public class UnitDragDropSystem : MonoBehaviour
         return worldMouse;
     }
 
+    private static Vector2 GetWorldMouseFromScreenPosition(Vector2 screenPosition)
+    {
+        Vector3 pos = screenPosition;
+        pos.z = -Camera.main.transform.position.z;
+        return Camera.main.ScreenToWorldPoint(pos);
+    }
+
     public void SetUnit(GameObject unit)
     {
         IsDragging = true;
@@ -244,8 +390,24 @@ public class UnitDragDropSystem : MonoBehaviour
     {
         return _currentUnitBase;
     }
+
     public int GetCurrentSlotIdx()
     {
         return _currentSlotIdx;
+    }
+
+    private bool IsPointerOverUI()
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        PointerEventData pointerData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerData, results);
+        return results.Count > 0;
     }
 }

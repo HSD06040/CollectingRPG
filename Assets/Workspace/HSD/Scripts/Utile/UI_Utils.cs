@@ -56,4 +56,11 @@ public static class UI_Utils
 
         await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).SetEase(Ease.Linear).AsyncWaitForCompletion();
     }
+
+    public static void Reset(this CanvasGroup canvasGroup)
+    {
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false; 
+        canvasGroup.blocksRaycasts = false;        
+    }
 }
