@@ -77,6 +77,9 @@ namespace Map
 
             _titleText.text = eventData._eventTitle;
             _descriptionText.text = eventData._eventDescription;
+
+            _yesButton.interactable = true;
+            _nvmButton.interactable = true;
         }
 
         /// <summary>
@@ -85,6 +88,8 @@ namespace Map
         private void OnChoiceSelected(bool acceptChallenge)
         {
             _descriptionCanvasGroup.interactable = false;
+            _yesButton.interactable = false;
+            _nvmButton.interactable = false;
 
             ShowResultWithFade(acceptChallenge).Forget();
         }

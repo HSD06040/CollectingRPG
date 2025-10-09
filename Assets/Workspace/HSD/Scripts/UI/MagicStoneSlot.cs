@@ -15,17 +15,24 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private Image _magicStoneIcon;
     [SerializeField] private Image _highlight;
     [SerializeField] private TMP_Text _magicStoneName;
-    
-    private Image[] _images;
+    [SerializeField] Transform _parent;
+    private Transform _dragParent;
 
     [Header("Drag Settings")]
     private Transform _dropAreaPanel;
     private Vector3 _originalPos;
 
-    public void Init(Transform dropArea)
+    private void OnDestroy()
     {
+        BattleManager.OnBattleEnded -= DragEnd;
+    }
+
+    public void Init(Transform dropArea, Transform dragParent)
+    {
+        _dragParent = dragParent;
         _dropAreaPanel = dropArea;
-        _images = GetComponentsInChildren<Image>(true);
+
+        BattleManager.OnBattleEnded += DragEnd;
         DragEnd();
     }
 
@@ -118,17 +125,11 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private void DragStart()
     {
-        foreach (var image in _images)
-        {
-            image.maskable = false;
-        }
+        _highlight.transform.SetParent(_dragParent, true);
     }
 
     private void DragEnd()
     {
-        foreach (var image in _images)
-        {
-            image.maskable = true;
-        }
+        _highlight.transform.SetParent(_parent, true);
     }
 }
