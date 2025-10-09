@@ -1,30 +1,36 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UpgradeStonePopupUI : MonoBehaviour
+public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
 {
+    [Header("Reference")]
+    [SerializeField] private GameObject _backgroundPanel;
+
     [Header("Stone Info")]
     [SerializeField] private Image _stoneIcon;
     [SerializeField] private TMP_Text _stoneLevelText;
     [SerializeField] private TMP_Text _stoneNameText;
     [SerializeField] private TMP_Text _stoneDescriptionText;
-    [SerializeField] private TMP_Text[] _stoneProbleText;
 
-    [Header("Level Up Button UI")]
+    [Header("StoneProbable")]
+    [SerializeField] private TMP_Text[] _currentStoneProbleText;
+    [SerializeField] private TMP_Text[] _nextStoneProbleText;
+
+    [Header("PieceGauge")]
     [SerializeField] private TMP_Text _pieceText;
     [SerializeField] private Image _pieceGauge;
-    [SerializeField] private TMP_Text _goldText;
+
+    [Header("Level Up Button UI")]
     [SerializeField] private TMP_Text _openPieceText;
-    [SerializeField] private Image _openPieceGauge;
+    [SerializeField] private GameObject _levelUpUI;
+    [SerializeField] private TMP_Text _goldText;
 
     [Header("Button")]
     [SerializeField] private Button _levelUpButton;
-    [SerializeField] private Button _openButton;
-    [SerializeField] private Button _closeButton;
 
     private MagicStoneUpgradeUnit _currentMagicStoneUnit;
 
@@ -32,9 +38,7 @@ public class UpgradeStonePopupUI : MonoBehaviour
 
     private void Awake()
     {
-        _closeButton.onClick.AddListener(CloseUI);
         _levelUpButton.onClick.AddListener(LevelUp);
-        _openButton.onClick.AddListener(LevelUp);
         gameObject.SetActive(false);
     }
 
@@ -58,56 +62,93 @@ public class UpgradeStonePopupUI : MonoBehaviour
     {
         UpdateStoneInfo();
         UpdateStoneProbable();
-        LevelUpButtonUpdate();
+        PieceGaugeUpdate();
+        LevelUpButtonUIUpdate();
     }
 
     private void UpdateStoneInfo()
     {
         _stoneIcon.sprite = _currentMagicStoneUnit.Data.Icon;
-        _stoneLevelText.text = $"LV.{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel}";
         _stoneNameText.text = _currentMagicStoneUnit.Data.Name;
+        _stoneLevelText.text = $"Lv.{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel}";
         _stoneDescriptionText.text = _currentMagicStoneUnit.Data.Description;
     }
 
     private void UpdateStoneProbable()
     {
-        List<SubGradeProb> probs = _currentMagicStoneUnit.Data.UpgradeProbData.
-            GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
-        
-        for(int i = 0; i < _stoneProbleText.Length; i++)
+        List<SubGradeProb> currentProbs = new List<SubGradeProb>();
+        List<SubGradeProb> nextProbs = new List<SubGradeProb>();
+        if (_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel != 10)
         {
-            _stoneProbleText[i].text = $"{probs[i].Probable.ToString()}%";
+            currentProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
+            GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
+
+            nextProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
+                GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel + 1);
+
+            for (int i = 0; i < _currentStoneProbleText.Length; i++)
+            {
+                _currentStoneProbleText[i].text = $"{currentProbs[i].Probable.ToString()}%";
+                _nextStoneProbleText[i].text = $"{nextProbs[i].Probable.ToString()}%";
+            }
+        }
+        else
+        {
+            currentProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
+            GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel - 1);
+
+            nextProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
+                GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
+
+            for (int i = 0; i < _currentStoneProbleText.Length; i++)
+            {
+                _currentStoneProbleText[i].text = $"{currentProbs[i].Probable.ToString()}%";
+                _nextStoneProbleText[i].text = $"{nextProbs[i].Probable.ToString()}%";
+            }
         }
     }
 
-    private void LevelUpButtonUpdate()
+    private void PieceGaugeUpdate()
+    {        
+        if(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        {
+            _pieceGauge.fillAmount = (float)_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / 5;
+            _pieceText.text = $"{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/5";
+        }
+        else if(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel < 10)
+        {
+            int requirePiece = _currentMagicStoneUnit.Data.UpgradeData.GetRequiredPiece();
+            _pieceGauge.fillAmount = (float)_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
+            _pieceText.text = $"{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
+        }
+        else
+        {
+            _pieceGauge.fillAmount = 1;
+            _pieceText.text = "MAX";
+        }
+    }
+
+    private void LevelUpButtonUIUpdate()
     {
         if (_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
         {
-            _openButton.gameObject.SetActive(true);
-            _levelUpButton.gameObject.SetActive(false);
+            _openPieceText.text = "해금하기";
+            _openPieceText.gameObject.SetActive(true);
+            _levelUpUI.gameObject.SetActive(false);
+        }
+        else if(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel < 10)
+        {
+            int requireGold = _currentMagicStoneUnit.Data.UpgradeData.GetRequiredGold();
+            _goldText.text = requireGold.ToString();
+            _openPieceText.gameObject.SetActive(false);
+            _levelUpUI.gameObject.SetActive(true);
         }
         else
         {
-            _openButton.gameObject.SetActive(false);
-            _levelUpButton.gameObject.SetActive(true);
+            _openPieceText.text = "최대 레벨";
+            _openPieceText.gameObject.SetActive(true);
+            _levelUpUI.gameObject.SetActive(false);
         }
-
-        int requirePiece = _currentMagicStoneUnit.Data.UpgradeData.GetRequiredPiece();
-        int requireGold = _currentMagicStoneUnit.Data.UpgradeData.GetRequiredGold();
-        if (_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
-        {
-            _pieceGauge.fillAmount = 0;
-            _openPieceGauge.fillAmount = 0;
-        }
-        else
-        {
-            _pieceGauge.fillAmount = (float)_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
-            _openPieceGauge.fillAmount = (float)_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / 5;
-        }
-        _pieceText.text = $"{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
-        _goldText.text = requireGold.ToString();
-        _openPieceText.text = $"{_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/5";
     }
 
     private async void LevelUp()
@@ -138,9 +179,11 @@ public class UpgradeStonePopupUI : MonoBehaviour
         }
     }
 
-
-    private void CloseUI()
+    public void OnPointerDown(PointerEventData eventData)
     {
-        gameObject.SetActive(false);
+        if(eventData.pointerEnter.gameObject == _backgroundPanel)
+        {
+            gameObject.SetActive(false);
+        }
     }
 }
