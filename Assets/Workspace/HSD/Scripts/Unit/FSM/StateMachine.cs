@@ -6,7 +6,7 @@ using UnityEngine;
 public class StateMachine
 {
     public BaseState _currentState;
-    private BaseState _nextState;
+    public BaseState _nextState;
     private bool _isTransitioning;
 
     public void Update()

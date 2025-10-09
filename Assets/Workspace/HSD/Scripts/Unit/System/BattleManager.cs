@@ -78,7 +78,7 @@ public class BattleManager : MonoBehaviour
 
     private void CheckBattleEnded(UnitStatusController statusCon)
     {
-        if (!statusCon.IsDead) return;
+        if (!statusCon.IsDead || !InGameManager.Instance.IsBattle) return;
 
         if (_processedDeadUnits.Contains(statusCon))
             return;
@@ -172,7 +172,6 @@ public class BattleManager : MonoBehaviour
             OnPlayerDefeat?.Invoke();
             return;
         }
-
         OnBattleEnded?.Invoke();
     }
 }

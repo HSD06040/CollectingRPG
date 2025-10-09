@@ -218,8 +218,12 @@ public class UnitPassive
             AttackActive();
             if (!string.IsNullOrEmpty(Effect.SynergyEffectAddress))
             {
+                GameObject effect = Manager.Resources.Load<GameObject>(Effect.SynergyEffectAddress);
+                if (effect == null)
+                    return;
+
                 Manager.Resources.Destroy(
-                Manager.Resources.Instantiate<GameObject>(Effect.SynergyEffectAddress, _owner.GetCenter()), Effect.EffectDuration
+                Manager.Resources.Instantiate<GameObject>(effect, _owner.GetCenter()), Effect.EffectDuration
                 );
             }
         }

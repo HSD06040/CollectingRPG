@@ -55,10 +55,7 @@ public class Reward_UI : MonoBehaviour
             var rewardData = outGameRewardDatas[i];
             var icon = GetRewardSprite(rewardData);
 
-            if (icon != null)
-            {
-                _rewardSlots[i].Setup(icon, rewardData.Amount);
-            }
+            _rewardSlots[i].Setup(icon, rewardData.Amount);
         }
 
         for (int i = count; i < _rewardSlots.Length; i++)
@@ -78,10 +75,7 @@ public class Reward_UI : MonoBehaviour
             var rewardData = inGameRewardDatas[i];
             var icon = GetRewardSprite(rewardData);
 
-            if (icon != null)
-            {
-                _rewardSlots[i].Setup(icon, rewardData.Amount);
-            }
+            _rewardSlots[i].Setup(icon, rewardData.Amount);
         }
 
         for (int i = count; i < _rewardSlots.Length; i++)
