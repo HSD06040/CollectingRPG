@@ -22,9 +22,11 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Transform _dropAreaPanel;
     private Vector3 _originalPos;
 
+    private bool _isDragging = false;
+
     private void OnDestroy()
     {
-        BattleManager.OnBattleEnded -= DragEnd;
+        BattleManager.OnBattleEnded -= ForceStopDrag;
     }
 
     public void Init(Transform dropArea, Transform dragParent)
@@ -32,7 +34,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         _dragParent = dragParent;
         _dropAreaPanel = dropArea;
 
-        BattleManager.OnBattleEnded += DragEnd;
+        BattleManager.OnBattleEnded += ForceStopDrag;
         DragEnd();
     }
 
@@ -76,13 +78,16 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        _originalPos = _highlight.rectTransform.position;
+        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
+
+        _isDragging = true;
+        _originalPos = _magicStone.position;
         DragStart();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
+        if (!_isDragging || MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
 
         Vector3 worldPos;
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
@@ -104,7 +109,14 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
+        if (!_isDragging) return;
+        _isDragging = false;
+
+        if (MagicStoneData == null || !InGameManager.Instance.IsBattle)
+        {
+            ForceStopDrag();
+            return;
+        }
 
         bool insideDropArea = RectTransformUtility.RectangleContainsScreenPoint(
             _dropAreaPanel as RectTransform,
@@ -116,20 +128,29 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             UseMagicStone(Camera.main.ScreenToWorldPoint(eventData.position));
         }
 
-        _magicStone.position = _originalPos;
-
-        _highlight.enabled = false;
-
         DragEnd();
     }
 
     private void DragStart()
     {
-        _highlight.transform.SetParent(_dragParent, true);
+        transform.SetParent(_dragParent, true);
     }
 
     private void DragEnd()
     {
-        _highlight.transform.SetParent(_parent, true);
+        transform.SetParent(_parent, true);
+        _magicStone.position = _originalPos;
+        _highlight.enabled = false;
+        _isDragging = false;
+    }
+
+    private void ForceStopDrag()
+    {
+        if (!_isDragging) return;
+
+        _isDragging = false;
+        transform.SetParent(_parent, true);
+        _magicStone.position = _originalPos;
+        _highlight.enabled = false;
     }
 }
