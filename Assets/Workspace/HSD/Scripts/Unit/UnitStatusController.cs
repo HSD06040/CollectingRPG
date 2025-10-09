@@ -129,7 +129,6 @@ public class UnitStatusController : MonoBehaviour, IDamageable, IEffectable
         ManaGain.SetBaseStat(stat.ManaGain);
 
         AttackSpeed.SetBaseStat(stat.AttackSpeed + addStat.AttackSpeed);
-        Debug.Log($"{name}_{stat.MoveSpeed}");
         MoveSpeed.SetBaseStat(stat.MoveSpeed);
 
         PhysicalDamage.SetBaseStat(stat.PhysicalDamage + addStat.PhysicalDamage);

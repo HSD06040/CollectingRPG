@@ -4,22 +4,15 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MagicStone_UpgradeMagicStoneData", menuName = "Data/Upgrade/MagicStone_UpgradeMagicStoneData")]
-public class MagicStoneUpgradeData : ScriptableObject
+[Serializable]
+public class MagicStoneUpgradeData
 {
     // 캐릭터의 업그레이드 레벨 - 레벨이 0일 때는 획득하지 않은 상태
-    private SubGrade _grade;
-    private MagicStoneLevelUpData _levelUpData;
+    private MagicStoneLevelUpData _levelUpData => Manager.Data.MagicStoneLevelChanceData.MagicStoneLevelUpData;
 
-    public CurrentUpgradeData CurrentUpgradeData;
+    public CurrentUpgradeData CurrentUpgradeData = new();
 
     public event Action OnLevelUp;
-
-    public void Init(SubGrade grade, MagicStoneLevelUpData data)
-    {
-        _grade = grade;
-        _levelUpData = data;
-    }
 
     public int GetRequiredPiece()
     {
@@ -28,16 +21,11 @@ public class MagicStoneUpgradeData : ScriptableObject
 
         if (_levelUpData == null)
         {
-            Debug.LogError($"[{name}] LevelUpData가 설정되지 않았습니다.");
+            Debug.LogError($"LevelUpData가 설정되지 않았습니다.");
             return 0;
         }
 
         PieceLevelRatio pieceLevelRatio = _levelUpData.LevelRatio.Find(l => l.Level == CurrentUpgradeData.UpgradeLevel + 1);
-        if (pieceLevelRatio == null)
-        {
-            Debug.LogError($"[{name}] {_grade} / {CurrentUpgradeData.UpgradeLevel}에 맞는 PieceLevelRatio 데이터가 없습니다.");
-            return 0;
-        }
 
         return pieceLevelRatio.RequirePiece;
     }
@@ -49,16 +37,11 @@ public class MagicStoneUpgradeData : ScriptableObject
 
         if (_levelUpData == null)
         {
-            Debug.LogError($"[{name}] LevelUpData가 설정되지 않았습니다.");
+            Debug.LogError($"LevelUpData가 설정되지 않았습니다.");
             return 0;
         }
 
         PieceLevelRatio pieceLevelRatio = _levelUpData.LevelRatio.Find(l => l.Level == CurrentUpgradeData.UpgradeLevel + 1);
-        if (pieceLevelRatio == null)
-        {
-            Debug.LogError($"[{name}] {_grade} / {CurrentUpgradeData.UpgradeLevel}에 맞는 PieceLevelRatio 데이터가 없습니다.");
-            return 0;
-        }
 
         return pieceLevelRatio.RequireGold;
     }

@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "MagicStone_LevelUpData", menuName = "Data/Temp/MagicStone_LevelUpData")]
-public class MagicStoneLevelUpData : ScriptableObject
+[Serializable]
+public class MagicStoneLevelUpData
 {
     public List<PieceLevelRatio> LevelRatio = new List<PieceLevelRatio>();
 

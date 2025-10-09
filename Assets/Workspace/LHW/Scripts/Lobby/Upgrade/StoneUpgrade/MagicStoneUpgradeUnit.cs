@@ -11,8 +11,8 @@ public class MagicStoneUpgradeUnit : MonoBehaviour
     [SerializeField] private Image _pieceGauge;
 
     private UpgradeManager _manager;
-    private MagicStoneData _data;
-    public MagicStoneData Data => _data;
+    private MagicStone _data;
+    public MagicStone Data => _data;
 
     private void Awake()
     {
@@ -44,7 +44,7 @@ public class MagicStoneUpgradeUnit : MonoBehaviour
         _manager.ShowStonePopUp();
     }
 
-    public void InitMagicStoneStatus(MagicStoneData data)
+    public void InitMagicStoneStatus(MagicStone data)
     {
         _data = data;
     }

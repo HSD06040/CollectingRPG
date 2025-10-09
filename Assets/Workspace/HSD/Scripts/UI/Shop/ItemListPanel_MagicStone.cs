@@ -46,7 +46,7 @@ public class ItemListPanel_MagicStone : ItemListPanel
     {
         if (MagicStoneController.Instance.IsFull())
         {
-            Debug.Log("마법석칸이 부족합니다.");
+            UIManager.Instance.MessagePopup.Show("마법석 칸이 꽉찼습니다!");
             return;
         }
 

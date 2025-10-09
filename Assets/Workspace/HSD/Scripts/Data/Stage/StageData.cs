@@ -7,6 +7,7 @@ using UnityEngine;
 public class StageData : ScriptableObject
 {
     private readonly Dictionary<int, bool> _clearProofDic = new Dictionary<int, bool>();
+    private readonly Dictionary<int, bool> _firstRewardGainDic = new Dictionary<int, bool>();
 
     public string StageName;
     [TextArea] public string StageDescription;
@@ -23,11 +24,11 @@ public class StageData : ScriptableObject
 
     public OutGameRewardData[] GetStageFirstReward(int stageNumber)
     {
-        if (_clearProofDic.TryGetValue(stageNumber, out bool stageClear))
+        if (_firstRewardGainDic.TryGetValue(stageNumber, out bool stageRewardGain))
         {
-            if (stageClear)
+            if (stageRewardGain)
             {
-                Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 이미 클리어 되어 보상 불가");
+                UIManager.Instance.MessagePopup.Show($"이미 {RegionNumber}-{stageNumber}의 최초 클리어 보상을 획득했습니다.");                
                 return null;
             }
         }        
@@ -85,18 +86,29 @@ public class StageData : ScriptableObject
         Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 클리어 증명 로컬 세팅 완료: {isCleared}");
     }
 
+    public void SetFirstRewardGainProof(int stageNumber, bool isGain)
+    {
+        if(_firstRewardDic.ContainsKey(stageNumber))
+        {
+            _firstRewardGainDic[stageNumber] = isGain;
+        }
+        else
+        {
+            _firstRewardGainDic.Add(stageNumber, isGain);
+        }
+        Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 최초 클리어 보상 획득 로컬 세팅 완료: {isGain}");
+    }
+
     public bool HasClearProof(int stageNumber)
     {
         return _clearProofDic.GetValueOrDefault(stageNumber, false);
+    }
+    public bool HasFirstRewardGainProof(int stageNumber)
+    {
+        return _firstRewardGainDic.GetValueOrDefault(stageNumber, false);
     }
     public Sprite GetStagePreviewSprite(int stageNumber)
     {
         return RegionPreviewSprite;
     }
-}
-
-[Serializable]
-public class StageClearData
-{
-    public bool isCleared = false;
 }

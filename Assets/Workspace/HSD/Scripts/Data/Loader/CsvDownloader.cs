@@ -139,7 +139,6 @@ public class CsvDownloader
             AnimationType attackAnimation = Enum.TryParse(row[8], out AnimationType attackAnim) ? attackAnim : AnimationType.Magic_Attack;
             AnimationType skillAnimation = Enum.TryParse(row[9], out AnimationType skillAnim) ? skillAnim : AnimationType.Magic_Attack;
 
-            unitData.AnimatiorData = new AnimatorData();
             unitData.AnimatiorData.AttackAnimationType = attackAnimation;
             unitData.AnimatiorData.SkillAnimationType = skillAnimation;
 

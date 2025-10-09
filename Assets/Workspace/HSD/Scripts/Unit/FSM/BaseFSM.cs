@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -56,8 +57,10 @@ public class BaseFSM : MonoBehaviour
             _fightRoutine = null;
         }
 
-        StateMachine.ChangeState(StandbyState);
-        StateMachine.Update();
+        StateMachine._nextState = StandbyState;
+        
+        if(StateMachine._nextState == StandbyState)
+            StateMachine.Update();
     }
 
     public void Move()

@@ -76,34 +76,35 @@ public class UpgradeStonePopupUI : MonoBehaviour, IPointerDownHandler
 
     private void UpdateStoneProbable()
     {
-        List<SubGradeProb> currentProbs = new List<SubGradeProb>();
-        List<SubGradeProb> nextProbs = new List<SubGradeProb>();
+        SubGradeChanceData[] currentProbs = null;
+        SubGradeChanceData[] nextProbs = null;
+
         if (_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel != 10)
         {
-            currentProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
-            GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
+            currentProbs = Manager.Data.MagicStoneLevelChanceData.
+            GetMagicStoneLevelChances(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel).MagicStonLevelChanceDatas;
 
-            nextProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
-                GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel + 1);
+            nextProbs = Manager.Data.MagicStoneLevelChanceData.
+            GetMagicStoneLevelChances(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel + 1).MagicStonLevelChanceDatas;
 
             for (int i = 0; i < _currentStoneProbleText.Length; i++)
             {
-                _currentStoneProbleText[i].text = $"{currentProbs[i].Probable.ToString()}%";
-                _nextStoneProbleText[i].text = $"{nextProbs[i].Probable.ToString()}%";
+                _currentStoneProbleText[i].text = $"{currentProbs[i].Chance.ToString()}%";
+                _nextStoneProbleText[i].text = $"{nextProbs[i].Chance.ToString()}%";
             }
         }
         else
         {
-            currentProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
-            GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel - 1);
+            currentProbs = Manager.Data.MagicStoneLevelChanceData.
+            GetMagicStoneLevelChances(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel - 1).MagicStonLevelChanceDatas;
 
-            nextProbs = _currentMagicStoneUnit.Data.UpgradeProbData.
-                GetCurrentLevelProbData(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel);
+            nextProbs = Manager.Data.MagicStoneLevelChanceData.
+            GetMagicStoneLevelChances(_currentMagicStoneUnit.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel).MagicStonLevelChanceDatas;
 
             for (int i = 0; i < _currentStoneProbleText.Length; i++)
             {
-                _currentStoneProbleText[i].text = $"{currentProbs[i].Probable.ToString()}%";
-                _nextStoneProbleText[i].text = $"{nextProbs[i].Probable.ToString()}%";
+                _currentStoneProbleText[i].text = $"{currentProbs[i].Chance.ToString()}%";
+                _nextStoneProbleText[i].text = $"{nextProbs[i].Chance.ToString()}%";
             }
         }
     }

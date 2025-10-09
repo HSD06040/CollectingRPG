@@ -308,6 +308,9 @@ public class ResourcesManager : Singleton<ResourcesManager>
 
     public void Destroy(GameObject obj, float delay)
     {
+        if (obj == null)
+            return;
+
         if (Manager.Pool.ContainsKey(obj.name))
             Manager.Pool.Release(obj, delay);
         else

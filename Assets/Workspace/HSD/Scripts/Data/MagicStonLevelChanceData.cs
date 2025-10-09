@@ -5,9 +5,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MagicStonLevelChanceData", menuName = "Data/MagicStone/MagicStonLevelChanceData")]
 public class MagicStonLevelChanceData : ScriptableObject
 {
-    public MagicStonLevelChances[] MagicStonLevelsChanceDatas;
-    private static readonly Dictionary<int, MagicStonLevelChances> _magicStonLevelChanceDic = new Dictionary<int, MagicStonLevelChances>();
-    public int[] NeedPirces;
+    public MagicStoneLevelChances[] MagicStonLevelsChanceDatas;
+    private static readonly Dictionary<int, MagicStoneLevelChances> _magicStonLevelChanceDic = new Dictionary<int, MagicStoneLevelChances>();
+    public MagicStoneLevelUpData MagicStoneLevelUpData;
 
     public void Init()
     {
@@ -19,6 +19,16 @@ public class MagicStonLevelChanceData : ScriptableObject
                 _magicStonLevelChanceDic.Add(level, MagicStonLevelsChanceDatas[i]);
             }
         }
+    }
+
+    public MagicStoneLevelChances GetMagicStoneLevelChances(int level)
+    {
+        if (!_magicStonLevelChanceDic.ContainsKey(level))
+        {
+            Init();
+        }
+
+        return _magicStonLevelChanceDic[level];
     }
 
     public SubGrade GetGrade(int level)
@@ -64,7 +74,7 @@ public class MagicStonLevelChanceData : ScriptableObject
 }
 
 [System.Serializable]
-public class MagicStonLevelChances
+public class MagicStoneLevelChances
 {
     public SubGradeChanceData[] MagicStonLevelChanceDatas;
 }

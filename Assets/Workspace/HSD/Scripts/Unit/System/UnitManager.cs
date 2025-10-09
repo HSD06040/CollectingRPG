@@ -186,7 +186,10 @@ public class UnitManager : MonoBehaviour
     public void Fight()
     {
         if (UnitController.GetUnitsCount() == 0)
+        {
+            UIManager.Instance.MessagePopup.Show("유닛을 배치해주세요.");
             return;
+        }
 
         _unitUIManager.StandbyUIDeActive();
 

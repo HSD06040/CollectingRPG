@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -12,6 +13,7 @@ public class StageSelectButton : MonoBehaviour
     [SerializeField] Button _selectButton;
     [SerializeField] TMP_Text _stageText;
     [SerializeField] Image _clearImage;
+    [SerializeField] Button _firstRewardChest;
     [SerializeField] Image _outline;
     
     private int _region;
@@ -28,6 +30,12 @@ public class StageSelectButton : MonoBehaviour
 
         _selectButton.onClick.AddListener(action);
         _selectButton.onClick.AddListener(Select);
+
+        int stageNumber = stage;
+        StageData data = Manager.Data.StageDatas.GetStage(region);
+
+        _firstRewardChest.onClick.RemoveAllListeners();
+        _firstRewardChest.onClick.AddListener(() => GetFirstReward(data, stageNumber));
 
         _stageText.text = $"{_region} - {_stage}";
 
@@ -63,15 +71,31 @@ public class StageSelectButton : MonoBehaviour
         }
     }
 
-    public void CheckClear(StageData stageData)
+    public void CheckFirstRewardGain(StageData stageData)
     {
-        if(stageData.HasClearProof(_stage))
+        if(stageData.HasFirstRewardGainProof(_stage))
         {
             _clearImage.sprite = Manager.Resources.SpriteLoad("OpenChest");
+            _firstRewardChest.interactable = false;
         }
         else
         {
             _clearImage.sprite = Manager.Resources.SpriteLoad("CloseChest");
+
+            if(stageData.HasClearProof(_stage))
+            {
+                _firstRewardChest.interactable = true;
+            }
+            else
+            {
+                _firstRewardChest.interactable = false;
+            }
         }
+    }
+
+    private void GetFirstReward(StageData data, int stageNumber)
+    {
+        Manager.Game.Reward_Controller.GetFirstReward(data, stageNumber);
+        _firstRewardChest.interactable = false;        
     }
 }

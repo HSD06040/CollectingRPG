@@ -41,8 +41,8 @@ public class StagePanel : MonoBehaviour
             button.Init(() => SetStage(region, index, button), region, index);
         }
 
-        StageClearCheck();
         StageOpenCheck();
+        StageClearCheck();
 
         _stageImage.sprite = stageData.RegionImage;
         _stageName.text = $"{stageData.RegionNumber}. {stageData.StageName}";
@@ -70,7 +70,7 @@ public class StagePanel : MonoBehaviour
 
         for (int i = 0; i < _stageButtons.Length; i++)
         {
-            _stageButtons[i].CheckClear(_stageData);
+            _stageButtons[i].CheckFirstRewardGain(_stageData);
         }
     }
 

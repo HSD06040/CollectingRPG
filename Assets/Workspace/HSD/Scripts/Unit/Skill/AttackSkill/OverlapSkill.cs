@@ -52,6 +52,9 @@ public class OverlapSkill : AttackSkill
         }
         else if (Priority == Priority.TargetRadius)
         {
+            if (attacker.GetTarget() == null)
+                return;
+
             foreach (var target in Utils.GetTargetsNonAlloc(attacker,
             attacker.GetTarget().position, SearchType, SizeOrRadius, BoxSize, Angle, MaxCount, attacker.TargetLayer))
             {
