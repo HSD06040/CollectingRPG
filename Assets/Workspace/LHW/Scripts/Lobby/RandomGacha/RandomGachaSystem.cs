@@ -87,7 +87,7 @@ public class RandomGachaSystem : MonoBehaviour
         _tenStoneGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(GachaType.Stone, 10));
 
         // 테스트 기능
-        _testCharacterGachaButton.onClick.AddListener(TestItemSelect);
+        //_testCharacterGachaButton.onClick.AddListener(TestItemSelect);
     }
 
     /// <summary>
@@ -580,7 +580,7 @@ public class RandomGachaSystem : MonoBehaviour
         {
             data.UpgradeData.AddPiece(pieces);
 
-            await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(data);
+            //await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(data);
         }
 
         _resultUI.StoneGachaUpdate(data, index, pieces.ToString());

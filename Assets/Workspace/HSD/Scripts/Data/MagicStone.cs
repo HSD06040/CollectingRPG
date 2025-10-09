@@ -25,7 +25,7 @@ public class MagicStone : MetaData
         return GetMagicStone(Manager.Data.MagicStoneLevelChanceData.GetGrade(UpgradeData.CurrentUpgradeData.UpgradeLevel));
     }
 
-    private MagicStoneData GetMagicStone(SubGrade subGrade)
+    public MagicStoneData GetMagicStone(SubGrade subGrade)
     {
         return Array.Find(MagicStoneDatas, m => m.Grade == subGrade);
     }
