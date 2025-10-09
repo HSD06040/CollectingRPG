@@ -107,8 +107,8 @@ public class Reward_UI : MonoBehaviour
 
     private async UniTask PlayHideAnimation()
     {
-        _rewardSlotGroup.FadeOut(_fadeDuration).Forget();
-        await _rewardGroup.FadeOut(_fadeDuration);
+        _rewardSlotGroup.FadeOut(_fadeDuration, false).Forget();
+        await _rewardGroup.FadeOut(_fadeDuration, false);
     }
 
     private Sprite GetRewardSprite(OutGameRewardData rewardData)

@@ -49,12 +49,21 @@ public static class UI_Utils
         canvasGroup.interactable = true;
     }
 
-    public async static UniTask FadeOut(this CanvasGroup canvasGroup, float fadeDuration)
+    public async static UniTask FadeOut(this CanvasGroup canvasGroup, float fadeDuration, bool beforeDeActive = true)
     {
+        if(beforeDeActive)
+        {
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }        
+
         await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).SetEase(Ease.Linear).AsyncWaitForCompletion();
 
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
+        if(!beforeDeActive)
+        {
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }        
     }
 
     public static void Reset(this CanvasGroup canvasGroup)
