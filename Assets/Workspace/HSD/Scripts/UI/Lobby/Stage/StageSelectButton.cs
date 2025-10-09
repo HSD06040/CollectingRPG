@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -34,7 +35,7 @@ public class StageSelectButton : MonoBehaviour
         StageData data = Manager.Data.StageDatas.GetStage(region);
 
         _firstRewardChest.onClick.RemoveAllListeners();
-        _firstRewardChest.onClick.AddListener(() => Manager.Game.Reward_Controller.GetFirstReward(data, stageNumber));
+        _firstRewardChest.onClick.AddListener(() => GetFirstReward(data, stageNumber));
 
         _stageText.text = $"{_region} - {_stage}";
 
@@ -90,5 +91,11 @@ public class StageSelectButton : MonoBehaviour
                 _firstRewardChest.interactable = false;
             }
         }
+    }
+
+    private void GetFirstReward(StageData data, int stageNumber)
+    {
+        Manager.Game.Reward_Controller.GetFirstReward(data, stageNumber);
+        _firstRewardChest.interactable = false;        
     }
 }

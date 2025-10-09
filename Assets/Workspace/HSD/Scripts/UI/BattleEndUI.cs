@@ -92,7 +92,7 @@ public class BattleEndUI : MonoBehaviour
     private async UniTask WaitForClose()
     {
         await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", TimeScaleClear);
-
+        await Manager.Game.StageClearAsync(Manager.Data.StageGameData.GetCurrentStage());
         await Manager.DB.SetTutorialCompleteAsync();
     }
 

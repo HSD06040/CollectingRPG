@@ -25,6 +25,11 @@ public class StageGameData
     }
     #endregion
 
+    public StageData GetCurrentStage()
+    {
+        return Manager.Data.StageDatas.GetStage(_currentStage);
+    }
+
     public StageInGameRewardType[] GetFloorReward(int floor)
     {
         if (!_floorRewardDic.ContainsKey(floor))

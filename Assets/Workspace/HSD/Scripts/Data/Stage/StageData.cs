@@ -112,9 +112,3 @@ public class StageData : ScriptableObject
         return RegionPreviewSprite;
     }
 }
-
-[Serializable]
-public class StageClearData
-{
-    public bool isCleared = false;
-}
