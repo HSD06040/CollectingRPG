@@ -4,8 +4,6 @@ using Firebase.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class DBManager : Singleton<DBManager>
@@ -346,7 +344,7 @@ public class DBManager : Singleton<DBManager>
             current = Convert.ToInt32(snapshot.Value);
         }
 
-        if (current-subAmount < 0)
+        if (current - subAmount < 0)
         {
             Debug.LogWarning("골드 부족");
             return;
@@ -658,7 +656,7 @@ public class DBManager : Singleton<DBManager>
         DataSnapshot userMailSnapShot = await FirebaseDatabase.DefaultInstance
             .RootReference.Child("UserData").Child(uid).Child("MailData").GetValueAsync();
         List<string> existingIdList = new List<string>();
-        
+
         if (userMailSnapShot.Exists)
         {
             foreach (var child in userMailSnapShot.Children)
@@ -758,12 +756,12 @@ public class DBManager : Singleton<DBManager>
         // 3) 유저가 가진 MailId - MasterMail snapshot 매칭
         Dictionary<string, DataSnapshot> userMailDict = new Dictionary<string, DataSnapshot>(userMailIdList.Count);
         bool isCoupon = false;
-        
+
         for (int i = 0; i < userMailIdList.Count; i++)
         {
             string mailId = userMailIdList[i];
             DataSnapshot snapShot = masterSnapShot[i];
-            
+
             // MailBox/MailData 조회 실패 -> CouponData 재조회
             if (!snapShot.Exists)
             {
@@ -872,7 +870,7 @@ public class DBManager : Singleton<DBManager>
             Debug.LogWarning("쿠폰 코드 정보x");
             return;
         }
-        
+
         string couponId = couponCode;
 
         // 2) 쿠폰 만료기간 체크
@@ -881,7 +879,7 @@ public class DBManager : Singleton<DBManager>
         long offset = (long)DateTimeOffset.Now.Offset.TotalMilliseconds;
         long expireDate = new DateTimeOffset(couponExpireDateDT).ToUnixTimeMilliseconds() - offset;
         long currentTime = await LoadSeverTimeAsync();
-        
+
         if (expireDate < currentTime)
         {
             Debug.LogWarning($"CouponCode : {couponId} 기간 만료");
@@ -891,9 +889,9 @@ public class DBManager : Singleton<DBManager>
         // 3) User메일 DB에서 이미 있는 쿠폰 체크
         DataSnapshot userCouponSnapShot = await FirebaseDatabase.DefaultInstance.RootReference
             .Child("UserData").Child(uid).Child("MailData").GetValueAsync();
-        
+
         List<string> existingCouponList = new List<string>();
-        
+
         if (userCouponSnapShot.Exists)
         {
             foreach (var child in userCouponSnapShot.Children)
@@ -919,4 +917,116 @@ public class DBManager : Singleton<DBManager>
     }
 
     #endregion
+
+
+    #region PlayerLevel
+
+    /// <summary>
+    /// 현재 유저 레벨을 로드하는 메서드
+    /// </summary>
+    /// <returns></returns>
+    public async UniTask<int> LoadUserLevelAsync()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Level");
+        DataSnapshot snapshot = await levelRef.GetValueAsync();
+
+        int level = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            level = Convert.ToInt32(snapshot.Value);
+        }
+        else
+        {
+            await levelRef.SetValueAsync(0);
+            Debug.Log("현재 유저 레벨 x / 0 으로 초기화");
+        }
+
+        return level;
+    }
+
+    /// <summary>
+    /// 현재 유저 경험치를 로드하는 메서드
+    /// </summary>
+    /// <returns></returns>
+    public async UniTask<int> LoadUserExpAsync()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        DatabaseReference expRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Exp");
+        DataSnapshot snapshot = await expRef.GetValueAsync();
+
+        int exp = 0;
+
+        if (snapshot.Exists && snapshot.Value != null)
+        {
+            exp = Convert.ToInt32(snapshot.Value);
+        }
+        else
+        {
+            await expRef.SetValueAsync(0);
+            Debug.Log("현재 유저 경험치 x / 0 으로 초기화");
+        }
+
+        return exp;
+    }
+
+    /// <summary>
+    /// 현재 유저 경험치에 값을 누적 및 저장하는 메서드
+    /// 누적된 경험치가 500 이상 -> 레벨 1 상승
+    /// </summary>
+    /// <param name="addAmount">추가할 경험치 양</param>
+    public async UniTask UpdateUserExpAsync(int addAmount)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+
+        DatabaseReference expRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Exp");
+        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Level");
+
+        // 현재 경험치 로드
+        DataSnapshot expSnapshot = await expRef.GetValueAsync();
+        int currentExp = 0;
+
+        if (expSnapshot.Exists && expSnapshot.Value != null)
+        {
+            currentExp = Convert.ToInt32(expSnapshot.Value);
+        }
+
+        // 현재 레벨 로드
+        DataSnapshot levelSnapshot = await levelRef.GetValueAsync();
+        int currentLevel = 0;
+
+        if (levelSnapshot.Exists && levelSnapshot.Value != null)
+        {
+            currentLevel = Convert.ToInt32(levelSnapshot.Value);
+        }
+
+        if (currentLevel == 300) return;
+
+        // 경험치 누적
+        int totalExp = currentExp + addAmount;
+        int maxExp = 500;
+
+        // 레벨업 수치
+        int levelUpCount = totalExp / maxExp;   
+        int remainingExp = totalExp % maxExp;  
+
+        if (levelUpCount > 0)
+        {
+            currentLevel += levelUpCount;
+
+            if (currentLevel >= 300)
+            {
+                currentLevel = 300;
+            }
+
+            await levelRef.SetValueAsync(currentLevel);
+            Debug.Log($"레벨업: {levelUpCount} / 현재 레벨: {currentLevel}");
+        }
+
+        await expRef.SetValueAsync(remainingExp);
+        Debug.Log($"경험치 {addAmount} 증가: {currentExp} -> {remainingExp}");
+    }
 }
+
+#endregion
