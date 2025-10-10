@@ -24,7 +24,7 @@ public class Reward_Controller
         StageInGameRewardType[] stageInGameRewardTypes = new StageInGameRewardType[source.Length];
         Array.Copy(source, stageInGameRewardTypes, source.Length);
 
-        GetInGameReward(stageInGameRewardTypes);
+        GetInGameReward(stageInGameRewardTypes, action);
     }
 
     public void GetInGameReward(StageInGameRewardType[] stageInGameRewardTypes, UnityAction action = null)

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class SynergySlot_New : MonoBehaviour, IPointerDownHandler
+public class SynergySlot_New : MonoBehaviour, IDragHandler, IEndDragHandler, IBeginDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] Image _icon;
     [SerializeField] SynergyActiveSlot_Controller _synergyActiveSlot_Controller;
@@ -53,10 +53,33 @@ public class SynergySlot_New : MonoBehaviour, IPointerDownHandler
         }
     }
 
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (_synergyData == null) return;
+
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        _synergyToolTip.Close();
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (_synergyData == null) return;
+
+        _synergyToolTip.Show(eventData, _synergyData); 
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         if (_synergyData == null) return;
 
         _synergyToolTip.Show(eventData, _synergyData);
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        _synergyToolTip.Close();
     }
 }

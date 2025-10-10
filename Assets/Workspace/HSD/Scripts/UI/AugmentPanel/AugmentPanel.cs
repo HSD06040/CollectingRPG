@@ -24,8 +24,9 @@ public class AugmentPanel : MonoBehaviour
     }
 #endif
 
-    private void Awake()
+    private void Start()
     {
+        _group.Reset();
         _originY = _augmentPanel.anchoredPosition.y;
         _downY = _augmentPanel.anchoredPosition.y - _yOffset;
 

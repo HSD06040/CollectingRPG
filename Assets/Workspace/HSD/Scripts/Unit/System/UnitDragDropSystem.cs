@@ -210,7 +210,7 @@ public class UnitDragDropSystem : MonoBehaviour
                         isEnemy
                     );
 
-                    ToolTipController.SynergyToolTip.Close();
+                    SynergyToolTipClose();
                 }
             }
             else if (_pressedObject.CompareTag("BattleUnit"))
@@ -227,14 +227,19 @@ public class UnitDragDropSystem : MonoBehaviour
                         isEnemy
                     );
 
-                    ToolTipController.SynergyToolTip.Close();
+                    SynergyToolTipClose();
                 }
             }
             return;
         }
 
         ToolTipController.UnitToolTip.Close();
-        ToolTipController.SynergyToolTip.Close();
+        SynergyToolTipClose();
+    }
+
+    private void SynergyToolTipClose()
+    {
+        //ToolTipController.SynergyToolTip.Close();
     }
 
     /// <summary>
