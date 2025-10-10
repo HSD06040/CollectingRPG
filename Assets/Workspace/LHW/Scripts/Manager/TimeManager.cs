@@ -168,7 +168,7 @@ public class TimeManager : MonoBehaviour
 
             SaveAdGachaTime(GachaType.Char);
         }
-        if(_dailyStoneAdGachaRewardInfo.state < 2 && IsDailyCharAdGachaResetTime(out int stack2))
+        if(_dailyStoneAdGachaRewardInfo.state < 2 && IsDailyStoneAdGachaResetTime(out int stack2))
         {
             _dailyStoneAdGachaRewardInfo.state += stack2;
             if (_dailyStoneAdGachaRewardInfo.state > 2) _dailyStoneAdGachaRewardInfo.state = 2;
