@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class PlayerDataView : MonoBehaviour
 {
@@ -13,7 +14,8 @@ public class PlayerDataView : MonoBehaviour
 
     private List<TMP_Text> staminaTimerTexts = new List<TMP_Text>();
     
-
+    private List<Image> expBars = new();
+    
     private void OnEnable()
     {
         if (cachedTexts.Count > 0)
@@ -45,6 +47,8 @@ public class PlayerDataView : MonoBehaviour
             string textValue = FormatValue(field.Name, value,data);
             UpdateTextsByName(field.Name + "Text", textValue);
         }
+
+        UpdateExpBar(data);
 
         //  _playerNameText.text = data.PlayerName;
         //  _goldText.text = $"{data.Gold}";
@@ -108,6 +112,39 @@ public class PlayerDataView : MonoBehaviour
         }
     }
 
+    // 유저 경험치 게이지바 업데이트
+    private void UpdateExpBar(PlayerData data)
+    {
+        if (expBars.Count == 0)
+        {
+            var allImages = FindObjectsOfType<Image>(true);
+            foreach (var img in allImages)
+            {
+                if (img.name.Equals("TopPanel_PlayerExpBar (1)", StringComparison.OrdinalIgnoreCase))
+                {
+                    expBars.Add(img);
+                }
+            }
+
+            if (expBars.Count == 0)
+            {
+                return;
+            }
+        }
+
+        float ratio = 0f;
+        int maxExp = data.MaxExp > 0 ? data.MaxExp : 500;
+        ratio = Mathf.Clamp01((float)data.PlayerExp / maxExp);
+
+        foreach (var bar in expBars)
+        {
+            if (bar != null)
+            {
+                bar.fillAmount = ratio;
+            }
+        }
+    }
+
     // 값 포맷팅
     private string FormatValue(string fieldName, object value, PlayerData data = null)
     {
@@ -127,10 +164,12 @@ public class PlayerDataView : MonoBehaviour
         {
             "Gold" => $"{value:N0}", 
             "Diamond" => $"{value:N0}", 
+            "PlayerLevel" => $"{value:N0}",
+            "PlayerExp" => data != null ? $"{data.PlayerExp}/{data.MaxExp}" : $"{value}",
             "Stamina" => data != null ? $"{data.Stamina}/{data.MaxStamina}" : $"{value}",
             "MaxStamina" => "",
-            _ => value?.ToString() ?? ""
-            
+            _ => value?.ToString() ?? "",
+
         };
         Debug.Log($"result: {result}");
         return result;

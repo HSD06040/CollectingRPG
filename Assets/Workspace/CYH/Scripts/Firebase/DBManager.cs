@@ -142,7 +142,9 @@ public class DBManager : Singleton<DBManager>
             Diamond = int.TryParse(snapshot.Child("Diamond").Value?.ToString(), out int diamond) ? diamond : 0,
             Stamina = recoveredStamina,
             MaxStamina = 30,
-            LastStaminaRecoveryTime = newRecoveryTime
+            LastStaminaRecoveryTime = newRecoveryTime,
+            PlayerLevel = int.TryParse(snapshot.Child("Level").Value?.ToString(), out int levelValue) ? levelValue : 1,
+            PlayerExp = int.TryParse(snapshot.Child("Exp").Value?.ToString(), out int expValue) ? expValue : 0
         };
 
         //await charDB.InitializeCharacterData();
@@ -928,7 +930,7 @@ public class DBManager : Singleton<DBManager>
     public async UniTask<int> LoadUserLevelAsync()
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
-        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Level");
+        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Level");
         DataSnapshot snapshot = await levelRef.GetValueAsync();
 
         int level = 0;
@@ -939,8 +941,8 @@ public class DBManager : Singleton<DBManager>
         }
         else
         {
-            await levelRef.SetValueAsync(0);
-            Debug.Log("현재 유저 레벨 x / 0 으로 초기화");
+            await levelRef.SetValueAsync(1);
+            Debug.Log("현재 유저 레벨 x / 1 으로 초기화");
         }
 
         return level;
@@ -953,7 +955,7 @@ public class DBManager : Singleton<DBManager>
     public async UniTask<int> LoadUserExpAsync()
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
-        DatabaseReference expRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Exp");
+        DatabaseReference expRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Exp");
         DataSnapshot snapshot = await expRef.GetValueAsync();
 
         int exp = 0;
@@ -972,6 +974,28 @@ public class DBManager : Singleton<DBManager>
     }
 
     /// <summary>
+    /// 현재 유저의 레벨을 저장하는 메서드
+    /// </summary>
+    /// <param name="level">저장할 레벨 값</param>
+    public async UniTask SaveUserLevelAsync(int level)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Level");
+        await levelRef.SetValueAsync(level);
+    }
+
+    /// <summary>
+    /// 현재 유저의 레벨을 저장하는 메서드
+    /// </summary>
+    /// <param name="level">저장할 레벨 값</param>
+    public async UniTask SaveUserExpAsync(int exp)
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Exp");
+        await levelRef.SetValueAsync(exp);
+    }
+
+    /// <summary>
     /// 현재 유저 경험치에 값을 누적 및 저장하는 메서드
     /// 누적된 경험치가 500 이상 -> 레벨 1 상승
     /// </summary>
@@ -980,8 +1004,8 @@ public class DBManager : Singleton<DBManager>
     {
         string uid = FirebaseManager.Auth.CurrentUser.UserId;
 
-        DatabaseReference expRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Exp");
-        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("CharacterData").Child("Level");
+        DatabaseReference expRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Exp");
+        DatabaseReference levelRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("Level");
 
         // 현재 경험치 로드
         DataSnapshot expSnapshot = await expRef.GetValueAsync();

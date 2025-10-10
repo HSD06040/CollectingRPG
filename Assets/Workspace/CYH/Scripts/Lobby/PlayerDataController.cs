@@ -1,12 +1,12 @@
-using UnityEngine;
 using Firebase.Database;
 using System;
 using System.Collections;
+using UnityEngine;
 
 public class PlayerDataController : MonoBehaviour
 {
     [SerializeField] private PlayerDataView _view;
- 
+
     private DatabaseReference _userRef;
     private PlayerData _data;
 
@@ -14,9 +14,9 @@ public class PlayerDataController : MonoBehaviour
 
     public Action<PlayerData> OnPlayerProfilePopupUpdated;
     public Action<PlayerData> OnUpdateUI;
-    
-    public Action<int> OnStaminaRecoveryTimer; 
-    
+
+    public Action<int> OnStaminaRecoveryTimer;
+
     // 스테미나 타이머 관련
     private Coroutine _staminaTimer;
     private float _nextStaminaRecoveryTime;
@@ -97,8 +97,8 @@ public class PlayerDataController : MonoBehaviour
                 // 매초마다 남은 시간 계산 및 UI 업데이트
                 int timeUntilNext = DBManager.Instance.GetTimeUntilNextStaminaRecovery(_data.LastStaminaRecoveryTime);
                 OnStaminaRecoveryTimer?.Invoke(timeUntilNext);
-                
-                if (timeUntilNext <= 1) 
+
+                if (timeUntilNext <= 1)
                 {
                     StartCoroutine(CheckAndRecoverStaminaCoroutine());
                 }
@@ -107,7 +107,7 @@ public class PlayerDataController : MonoBehaviour
             {
                 OnStaminaRecoveryTimer?.Invoke(0);
             }
-            
+
             yield return new WaitForSeconds(1f);
         }
     }
@@ -115,23 +115,23 @@ public class PlayerDataController : MonoBehaviour
     private IEnumerator CheckAndRecoverStaminaCoroutine()
     {
         var (recoveredStamina, newRecoveryTime) = DBManager.Instance.CalculateStaminaRecovery(_data.Stamina, _data.LastStaminaRecoveryTime);
-        
+
         if (recoveredStamina != _data.Stamina)
         {
             // 스테미나가 회복되었다면 DB에 저장하고 UI 업데이트
             var saveTask = DBManager.Instance.SaveStaminaAsync(recoveredStamina, newRecoveryTime);
-            
+
             // Task가 완료될 때까지 대기
             while (!saveTask.IsCompleted)
             {
                 yield return null;
             }
-            
+
             if (saveTask.Result)
             {
                 _data.Stamina = recoveredStamina;
                 _data.LastStaminaRecoveryTime = newRecoveryTime;
-                
+
                 // UI 업데이트는 Firebase ValueChanged 이벤트에서 처리됨
                 Debug.Log($"스테미나 자동 회복: {_data.Stamina}/{_data.MaxStamina}");
             }
@@ -152,7 +152,7 @@ public class PlayerDataController : MonoBehaviour
         }
 
         bool result = await DBManager.Instance.ConsumeStaminaAsync(amount);
-        
+
         if (result)
         {
             Debug.Log($"스테미나 사용: {amount} (남은 스테미나: {_data.Stamina - amount})");
@@ -188,7 +188,7 @@ public class PlayerDataController : MonoBehaviour
         }
 
         DataSnapshot snapshot = changeEvent.Snapshot;
-        
+
         Debug.Log("데이터 변경");
 
         PlayerData data = new PlayerData
@@ -199,7 +199,9 @@ public class PlayerDataController : MonoBehaviour
             Diamond = int.TryParse(snapshot.Child("Diamond").Value?.ToString(), out int diamond) ? diamond : 0,
             Stamina = int.TryParse(snapshot.Child("Stamina").Value?.ToString(), out int stamina) ? stamina : 30,
             MaxStamina = 30,
-            LastStaminaRecoveryTime = long.TryParse(snapshot.Child("LastStaminaRecoveryTime").Value?.ToString(), out long recoveryTime) ? recoveryTime : DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            LastStaminaRecoveryTime = long.TryParse(snapshot.Child("LastStaminaRecoveryTime").Value?.ToString(), out long recoveryTime) ? recoveryTime : DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            PlayerLevel = int.TryParse(snapshot.Child("Level").Value?.ToString(), out int levelValue) ? levelValue : 1,
+            PlayerExp = int.TryParse(snapshot.Child("Exp").Value?.ToString(), out int expValue) ? expValue : 0
         };
 
         Debug.Log($"[OnPlayerDataChanged] UI 업데이트 / UID: {FirebaseManager.Auth.CurrentUser.UserId}");
