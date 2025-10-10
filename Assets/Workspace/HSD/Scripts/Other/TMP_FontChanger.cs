@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -70,3 +71,4 @@ public class TMP_FontChanger : MonoBehaviour
         Debug.Log($"완료! {changedCount}개의 프리팹에서 폰트가 변경되었습니다.");
     }
 }
+#endif

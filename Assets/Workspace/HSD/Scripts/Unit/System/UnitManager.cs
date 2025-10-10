@@ -59,14 +59,15 @@ public class UnitManager : MonoBehaviour
     }
 
     private async void InitAsync()
-    {        
+    {
+#if UNITY_EDITOR
         if (IsTest)
         {
             await Manager.Resources.LoadLabel("Stage");
             Manager.Data.StageGameData.SetStage(_testRegionIndex, _testStageIndex);
             await Manager.Data.StageGridData.SetGridData();
         }
-
+#endif
         if (!InGameManager.Instance.IsOneBattle)
         {
             MapPlayerTracker.Instance.unitManager = this;
