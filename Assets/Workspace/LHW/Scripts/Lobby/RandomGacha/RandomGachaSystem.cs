@@ -85,9 +85,6 @@ public class RandomGachaSystem : MonoBehaviour
         _dailyStoneButton.onClick.AddListener(StoneAdButtonClick);
         _oneStoneGachaButton.onClick.AddListener(StoneOneButtonClick);
         _tenStoneGachaButton.onClick.AddListener(() => ConsumeGoodsButtonClick(GachaType.Stone, 10));
-
-        // 테스트 기능
-        //_testCharacterGachaButton.onClick.AddListener(TestItemSelect);
     }
 
     /// <summary>
@@ -346,29 +343,6 @@ public class RandomGachaSystem : MonoBehaviour
         }
     }
 
-    #region DB Test
-
-    /// <summary>
-    /// 데이터베이스 연동 테스트용 기능. 1회 뽑기와 동일 로직
-    /// </summary>
-    private async void TestItemSelect()
-    {
-        UnitData data = _testData;
-
-        // 조각 등장 확률도 나중에 가중치로 전환되면 가중치로 적용 필요
-        int pieceNum = UnityEngine.Random.Range(1, 11);
-
-        _testData.UpgradeData.AddPiece(pieceNum);
-
-        _resultUI.HeroGachaUpdate(data, 0, pieceNum.ToString());
-
-        await DBManager.Instance.charDB.SaveCharacterUpgradeData(_testData);
-
-        _resultUI.gameObject.SetActive(true);
-    }
-
-    #endregion
-
     #endregion
 
     #region 가중치 확률 선택
@@ -580,7 +554,7 @@ public class RandomGachaSystem : MonoBehaviour
         {
             data.UpgradeData.AddPiece(pieces);
 
-            //await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(data);
+            await DBManager.Instance.magicStoneDB.SaveMagicStoneUpgradeData(data);
         }
 
         _resultUI.StoneGachaUpdate(data, index, pieces.ToString());
