@@ -120,7 +120,10 @@ public class ShopUIController : MonoBehaviour
         {
             if (TimeManager.Instance != null)
             {
-                bool isResetTime = TimeManager.Instance.LoadDailyShopResetTime(out DateTime nextDate);
+                var loadTask = TimeManager.Instance.LoadDailyShopResetTime();
+                yield return new WaitUntil(() => loadTask.IsCompleted);
+
+                bool isResetTime = loadTask.Result;
 
                 if (_initialized && isResetTime)
                 {
@@ -130,6 +133,7 @@ public class ShopUIController : MonoBehaviour
                 }
 
                 DateTime now = DateTime.Now;
+                DateTime nextDate = TimeManager.Instance.GetDailyShopResetTime();
                 TimeSpan cooltime = nextDate - now;
                 _dailyResetText.text = $"다음 초기화 : {cooltime.Hours}시간 {cooltime.Minutes}분";
             }

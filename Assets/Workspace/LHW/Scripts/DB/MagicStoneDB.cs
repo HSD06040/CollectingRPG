@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using Firebase.Database;
 using UnityEngine;
 
-public class MagicStoneDB : MonoBehaviour
+public class MagicStoneDB
 {
     private DatabaseReference _characterReference;
     private string _uid => FirebaseManager.Auth.CurrentUser.UserId;
@@ -40,8 +40,8 @@ public class MagicStoneDB : MonoBehaviour
         {
             foreach (var child in dataSnapshot.Children)
             {
-                string charName = child.Key;
-                UnitData data = Manager.Data.GetUnitData(charName);
+                string stoneName = child.Key;
+                MagicStone data = Manager.Data.GetMagicStoneData(stoneName);
 
                 if (data != null)
                 {

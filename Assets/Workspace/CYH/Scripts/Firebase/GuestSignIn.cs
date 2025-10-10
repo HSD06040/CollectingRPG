@@ -69,6 +69,9 @@ public class GuestSignIn : MonoBehaviour
             SetTutorialInCompleteAsync();
             // 유저 재화 생성
             await Manager.DB.SaveCurrencyAsync(30, 50);
+            // 유저 레벨, 경험치 생성
+            await Manager.DB.SaveUserLevelAsync(1);
+            await Manager.DB.SaveUserExpAsync(0);
 
             // SignInPanel -> Tutorial패널 로 변경
             if (currentUser != null)

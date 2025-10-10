@@ -168,15 +168,23 @@ public class DataManager : Singleton<DataManager>
     {
         MagicStones = await Manager.Resources.LoadAll<MagicStone>("MagicStone");
 
+        MagicStoneDic = new Dictionary<string, MagicStone>();
+
         foreach (var magicStone in MagicStones)
         {
+            if (!MagicStoneDic.ContainsKey(magicStone.Name))
+                MagicStoneDic.Add(magicStone.Name, magicStone);
+
             magicStone.Init();
         }
     }
 
     public MagicStone GetMagicStoneData(string magicStoneName)
     {
-        if(!MagicStoneDic.ContainsKey(magicStoneName))
+        if (MagicStoneDic == null)
+            MagicStoneDic = new Dictionary<string, MagicStone>();
+
+        if (!MagicStoneDic.ContainsKey(magicStoneName))
         {
             foreach (var data in MagicStones)
             {
