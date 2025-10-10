@@ -217,6 +217,7 @@ MonoBehaviour:
   _stageImage: {fileID: 1808766959095261688}
   _stageName: {fileID: 8594170513709827488}
   _stageDescription: {fileID: 2825987757334514150}
+  _rewardCheckButton: {fileID: 1874408786448952000}
 --- !u!114 &9122442659620462189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1069,4 +1070,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 342675622946397438}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5928237605199461257}
+        m_TargetAssemblyTypeName: StagePanel, Assembly-CSharp
+        m_MethodName: StageRewardPanelOpen
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

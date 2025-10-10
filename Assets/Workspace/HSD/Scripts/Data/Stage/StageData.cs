@@ -17,21 +17,22 @@ public class StageData : ScriptableObject
     public int MaxStageNumber;
     public Sprite RegionImage;
     public Sprite RegionPreviewSprite;
+    public Sprite RewardImage;
     public GameObject Map => Manager.Resources.Load<GameObject>($"Stage{RegionNumber}Map");
 
-    private static readonly Dictionary<int, OutGameRewardData[]> _firstRewardDic = new Dictionary<int, OutGameRewardData[]>();
-    private static readonly Dictionary<int, OutGameRewardData[]> _rewardDic = new Dictionary<int, OutGameRewardData[]>();
+    private readonly Dictionary<int, OutGameRewardData[]> _firstRewardDic = new Dictionary<int, OutGameRewardData[]>();
+    private readonly Dictionary<int, OutGameRewardData[]> _rewardDic = new Dictionary<int, OutGameRewardData[]>();
 
-    public OutGameRewardData[] GetStageFirstReward(int stageNumber)
+    public OutGameRewardData[] GetStageFirstRewardAndClear(int stageNumber)
     {
         if (_firstRewardGainDic.TryGetValue(stageNumber, out bool stageRewardGain))
         {
             if (stageRewardGain)
             {
-                UIManager.Instance.MessagePopup.Show($"이미 {RegionNumber}-{stageNumber}의 최초 클리어 보상을 획득했습니다.");                
+                UIManager.Instance.MessagePopup.Show($"이미 {RegionNumber}-{stageNumber}의 최초 클리어 보상을 획득했습니다.");
                 return null;
             }
-        }        
+        }
 
         if (!_firstRewardDic.ContainsKey(stageNumber))
         {
@@ -39,6 +40,16 @@ public class StageData : ScriptableObject
         }
 
         SetClearProof(stageNumber, true);
+        return _firstRewardDic[stageNumber];
+    }
+
+    public OutGameRewardData[] GetStageFirstReward(int stageNumber)
+    {
+        if (!_firstRewardDic.ContainsKey(stageNumber))
+        {
+            InitFistReward();
+        }
+
         return _firstRewardDic[stageNumber];
     }
 
@@ -83,7 +94,7 @@ public class StageData : ScriptableObject
         {
             _clearProofDic.Add(stageNumber, isCleared);
         }
-        Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 클리어 증명 로컬 세팅 완료: {isCleared}");
+        Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 클리어 증명 로컬 세팅 완료: {isCleared}");   
     }
 
     public void SetFirstRewardGainProof(int stageNumber, bool isGain)

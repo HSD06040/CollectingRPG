@@ -56,7 +56,7 @@ public class Reward_UI : MonoBehaviour
         {
             count++;
             var rewardData = outGameRewardDatas[i];
-            var icon = GetRewardSprite(rewardData);
+            var icon = rewardData.GetRewardSprite();
 
             _rewardSlots[i].Setup(icon, rewardData.Amount);
         }
@@ -78,7 +78,7 @@ public class Reward_UI : MonoBehaviour
         {
             count++;
             var rewardData = inGameRewardDatas[i];
-            var icon = GetRewardSprite(rewardData);
+            var icon = rewardData.GetRewardSprite();
 
             _rewardSlots[i].Setup(icon, rewardData.Amount);
         }
@@ -109,28 +109,6 @@ public class Reward_UI : MonoBehaviour
     {
         _rewardSlotGroup.FadeOut(_fadeDuration, false).Forget();
         await _rewardGroup.FadeOut(_fadeDuration, false);
-    }
-
-    private Sprite GetRewardSprite(OutGameRewardData rewardData)
-    {
-        return rewardData.RewardType switch
-        {
-            OutGameRewardType.Diamond => Manager.Resources.SpriteLoad("Diamond"),
-            OutGameRewardType.Gold => Manager.Resources.SpriteLoad("Gold"),
-            OutGameRewardType.Exp => Manager.Resources.SpriteLoad("Exp"),
-            _ => null,
-        };
-    }
-
-    private Sprite GetRewardSprite(StageInGameRewardType rewardData)
-    {
-        return rewardData.RewardType switch
-        {
-            InGameRewardType.Silver => Manager.Resources.SpriteLoad("Silver"),
-            InGameRewardType.Energy => Manager.Resources.SpriteLoad("Energy"),
-            InGameRewardType.MagicStone => rewardData.MagicStoneData != null ? rewardData.MagicStoneData.Icon : null,
-            _ => null,
-        };
     }
 
     private void ButtonEventSubcribe(UnityAction unityAction)

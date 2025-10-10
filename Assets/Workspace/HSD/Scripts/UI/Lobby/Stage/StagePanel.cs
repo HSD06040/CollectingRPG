@@ -1,4 +1,5 @@
 using TMPro;
+using UnityEditor.U2D.Aseprite;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -14,17 +15,20 @@ public class StagePanel : MonoBehaviour
     [SerializeField] Image _stageImage;
     [SerializeField] TMP_Text _stageName;
     [SerializeField] TMP_Text _stageDescription;
+    [SerializeField] Button _rewardCheckButton;
     private StageData _stageData;
-    
+    private StageRewardPanel _stageRewardPanel;
+
     private void OnEnable()
     {
         StageOpenCheck();
         StageClearCheck();
     }
 
-    public void Init(StageData stageData)
+    public void Init(StageData stageData, StageRewardPanel stageRewardPanel)
     {
         _stageData = stageData;
+        _stageRewardPanel = stageRewardPanel;
 
         //_applyButton.onClick.AddListener(); !확인 버튼 클릭 시 추가필요!
         _stageButtons = new StageSelectButton[4];
@@ -47,6 +51,11 @@ public class StagePanel : MonoBehaviour
         _stageImage.sprite = stageData.RegionImage;
         _stageName.text = $"{stageData.RegionNumber}. {stageData.StageName}";
         _stageDescription.text = stageData.StageDescription;
+    }
+
+    public void StageRewardPanelOpen()
+    {
+        _stageRewardPanel.Setup(_stageData);
     }
 
     private void StageOpenCheck()
