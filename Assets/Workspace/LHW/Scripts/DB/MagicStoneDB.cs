@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using Firebase.Database;
 using UnityEngine;
 
-public class MagicStoneDB : MonoBehaviour
+public class MagicStoneDB
 {
     private DatabaseReference _characterReference;
     private string _uid => FirebaseManager.Auth.CurrentUser.UserId;
