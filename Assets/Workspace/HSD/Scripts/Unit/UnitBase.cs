@@ -100,6 +100,7 @@ public class UnitBase : MonoBehaviour, IAttacker
             TriggerCol.enabled = false;
 
         tag = "BattleUnit";
+        transform.GetChild(0).gameObject.tag = "BattleUnit";
         StatusController.UnitFXController.BattleSetting();
         StatusController.UnitFXController.SortingLayer(line);
     }

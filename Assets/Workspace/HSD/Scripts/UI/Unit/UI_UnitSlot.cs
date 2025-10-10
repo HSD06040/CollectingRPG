@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPointerUpHandler, IPointerDownHandler
+public class UI_UnitSlot : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private UnitStatus _unit;
     [SerializeField] private Image _unitIcon;
@@ -98,7 +98,7 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
     }
 
     #region Drag&Drop
-    public void OnBeginDrag(PointerEventData eventData)
+    public void OnBeginDrag()
     {
         if (_unit == null) return;
 

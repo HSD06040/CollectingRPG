@@ -9,7 +9,8 @@ public class UnitSkillUI : MonoBehaviour
     [SerializeField] Image _skillIcon;
     [SerializeField] TMP_Text _skillNameText;
     [SerializeField] TMP_Text _manaText;
-    [SerializeField] TMP_Text _skillPowerText;
+    [SerializeField] TMP_Text _skillPhysicalPowerText;
+    [SerializeField] TMP_Text _skillMagicPowerText;
     [SerializeField] TMP_Text _skillDescriptionText;
 
     public void Setup(UnitStatus status)
@@ -19,7 +20,8 @@ public class UnitSkillUI : MonoBehaviour
         _skillIcon.sprite = skill.Icon;
         _skillNameText.text = skill.SkillName;
         _manaText.text = skill.ManaCost.ToString();
-        _skillPowerText.text = skill.PhysicalPower.ToString();
+        _skillPhysicalPowerText.text = skill.PhysicalPower.ToString();
+        _skillMagicPowerText.text = skill.AbilityPower.ToString();
         _skillDescriptionText.text = GetDescription(skill, status);
     }
 

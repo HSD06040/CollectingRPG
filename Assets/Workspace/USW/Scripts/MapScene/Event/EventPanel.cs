@@ -77,6 +77,9 @@ namespace Map
 
             _titleText.text = eventData._eventTitle;
             _descriptionText.text = eventData._eventDescription;
+
+            _yesButton.interactable = true;
+            _nvmButton.interactable = true;
             
             if (_yesButton != null)
             {
@@ -103,6 +106,8 @@ namespace Map
         private void OnChoiceSelected(bool acceptChallenge)
         {
             _descriptionCanvasGroup.interactable = false;
+            _yesButton.interactable = false;
+            _nvmButton.interactable = false;
 
             ShowResultWithFade(acceptChallenge).Forget();
         }
@@ -176,7 +181,7 @@ namespace Map
 
             if (stageRewards.Count > 0)
             {
-                UIManager.Instance.Reward_UI.Show(stageRewards.ToArray());
+                Manager.Game.Reward_Controller.GetInGameReward(stageRewards.ToArray());
             }
             else
             {

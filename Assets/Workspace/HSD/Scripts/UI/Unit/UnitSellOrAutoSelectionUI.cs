@@ -23,7 +23,7 @@ public class UnitSellOrAutoSelectionUI : UIBase
         gameObject.SetActive(true);
 
         _currentUnit = unit;
-        _sellGold = (unit.Level + 1) * 20;
+        _sellGold = Manager.Data.CharacterSellAmountData.GetSellAmount(unit.Level);        
 
         _sellAmountText.text = Utils.ToAbbreviation(_sellGold);
 
@@ -33,10 +33,12 @@ public class UnitSellOrAutoSelectionUI : UIBase
         if (isUI)
         {
             _sellButton.onClick.AddListener(SellUI);
+            _autoSelectionButton.gameObject.SetActive(true);
         }
         else
         {
             _sellButton.onClick.AddListener(SellBattleUnit);
+            _autoSelectionButton.gameObject.SetActive(false);
         }
 
         _autoSelectionButton.onClick.AddListener(AutoSelection);
@@ -47,13 +49,13 @@ public class UnitSellOrAutoSelectionUI : UIBase
 
     private void SellBattleUnit()
     {
-        InGameManager.Instance.AddSilver(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
+        InGameManager.Instance.AddEnergy(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
         _unitManager.UnitController.RemoveUnit(_currentUnit);
     }
 
     private void SellUI()
     {
-        InGameManager.Instance.AddSilver(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
+        InGameManager.Instance.AddEnergy(Manager.Data.CharacterSellAmountData.GetSellAmount(_currentUnit.Level));
         _unitManager.UnitController.UISlotController.ClearSlot(_currentUnit);
     }
 
