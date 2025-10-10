@@ -11,7 +11,13 @@ public class SynergyLevelData
 
 public abstract class SynergyData : ScriptableObject
 {
-    public Sprite Icon;
+    public Sprite ActiveIcon => Manager.Resources.SpriteLoad(activeIconAddress);
+    public Sprite DeActiveIcon => Manager.Resources.SpriteLoad(deActiveIconAddress);
+    protected string activeIconAddress;
+    protected string deActiveIconAddress;
+    [Space]
+
+    public Color SynergyColor;
     public string SynergyName;
     [TextArea]
     public string Description;

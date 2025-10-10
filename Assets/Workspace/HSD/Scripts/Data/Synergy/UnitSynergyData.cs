@@ -11,5 +11,11 @@ public class UnitSynergyData : SynergyData
     {
         base.Init();
         _synergy = (int)Synergy;
+
+        string synergy = Synergy.ToString();
+        synergy = $"{char.ToUpper(synergy[0])}{synergy.Substring(1).ToLower()}";
+
+        deActiveIconAddress = $"{synergy}_DeActive";
+        activeIconAddress = $"{synergy}_Active";
     }
 }

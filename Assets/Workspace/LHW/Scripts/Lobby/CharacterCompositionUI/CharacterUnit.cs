@@ -15,19 +15,15 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
     [SerializeField] UnitData _unitData;
 
     [Header("UI")]
-    //[SerializeField] private TMP_Text _charText;
+    [SerializeField] private Image _cardImage;
     [SerializeField] private Image _characterImg;
-    [SerializeField] private Image _costImg;
-    [SerializeField] private Image _jobSynergyImg;
     [SerializeField] private Image _roleSynergyImg;
-    [SerializeField] private TMP_Text _overallPowerText;
     [SerializeField] private TMP_Text _levelText;
-    [SerializeField] private Image _pieceGauge;
-    [SerializeField] private TMP_Text _pieceNum;
+    [SerializeField] private TMP_Text _nameText;
     [SerializeField] private Image _selectedImage;
 
     [Header("Reference")]
-    [SerializeField] ImageSO _costImages;
+    [SerializeField] private Sprite[] _gradeSprite;
 
 
     private bool _isCollected = true;
@@ -111,34 +107,16 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
 
     private void UIUpdate()
     {
-        //_charText.text = $"{_status.Data.Name}";
+        _cardImage.sprite = _gradeSprite[(int)_status.Data.Grade];
         _characterImg.sprite = _status.Data.Icon;
-        _costImg.sprite = _costImages.CostSprites[_status.Data.Cost - 1];
         if (Manager.Data.SynergyDB != null)
         {
-            _jobSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.Synergy).Icon;
-            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).Icon;
+            _roleSynergyImg.sprite = Manager.Data.SynergyDB.GetSynergy((int)_status.Data.ClassSynergy).ActiveIcon;
         }
-        _overallPowerText.text = $"{_status.CombatPower}";
         _levelText.text = $"Lv.{_status.Level}";
-        // 캐릭터 데이터 업데이트 되면 사용 예정
-        //GaugeUpdate();
+        _nameText.text = _status.Data.Name;
 
         SelectedUpdate();
-    }
-
-    private void GaugeUpdate()
-    {
-        int requirePiece = _status.Data.UpgradeData.GetRequiredPiece();
-        if (_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
-        {
-            _pieceGauge.fillAmount = 0;
-        }
-        else
-        {
-            _pieceGauge.fillAmount = (float)_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
-        }
-        _pieceNum.text = $"{_status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
     }
 
     private void SelectedUpdate()
@@ -157,8 +135,7 @@ public class CharacterUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandl
             }
             
             if(i == 4) _selectedImage.gameObject.SetActive(false);
-        }
-        
+        }        
     }
 
     #endregion

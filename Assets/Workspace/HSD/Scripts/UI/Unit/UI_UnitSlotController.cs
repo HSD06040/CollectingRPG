@@ -60,8 +60,8 @@ public class UI_UnitSlotController : MonoBehaviour
     }
 
     public void ClearSlot(UnitStatus unit)
-    {
-        GetUnitSlot(unit)?.ClearSlot();
+    {        
+        ClearSlot(GetUnitSlot(unit).GetSlotIdx());
     }
 
     /// <summary>

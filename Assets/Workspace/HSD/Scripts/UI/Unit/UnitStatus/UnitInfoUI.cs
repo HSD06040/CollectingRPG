@@ -9,12 +9,9 @@ public class UnitInfoUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] Image _unitIcon;
     [SerializeField] TMP_Text _unitNameText;
-    [SerializeField] TMP_Text _levelText;
-    [SerializeField] TMP_Text _powerText;
+    //[SerializeField] TMP_Text _powerText;
     [SerializeField] Image _synergyImage;
-    [SerializeField] TMP_Text _synergyNameText;
     [SerializeField] Image _classImage;
-    [SerializeField] TMP_Text _classNameText;
 
     [Header("HP_MP")]
     [SerializeField] Slider _hpSlider;
@@ -32,17 +29,17 @@ public class UnitInfoUI : MonoBehaviour
         _unitNameText.text = status.Data.Name;
         _unitIcon.sprite = status.Data.Icon;
 
-        if(status.Data.UpgradeData != null)
-            _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
-        else
-            _levelText.text = "0";
+        //if(status.Data.UpgradeData != null)
+        //    _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
+        //else
+        //    _levelText.text = "0";
 
-        _powerText.text = status.CombatPower.ToString();
+        //_powerText.text = status.CombatPower.ToString();
 
         // isEnemy로 분리
 
-        _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.Synergy).Icon;
-        _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.ClassSynergy).Icon;
+        _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.Synergy).ActiveIcon;
+        _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.ClassSynergy).ActiveIcon;
 
         UnitStats stat = status.GetCurrentStat();
 

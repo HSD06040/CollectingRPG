@@ -201,16 +201,24 @@ public class AddressablesDownloader : MonoBehaviour
 
         foreach (var label in LabelsToDownload)
         {
-            var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);
-            long labelSize = await sizeHandle.ToUniTask();
-            TotalFileSize += labelSize;
-
-            if (labelSize > 0)
+            try
             {
-                Debug.Log($"[어드레서블] '{label}' 라벨 다운로드 크기: {FormatBytes(labelSize)}");
-            }
+                var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);
+                long labelSize = await sizeHandle.ToUniTask();
+                TotalFileSize += labelSize;
 
-            Addressables.Release(sizeHandle);
+                if (labelSize > 0)
+                {
+                    Debug.Log($"[어드레서블] '{label}' 라벨 다운로드 크기: {FormatBytes(labelSize)}");
+                }
+
+                Addressables.Release(sizeHandle);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[어드레서블] '{label}' 라벨의 다운로드 크기 확인 중 오류: {e.Message}");
+                continue;
+            }
         }
 
         Debug.Log($"[어드레서블] 전체 다운로드 크기: {FormatBytes(TotalFileSize)}");
@@ -221,11 +229,19 @@ public class AddressablesDownloader : MonoBehaviour
 
         foreach (var label in LabelsToDownload)
         {
-            var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);  
-            long labelSize = await sizeHandle.ToUniTask();
-            totalSize += labelSize;
-            Debug.Log($"[어드레서블] '{label.labelString}' 라벨 다운로드 크기 {labelSize}...");
-            Addressables.Release(sizeHandle);
+            try
+            {
+                var sizeHandle = Addressables.GetDownloadSizeAsync(label.labelString);
+                long labelSize = await sizeHandle.ToUniTask();
+                totalSize += labelSize;
+                Debug.Log($"[어드레서블] '{label.labelString}' 라벨 다운로드 크기 {labelSize}...");
+                Addressables.Release(sizeHandle);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[어드레서블] '{label.labelString}' 라벨의 다운로드 크기 확인 중 오류: {e.Message}");
+                continue;
+            }            
         }
 
         return totalSize;

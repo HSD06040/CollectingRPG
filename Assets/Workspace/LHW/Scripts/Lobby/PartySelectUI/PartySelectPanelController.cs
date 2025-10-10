@@ -62,6 +62,8 @@ public class PartySelectPanelController : MonoBehaviour
     private async UniTask GameSceneInit()
     {
         await Manager.Resources.LoadLabel("Stage");
+
+        await Manager.Data.StageGridData.SetGridData();
     }
 
     public void ArrangePreset()

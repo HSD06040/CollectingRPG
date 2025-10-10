@@ -14,7 +14,9 @@ public class SplashAttack : UnitAttackData
         base.Attack(attacker);
 
         GameObject effectPrefab = Manager.Resources.Load<GameObject>(EffectAddress);
+
         if (effectPrefab == null) return;
+        if (attacker.GetTarget() == null) return;
 
         GameObject effect = Manager.Resources.Instantiate(effectPrefab, attacker.GetTarget().position, true);
         Manager.Resources.Destroy(effect, 2);
@@ -40,8 +42,11 @@ public class SplashAttack : UnitAttackData
         );
     }
 
+#if UNITY_EDITOR
     public void DrawGizmos(IAttacker attacker)
     {
+        if (attacker == null || attacker.GetTarget() == null) return;
+
         Vector2 targetDir = attacker.GetTargetDir();
 
         switch (_searchType)
@@ -62,4 +67,5 @@ public class SplashAttack : UnitAttackData
                 break;
         } 
     }
+#endif
 }

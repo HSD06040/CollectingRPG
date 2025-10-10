@@ -17,6 +17,19 @@ public enum Synergy
     Length
 }
 #endregion
+public enum OutGameRewardType
+{
+    Diamond,
+    Gold,
+    Exp
+}
+
+public enum InGameRewardType
+{
+    Silver,
+    Energy,
+    MagicStone,
+}
 
 public enum SortingType
 {
@@ -35,6 +48,14 @@ public enum SubGrade
 }
 
 #region Type
+public enum MagicStoneType
+{
+    Attack,
+    Defense,
+    Support,
+    Control
+}
+
 public enum BuffEffect
 {
     Shield,

@@ -317,7 +317,7 @@ public static class Utils
             return $"{(value / 1_000f).ToString("0.#")}k";
 
         return value.ToString();
-    }
+    }    
 
     private static StringBuilder sb = new StringBuilder();
 
@@ -360,7 +360,12 @@ public static class Utils
 
     public static Color GetGradeColor(this UnitStatus status)
     {
-        return status.Data.Grade switch
+        return GetGradeColor(status.Data.Grade);
+    }
+
+    public static Color GetGradeColor(this Grade grade)
+    {
+        return grade switch
         {
             Grade.NORMAL => new Color(173f / 255f, 255f / 255f, 47f / 255f),
             Grade.RARE => new Color32(0x7B, 0x7B, 0xD9, 0xFF),
@@ -381,16 +386,28 @@ public static class Utils
         };
     }
 
+    public static string GetMagicStonTypeKorean(this MagicStoneType magicStoneType)
+    {
+        return magicStoneType switch
+        {
+            MagicStoneType.Attack => "공격형",
+            MagicStoneType.Defense => "방어형",
+            MagicStoneType.Support => "지원형",
+            MagicStoneType.Control => "제어형",
+            _ => "알 수 없음"
+        };
+    }
+
     #endregion
 
     #region UI
     public static void SetupGridLayoutGroup(
-    this GridLayoutGroup gridLayoutGroup,
-    Transform content,
-    int columns,
-    int rows,
-    int offset = 10,
-    bool keepSquare = false)
+        this GridLayoutGroup gridLayoutGroup,
+        Transform content,
+        int columns,
+        int rows,
+        int offset = 10,
+        bool keepSquare = false)
     {
         RectTransform rectTransform = content as RectTransform;
         if (rectTransform == null) return;
@@ -403,32 +420,78 @@ public static class Utils
         float availableHeight = rectTransform.rect.height
                               - gridLayoutGroup.padding.top - gridLayoutGroup.padding.bottom;
 
+        float currentSpacingX = gridLayoutGroup.spacing.x;
+        float currentSpacingY = gridLayoutGroup.spacing.y;
+
         if (!keepSquare)
         {
-            // 기존 방식
-            float totalWidth = availableWidth - (gridLayoutGroup.spacing.x * (columns - 1));
-            float totalHeight = availableHeight - (gridLayoutGroup.spacing.y * (rows - 1));
+            float totalSpacingX = currentSpacingX * (columns - 1);
+            float totalSpacingY = currentSpacingY * (rows - 1);
 
-            float cellWidth = totalWidth / columns;
-            float cellHeight = totalHeight / rows;
+            float totalCellWidth = availableWidth - totalSpacingX;
+            float totalCellHeight = availableHeight - totalSpacingY;
+
+            float cellWidth = totalCellWidth / columns;
+            float cellHeight = totalCellHeight / rows;
 
             gridLayoutGroup.cellSize = new Vector2(cellWidth, cellHeight);
         }
         else
         {
-            // 정사각형 셀 크기
-            float cellWidth = availableWidth / columns;
-            float cellHeight = (availableHeight - (gridLayoutGroup.spacing.y * (rows - 1))) / rows;
-            float cellSize = Mathf.Min(cellWidth, cellHeight);
+            float maxPossibleCellWidth = (availableWidth - (currentSpacingX * (columns - 1))) / columns;
+            float maxPossibleCellHeight = (availableHeight - (currentSpacingY * (rows - 1))) / rows;
+
+            float cellSize = Mathf.Min(maxPossibleCellWidth, maxPossibleCellHeight);
 
             gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
 
-            // spacing.x 재계산
             float totalCellWidth = cellSize * columns;
             float remainingWidth = Mathf.Max(0, availableWidth - totalCellWidth);
-            float spacingX = columns > 1 ? remainingWidth / (columns - 1) : 0;
+            float spacingX = columns > 1 ? remainingWidth / (columns - 1) : currentSpacingX;
 
-            gridLayoutGroup.spacing = new Vector2(spacingX, gridLayoutGroup.spacing.y);
+            gridLayoutGroup.spacing = new Vector2(spacingX, currentSpacingY);
+        }
+    }
+    public static void SetupGridLayoutGroup(
+    this GridLayoutGroup gridLayoutGroup,
+    Transform content,
+    int columns,
+    int rows,
+    Vector2 cellSize,
+    int offset = 10,
+    bool centerContent = true)
+    {
+        if (content is not RectTransform rectTransform) return;
+
+        gridLayoutGroup.cellSize = cellSize;
+        gridLayoutGroup.padding = new RectOffset(offset, offset, offset, offset);
+
+        float availableWidth = rectTransform.rect.width - offset * 2;
+        float availableHeight = rectTransform.rect.height - offset * 2;
+
+        float totalCellsWidth = cellSize.x * columns;
+        float totalCellsHeight = cellSize.y * rows;
+
+        float spacingX = columns > 1 ? (availableWidth - totalCellsWidth) / (columns - 1) : 0f;
+        float spacingY = rows > 1 ? (availableHeight - totalCellsHeight) / (rows - 1) : 0f;
+
+        spacingX = Mathf.Max(0f, spacingX);
+        spacingY = Mathf.Max(0f, spacingY);
+
+        gridLayoutGroup.spacing = new Vector2(spacingX, spacingY);
+
+        if (centerContent)
+        {
+            float usedWidth = totalCellsWidth + spacingX * (columns - 1);
+            float usedHeight = totalCellsHeight + spacingY * (rows - 1);
+
+            float leftoverX = Mathf.Max(0, (availableWidth - usedWidth) / 2f);
+            float leftoverY = Mathf.Max(0, (availableHeight - usedHeight) / 2f);
+
+            gridLayoutGroup.padding.left = offset + Mathf.RoundToInt(leftoverX);
+            gridLayoutGroup.padding.right = offset + Mathf.RoundToInt(leftoverX);
+            gridLayoutGroup.padding.top = offset + Mathf.RoundToInt(leftoverY);
+            gridLayoutGroup.padding.bottom = offset + Mathf.RoundToInt(leftoverY);
         }
     }
     #endregion
@@ -444,7 +507,16 @@ public static class Utils
             MagicDamage = Mathf.RoundToInt(unitStats.MagicDamage * multiply),
 
             PhysicalDefense = Mathf.RoundToInt(unitStats.PhysicalDefense * multiply),
-            MagicDefense = Mathf.RoundToInt(unitStats.MagicDefense * multiply)
+            MagicDefense = Mathf.RoundToInt(unitStats.MagicDefense * multiply),
+
+            CritChance = Mathf.RoundToInt(unitStats.CritChance),
+            ManaGain = Mathf.RoundToInt(unitStats.ManaGain),
+            MaxMana = Mathf.RoundToInt(unitStats.MaxMana),
+            AttackSpeed = unitStats.AttackSpeed,
+            MoveSpeed = unitStats.MoveSpeed,
+
+            AttackRange = Mathf.RoundToInt(unitStats.AttackRange),
+            AttackCount = Mathf.RoundToInt(unitStats.AttackCount)
         };
     }
     #endregion

@@ -10,7 +10,7 @@ public class UpgradeCharacterDataInput : MonoBehaviour
     private void Init()
     {
         units = GetComponentsInChildren<CharacterUpgradeUnit>();
-        for(int i = 0; i < units.Length; i++)
+        for(int i = 0; i < datas.Length; i++)
         {
             units[i].InitUnitStatus(datas[i]);
         }

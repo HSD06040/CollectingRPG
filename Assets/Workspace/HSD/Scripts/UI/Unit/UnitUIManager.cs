@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,37 +8,50 @@ using UnityEngine.UI;
 public class UnitUIManager : MonoBehaviour
 {           
     [SerializeField] Button _fightButton;
-    [SerializeField] GameObject _battleUI;
-    [SerializeField] GameObject _notBattleUI;
+    [SerializeField] CanvasGroup _battleUI;
+    [SerializeField] CanvasGroup _notBattleUI;
+    [SerializeField] CanvasGroup _chestUI;
+
+    [SerializeField] private float _fadeDuration = 0.3f;
 
     [Header("Battle")]
-    public FightUnitSlotController FightSlotController;
     public DamageMeterController DamageMeterController;
     public HpMeterController HpMeterController;
     public SkillPopUpController SkillPopUpController;
     public UnitHealthBarManager UnitHealthBarManager;
+    public BattleUISwitch BattleUISwitch;
 
     [Header("Not Battle")]
+    public GradeChancePanel GradeChancePanel;
     public SynergyPanel SynergyPanel;
-    public SynergySlotPanel SynergySlotPanel;
+    public SynergyPanel SynergySlotPanel;
     public UnitCountPanel UnitCountPanel;
     public UnitTotalPowerPanel[] UnitTotalPowerPanel;
 
     public void BattleUISetting()
     {
-        _battleUI.SetActive(true);        
+        _battleUI.FadeIn(_fadeDuration).Forget();
+        _chestUI.FadeIn(_fadeDuration).Forget();
+
+        BattleUISwitch.Init();
     }
 
     public void StandbyUISetting()
     {
-        _battleUI.SetActive(false);
-        _notBattleUI.SetActive(true);
+        UnitHealthBarManager.Clear();
+
+        _battleUI.FadeOut(_fadeDuration).Forget();
+        _chestUI.FadeOut(_fadeDuration).Forget();
+
         _fightButton.gameObject.SetActive(true);
+
+        _notBattleUI.FadeIn(_fadeDuration).Forget();
     }
 
     public void StandbyUIDeActive()
     {
-        _notBattleUI.SetActive(false);
+        _notBattleUI.FadeOut(_fadeDuration).Forget();
+
         _fightButton.gameObject.SetActive(false);
     }
 }

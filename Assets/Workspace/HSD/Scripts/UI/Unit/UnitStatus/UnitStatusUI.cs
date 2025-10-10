@@ -10,9 +10,7 @@ public class UnitStatusUI : MonoBehaviour
     [SerializeField] TMP_Text _physicalDefenseText;
     [SerializeField] TMP_Text _magicDefenseText;
     [SerializeField] TMP_Text _critChanceText;
-    [SerializeField] TMP_Text _cirtDamageText;
     [SerializeField] TMP_Text _attackSpeedText;
-    [SerializeField] TMP_Text _attackRangeText;
 
     public void Setup(UnitStats stat)
     {
@@ -22,6 +20,5 @@ public class UnitStatusUI : MonoBehaviour
         _magicDefenseText.text = stat.MagicDefense.ToString();
         _critChanceText.text = stat.CritChance.ToString("F1");
         _attackSpeedText.text = stat.AttackSpeed.ToString("F2");
-        _attackRangeText.text = stat.AttackRange.ToString();
     }
 }

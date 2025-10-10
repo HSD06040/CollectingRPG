@@ -2,16 +2,21 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Networking;
 public enum CsvType
 {
     PlayerUnit,
     MonsterSkillData,
     Monster,
-    PlayerSkillData,    
+    PlayerSkillData,
+    StageFirstReward,
+    StageReward,
+    Floor
 }
 
 public class CsvDownloader
@@ -24,7 +29,8 @@ public class CsvDownloader
     private UnitSkill[] _playerSkills;
     private UnitData[] _monsterUnitDatas;
     private UnitAttackData[] _attackDatas;
-    
+    private LevelUpData _levelUpData;
+
     public CsvDownloader(CsvLoadData csvLoadData)
     {
         _csvLoadData = csvLoadData;
@@ -39,6 +45,7 @@ public class CsvDownloader
         _playerSkills = await Manager.Resources.LoadAll<UnitSkill>("SkillData_Player");
         _monsterUnitDatas = await Manager.Resources.LoadAll<UnitData>("EnemyUnitData");
         _attackDatas = await Manager.Resources.LoadAll<UnitAttackData>("AttackData");
+        _levelUpData = await Addressables.LoadAssetAsync<LevelUpData>("Data/LevelUpData");
 
         List<UniTask> tasks = new List<UniTask>(10);
 
@@ -46,8 +53,6 @@ public class CsvDownloader
         {
             tasks.Add(LoadCSV(csvData.GetURL(), GetSetupMethod(csvData.CsvType), csvData.StartLine));
         }
-
-        //await LoadCSV(_csvLoadData.CsvDatas[2].GetURL(), GetSetupMethod(CsvType.Monster));
 
         await UniTask.WhenAll(tasks);
 
@@ -96,6 +101,12 @@ public class CsvDownloader
                 return MonsterSetup;
             case CsvType.MonsterSkillData:
                 return MonsterSkillSetup;
+            case CsvType.StageFirstReward:
+                return StageFirstRewardSetup;
+            case CsvType.StageReward:
+                return StageRewardSetup;
+            case CsvType.Floor:
+                return FloorRewardSetup;
             default:
                 Debug.LogError($"알 수 없는 CSV 이름: {csvType.ToString()}");
                 return null;
@@ -128,7 +139,6 @@ public class CsvDownloader
             AnimationType attackAnimation = Enum.TryParse(row[8], out AnimationType attackAnim) ? attackAnim : AnimationType.Magic_Attack;
             AnimationType skillAnimation = Enum.TryParse(row[9], out AnimationType skillAnim) ? skillAnim : AnimationType.Magic_Attack;
 
-            unitData.AnimatiorData = new AnimatorData();
             unitData.AnimatiorData.AttackAnimationType = attackAnimation;
             unitData.AnimatiorData.SkillAnimationType = skillAnimation;
 
@@ -159,13 +169,15 @@ public class CsvDownloader
                 unitData.UnitStats[i] = unitData.UnitStats[i-1].StatMultiply(1.5f);
             }
             
+            unitData.LevelUpData = _levelUpData;
+
             string synergyText = unitData.Synergy.ToString();
             string synergyName = $"{char.ToUpper(synergyText[0])}{synergyText.Substring(1).ToLower()}";
             int lastDigit = Mathf.Abs(id % 10);
 
             unitData.AddressableAddress = $"{synergyName}{lastDigit}";
-            unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
-            unitData.Skill.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_SkillIcon");
+            unitData.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_Icon");
+            unitData.Skill.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_SkillIcon");
 
             //#if UNITY_EDITOR
             //            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
@@ -191,6 +203,8 @@ public class CsvDownloader
                 continue;
             }
 
+            unitData.Name = row[2];
+
             UnitStats stat = new UnitStats
             {
                 AttackRange = float.TryParse(row[1], out float attackRange) ? attackRange * 1.5f : 1,
@@ -215,14 +229,12 @@ public class CsvDownloader
             unitData.PerferredLine = Mathf.RoundToInt(stat.AttackRange / 1.5f);
             unitData.AddressableAddress = $"Monster_{unitData.ID}";
 
-            unitData.Icon = Manager.Resources.SpriteGet($"{unitData.AddressableAddress}_Icon");
+            unitData.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_Icon");
 
             unitData.UnitStats[0] = stat;
             unitData.UnitStats[1] = stat;
             unitData.UnitStats[2] = stat;
-            unitData.UnitStats[3] = stat;
-
-            unitData.Name = id.ToString(); // 임시
+            unitData.UnitStats[3] = stat;            
         }
     }
 
@@ -232,7 +244,9 @@ public class CsvDownloader
         {
             int id = int.Parse(row[0]);
 
-           UnitSkill skill = Array.Find(_monsterSkills, u => u.ID == id);
+            UnitSkill skill = Array.Find(_monsterSkills, u => u.ID == id);
+
+            if (skill == null) continue;
 
             skill.SkillName = row[1];
             skill.Description = row[14];
@@ -247,7 +261,7 @@ public class CsvDownloader
             skill.PhysicalPower = float.TryParse(row[6], out float power) ? power : 1;
             skill.AbilityPower = float.TryParse(row[7], out float abilityPower) ? abilityPower : 100;
 
-            skill.Icon = Manager.Resources.SpriteGet($"{skill.ID}_SkillIcon");
+            skill.Icon = Manager.Resources.SpriteLoad($"{skill.ID}_SkillIcon");
         }
     }
 
@@ -295,6 +309,110 @@ public class CsvDownloader
         }
     }
 
+    private void StageFirstRewardSetup(string[][] data)
+    {        
+        foreach (var row in data)
+        {
+            string[] numbers = row[0].Split('-');
+
+            int region = int.Parse(numbers[0]);
+            int stage = int.Parse(numbers[1]);
+
+            StageRewardData[] stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas;
+
+            if (stageRewardDatas == null)
+            {
+                Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas = new StageRewardData[4];
+                stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas;
+            }
+
+            OutGameRewardData[] outGameRewardDatas = new OutGameRewardData[3];
+
+            outGameRewardDatas[0].RewardType = OutGameRewardType.Gold;
+            outGameRewardDatas[0].Amount = int.TryParse(row[1], out int gold) ? gold : 0;
+
+            outGameRewardDatas[1].RewardType = OutGameRewardType.Diamond;
+            outGameRewardDatas[1].Amount = int.TryParse(row[2], out int diamond) ? diamond : 0;
+
+            outGameRewardDatas[2].RewardType = OutGameRewardType.Exp;
+            outGameRewardDatas[2].Amount = int.TryParse(row[3], out int exp) ? exp : 0;
+
+            int idx = stage - 1;
+            Debug.Log(row[0]);
+
+            // 배열이 null이면 새로 생성
+            if (stageRewardDatas == null || stageRewardDatas.Length < 4)
+            {
+                stageRewardDatas = new StageRewardData[4];
+                Manager.Data.StageDatas.GetStage(region).StageFirstRewardDatas = stageRewardDatas;
+            }
+
+            // 해당 인덱스에 객체가 없으면 초기화
+            if (stageRewardDatas[idx] == null)
+            {
+                stageRewardDatas[idx] = new StageRewardData();
+            }
+
+            stageRewardDatas[idx].StageNumber = stage;
+            stageRewardDatas[idx].RewardDatas = outGameRewardDatas;
+        }
+    }
+
+    private void StageRewardSetup(string[][] data)
+    {
+        foreach (var row in data)
+        {
+            string[] numbers = row[0].Split('-');
+
+            int region = int.Parse(numbers[0]);
+            int stage = int.Parse(numbers[1]);
+
+            StageRewardData[] stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageRewardDatas;
+
+            if (stageRewardDatas == null)
+            {
+                Manager.Data.StageDatas.GetStage(region).StageRewardDatas = new StageRewardData[4];
+                stageRewardDatas = Manager.Data.StageDatas.GetStage(region).StageRewardDatas;
+            }
+
+            OutGameRewardData[] outGameRewardDatas = new OutGameRewardData[3];
+
+            outGameRewardDatas[0].RewardType = OutGameRewardType.Gold;
+            outGameRewardDatas[0].Amount = int.TryParse(row[1], out int gold) ? gold : 0;
+
+            outGameRewardDatas[1].RewardType = OutGameRewardType.Diamond;
+            outGameRewardDatas[1].Amount = int.TryParse(row[2], out int diamond) ? diamond : 0;
+
+            outGameRewardDatas[2].RewardType = OutGameRewardType.Exp;
+            outGameRewardDatas[2].Amount = int.TryParse(row[3], out int exp) ? exp : 0;
+
+            stageRewardDatas[stage-1].StageNumber = stage;
+            stageRewardDatas[stage-1].RewardDatas = outGameRewardDatas;
+        }
+    }
+
+    private void FloorRewardSetup(string[][] data)
+    {
+        int count = 0;
+        foreach (var row in data)
+        {
+            int floor = int.Parse(row[0]);
+
+            StageInGameRewardData stageFloorRewardData = new StageInGameRewardData();
+
+            stageFloorRewardData.Floor = floor;
+
+            stageFloorRewardData.StageFloorRewardTypes[0].RewardType = InGameRewardType.Energy;
+            stageFloorRewardData.StageFloorRewardTypes[0].Amount = int.TryParse(row[1], out int energy) ? energy : 0;
+
+            stageFloorRewardData.StageFloorRewardTypes[1].RewardType = InGameRewardType.Silver;
+            stageFloorRewardData.StageFloorRewardTypes[1].Amount = int.TryParse(row[2], out int silver) ? silver : 0;
+
+            Manager.Data.StageGameData.FloorRewardDatas[count] = stageFloorRewardData;
+
+            count++;
+        }
+    }
 
     //private void CreateMonsterUnitData(string[][] data)
     //{

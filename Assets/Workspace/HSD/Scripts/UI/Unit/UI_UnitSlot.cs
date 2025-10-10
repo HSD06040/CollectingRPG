@@ -10,7 +10,7 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
 {
     [SerializeField] private UnitStatus _unit;
     [SerializeField] private Image _unitIcon;
-    [SerializeField] private TMP_Text _unitLevelText;
+    [SerializeField] private GameObject[] _unitLevelStars;
 
     private UI_UnitSlotController _unitSlotController;
     private UnitDragDropSystem _dragDropSystem;
@@ -39,15 +39,31 @@ public class UI_UnitSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IPoin
         {
             _unitIcon.sprite = _unit.Data.Icon;
             _unitIcon.color = Color.white;
-            _unitLevelText.text = (_unit.Level + 1).ToString();
+
+            for (int i = 0; i < _unitLevelStars.Length ; i++)
+            {                
+                if(_unit.Level + 1 > i)
+                {
+                    _unitLevelStars[i].SetActive(true);
+                }
+                else
+                {
+                    _unitLevelStars[i].SetActive(false);
+                }
+            }            
         }
         else
         {
             _unitIcon.sprite = null;
             _unitIcon.color = Color.clear;
-            _unitLevelText.text = "";
+
+            for (int i = 0; i < _unitLevelStars.Length; i++)
+            {                
+                _unitLevelStars[i].SetActive(false);                
+            }
         }                
     }
+
     private void UnitSetting(Collider2D collider, UnitBase unit)
     {
         if (collider == null)

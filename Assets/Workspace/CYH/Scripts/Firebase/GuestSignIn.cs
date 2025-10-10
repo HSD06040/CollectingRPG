@@ -117,5 +117,6 @@ public class GuestSignIn : MonoBehaviour
     {
         Manager.Resources.LoadLabel("UnitPrefab").Forget();
         await Manager.Data.InitAsync();
+        await Manager.Resources.LoadLabel("Stage");
     }
 }

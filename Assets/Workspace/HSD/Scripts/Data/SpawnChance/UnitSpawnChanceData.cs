@@ -7,7 +7,13 @@ public class UnitSpawnChanceData : ScriptableObject
 {
     private Dictionary<UnitData, float> _cachedChances = new Dictionary<UnitData, float>();
 
-    [SerializeField] private Synergy CurrentLeaderSynergy;
+    [SerializeField] private Synergy _currentLeaderSynergy;
+    public Synergy CurrentLeaderSynergy
+    {
+        get => _currentLeaderSynergy;
+        set => _currentLeaderSynergy = value;
+    }
+
     [SerializeField] private UnitSpawnChance[] UnitSpawnChances;
 
     [SerializeField] private float leaderWeight = 1.5f; // 고정 규칙
@@ -15,6 +21,9 @@ public class UnitSpawnChanceData : ScriptableObject
     public void CalculateChances(int currentFloor)
     {
         _cachedChances.Clear();
+
+        if (currentFloor == -1)
+            return;
 
         UnitData[] allUnits = Manager.Data.PlayerUnitDatas;
         UnitSpawnChance floorChance = UnitSpawnChances[currentFloor];
@@ -37,7 +46,7 @@ public class UnitSpawnChanceData : ScriptableObject
             List<UnitData> leaders = new List<UnitData>();
             foreach (var unit in candidates)
             {
-                if (unit.Synergy == CurrentLeaderSynergy)
+                if (unit.Synergy == _currentLeaderSynergy)
                     leaders.Add(unit);
             }
 
@@ -98,13 +107,30 @@ public class UnitSpawnChanceData : ScriptableObject
             _ => 0f
         };
     }
+
+    public UnitSpawnChance GetCurrentFloorChance(int floor)
+    {        
+        return UnitSpawnChances[floor];
+    }
 }
 
 [System.Serializable]
-public struct UnitSpawnChance // 10층까지의 가중치들
+public struct UnitSpawnChance
 {
     public float Normal;
     public float Rare;
     public float Unique;
     public float Legendary;
+
+    public float GetChance(Grade grade)
+    {
+        return grade switch
+        {
+            Grade.NORMAL => Normal,
+            Grade.RARE => Rare,
+            Grade.UNIQUE => Unique,
+            Grade.LEGEND => Legendary,
+            _ => 0f
+        };
+    }
 }

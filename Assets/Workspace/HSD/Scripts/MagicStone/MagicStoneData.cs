@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class MagicStoneData : ScriptableObject
@@ -7,6 +5,7 @@ public abstract class MagicStoneData : ScriptableObject
     public Sprite Icon;
     public string Name;
     public SubGrade Grade;
+    public MagicStoneType Type;
     [TextArea]
     public string Description;
     public GameObject Prefab => Manager.Resources.Load<GameObject>(Address);
@@ -119,7 +118,9 @@ public abstract class MagicStoneData : ScriptableObject
         unit.StatusController.TakeTickDamage((int)Value, tickDamageData.TickCount, tickDamageData.TickInterval);
     }
     protected void ApplyTickDamageMultiple(GameObject[] objs, TickDamageData tickDamageData)
-    {        
+    {
+        if (objs == null) return;
+
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
@@ -132,13 +133,13 @@ public abstract class MagicStoneData : ScriptableObject
 
     protected void ApplyStatSingle(UnitBase unit, StatType statType)
     {
-        Debug.Log($"{unit.name}에게 {statType} {Value} 적용");
         unit.StatusController.AddStat(statType, Value, name);
     }
 
     protected void ApplyStatMultiple(GameObject[] objs, StatType statType)
     {
-        Debug.Log($"대상 수 : {objs.Length}");
+        if (objs == null) return;
+
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
@@ -156,12 +157,32 @@ public abstract class MagicStoneData : ScriptableObject
 
     protected void ApplyTakeDamageMultiple(GameObject[] objs)
     {
+        if (objs == null) return;
+
         foreach (var obj in objs)
         {
             UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
             if (unit != null)
             {
                 ApplyTakeDamageSingle(unit);
+            }
+        }
+    }
+
+    protected void ApplyStunSingle(UnitBase unit)
+    {
+        unit.StatusController.Stun(Value);
+    }
+
+    protected void ApplyStunMultiple(GameObject[] objs)
+    {
+        if (objs == null) return;
+        foreach (var obj in objs)
+        {
+            UnitBase unit = ComponentProvider.Get<UnitBase>(obj);
+            if (unit != null)
+            {
+                ApplyStunSingle(unit);
             }
         }
     }

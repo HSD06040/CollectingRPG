@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
+using UnityEngine.UI;
 
 public class CharacterList_UI : MonoBehaviour
 {
     [SerializeField] TMP_Text _synergyName;
+    [SerializeField] Image _synergyImage;
     [SerializeField] GameObject _characterUnit;
     [SerializeField] Transform _content;
     private CharacterUnit[] _synergyUnits;
@@ -13,6 +16,10 @@ public class CharacterList_UI : MonoBehaviour
     public void Setup(string synergyName, UnitData[] synergyUnits)
     {
         _synergyName.text = synergyName;
+        if (Manager.Data.SynergyDB != null)
+        {
+            _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)synergyUnits[0].Synergy).ActiveIcon;
+        }
 
         _synergyUnits = new CharacterUnit[synergyUnits.Length];
 

@@ -53,6 +53,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     }
     #endregion
 
+    #region Settings
     public void Inject()
     {
         Anim = GetComponentInChildren<Animator>();
@@ -102,6 +103,7 @@ public class UnitBase : MonoBehaviour, IAttacker
         StatusController.UnitFXController.BattleSetting();
         StatusController.UnitFXController.SortingLayer(line);
     }
+    #endregion
 
     #region Provider
     private void AddProviderComponents()
@@ -134,6 +136,7 @@ public class UnitBase : MonoBehaviour, IAttacker
     public void Fight()
     {
         _fsm.Fight();
+        Col.enabled = true;
     }
     public void Standby()
     {
@@ -171,7 +174,18 @@ public class UnitBase : MonoBehaviour, IAttacker
 
     public void FindTarget()
     {
-        if (Target == null || ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead)
+        bool currentTargetValid = Target != null && !ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead;
+
+        if (currentTargetValid)
+        {
+            if (Vector2.Distance(Target.position, transform.position) > StatusController.DetectionRange)
+            {
+                Target = null;
+                currentTargetValid = false;
+            }
+        }
+
+        if (!currentTargetValid)
         {
             Target = Utils.GetClosestTargetNonAlloc(GetCenter(), StatusController.DetectionRange, TargetLayer);
         }

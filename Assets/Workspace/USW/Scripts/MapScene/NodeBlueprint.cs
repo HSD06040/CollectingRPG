@@ -6,11 +6,9 @@ namespace Map
     {
         MinorEnemy,
         EliteEnemy,
-        RestSite,
-        Treasure,
         Store,
-        Boss,
-        Mystery
+        Event,
+        Boss
     }
 }
 

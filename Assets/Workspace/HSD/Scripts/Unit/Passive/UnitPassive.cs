@@ -218,8 +218,12 @@ public class UnitPassive
             AttackActive();
             if (!string.IsNullOrEmpty(Effect.SynergyEffectAddress))
             {
+                GameObject effect = Manager.Resources.Load<GameObject>(Effect.SynergyEffectAddress);
+                if (effect == null)
+                    return;
+
                 Manager.Resources.Destroy(
-                Manager.Resources.Instantiate<GameObject>(Effect.SynergyEffectAddress, _owner.GetCenter()), Effect.EffectDuration
+                Manager.Resources.Instantiate<GameObject>(effect, _owner.GetCenter()), Effect.EffectDuration
                 );
             }
         }
@@ -250,8 +254,6 @@ public class UnitPassive
 
         if (Effect.NextEffect.EffectApplyType == EffectApplyType.All)
             return;
-
-        Debug.Log($"[Next]");
 
         NextBuffEffectActive();
         NextAttackActive();
@@ -327,6 +329,9 @@ public class UnitPassive
             Debug.LogWarning($"[시너지 공격 시스템] 해당 주소에 Prefab이 없습니다. 주소 : {effect.AttackAddress}");
             return;
         }
+
+        if (_owner.Target == null)
+            return;
 
         GameObject attackObj = effect.SpawnPositionType == SpawnPositionType.Self ?
             Manager.Resources.Instantiate(effect.AttackPrefab, _owner.transform.position, Quaternion.identity, true) :

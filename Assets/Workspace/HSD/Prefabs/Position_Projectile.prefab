@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.39, y: 2.03, z: -0.020060984}
-  m_LocalScale: {x: 0.5719, y: 0.5719, z: 0.5719}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -54,7 +54,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: c5a65547d1edf4a9d882bd6cff83eda8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 1992a7dd88bf512408f9620477f8bfdf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a7bc98a660b1b624ca559d2543c63595, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -120,7 +120,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 0.25
 --- !u!114 &6961760112308522568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,10 +135,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lifeTime: 5
   _isPirece: 1
-  _ease: 4
   _throwType: 0
   _statEffectModifier:
     StatType: 0
     Value: 0
+  _buffEffectData:
+    StatType: 0
+    Duration: 0
+    IsTicking: 0
+    TickInterval: 0
   _isRotate: 1
   _rotSpeed: 200

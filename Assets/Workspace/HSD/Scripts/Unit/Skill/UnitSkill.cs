@@ -38,16 +38,29 @@ public abstract class UnitSkill : ScriptableObject
         
         if (EffectSpawnType == EffectSpawnType.Target)
         {
-            Manager.Resources.Destroy(Manager.Resources.Instantiate<GameObject>(
-                    EffectAddress,
-                    attacker.GetTarget().gameObject.GetCenterPosition(),
-                    true
-                ), 
-            2f);
+            if (attacker.GetTarget() == null)
+                return;
+
+            GameObject effect = Manager.Resources.Instantiate<GameObject>(EffectAddress, attacker.GetTarget().gameObject.GetCenterPosition(),true);
+
+            if (effect == null)
+            {
+                Debug.LogWarning($"[Effect] {EffectAddress} 프리팹을 찾을 수 없습니다.");
+                return;
+            }
+
+            Manager.Resources.Destroy(effect, 2f);
         }
         else
         {
             GameObject prefab = Manager.Resources.Load<GameObject>(EffectAddress);
+
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[Effect] {EffectAddress} 프리팹을 찾을 수 없습니다.");
+                return;
+            }
+
             GameObject obj = Manager.Resources.Instantiate(
                 prefab,
                 GetSpawnPoint(attacker),
@@ -235,6 +248,8 @@ public abstract class UnitSkill : ScriptableObject
     #if  UNITY_EDITOR
     public virtual void DrawGizmos(IAttacker attacker) // 씬 창에서 부채꼴 범위 그리기
     {
+        if (attacker == null || attacker.GetTarget() == null) return;
+
         Handles.color = Color.blue;
         Handles.DrawSolidDisc(GetSpawnPoint(attacker), Vector3.forward, 0.05f);
     }

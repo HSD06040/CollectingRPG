@@ -87,11 +87,11 @@ public class UnitController : MonoBehaviour
     }
 
     public void UnitFight()
-    {
+    {        
         foreach (var unit in _battleUnitManager.GetUnits())
         {
             if (unit == null)
-                continue;
+                continue;            
 
             unit.Fight();
         }
@@ -144,8 +144,6 @@ public class UnitController : MonoBehaviour
     {
         UnitBase slotUnit = slot.Unit;
 
-        Debug.Log($"[AddUnit]");
-
         bool isMax = unit.CurrentSlot != Vector2Int.zero ? false : IsUnitMaxCount() && slotUnit == null;
 
         if (isMax)
@@ -191,11 +189,9 @@ public class UnitController : MonoBehaviour
         {
             UnitSlot unitSlot = _unitSlotManager.GetUnitSlot(unit);
 
-            Debug.Log($"[AddUnit] {unit.CurrentSlot} is Not Zero");
             // 스왑
             if (slotUnit != null && slotUnit != unit)
             {
-                Debug.Log($"[AddUnit] Swap");
                 ClearSlot(unitSlot, unit);
                 ClearSlot(slot, slotUnit);
 
@@ -210,8 +206,6 @@ public class UnitController : MonoBehaviour
             }
             else
             {
-                Debug.Log($"[AddUnit] JustMove");
-
                 ClearSlot(unitSlot, unit);
 
                 _battleUnitManager.MoveUnit(unitSlot, slot, unit);

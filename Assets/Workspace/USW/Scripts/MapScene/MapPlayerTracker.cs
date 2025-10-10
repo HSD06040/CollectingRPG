@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using DG.Tweening;
+using map;
 using UnityEngine;
 
 namespace Map
@@ -9,17 +10,22 @@ namespace Map
     {
         public bool lockAfterSelecting = false;
         public float enterNodeDelay = 1f;
-        public MapManager mapManager;
+        public MapManager mapManager;        
+        public UnitManager unitManager;       
         public MapView view;
 
         public static MapPlayerTracker Instance;
+
+        // 각 이벤트가 끝날때 호출
+        public static Action OnEventEnded;
 
         public bool Locked { get; set; }
 
         private void Awake()
         {
-            Instance = this;
-        }
+            Instance = this;            
+            OnEventEnded += Unlock;
+        }        
 
         public void SelectNode(MapNode mapNode)
         {
@@ -51,32 +57,54 @@ namespace Map
         {
             Locked = lockAfterSelecting;
             mapManager.CurrentMap.path.Add(mapNode.Node.point);
-            mapManager.SaveMap();
             view.SetAttainableNodes();
             view.SetLineColors();
             mapNode.ShowSwirlAnimation();
 
-            DOTween.Sequence().AppendInterval(enterNodeDelay).OnComplete(() => EnterNode(mapNode));
+            if (mapNode.Node.nodeType == NodeType.Store)
+            {
+                EnterNode(mapNode);
+            }
+            else
+            {
+                DOTween.Sequence().AppendInterval(enterNodeDelay).OnComplete(() => EnterNode(mapNode));
+            }
         }
 
         private static void EnterNode(MapNode mapNode)
         {
-            // we have access to blueprint name here as well
             Debug.Log("Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
-            // load appropriate scene with context based on nodeType:
-            // or show appropriate GUI over the map: 
-            // if you choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
+            Manager.Data.StageGameData.CurrentFloor.Value++;
+
             switch (mapNode.Node.nodeType)
             {
                 case NodeType.MinorEnemy:
-                    break;
                 case NodeType.EliteEnemy:
-                    break;
-                case NodeType.Store:
-                    break;
                 case NodeType.Boss:
-                    break;
-                case NodeType.Mystery:
+                    if (Instance != null)
+                    {
+                        Instance.Locked = true;
+                        Instance.unitManager.EnemyController.SetUnit(mapNode.Node.gridData);
+                        Instance.unitManager.GameStandby();                        
+                    }
+                    break;                
+                case NodeType.Store:
+                    if (Instance != null)
+                        Instance.Locked = true;
+
+                    if (StageShopPanel.Instance != null)
+                    {
+                        StageShopPanel.Instance.OpenShop();
+                    }
+                    break;                                   
+                case NodeType.Event:
+                    if(Instance != null)
+                        Instance.Locked = true;
+
+                    if(EventPanel.Instance != null)
+                    {
+                        EventPanel.Instance.ShowEvent(mapNode.Node.eventData);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -87,5 +115,8 @@ namespace Map
         {
             Debug.Log("Selected node cannot be accessed");
         }
+
+        private void Lock() { Locked = true; }
+        private void Unlock() { Locked = false; }
     }
 }
