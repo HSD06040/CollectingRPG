@@ -17,7 +17,7 @@ public class StageData : ScriptableObject
     public int MaxStageNumber;
     public Sprite RegionImage;
     public Sprite RegionPreviewSprite;
-    public GameObject Map;
+    public GameObject Map => Manager.Resources.Load<GameObject>($"Stage{RegionNumber}Map");
 
     private static readonly Dictionary<int, OutGameRewardData[]> _firstRewardDic = new Dictionary<int, OutGameRewardData[]>();
     private static readonly Dictionary<int, OutGameRewardData[]> _rewardDic = new Dictionary<int, OutGameRewardData[]>();

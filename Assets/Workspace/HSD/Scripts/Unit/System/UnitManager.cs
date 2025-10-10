@@ -9,6 +9,7 @@ public class UnitManager : MonoBehaviour
 {
     [Header("Test")]
     public bool IsTest;
+    [SerializeField] StageMapLoader _stageMapLoader;
 
     [Header("Center")]
     [SerializeField] Transform _center;
@@ -72,6 +73,7 @@ public class UnitManager : MonoBehaviour
             _mapManager.GenerateNewMap();
         }
 
+        _stageMapLoader.MapSetting();
         _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();
 
