@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public enum GachaType
@@ -83,14 +84,16 @@ public class TimeManager : MonoBehaviour
 
     public Action OnDailyGachaInfoChanged;
 
-    private void Init()
+    private async void Init()
     {
         _dailyCharFreeGachaRewardInfo = new RewardInfo(DateTime.Now.Ticks, 0);
         _dailyCharAdGachaRewardInfo = new RewardInfo(DateTime.Now.Ticks, 0);
         _dailyStoneFreeGachaRewardInfo = new RewardInfo(DateTime.Now.Ticks, 0);
         _dailyStoneAdGachaRewardInfo = new RewardInfo(DateTime.Now.Ticks, 0);
+        _dailyShopResetTime = new();
         LoadDailyFreeGachaResetTimeInfo();
         LoadAdGachaResetTimeInfo();
+        await LoadDailyShopResetTime();
     }
 
     #region Data Load & Save
@@ -103,8 +106,8 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     private async void LoadDailyFreeGachaResetTimeInfo()
     {
-        _dailyCharFreeGachaRewardInfo = await Manager.DB.timeDB.LoadGachaTime(GachaType.Char, false);
-        _dailyStoneFreeGachaRewardInfo = await Manager.DB.timeDB.LoadGachaTime(GachaType.Stone, false);
+        _dailyCharFreeGachaRewardInfo = await Manager.DB.timeDB.LoadTimeData(GachaType.Char, false);
+        _dailyStoneFreeGachaRewardInfo = await Manager.DB.timeDB.LoadTimeData(GachaType.Stone, false);
 
         if (_dailyCharFreeGachaRewardInfo.state == 0 && IsDailyResetTime(_dailyCharFreeGachaRewardInfo.GetDateTime()))
         {
@@ -158,8 +161,8 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     private async void LoadAdGachaResetTimeInfo()
     {
-        _dailyCharAdGachaRewardInfo = await Manager.DB.timeDB.LoadGachaTime(GachaType.Char, true);
-        _dailyStoneAdGachaRewardInfo = await Manager.DB.timeDB.LoadGachaTime(GachaType.Stone, true);
+        _dailyCharAdGachaRewardInfo = await Manager.DB.timeDB.LoadTimeData(GachaType.Char, true);
+        _dailyStoneAdGachaRewardInfo = await Manager.DB.timeDB.LoadTimeData(GachaType.Stone, true);
 
         if (_dailyCharAdGachaRewardInfo.state < 2 && IsDailyCharAdGachaResetTime(out int stack))
         {
@@ -245,13 +248,11 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     /// <param name="resetTime"></param>
     /// <returns></returns>
-    public bool LoadDailyShopResetTime(out DateTime resetTime)
+    public async Task<bool> LoadDailyShopResetTime()
     {
-        // TODO : DB에 저장된 [상점 초기화] 시간 데이터를 가져와서 캐싱
-        // _dailyShopResetTime = {상점 초기화 시간}
+        _dailyShopResetTime = await Manager.DB.timeDB.LoadShopResetTime();
 
-        bool isResetTime = SaveDailyShopResetTime(_dailyShopResetTime);
-        resetTime = _dailyShopResetTime;
+        bool isResetTime = await SaveDailyShopResetTime(_dailyShopResetTime);
 
         return isResetTime;
     }
@@ -261,26 +262,25 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     /// <param name="lastTime"></param>
     /// <returns></returns>
-    private bool SaveDailyShopResetTime(DateTime lastTime)
+    private async Task<bool> SaveDailyShopResetTime(DateTime lastTime)
     {
-        if (IsDailyResetTime(lastTime))
+        DateTime now = DateTime.Now;
+        DateTime todayReset = new DateTime(now.Year, now.Month, now.Day, 6, 0, 0);
+        DateTime nextReset = (now.Hour < 6) ? todayReset : todayReset.AddDays(1);
+
+        if (now >= lastTime)
         {
-            DateTime now = DateTime.Now;
-            DateTime todayReset = new DateTime(now.Year, now.Month, now.Day, 6, 0, 0);
-
-            if (now.Hour < 6)
-            {
-                _dailyShopResetTime = todayReset;
-            }
-            else
-            {
-                _dailyShopResetTime = todayReset.AddDays(1);
-            }
-
-            // TODO : DB에 [상점 초기화] 시간을 저장
+            _dailyShopResetTime = nextReset;
+            await Manager.DB.timeDB.SaveShopResetTime(_dailyShopResetTime);
             return true;
         }
+
         return false;
+    }
+
+    public DateTime GetDailyShopResetTime()
+    {
+        return _dailyShopResetTime;
     }
 
     #endregion
