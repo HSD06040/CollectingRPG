@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -23,6 +24,11 @@ public class Reward_Controller
         StageInGameRewardType[] stageInGameRewardTypes = new StageInGameRewardType[source.Length];
         Array.Copy(source, stageInGameRewardTypes, source.Length);
 
+        GetInGameReward(stageInGameRewardTypes);
+    }
+
+    public void GetInGameReward(StageInGameRewardType[] stageInGameRewardTypes, UnityAction action = null)
+    {
         foreach (var reward in stageInGameRewardTypes)
         {
             switch (reward.RewardType)

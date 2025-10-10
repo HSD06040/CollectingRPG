@@ -176,9 +176,7 @@ public class UnitDragDropSystem : MonoBehaviour
 
         if (!_isUI)
         {
-            if (_pressedObject.CompareTag("UnitTrigger") ||
-            _pressedObject.CompareTag("Unit") ||
-            _pressedObject.CompareTag("BattleUnit"))
+            if (_pressedObject.CompareTag("UnitTrigger"))
             {
                 SetUnit(_pressedObject);
             }

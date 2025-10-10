@@ -68,15 +68,6 @@ public class UnitInfoUI : MonoBehaviour
             _stars[i].gameObject.SetActive(false);
         }
 
-        //if(status.Data.UpgradeData != null)
-        //    _levelText.text = status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString();
-        //else
-        //    _levelText.text = "0";
-
-        //_powerText.text = status.CombatPower.ToString();
-
-        // isEnemy로 분리
-
         _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.Synergy).ActiveIcon;
         _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)status.Data.ClassSynergy).ActiveIcon;
 
@@ -93,7 +84,7 @@ public class UnitInfoUI : MonoBehaviour
         _unitSkillUI.Setup(status);
         _unitStatusUI.Setup(stat);
 
-        if (isSell)
+        if (isSell && !isEnemy)
         {
             _unitSellOrAutoSelectionUI.Setup(status, isUI, Close);
         }

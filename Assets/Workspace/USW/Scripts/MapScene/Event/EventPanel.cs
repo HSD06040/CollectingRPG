@@ -181,7 +181,7 @@ namespace Map
 
             if (stageRewards.Count > 0)
             {
-                UIManager.Instance.Reward_UI.Show(stageRewards.ToArray());
+                Manager.Game.Reward_Controller.GetInGameReward(stageRewards.ToArray());
             }
             else
             {
