@@ -152,6 +152,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         _isDragging = false;
         _magicStone.SetParent(_parent, true);
         _magicStone.position = _originalPos;
+        ResetMagicStoneRect();
         _highlight.enabled = false;
     }
 

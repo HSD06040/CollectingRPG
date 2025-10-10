@@ -29,7 +29,6 @@ public class StageDB
             .Child(stageNumber.ToString());
     }
 
-    // ✅ 스테이지 클리어 시 동시에 최초 보상 획득 정보도 저장
     public async UniTask SaveStageProgress(StageData stageData, int stageNumber, bool cleared = true, bool firstRewardGained = false)
     {
         _stageDataReference = GetStageReference(stageData, stageNumber);
@@ -45,12 +44,10 @@ public class StageDB
         Debug.Log($"스테이지 진행 데이터 저장 완료: 지역 {stageData.RegionNumber}, 스테이지 {stageNumber}, 클리어 여부: {cleared}, 최초보상: {firstRewardGained}");
     }
 
-    // ✅ 최초 보상만 갱신하고 싶을 때 (예: 스테이지는 이미 클리어 상태)
     public async UniTask SaveStageFirstRewardGainData(StageData stageData, int stageNumber, bool isGained = true)
     {
         _stageDataReference = GetStageReference(stageData, stageNumber);
 
-        // 현재 데이터 불러오기
         var snapshot = await _stageDataReference.GetValueAsync();
         StageProgressData progressData;
 
@@ -59,7 +56,6 @@ public class StageDB
         else
             progressData = new StageProgressData();
 
-        // 최초보상 상태만 업데이트
         progressData.isFirstRewardGained = isGained;
 
         await _stageDataReference.SetRawJsonValueAsync(JsonUtility.ToJson(progressData));
