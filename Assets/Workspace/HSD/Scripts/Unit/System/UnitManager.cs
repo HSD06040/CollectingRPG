@@ -289,13 +289,13 @@ public class UnitManager : MonoBehaviour
 
         if (slotIdx == -1)
         {
-            Debug.Log("슬롯이 부족합니다.");
+            UIManager.Instance.MessagePopup.Show("슬롯이 부족합니다.");
             return;
         }
 
         if (!InGameManager.Instance.SpendEnergy(InGameManager.Instance.SpawnEnergy))
         {
-            Debug.Log("골드가 부족합니다.");
+            UIManager.Instance.MessagePopup.Show("골드가 부족합니다.");
             return;
         }
 

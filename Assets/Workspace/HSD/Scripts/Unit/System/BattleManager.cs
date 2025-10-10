@@ -23,10 +23,11 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] float _cameraZoomDuration = .3f;
     private Vector2 _lastTargetPos;
+    private bool _isBattleEnded;
 
     [Header("UnitCount")]
     private int _playerUnitCount;
-    private int _enemyUnitCount;
+    private int _enemyUnitCount;    
 
     private readonly HashSet<UnitStatusController> _processedDeadUnits = new();
 
@@ -69,6 +70,7 @@ public class BattleManager : MonoBehaviour
     public void BattleStart()
     {
         OnBattleStarted?.Invoke();
+        _isBattleEnded = false;
     }
 
     public void GameStanby()
@@ -78,6 +80,8 @@ public class BattleManager : MonoBehaviour
 
     private void CheckBattleEnded(UnitStatusController statusCon)
     {
+        if (_isBattleEnded) return;
+
         if (!statusCon.IsDead || !InGameManager.Instance.IsBattle) return;
 
         if (_processedDeadUnits.Contains(statusCon))
@@ -149,6 +153,7 @@ public class BattleManager : MonoBehaviour
 
     private void GameEnd(bool isPlayerWin)
     {
+        _isBattleEnded = true;
         GameEndRoutineAsync(isPlayerWin).Forget();
     }
 
