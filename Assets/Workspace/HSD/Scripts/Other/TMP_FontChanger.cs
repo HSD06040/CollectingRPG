@@ -13,7 +13,7 @@ public class TMP_FontChanger : MonoBehaviour
     [ContextMenu("Change")]
     public void ChangeFont()
     {
-        var texts = FindObjectsByType<TMP_Text>(FindObjectsSortMode.None);
+        var texts = FindObjectsOfType<TMP_Text>(true);
 
         foreach (var text in texts)
         {
