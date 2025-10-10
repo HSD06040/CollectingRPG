@@ -177,7 +177,7 @@ public class CsvDownloader
 
             unitData.AddressableAddress = $"{synergyName}{lastDigit}";
             unitData.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_Icon");
-            unitData.Skill.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_SkillIcon");
+            unitData.Skill.Icon = Manager.Resources.SpriteLoad($"{unitData.AddressableAddress}_Skillicon");
 
             //#if UNITY_EDITOR
             //            unitData.name = $"{unitData.Synergy.ToString()}_{id}";
@@ -261,7 +261,7 @@ public class CsvDownloader
             skill.PhysicalPower = float.TryParse(row[6], out float power) ? power : 1;
             skill.AbilityPower = float.TryParse(row[7], out float abilityPower) ? abilityPower : 100;
 
-            skill.Icon = Manager.Resources.SpriteLoad($"{skill.ID}_SkillIcon");
+            skill.Icon = Manager.Resources.SpriteLoad($"{skill.ID}_Skillicon");
         }
     }
 

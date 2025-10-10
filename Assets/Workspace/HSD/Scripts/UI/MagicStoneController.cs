@@ -8,7 +8,7 @@ public class MagicStoneController : InGameSingleton<MagicStoneController>
     [SerializeField] MagicStoneSlot[] _magicStoneSlots;
     [SerializeField] Transform _dropArea;
     [SerializeField] List<MagicStoneSlot> _activeSlots = new List<MagicStoneSlot>();
-
+    [SerializeField] Transform _dragParent;
 #if UNITY_EDITOR
     [SerializeField] MagicStoneData _testMagicStoneData;
 
@@ -40,7 +40,7 @@ public class MagicStoneController : InGameSingleton<MagicStoneController>
     {
         foreach (var slot in _magicStoneSlots)
         {
-            slot.Init(_dropArea);
+            slot.Init(_dropArea, _dragParent);
             slot.OnCleared += HandleSlotCleared;
         }
     }

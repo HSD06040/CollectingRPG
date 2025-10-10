@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemListPanel_Agument : ItemListPanel
+public class ItemListPanel_Augment : ItemListPanel
 {
     [SerializeField] ItemSlot_Augment[] _itemSlot_Augments;
 

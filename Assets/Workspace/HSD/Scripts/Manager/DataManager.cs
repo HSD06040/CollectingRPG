@@ -110,6 +110,13 @@ public class DataManager : Singleton<DataManager>
         AugmentDatas = await Manager.Resources.LoadAll<AUGData>("AugmentData");
         AugmentChanceData = await Addressables.LoadAssetAsync<AugmentChanceData>("Data/AugmentChanceData");
         PriceDatas = await Addressables.LoadAssetAsync<PriceDatas>("Data/PriceDatas");
+
+        foreach (var augData in AugmentDatas)
+        {
+            string[] sources = augData.AUGID.Split('_');
+            
+            augData.Icon = Manager.Resources.SpriteLoad(sources[1]);
+        }
     }
 
     private async UniTask PreLoadUnitDatas()
