@@ -13,6 +13,7 @@ public class DBManager : Singleton<DBManager>
     public MagicStoneDB magicStoneDB = new MagicStoneDB();
     public QuestDB questDB = new QuestDB();
     public ShopDB shopDB = new ShopDB();
+    public TimeDB timeDB = new TimeDB();
 
     #region Nickname/LobbyData
 

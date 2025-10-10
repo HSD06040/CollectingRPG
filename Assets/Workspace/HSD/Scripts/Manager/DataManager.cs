@@ -174,7 +174,10 @@ public class DataManager : Singleton<DataManager>
 
     public MagicStone GetMagicStoneData(string magicStoneName)
     {
-        if(!MagicStoneDic.ContainsKey(magicStoneName))
+        if (MagicStoneDic == null)
+            MagicStoneDic = new Dictionary<string, MagicStone>();
+
+        if (!MagicStoneDic.ContainsKey(magicStoneName))
         {
             foreach (var data in MagicStones)
             {

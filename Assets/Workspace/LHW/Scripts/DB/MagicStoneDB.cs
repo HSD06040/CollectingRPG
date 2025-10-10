@@ -40,8 +40,8 @@ public class MagicStoneDB
         {
             foreach (var child in dataSnapshot.Children)
             {
-                string charName = child.Key;
-                UnitData data = Manager.Data.GetUnitData(charName);
+                string stoneName = child.Key;
+                MagicStone data = Manager.Data.GetMagicStoneData(stoneName);
 
                 if (data != null)
                 {
