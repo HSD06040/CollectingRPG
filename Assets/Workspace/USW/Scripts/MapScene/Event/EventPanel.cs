@@ -77,6 +77,24 @@ namespace Map
 
             _titleText.text = eventData._eventTitle;
             _descriptionText.text = eventData._eventDescription;
+            
+            if (_yesButton != null)
+            {
+                TMP_Text yesButtonText = _yesButton.GetComponentInChildren<TMP_Text>();
+                if (yesButtonText != null)
+                {
+                    yesButtonText.text = eventData._yesButtonText;
+                }
+            }
+    
+            if (_nvmButton != null)
+            {
+                TMP_Text nvmButtonText = _nvmButton.GetComponentInChildren<TMP_Text>();
+                if (nvmButtonText != null)
+                {
+                    nvmButtonText.text = eventData._nvmButtonText;
+                }
+            }
         }
 
         /// <summary>
@@ -94,11 +112,24 @@ namespace Map
         /// </summary>
         private async UniTask ShowResultWithFade(bool acceptChallenge)
         {
-            EventOutcome outcome = acceptChallenge ? EventOutcome.Success : EventOutcome.Declined;
+            EventOutcome outcome;
+            
+            if (acceptChallenge)
+            {
+                ConsumeEnergy(_currentEvent._energyCost);
+                
+                bool isSuccess = Random.Range(0f, 100f) < 50f;
+                outcome = isSuccess ? EventOutcome.Success : EventOutcome.Failure;
+            }
+            else
+            {
+                outcome = EventOutcome.Declined;
+            }
 
             string nextText = outcome switch
             {
                 EventOutcome.Success => _currentEvent._successText,
+                EventOutcome.Failure => _currentEvent._failureText,
                 EventOutcome.Declined => _currentEvent._declinedText,
                 _ => ""
             };
