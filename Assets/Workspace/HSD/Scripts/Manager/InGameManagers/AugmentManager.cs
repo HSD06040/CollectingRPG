@@ -145,6 +145,8 @@ public class AugmentManager : InGameSingleton<AugmentManager>
 
     public void ApplyHealAugment(UnitBase unit)
     {
+        if (unit == null) return;
+
         for (int i = 0; i < currentAugment.Count; i++)
         {
             if (currentAugment == null || !IsAugmentTarget(unit, i) || currentAugment[i].EffectType != EffectType.Increase) continue;

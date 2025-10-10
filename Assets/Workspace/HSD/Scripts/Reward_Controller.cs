@@ -52,7 +52,7 @@ public class Reward_Controller
 
     private async UniTask GetStageFirstRewardAsync(StageData stageData, int stage)
     {
-        OutGameRewardData[] firstRewardData = stageData.GetStageFirstReward(stage);
+        OutGameRewardData[] firstRewardData = stageData.GetStageFirstRewardAndClear(stage);
 
         if (firstRewardData != null)
         {

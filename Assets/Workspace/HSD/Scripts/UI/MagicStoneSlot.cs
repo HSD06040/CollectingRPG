@@ -35,7 +35,8 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         _dropAreaPanel = dropArea;
 
         BattleManager.OnBattleEnded += ForceStopDrag;
-        DragEnd();
+
+        ResetMagicStoneRect();
     }
 
     public void ClearMagicStone()
@@ -81,7 +82,7 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
 
         _isDragging = true;
-        _originalPos = _magicStone.position;
+        _originalPos = _magicStone.anchoredPosition;
         DragStart();
     }
 
@@ -133,13 +134,13 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     private void DragStart()
     {
-        transform.SetParent(_dragParent, true);
+        _magicStone.SetParent(_dragParent, true);
     }
 
     private void DragEnd()
     {
-        transform.SetParent(_parent, true);
-        _magicStone.position = _originalPos;
+        _magicStone.SetParent(_parent, true);
+        ResetMagicStoneRect();
         _highlight.enabled = false;
         _isDragging = false;
     }
@@ -149,8 +150,18 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
         if (!_isDragging) return;
 
         _isDragging = false;
-        transform.SetParent(_parent, true);
+        _magicStone.SetParent(_parent, true);
         _magicStone.position = _originalPos;
+        ResetMagicStoneRect();
         _highlight.enabled = false;
+    }
+
+    private void ResetMagicStoneRect()
+    {
+        RectTransform rect = _magicStone;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
     }
 }

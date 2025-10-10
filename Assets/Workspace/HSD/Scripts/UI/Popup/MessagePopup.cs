@@ -50,7 +50,7 @@ public class MessagePopup : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            DOTween.Kill(_canvasGroup);
+            DOTween.Kill(_canvasGroup, true);
         }
     }
 }
