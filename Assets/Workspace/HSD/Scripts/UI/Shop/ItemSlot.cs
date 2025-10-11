@@ -9,6 +9,7 @@ public abstract class ItemSlot : MonoBehaviour
     [SerializeField] TMP_Text _itemNameText;
     [SerializeField] Image _itemIcon;
     [SerializeField] Image _soldOutImage;
+    [SerializeField] GameObject[] _gradeImages;
 
     public void SetItem(string itemName, Sprite itemIcon)
     {
@@ -24,5 +25,20 @@ public abstract class ItemSlot : MonoBehaviour
     public void ResetSoldOut()
     {
         _soldOutImage.gameObject.SetActive(false);
+    }
+
+    protected void SetGradeImage(SubGrade grade)
+    {
+        for (int i = 0; i < _gradeImages.Length; i++)
+        {
+            if(i == (int)grade)
+            {
+                _gradeImages[i].SetActive(true);
+            }
+            else
+            {
+                _gradeImages[i].SetActive(false);
+            }
+        }
     }
 }

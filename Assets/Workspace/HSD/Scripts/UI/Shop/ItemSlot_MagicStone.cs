@@ -13,5 +13,7 @@ public class ItemSlot_MagicStone : ItemSlot
         base.SetItem(magicStoneData.Name, magicStoneData.Icon);
         _magicStoneData = magicStoneData;
         _magicStoneTypeText.text = _magicStoneData.Type.GetMagicStonTypeKorean();
+
+        SetGradeImage(magicStoneData.Grade);
     }
 }

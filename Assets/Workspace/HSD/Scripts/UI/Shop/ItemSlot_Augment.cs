@@ -10,5 +10,7 @@ public class ItemSlot_Augment : ItemSlot
     {
         base.SetItem(augmentData.Name, augmentData.Icon);
         _augmentData = augmentData;
+
+        SetGradeImage(augmentData.Grade);
     }
 }
