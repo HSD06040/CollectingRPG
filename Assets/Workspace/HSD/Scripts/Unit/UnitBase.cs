@@ -177,15 +177,6 @@ public class UnitBase : MonoBehaviour, IAttacker
     {
         bool currentTargetValid = Target != null && !ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead;
 
-        if (currentTargetValid)
-        {
-            if (Vector2.Distance(Target.position, transform.position) > StatusController.DetectionRange)
-            {
-                Target = null;
-                currentTargetValid = false;
-            }
-        }
-
         if (!currentTargetValid)
         {
             Target = Utils.GetClosestTargetNonAlloc(GetCenter(), StatusController.DetectionRange, TargetLayer);

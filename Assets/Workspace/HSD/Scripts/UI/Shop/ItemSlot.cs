@@ -10,6 +10,7 @@ public abstract class ItemSlot : MonoBehaviour
     [SerializeField] Image _itemIcon;
     [SerializeField] Image _soldOutImage;
     [SerializeField] GameObject[] _gradeImages;
+    [SerializeField] protected ShopToolTip _shopToolTip;
 
     public void SetItem(string itemName, Sprite itemIcon)
     {
@@ -40,5 +41,10 @@ public abstract class ItemSlot : MonoBehaviour
                 _gradeImages[i].SetActive(false);
             }
         }
+    }
+
+    public void ToolTipSet(ShopToolTip shopToolTip)
+    {
+        _shopToolTip = shopToolTip;
     }
 }

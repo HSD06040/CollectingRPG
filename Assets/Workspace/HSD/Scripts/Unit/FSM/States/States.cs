@@ -105,6 +105,7 @@ public class MoveState : BaseState
         else
         {
             _owner.transform.Translate(_owner.TargetDir * _status.MoveSpeed.Value * Time.deltaTime, Space.World);
+            _owner.FindTarget();
         }
     }
 }
