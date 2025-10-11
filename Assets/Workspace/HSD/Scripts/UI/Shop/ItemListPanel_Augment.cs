@@ -7,6 +7,11 @@ public class ItemListPanel_Augment : ItemListPanel
 {
     [SerializeField] ItemSlot_Augment[] _itemSlot_Augments;
 
+    private void Awake()
+    {
+        ToolTipSetting();
+    }
+
     public override void SettingItmes()
     {
         HashSet<AUGData> usedAugments = new HashSet<AUGData>();
@@ -52,6 +57,14 @@ public class ItemListPanel_Augment : ItemListPanel
         else
         {
             Debug.Log("골드 부족");
+        }
+    }
+
+    private void ToolTipSetting()
+    {
+        foreach (var slot in _itemSlot_Augments)
+        {
+            slot.ToolTipSet(_shopToolTip);
         }
     }
 }
