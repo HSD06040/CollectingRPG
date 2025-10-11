@@ -11,6 +11,10 @@ namespace Map
     public class EventPanel : MonoBehaviour
     {
         public static EventPanel Instance;
+        
+        [Header("Event Database")]
+        public EventDataDB EventDatabase;
+        
         public EventRewardChanceData[] EventRewardChances;        
 
         [Header("UI References")] 
@@ -32,10 +36,18 @@ namespace Map
 #if UNITY_EDITOR
         [Header("Test")]
         [SerializeField] EventData _testEventData;
+        [SerializeField, Range(1, 7)] int _testRegionNumber = 1;
+        
         [Button]
         private void TestShow()
         {
             ShowEvent(_testEventData);
+        }
+        
+        [Button]
+        private void TestShowRandom()
+        {
+            ShowRandomEvent(_testRegionNumber);
         }
 #endif
 
@@ -62,9 +74,42 @@ namespace Map
             }
         }
 
-        /// <summary>
-        /// 이벤트 표시
-        /// </summary>
+        public void ShowRandomEvent(int regionNumber)
+        {
+            if (EventDatabase == null)
+            {
+                Debug.LogError("EventDatabase가 설정되지 않았습니다!");
+                return;
+            }
+
+            EventData randomEvent = EventDatabase.GetRandomEvent(regionNumber);
+            
+            if (randomEvent != null)
+            {
+                ShowEvent(randomEvent);
+            }
+        }
+
+        public void ShowRegionFixedEvent(int regionNumber)
+        {
+            EventData fixedEvent = EventDatabase.GetRegionFixedEvent(regionNumber);
+            
+            if (fixedEvent != null)
+            {
+                ShowEvent(fixedEvent);
+            }
+        }
+
+        public void ShowCommonEvent()
+        {
+            EventData commonEvent = EventDatabase.GetRandomCommonEvent();
+            
+            if (commonEvent != null)
+            {
+                ShowEvent(commonEvent);
+            }
+        }
+
         public void ShowEvent(EventData eventData)
         {
             if (eventData == null)
@@ -100,9 +145,6 @@ namespace Map
             }
         }
 
-        /// <summary>
-        /// Yes 또는 Nvm 선택
-        /// </summary>
         private void OnChoiceSelected(bool acceptChallenge)
         {
             _descriptionCanvasGroup.interactable = false;
@@ -112,9 +154,6 @@ namespace Map
             ShowResultWithFade(acceptChallenge).Forget();
         }
 
-        /// <summary>
-        /// Fade 연출과 함께 결과 표시
-        /// </summary>
         private async UniTask ShowResultWithFade(bool acceptChallenge)
         {
             EventOutcome outcome;
@@ -156,17 +195,10 @@ namespace Map
             CloseEvent();
         }
 
-        /// <summary>
-        /// Energy 소비
-        /// </summary>
         private void ConsumeEnergy(int amount)
         {
-            // TODO: 실제 에너지 시스템 연결
         }
 
-        /// <summary>
-        /// 성공 시 보상 지급
-        /// </summary>
         private void ApplyReward()
         {
             List<StageInGameRewardType> stageRewards = new List<StageInGameRewardType>();
@@ -189,12 +221,8 @@ namespace Map
             }
         }
 
-        /// <summary>
-        /// 실패 시 추가 패널티 적용
-        /// </summary>
         private void ApplyPenalty()
         {
-            // TODO: 패널티 시스템 연결
         }
 
         public void CloseEvent()

@@ -22,7 +22,7 @@ namespace Map
         public string _nvmButtonText = "Nvm";   
         
         [Header("Energy Cost")]
-        public int _energyCost = 1; // 선택지중 Yes 할시 코스트 드는거.
+        public int _energyCost = 1; 
         
         [Header("Success")]
         [TextArea(3, 10)]
