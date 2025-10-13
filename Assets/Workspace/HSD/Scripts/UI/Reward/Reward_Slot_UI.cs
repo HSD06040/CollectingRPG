@@ -15,4 +15,9 @@ public class Reward_Slot_UI : MonoBehaviour
         _amountText.text = Utils.ToAbbreviation(amount);
         gameObject.SetActive(true);
     }
+
+    public void Close()
+    {
+        gameObject.SetActive(false);
+    }
 }

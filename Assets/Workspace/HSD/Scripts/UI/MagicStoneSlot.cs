@@ -15,18 +15,28 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     [SerializeField] private Image _magicStoneIcon;
     [SerializeField] private Image _highlight;
     [SerializeField] private TMP_Text _magicStoneName;
-    
-    private Image[] _images;
+    [SerializeField] Transform _parent;
+    private Transform _dragParent;
 
     [Header("Drag Settings")]
     private Transform _dropAreaPanel;
     private Vector3 _originalPos;
 
-    public void Init(Transform dropArea)
+    private bool _isDragging = false;
+
+    private void OnDestroy()
     {
+        BattleManager.OnBattleEnded -= ForceStopDrag;
+    }
+
+    public void Init(Transform dropArea, Transform dragParent)
+    {
+        _dragParent = dragParent;
         _dropAreaPanel = dropArea;
-        _images = GetComponentsInChildren<Image>(true);
-        DragEnd();
+
+        BattleManager.OnBattleEnded += ForceStopDrag;
+
+        ResetMagicStoneRect();
     }
 
     public void ClearMagicStone()
@@ -69,13 +79,16 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        _originalPos = _highlight.rectTransform.position;
+        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
+
+        _isDragging = true;
+        _originalPos = _magicStone.anchoredPosition;
         DragStart();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
+        if (!_isDragging || MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
 
         Vector3 worldPos;
         if (RectTransformUtility.ScreenPointToWorldPointInRectangle(
@@ -97,7 +110,14 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (MagicStoneData == null || !InGameManager.Instance.IsBattle) return;
+        if (!_isDragging) return;
+        _isDragging = false;
+
+        if (MagicStoneData == null || !InGameManager.Instance.IsBattle)
+        {
+            ForceStopDrag();
+            return;
+        }
 
         bool insideDropArea = RectTransformUtility.RectangleContainsScreenPoint(
             _dropAreaPanel as RectTransform,
@@ -109,26 +129,39 @@ public class MagicStoneSlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
             UseMagicStone(Camera.main.ScreenToWorldPoint(eventData.position));
         }
 
-        _magicStone.position = _originalPos;
-
-        _highlight.enabled = false;
-
         DragEnd();
     }
 
     private void DragStart()
     {
-        foreach (var image in _images)
-        {
-            image.maskable = false;
-        }
+        _magicStone.SetParent(_dragParent, true);
     }
 
     private void DragEnd()
     {
-        foreach (var image in _images)
-        {
-            image.maskable = true;
-        }
+        _magicStone.SetParent(_parent, true);
+        ResetMagicStoneRect();
+        _highlight.enabled = false;
+        _isDragging = false;
+    }
+
+    private void ForceStopDrag()
+    {
+        if (!_isDragging) return;
+
+        _isDragging = false;
+        _magicStone.SetParent(_parent, true);
+        _magicStone.position = _originalPos;
+        ResetMagicStoneRect();
+        _highlight.enabled = false;
+    }
+
+    private void ResetMagicStoneRect()
+    {
+        RectTransform rect = _magicStone;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
     }
 }

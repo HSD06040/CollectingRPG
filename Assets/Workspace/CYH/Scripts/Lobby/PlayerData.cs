@@ -12,6 +12,10 @@ public class PlayerData
     public int MaxStamina = 30;
     public long LastStaminaRecoveryTime;
 
+    public int PlayerLevel;
+    public int PlayerExp;
+    public int MaxExp = 500;
+
     // 스테미나 시스템 추가
     public PlayerData()
     {

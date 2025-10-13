@@ -7,6 +7,11 @@ public class ItemListPanel_MagicStone : ItemListPanel
 {
     [SerializeField] ItemSlot_MagicStone[] _itemSlot_MagicStone;
 
+    private void Awake()
+    {
+        ToolTipSetting();
+    }
+
     public override void SettingItmes()
     {
         HashSet<MagicStoneData> usedStones = new HashSet<MagicStoneData>();
@@ -59,6 +64,14 @@ public class ItemListPanel_MagicStone : ItemListPanel
         else
         {
             Debug.Log("골드 부족");
+        }
+    }
+
+    private void ToolTipSetting()
+    {
+        foreach (var slot in _itemSlot_MagicStone)
+        {
+            slot.ToolTipSet(_shopToolTip);
         }
     }
 }

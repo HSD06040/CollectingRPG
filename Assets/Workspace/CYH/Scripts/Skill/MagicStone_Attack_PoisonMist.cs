@@ -11,7 +11,12 @@ public class MagicStone_Attack_PoisonMist : MagicStoneData
     {
         Vector2 centerPos = Vector2.zero;
 
-        foreach (var target in GetMultipleTargets(pos))
+        GameObject[] objs = GetMultipleTargets(pos);
+
+        if (objs == null || objs.Length <= 0)
+            return;
+
+        foreach (var target in objs)
         {
             centerPos += (Vector2)target.transform.position;
         }

@@ -1,12 +1,15 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using DG.Tweening.Core.Easing;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Reward_UI : MonoBehaviour
 {
-    // 애니메이션 필요
+    [SerializeField] Button _closeButton;
     [SerializeField] CanvasGroup _rewardSlotGroup;
     [SerializeField] CanvasGroup _rewardGroup;
     [SerializeField] Transform _content;
@@ -53,7 +56,7 @@ public class Reward_UI : MonoBehaviour
         {
             count++;
             var rewardData = outGameRewardDatas[i];
-            var icon = GetRewardSprite(rewardData);
+            var icon = rewardData.GetRewardSprite();
 
             _rewardSlots[i].Setup(icon, rewardData.Amount);
         }
@@ -66,14 +69,16 @@ public class Reward_UI : MonoBehaviour
         PlayShowAnimation().Forget();
     }
 
-    public void Show(StageInGameRewardType[] inGameRewardDatas)
+    public void Show(StageInGameRewardType[] inGameRewardDatas, UnityAction action = null)
     {
+        ButtonEventSubcribe(action);
+
         int count = 0;
         for (int i = 0; i < inGameRewardDatas.Length; i++)
         {
             count++;
             var rewardData = inGameRewardDatas[i];
-            var icon = GetRewardSprite(rewardData);
+            var icon = rewardData.GetRewardSprite();
 
             _rewardSlots[i].Setup(icon, rewardData.Amount);
         }
@@ -88,6 +93,7 @@ public class Reward_UI : MonoBehaviour
 
     public void Close()
     {
+        _closeButton.interactable = false;
         PlayHideAnimation().Forget();
     }
 
@@ -101,29 +107,22 @@ public class Reward_UI : MonoBehaviour
 
     private async UniTask PlayHideAnimation()
     {
-        _rewardSlotGroup.FadeOut(_fadeDuration).Forget();
-        await _rewardGroup.FadeOut(_fadeDuration);
+        _rewardSlotGroup.FadeOut(_fadeDuration, false).Forget();
+        await _rewardGroup.FadeOut(_fadeDuration, false);
     }
 
-    private Sprite GetRewardSprite(OutGameRewardData rewardData)
+    private void ButtonEventSubcribe(UnityAction unityAction)
     {
-        return rewardData.RewardType switch
-        {
-            OutGameRewardType.Diamond => Manager.Resources.SpriteLoad("Diamond"),
-            OutGameRewardType.Gold => Manager.Resources.SpriteLoad("Gold"),
-            OutGameRewardType.Exp => Manager.Resources.SpriteLoad("Exp"),
-            _ => null,
-        };
-    }
+        _closeButton.interactable = true;
+        _closeButton.onClick.RemoveAllListeners();
 
-    private Sprite GetRewardSprite(StageInGameRewardType rewardData)
-    {
-        return rewardData.RewardType switch
+        if (unityAction == null)
         {
-            InGameRewardType.Silver => Manager.Resources.SpriteLoad("Silver"),
-            InGameRewardType.Energy => Manager.Resources.SpriteLoad("Energy"),
-            InGameRewardType.MagicStone => rewardData.MagicStoneData != null ? rewardData.MagicStoneData.Icon : null,
-            _ => null,
-        };
+            _closeButton.onClick.AddListener(Close);
+            return;   
+        }
+
+        _closeButton.onClick.AddListener(unityAction);
+        _closeButton.onClick.AddListener(Close);
     }
 }

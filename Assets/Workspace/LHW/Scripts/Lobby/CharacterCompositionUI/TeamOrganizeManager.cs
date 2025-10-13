@@ -155,6 +155,8 @@ public class TeamOrganizeManager : MonoBehaviour
 
     public void RemoveUnitData(int index)
     {
+        if (_currentPreset[index] == null) return;
+
         if (_currentPreset[index].Data != null)
         {
             CurrentCost.Value -= _currentPreset[index].Data.Cost;

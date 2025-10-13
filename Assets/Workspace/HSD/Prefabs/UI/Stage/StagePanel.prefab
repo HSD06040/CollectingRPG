@@ -217,6 +217,7 @@ MonoBehaviour:
   _stageImage: {fileID: 1808766959095261688}
   _stageName: {fileID: 8594170513709827488}
   _stageDescription: {fileID: 2825987757334514150}
+  _rewardCheckButton: {fileID: 1874408786448952000}
 --- !u!114 &9122442659620462189
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,8 +459,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "1. \uCFE0\uD30C\uC758 \uC131"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3b0f5b73af4cf634cb3afcc1005a8726, type: 2}
-  m_sharedMaterial: {fileID: -5823114441732394219, guid: 3b0f5b73af4cf634cb3afcc1005a8726,
+  m_fontAsset: {fileID: 11400000, guid: 20efb952fa7ca5f44b25ef97c72e8ba4, type: 2}
+  m_sharedMaterial: {fileID: 8634646578196730666, guid: 20efb952fa7ca5f44b25ef97c72e8ba4,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -593,8 +594,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uBCF4\uC0C1 \uD655\uC778"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3b0f5b73af4cf634cb3afcc1005a8726, type: 2}
-  m_sharedMaterial: {fileID: -5823114441732394219, guid: 3b0f5b73af4cf634cb3afcc1005a8726,
+  m_fontAsset: {fileID: 11400000, guid: 20efb952fa7ca5f44b25ef97c72e8ba4, type: 2}
+  m_sharedMaterial: {fileID: 8634646578196730666, guid: 20efb952fa7ca5f44b25ef97c72e8ba4,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -879,8 +880,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uC2A4\uD14C\uC774\uC9C0\uC5D0 \uB300\uD55C \uC124\uBA85"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3b0f5b73af4cf634cb3afcc1005a8726, type: 2}
-  m_sharedMaterial: {fileID: -5823114441732394219, guid: 3b0f5b73af4cf634cb3afcc1005a8726,
+  m_fontAsset: {fileID: 11400000, guid: 20efb952fa7ca5f44b25ef97c72e8ba4, type: 2}
+  m_sharedMaterial: {fileID: 8634646578196730666, guid: 20efb952fa7ca5f44b25ef97c72e8ba4,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -1069,4 +1070,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 342675622946397438}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5928237605199461257}
+        m_TargetAssemblyTypeName: StagePanel, Assembly-CSharp
+        m_MethodName: StageRewardPanelOpen
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

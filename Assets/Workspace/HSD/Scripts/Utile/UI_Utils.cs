@@ -49,11 +49,49 @@ public static class UI_Utils
         canvasGroup.interactable = true;
     }
 
-    public async static UniTask FadeOut(this CanvasGroup canvasGroup, float fadeDuration)
+    public async static UniTask FadeOut(this CanvasGroup canvasGroup, float fadeDuration, bool beforeDeActive = true)
     {
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.interactable = false;
+        if(beforeDeActive)
+        {
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }        
 
         await canvasGroup.DOFade(0f, fadeDuration).SetUpdate(true).SetEase(Ease.Linear).AsyncWaitForCompletion();
+
+        if(!beforeDeActive)
+        {
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
+        }        
+    }
+
+    public static void Reset(this CanvasGroup canvasGroup)
+    {
+        canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false; 
+        canvasGroup.blocksRaycasts = false;        
+    }
+
+    public static Sprite GetRewardSprite(this OutGameRewardData rewardData)
+    {
+        return rewardData.RewardType switch
+        {
+            OutGameRewardType.Diamond => Manager.Resources.SpriteLoad("Diamond"),
+            OutGameRewardType.Gold => Manager.Resources.SpriteLoad("Gold"),
+            OutGameRewardType.Exp => Manager.Resources.SpriteLoad("Exp"),
+            _ => null,
+        };
+    }
+
+    public static Sprite GetRewardSprite(this StageInGameRewardType rewardData)
+    {
+        return rewardData.RewardType switch
+        {
+            InGameRewardType.Silver => Manager.Resources.SpriteLoad("Silver"),
+            InGameRewardType.Energy => Manager.Resources.SpriteLoad("Energy"),
+            InGameRewardType.MagicStone => rewardData.MagicStoneData != null ? rewardData.MagicStoneData.Icon : null,
+            _ => null,
+        };
     }
 }

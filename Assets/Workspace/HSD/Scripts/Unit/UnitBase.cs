@@ -100,6 +100,7 @@ public class UnitBase : MonoBehaviour, IAttacker
             TriggerCol.enabled = false;
 
         tag = "BattleUnit";
+        transform.GetChild(0).gameObject.tag = "BattleUnit";
         StatusController.UnitFXController.BattleSetting();
         StatusController.UnitFXController.SortingLayer(line);
     }
@@ -175,15 +176,6 @@ public class UnitBase : MonoBehaviour, IAttacker
     public void FindTarget()
     {
         bool currentTargetValid = Target != null && !ComponentProvider.Get<UnitBase>(Target.gameObject).StatusController.IsDead;
-
-        if (currentTargetValid)
-        {
-            if (Vector2.Distance(Target.position, transform.position) > StatusController.DetectionRange)
-            {
-                Target = null;
-                currentTargetValid = false;
-            }
-        }
 
         if (!currentTargetValid)
         {

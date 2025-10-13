@@ -4,16 +4,32 @@ using UnityEngine;
 public class GoldPanel : MonoBehaviour
 {
     [SerializeField] TMP_Text _goldText;
+    [SerializeField] bool _isSilver = false;
 
     private void OnEnable()
     {
-        InGameManager.Instance.Energy.AddEvent(GoldTextUpdate);
-        GoldTextUpdate(InGameManager.Instance.Energy.Value);
+        if(_isSilver)
+        {
+            InGameManager.Instance.Silver.AddEvent(GoldTextUpdate);
+            GoldTextUpdate(InGameManager.Instance.Silver.Value);
+        }
+        else
+        {
+            InGameManager.Instance.Energy.AddEvent(GoldTextUpdate);
+            GoldTextUpdate(InGameManager.Instance.Energy.Value);
+        }        
     }
 
     private void OnDisable()
     {
-        InGameManager.Instance?.Energy.RemoveEvent(GoldTextUpdate);
+        if (_isSilver)
+        {
+            InGameManager.Instance?.Silver.RemoveEvent(GoldTextUpdate);
+        }
+        else
+        {
+            InGameManager.Instance?.Energy.RemoveEvent(GoldTextUpdate);
+        }
     }
 
     private void GoldTextUpdate(int amount)

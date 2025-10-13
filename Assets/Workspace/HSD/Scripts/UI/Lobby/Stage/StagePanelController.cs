@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class StagePanelController : MonoBehaviour
 {
+    [SerializeField] StageRewardPanel _stageRewardPanel;
     [SerializeField] GameObject _stagePanelPrefab;
     [SerializeField] int _stagePanelCount;
     [SerializeField] PanelSwiper _swiper;
@@ -39,7 +40,7 @@ public class StagePanelController : MonoBehaviour
         for (int i = 0; i < _stagePanelCount; i++)
         {
             StagePanel _stagePanel = Instantiate(_stagePanelPrefab, _content).GetComponent<StagePanel>();
-            _stagePanel.Init(Manager.Data.StageDatas.GetStage(i + 1));
+            _stagePanel.Init(Manager.Data.StageDatas.GetStage(i + 1), _stageRewardPanel);
             SetPosition((RectTransform)_stagePanel.transform, i);
         }
 

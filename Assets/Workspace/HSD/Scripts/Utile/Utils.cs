@@ -209,7 +209,7 @@ public static class Utils
     public static GameObject[] GetTargetsNonAlloc(Vector2 origin, SearchType searchType, float sizeOrRadius, Vector2 boxSize, LayerMask layerMask)
     {
         int hitCount = 0;
-        Debug.Log(layerMask.ToString());
+
         switch (searchType)
         {
             case SearchType.Circle:

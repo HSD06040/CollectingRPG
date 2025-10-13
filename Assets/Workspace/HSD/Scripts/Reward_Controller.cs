@@ -2,7 +2,9 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Reward_Controller
 {
@@ -16,12 +18,17 @@ public class Reward_Controller
         GetStageFirstRewardAsync(stageData, stage).Forget();
     }
 
-    public void GetCurrentFloorReward()
+    public void GetCurrentFloorReward(UnityAction action = null)
     {
         StageInGameRewardType[] source = Manager.Data.StageGameData.GetCurrentFloorReward();
         StageInGameRewardType[] stageInGameRewardTypes = new StageInGameRewardType[source.Length];
         Array.Copy(source, stageInGameRewardTypes, source.Length);
 
+        GetInGameReward(stageInGameRewardTypes, action);
+    }
+
+    public void GetInGameReward(StageInGameRewardType[] stageInGameRewardTypes, UnityAction action = null)
+    {
         foreach (var reward in stageInGameRewardTypes)
         {
             switch (reward.RewardType)
@@ -40,12 +47,12 @@ public class Reward_Controller
             }
         }
 
-        UIManager.Instance.Reward_UI.Show(stageInGameRewardTypes);
+        UIManager.Instance.Reward_UI.Show(stageInGameRewardTypes, action);
     }
 
     private async UniTask GetStageFirstRewardAsync(StageData stageData, int stage)
     {
-        OutGameRewardData[] firstRewardData = stageData.GetStageFirstReward(stage);
+        OutGameRewardData[] firstRewardData = stageData.GetStageFirstRewardAndClear(stage);
 
         if (firstRewardData != null)
         {

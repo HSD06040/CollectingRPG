@@ -27,7 +27,14 @@ public class StageGameData
 
     public StageData GetCurrentStage()
     {
-        return Manager.Data.StageDatas.GetStage(_currentStage);
+        StageData data = Manager.Data.StageDatas.GetStage(_currentStage);
+
+        if(data == null)
+        {
+            return Manager.Data.StageDatas.GetStage(1);
+        }
+
+        return data;
     }
 
     public StageInGameRewardType[] GetFloorReward(int floor)

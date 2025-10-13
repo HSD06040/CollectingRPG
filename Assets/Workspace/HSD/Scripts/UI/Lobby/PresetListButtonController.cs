@@ -1,6 +1,4 @@
 using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +7,10 @@ public class PresetListButtonController : MonoBehaviour
 {
     private const int BUTTON_MOVE_ID = 1134256432;
     private float _currentY = 0;
-    private Button[] _buttons;
+
+    [Header("Reference")]
+    [SerializeField] Image[] _presetButtonList;
+    [SerializeField] Sprite[] _presetButtonImages;
 
     [SerializeField] Button _openButton;
     [SerializeField] TMP_Text _currentIdxText;
@@ -17,7 +18,7 @@ public class PresetListButtonController : MonoBehaviour
     [SerializeField] Transform _targetTransform;
     private bool _isOpen;
 
-    private void Awake()
+    private void Start()
     {
         _currentY = _presetButtons.transform.position.y;
     }
@@ -25,6 +26,7 @@ public class PresetListButtonController : MonoBehaviour
     private void OnEnable()
     {
         _openButton.onClick.AddListener(Switch);
+        UpdateButtons();
     }
 
     private void OnDisable()
@@ -39,14 +41,15 @@ public class PresetListButtonController : MonoBehaviour
 
     private void Switch()
     {
-        if(_isOpen)
+        if (_isOpen)
         {
             DeActive();
         }
         else
         {
             Active();
-        }
+            UpdateButtons();
+        }        
     }
 
     private void Active()
@@ -63,5 +66,16 @@ public class PresetListButtonController : MonoBehaviour
 
         _presetButtons.transform.DOMoveY(_currentY, .3f).SetId(BUTTON_MOVE_ID);
         _isOpen = false;
+    }
+
+    private void UpdateButtons()
+    {
+        int index = Manager.Data.PresetDB.SelectedPresetIndex;
+
+        for(int i = 0; i < _presetButtonList.Length; i++)
+        {
+            if (index == i) _presetButtonList[i].sprite = _presetButtonImages[0];
+            else _presetButtonList[i].sprite = _presetButtonImages[1];
+        }
     }
 }
