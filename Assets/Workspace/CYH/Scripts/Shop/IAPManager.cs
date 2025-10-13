@@ -1,49 +1,168 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Unity.Services.Core;
 using UnityEngine;
 using UnityEngine.Purchasing;
 
 public class IAPManager : Singleton<IAPManager>
 {
-    // 가격 로드하는 메서드
-    public string GetLocalizedPrice(string productId)
+    //// 가격 로드하는 메서드
+    //public string GetLocalizedPrice(string productId)
+    //{
+    //    var listener = CodelessIAPStoreListener.Instance;
+    //    if (listener == null)
+    //    {
+    //        Debug.Log($"{productId} : listener == null");
+    //        return "error";
+    //    }
+
+    //    Product product = listener.GetProduct(productId);
+    //    if (product != null && product.availableToPurchase)
+    //    {
+    //        Debug.Log($"{productId} : localizedPriceString == {product.metadata.localizedPriceString}");
+    //        return product.metadata.localizedPriceString;
+    //    }
+
+    //    return "error";
+    //}
+
+    //// 상품명 로드하는 메서드
+    //public string GetLocalizedName(string productId)
+    //{
+    //    Product product = CodelessIAPStoreListener.Instance.GetProduct(productId);
+    //    return (product != null && product.availableToPurchase) ? product.metadata.localizedTitle : "";
+    //}
+
+    //// 구매 시 호출되는 메서드
+    //public void BuyProduct(string productId)
+    //{
+    //    CodelessIAPStoreListener listener = CodelessIAPStoreListener.Instance;
+    //    if (listener == null) return;
+
+    //    Product product = listener.GetProduct(productId);
+    //    if (product != null && product.availableToPurchase)
+    //    {
+    //        listener.InitiatePurchase(productId);
+    //    }
+    //    else
+    //    {
+    //        Debug.LogWarning($"IAP 상품 {productId} 구매 x");
+    //    }
+    //}
+
+
+
+    private StoreController _storeController;
+    private bool _isInitialized = false;
+    private string chachedProductID;
+
+    private async void Awake()
     {
-        var listener = CodelessIAPStoreListener.Instance;
-        if (listener == null)
+        await InitializeIAPAsync();
+    }
+
+    private async Task InitializeIAPAsync()
+    {
+        await UnityServices.InitializeAsync();
+
+        _storeController = UnityIAPServices.StoreController();
+
+        _storeController.OnProductsFetched += HandleProductsFetched;
+        _storeController.OnProductsFetchFailed += HandleProductsFetchFailed;
+
+        _storeController.OnPurchaseConfirmed += HandlePurchaseConfirmed;
+
+        await _storeController.Connect();
+
+        ProductCatalog catalog = ProductCatalog.LoadDefaultCatalog();
+
+        List<ProductDefinition> defs = new List<ProductDefinition>();
+
+        foreach (var item in catalog.allProducts)
         {
-            Debug.Log($"{productId} : listener == null");
-            return "error";
+            defs.Add(new ProductDefinition(
+                id: item.id,
+                storeSpecificId: item.id,
+                type: item.type,
+                enabled: true
+            ));
         }
 
-        Product product = listener.GetProduct(productId);
-        if (product != null && product.availableToPurchase)
+        _storeController.FetchProducts(defs);
+    }
+
+    private void HandleProductsFetched(List<Product> products)
+    {
+        Debug.Log($"상품 로드 완료: {products.Count}개");
+        _isInitialized = true;
+    }
+
+    private void HandleProductsFetchFailed(ProductFetchFailed failure)
+    {
+        Debug.LogError($"상품 로드 실패");
+    }
+
+
+    public string GetLocalizedPrice(string productId)
+    {
+        if (!_isInitialized)
         {
-            Debug.Log($"{productId} : localizedPriceString == {product.metadata.localizedPriceString}");
+            Debug.LogWarning("초기화 완료x / 가격 로드x");
+            return "loading";
+        }
+
+        Product product = _storeController.GetProductById(productId);
+        if (product != null)
+        {
+            Debug.Log($"[{productId}] localizedPriceString = {product.metadata.localizedPriceString}");
             return product.metadata.localizedPriceString;
         }
 
-        return "error";
+        return "0";
     }
 
-    // 상품명 로드하는 메서드
     public string GetLocalizedName(string productId)
     {
-        Product product = CodelessIAPStoreListener.Instance.GetProduct(productId);
-        return (product != null && product.availableToPurchase) ? product.metadata.localizedTitle : "";
+        if (!_isInitialized)
+        {
+            Debug.LogWarning("초기화 완료x / 상품 정보 로드x");
+            return "loading";
+        }
+
+        Product product = _storeController.GetProductById(productId);
+        if (product != null)
+        {
+            return product.metadata.localizedTitle;
+        }
+
+        return "0";
     }
 
-    // 구매 시 호출되는 메서드
+
     public void BuyProduct(string productId)
     {
-        CodelessIAPStoreListener listener = CodelessIAPStoreListener.Instance;
-        if (listener == null) return;
+        chachedProductID = productId;
+        if (!_isInitialized)
+        {
+            Debug.LogWarning("IAP 초기화 완료x");
+            return;
+        }
 
-        Product product = listener.GetProduct(productId);
-        if (product != null && product.availableToPurchase)
+        Product product = _storeController.GetProductById(productId);
+        if (product != null)
         {
-            listener.InitiatePurchase(productId);
+            Debug.Log($"구매 요청: {product.definition.id}");
+            _storeController.PurchaseProduct(product);
         }
-        else
-        {
-            Debug.LogWarning($"IAP 상품 {productId} 구매 x");
-        }
+
+        chachedProductID = "";
+    }
+
+    private async void HandlePurchaseConfirmed(Order order)
+    {
+        string numberOnly = Regex.Replace(chachedProductID, @"[^\d]", "");
+        int diaAmount = int.Parse(numberOnly);
+        await Manager.DB.AddDiamondAsync(diaAmount);
     }
 }
