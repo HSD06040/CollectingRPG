@@ -19,7 +19,7 @@ public class StagePanelController : MonoBehaviour
 
     private void Awake()
     {
-        Manager.Data.InitAsync().Forget();
+        Init();
     }
 
     public void Show()
