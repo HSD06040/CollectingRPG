@@ -2,21 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UpgradeCharacterPopupUI : MonoBehaviour
+public class UpgradeCharacterPopupUI : MonoBehaviour, IPointerDownHandler
 {
+    [Header("Reference")]
+    [SerializeField] private GameObject _backgroundPanel;
+
     [Header("Character Profile")]
     [SerializeField] private TMP_Text _gradeText;
-    [SerializeField] private TMP_Text _characterNameText;
     [SerializeField] private TMP_Text _characterLevelText;
     [SerializeField] private Image _characterImage;
-    [SerializeField] private Image _costImage;
+    [SerializeField] private TMP_Text _pieceText;
+    [SerializeField] private Image _pieceGauge;
+    [SerializeField] private TMP_Text _characterNameText;
+    [SerializeField] private TMP_Text _characterCostText;
     [SerializeField] private Image _synergyImage;
     [SerializeField] private Image _classImage;
 
-    [SerializeField] private ImageSO _costImages;
+    [Header("CombatPower UI")]
+    [SerializeField] private TMP_Text _combatPowerText;
 
     [Header("Character Status")]
     [SerializeField] private TMP_Text[] _statuses;
@@ -25,6 +33,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     [SerializeField] private Image _skillIcon;
     [SerializeField] private TMP_Text _skillNameText;
     [SerializeField] private TMP_Text _skillDescriptionText;
+    [SerializeField] private TMP_Text _skillManaConsume;
 
     [Header("Character Upgrade Info")]
     [SerializeField] private TMP_Text[] _characterUpgradeLevelText;
@@ -32,16 +41,12 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
     [SerializeField] private GameObject[] _upgradeStatusDisablePanel;
 
     [Header("Level Up Button UI")]
-    [SerializeField] private TMP_Text _pieceText;
-    [SerializeField] private Image _pieceGauge;
-    [SerializeField] private TMP_Text _goldText;
     [SerializeField] private TMP_Text _openPieceText;
-    [SerializeField] private Image _openPieceGauge;
+    [SerializeField] private GameObject _goldObject;
+    [SerializeField] private TMP_Text _goldText;
 
     [Header("Button")]
     [SerializeField] private Button _levelUpButton;
-    [SerializeField] private Button _openButton;
-    [SerializeField] private Button _closeButton;
 
     private CharacterUpgradeUnit _currentCharUnit;
 
@@ -49,9 +54,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     private void Awake()
     {
-        _closeButton.onClick.AddListener(CloseUI);
         _levelUpButton.onClick.AddListener(LevelUp);
-        _openButton.onClick.AddListener(LevelUp);
         gameObject.SetActive(false);
     }
 
@@ -137,13 +140,10 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     private void UpdateUI()
     {
-        Debug.Log($"{_currentCharUnit != null} {_currentCharUnit.Status.Data.UpgradeData != null} {_currentCharUnit.Status.Data.LevelUpData != null}");
         if (_currentCharUnit != null && _currentCharUnit.Status.Data.UpgradeData != null && _currentCharUnit.Status.Data.LevelUpData != null)
         {
-            // UI 표기
-            Debug.Log("UIUpdate");
-
             CharacterProfileUpdate();
+            CombatPowerUpdate();
             CharacterStatusUpdate();
             LevelUpButtonUpdate();
             SkillUIUpdate();
@@ -151,24 +151,51 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
         }
     }
 
+    #region CharacterProfileUIUpdate
+
     private void CharacterProfileUpdate()
-    {        
+    {
         _gradeText.text = _currentCharUnit.Status.Data.Grade.ToString();
-        Debug.Log("GradeTextUpdate");
+        _characterLevelText.text = $"Lv.{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString()}";
+        GaugeUpdate();
         _characterNameText.text = _currentCharUnit.Status.Data.Name;
-        Debug.Log("CharacterName Update");
-        _characterLevelText.text = $"LV.{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString()}";
-        Debug.Log("CharacterLevel Update");
         _characterImage.sprite = _currentCharUnit.Status.Data.Icon;
-        Debug.Log("CharacterIcon Update");
-        _costImage.sprite = _costImages.CostSprites[_currentCharUnit.Status.Data.Cost - 1];
-        Debug.Log("CosSprite Update");
+        _characterCostText.text = _currentCharUnit.Status.Data.Cost.ToString();
         if (Manager.Data.SynergyDB != null)
         {
             _synergyImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.Synergy).ActiveIcon;
             _classImage.sprite = Manager.Data.SynergyDB.GetSynergy((int)_currentCharUnit.Status.Data.ClassSynergy).ActiveIcon;
         }
     }
+
+    private void GaugeUpdate()
+    {
+        if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        {
+            _pieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / 10;
+            _pieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/10";
+        }
+        else
+        {
+            int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
+
+            _pieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
+            _pieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
+        }
+    }
+
+    #endregion
+
+    #region CombatPowerUpdate
+
+    private void CombatPowerUpdate()
+    {
+        _combatPowerText.text = _currentCharUnit.Status.CombatPower.ToString();
+    }
+
+    #endregion
+
+    #region CharacterStatusUpdate
 
     private void CharacterStatusUpdate()
     {
@@ -179,48 +206,32 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
         _statuses[3].text = _currentCharUnit.Status.Data.UpgradeStats[0].MagicDamage.ToString();
         _statuses[4].text = _currentCharUnit.Status.Data.UpgradeStats[0].PhysicalDefense.ToString();
         _statuses[5].text = _currentCharUnit.Status.Data.UpgradeStats[0].MagicDefense.ToString();
-        _statuses[6].text = _currentCharUnit.Status.Data.UpgradeStats[0].AttackRange.ToString();
-        _statuses[7].text = _currentCharUnit.Status.Data.UpgradeStats[0].AttackSpeed.ToString();
-        _statuses[8].text = _currentCharUnit.Status.Data.UpgradeStats[0].CritChance.ToString();
-        _statuses[9].text = _currentCharUnit.Status.CombatPower.ToString();
+        _statuses[6].text = _currentCharUnit.Status.Data.UpgradeStats[0].AttackSpeed.ToString();
+        _statuses[7].text = _currentCharUnit.Status.Data.UpgradeStats[0].CritChance.ToString();
     }
 
-    private void LevelUpButtonUpdate()
-    {
-        if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
-        {
-            _openButton.gameObject.SetActive(true);
-            _levelUpButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            _openButton.gameObject.SetActive(false);
-            _levelUpButton.gameObject.SetActive(true);
-        }
+    #endregion
 
-        int requirePiece = _currentCharUnit.Status.Data.UpgradeData.GetRequiredPiece();
-        int requireGold = _currentCharUnit.Status.Data.UpgradeData.GetRequiredGold();
-        if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces == 0)
-        {
-            _pieceGauge.fillAmount = 0;
-            _openPieceGauge.fillAmount = 0;
-        }
-        else
-        {
-            _pieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / requirePiece;
-            _openPieceGauge.fillAmount = (float)_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces / 10;
-        }
-        _pieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/{requirePiece}";
-        _goldText.text = requireGold.ToString();
-        _openPieceText.text = $"{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.CurrentPieces}/10";
-    }
+    #region SkillUIUpdate
 
     private void SkillUIUpdate()
     {
-        _skillIcon.sprite = _currentCharUnit.Status.Data.Skill.Icon;
-        _skillNameText.text = _currentCharUnit.Status.Data.Skill.SkillName;
-        _skillDescriptionText.text = _currentCharUnit.Status.Data.Skill.Description;
+        UnitStatus status = _currentCharUnit.Status;
+
+        _skillIcon.sprite = status.Data.Skill.Icon;
+        _skillNameText.text = status.Data.Skill.SkillName;
+        _skillDescriptionText.text = GetDescription(status.Data.Skill, status);
+        _skillManaConsume.text = $"소모 마나 : {status.Data.Skill.ManaCost}";
     }
+
+    private string GetDescription(UnitSkill skill, UnitStatus status)
+    {
+        return skill.Description.Replace("{value}", skill.GetCalculateValueString(status));
+    }
+
+    #endregion
+
+    #region StatusUIUpdate
 
     private void StatusUpgradeUIUpdate()
     {
@@ -287,11 +298,43 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
     #endregion
 
+    #region LevelUpButtonUpdate
+
+    private void LevelUpButtonUpdate()
+    {
+        if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        {
+            _openPieceText.gameObject.SetActive(true);
+            _goldObject.SetActive(false);
+            _openPieceText.text = "해금하기";
+        }
+        else if (_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel == 0)
+        {
+            _openPieceText.gameObject.SetActive(true);
+            _goldObject.SetActive(false);
+            _openPieceText.text = "최대레벨";
+        }
+        else
+        {
+            _openPieceText.gameObject.SetActive(false);
+            _goldObject.SetActive(true);
+            int requireGold = _currentCharUnit.Status.Data.UpgradeData.GetRequiredGold();
+            _goldText.text = requireGold.ToString();
+        }
+    }
+
+    #endregion
+
+    #endregion
+
     #region CloseUI
 
-    private void CloseUI()
+    public void OnPointerDown(PointerEventData eventData)
     {
-        gameObject.SetActive(false);
+        if (eventData.pointerEnter.gameObject == _backgroundPanel)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     #endregion
