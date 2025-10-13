@@ -32,6 +32,11 @@ public class DailyShopManager : MonoBehaviour
         set => _adRerollCount = value;
     }
 
+    public int AdMaxRerollCount
+    {
+        get => MaxAdRerollCount;
+    }
+
     // 데이터 연동용 리스트
     private List<ShopSlotData> DailyRandomItems = new();   // 일일 상점 슬롯
     private List<ShopSlotData> _goldSlots = new();        // 골드 상점 슬롯
