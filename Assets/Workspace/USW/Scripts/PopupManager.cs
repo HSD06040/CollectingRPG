@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 /// <summary>
 /// 게임내 다양한 팝업을 통한 관리하는 클래스입니다
@@ -346,6 +347,15 @@ public class PopupManager : Singleton<PopupManager>
             nicknameInputField.text = currentNickname;
             nicknameInputField.Select();
         }
+    }
+
+    public void ShowNicknameChangePopup()
+    {
+        HideAllPanels();
+        ShowNicknameChangePanel();
+        currentPopupType = PopupType.NicknameChange;
+        gameObject.SetActive(true);
+        ShowBackground(false);
     }
 
     /// <summary>

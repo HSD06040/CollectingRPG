@@ -685,7 +685,7 @@ public class DBManager : Singleton<DBManager>
             // 이미 유저가 있는 메일 -> 스킵
             if (existingIdList.Contains(mailId))
             {
-                Debug.Log($"유저 DB에 Mail_{mailId} 존재 / 저장 스킵");
+                // Debug.Log($"유저 DB에 Mail_{mailId} 존재 / 저장 스킵");
                 continue;
             }
 
@@ -716,7 +716,7 @@ public class DBManager : Singleton<DBManager>
             }
             else
             {
-                Debug.Log($"우편_ {mail.Key} 만료 (SendDate = {expireDateStr}/{expireDate}, currentTime = {currentTime})");
+                // Debug.Log($"우편_ {mail.Key} 만료 (SendDate = {expireDateStr}/{expireDate}, currentTime = {currentTime})");
             }
         }
     }

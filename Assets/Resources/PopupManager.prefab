@@ -5776,6 +5776,7 @@ GameObject:
   - component: {fileID: 8213369151013345983}
   - component: {fileID: 2365429789678234259}
   - component: {fileID: 6831842994690368709}
+  - component: {fileID: 8788872672617607714}
   m_Layer: 5
   m_Name: NicknameChangePanel
   m_TagString: Untagged
@@ -5885,6 +5886,20 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8788872672617607714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4253245613587312579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d674eaa619eae3419da73028d183428, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _nicknameInput: {fileID: 2940788631464654924}
+  _confirmButton: {fileID: 8142934635672628112}
 --- !u!1 &4253918996750179087
 GameObject:
   m_ObjectHideFlags: 0
@@ -9800,7 +9815,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7be4a12f6f9c1044496ce3b2625ccd1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _controller: {fileID: 0}
   _content: {fileID: 2058697402621707584}
   _mailItemPrefab: {fileID: 649065563765078761, guid: f22cd55ec23e1ba4b933ebd5bd152d49,
     type: 3}
