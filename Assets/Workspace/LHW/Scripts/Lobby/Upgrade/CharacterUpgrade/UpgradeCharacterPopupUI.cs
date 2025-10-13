@@ -11,8 +11,10 @@ public class UpgradeCharacterPopupUI : MonoBehaviour, IPointerDownHandler
 {
     [Header("Reference")]
     [SerializeField] private GameObject _backgroundPanel;
+    [SerializeField] private Sprite[] _gradeIconSprites;
 
     [Header("Character Profile")]
+    [SerializeField] private Image _gradeIcon;
     [SerializeField] private TMP_Text _gradeText;
     [SerializeField] private TMP_Text _characterLevelText;
     [SerializeField] private Image _characterImage;
@@ -155,6 +157,7 @@ public class UpgradeCharacterPopupUI : MonoBehaviour, IPointerDownHandler
 
     private void CharacterProfileUpdate()
     {
+        _gradeIcon.sprite = _gradeIconSprites[(int)_currentCharUnit.Status.Data.Grade];
         _gradeText.text = _currentCharUnit.Status.Data.Grade.ToString();
         _characterLevelText.text = $"Lv.{_currentCharUnit.Status.Data.UpgradeData.CurrentUpgradeData.UpgradeLevel.ToString()}";
         GaugeUpdate();
