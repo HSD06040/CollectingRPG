@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Unity.Services.Core;
@@ -44,6 +45,7 @@ public class IAPManager : Singleton<IAPManager>
     //    if (product != null && product.availableToPurchase)
     //    {
     //        listener.InitiatePurchase(productId);
+
     //    }
     //    else
     //    {
@@ -56,6 +58,7 @@ public class IAPManager : Singleton<IAPManager>
     private StoreController _storeController;
     private bool _isInitialized = false;
     private string chachedProductID;
+
 
     private async void Awake()
     {
@@ -127,13 +130,20 @@ public class IAPManager : Singleton<IAPManager>
         if (!_isInitialized)
         {
             Debug.LogWarning("초기화 완료x / 상품 정보 로드x");
-            return "loading";
         }
 
         Product product = _storeController.GetProductById(productId);
         if (product != null)
         {
-            return product.metadata.localizedTitle;
+            // return product.metadata.localizedTitle;
+            string name = product.metadata.localizedTitle;
+
+            int idx = name.IndexOf('(');
+            if (idx > 0)
+            {
+                name = name.Substring(0, idx).Trim();
+            }
+            return name;
         }
 
         return "0";
@@ -155,14 +165,14 @@ public class IAPManager : Singleton<IAPManager>
             Debug.Log($"구매 요청: {product.definition.id}");
             _storeController.PurchaseProduct(product);
         }
-
-        chachedProductID = "";
     }
 
     private async void HandlePurchaseConfirmed(Order order)
     {
-        string numberOnly = Regex.Replace(chachedProductID, @"[^\d]", "");
+        string numberOnly = new string(chachedProductID.Where(char.IsDigit).ToArray());
         int diaAmount = int.Parse(numberOnly);
         await Manager.DB.AddDiamondAsync(diaAmount);
+        // await Manager.DB.AddDiamondAsync(100);
+        chachedProductID = "";
     }
 }
