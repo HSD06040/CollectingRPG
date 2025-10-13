@@ -22,7 +22,7 @@ public class CharacterList_UI : MonoBehaviour
         }
 
         _synergyUnits = new CharacterUnit[synergyUnits.Length];
-
+        
         for (int i = 0; i < synergyUnits.Length; i++)
         {
             CharacterUnit characterUnit = Instantiate(_characterUnit, _content).GetComponent<CharacterUnit>();
