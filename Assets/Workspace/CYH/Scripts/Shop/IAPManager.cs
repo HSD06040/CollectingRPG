@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Unity.Services.Core;
 using UnityEngine;
@@ -75,8 +75,13 @@ public class IAPManager : Singleton<IAPManager>
         _storeController.OnProductsFetchFailed += HandleProductsFetchFailed;
 
         _storeController.OnPurchaseConfirmed += HandlePurchaseConfirmed;
+        _storeController.OnPurchaseFailed += HandlePurchaseFailed;
+
+
+
 
         await _storeController.Connect();
+        Debug.Log("IAP Connect 성공");
 
         ProductCatalog catalog = ProductCatalog.LoadDefaultCatalog();
 
@@ -95,6 +100,8 @@ public class IAPManager : Singleton<IAPManager>
         _storeController.FetchProducts(defs);
     }
 
+   
+
     private void HandleProductsFetched(List<Product> products)
     {
         Debug.Log($"상품 로드 완료: {products.Count}개");
@@ -111,7 +118,7 @@ public class IAPManager : Singleton<IAPManager>
     {
         if (!_isInitialized)
         {
-            Debug.LogWarning("초기화 완료x / 가격 로드x");
+            Debug.LogWarning("초기화x / 가격 로드x");
             return "loading";
         }
 
@@ -129,7 +136,7 @@ public class IAPManager : Singleton<IAPManager>
     {
         if (!_isInitialized)
         {
-            Debug.LogWarning("초기화 완료x / 상품 정보 로드x");
+            Debug.LogWarning("초기화 x / 상품 정보 로드x");
         }
 
         Product product = _storeController.GetProductById(productId);
@@ -155,7 +162,7 @@ public class IAPManager : Singleton<IAPManager>
         chachedProductID = productId;
         if (!_isInitialized)
         {
-            Debug.LogWarning("IAP 초기화 완료x");
+            Debug.LogWarning("IAP 초기화x");
             return;
         }
 
@@ -165,14 +172,33 @@ public class IAPManager : Singleton<IAPManager>
             Debug.Log($"구매 요청: {product.definition.id}");
             _storeController.PurchaseProduct(product);
         }
+        else
+        {
+            Debug.LogError($"상품 ID x: {productId}");
+        }
     }
 
     private async void HandlePurchaseConfirmed(Order order)
     {
+        Debug.Log($"구매 완료: OrderInfo = {order.Info}");
+       
+        if (string.IsNullOrEmpty(chachedProductID))
+        {
+            Debug.LogWarning("캐시된 상품 ID 없음 / 지급 실패");
+            return;
+        }
+
         string numberOnly = new string(chachedProductID.Where(char.IsDigit).ToArray());
         int diaAmount = int.Parse(numberOnly);
+        Debug.Log($"구매한 상품: {chachedProductID} / 지급 다이아: {diaAmount}개");
         await Manager.DB.AddDiamondAsync(diaAmount);
+        Debug.Log($"다이아 {diaAmount}개 지급 완료");
         // await Manager.DB.AddDiamondAsync(100);
         chachedProductID = "";
+    }
+
+    private void HandlePurchaseFailed(FailedOrder order)
+    {
+        Debug.LogError($"구매한 상품: {chachedProductID} / 구매 실패: {order.FailureReason}");
     }
 }

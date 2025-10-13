@@ -84,7 +84,7 @@ public class ShopSlotFactory
         ShopSlotMeta meta = db.GetMeta(productId);
 
         string localizedPrice = IAPManager.Instance.GetLocalizedPrice(productId);
-        string localizedName = IAPManager.Instance.GetLocalizedName(productId);
+        //string localizedName = IAPManager.Instance.GetLocalizedName(productId);
 
         if (meta.IsFree)
         {
@@ -104,7 +104,9 @@ public class ShopSlotFactory
         {
             Type = ShopType.Diamond,
             ItemId = productId,
-            ItemName = string.IsNullOrEmpty(localizedName) ? meta.Name : localizedName,
+            //ItemName = string.IsNullOrEmpty(localizedName) ? meta.Name : localizedName,
+            // 임시 수정
+            ItemName = meta.Name,
             ItemSprite = meta.ItemSprite,
             PriceSprite = meta.PriceSprite,
             Count = $"{meta.Count}",
