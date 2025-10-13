@@ -105,8 +105,11 @@ public class UpgradeCharacterPopupUI : MonoBehaviour
 
             if (PopupManager.Instance != null)
             {
+                int currentMythstone = await _currentCharUnit.Status.Data.UpgradeData.GetCurrentMythStoneCount();
+                int usedMythstone = _currentCharUnit.Status.Data.UpgradeData.GetRequiredMythStoneForNextLevel(out int requiredPiece);
+
                 PopupManager.instance.ShowConfirmationPopup(
-                    "조각이 부족합니다. 신화석을 사용해서 레벨업 하시겠습니까?",
+                    $"조각이 부족합니다. 신화석을 사용해서 레벨업 하시겠습니까?\n보유 마법석:{currentMythstone}\n 사용 마법석:{usedMythstone}->부족 조각 수:{requiredPiece}",
                     async () =>
                     {
                         await _currentCharUnit.Status.Data.UpgradeData.LevelUpWithMythStone();
