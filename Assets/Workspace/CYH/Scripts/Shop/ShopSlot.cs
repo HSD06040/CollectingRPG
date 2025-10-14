@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
 public class ShopSlot : MonoBehaviour
@@ -143,8 +144,6 @@ public class ShopSlot : MonoBehaviour
                 break;
             case ShopType.Daily:
                 if (_slotData.IsPurchased) return;
-                _slotData.IsPurchased = true;
-                _disablePanel.SetActive(true);
                 Debug.Log($"Daily 구매 : {_slotData.ItemName} / {_slotData.Count}개");
                 if (_slotData.IsGold)
                 {
@@ -154,6 +153,8 @@ public class ShopSlot : MonoBehaviour
                     if (success)
                     {
                         // TODO: [CYH] 아이템 구매처리
+                        _disablePanel.SetActive(true);
+                        _slotData.IsPurchased = true;
                     }
                     else
                     {
@@ -169,6 +170,8 @@ public class ShopSlot : MonoBehaviour
                     if (success)
                     {
                         // TODO: [CYH] 아이템 구매처리
+                        _disablePanel.SetActive(true);
+                        _slotData.IsPurchased = true;
                     }
                     else
                     {

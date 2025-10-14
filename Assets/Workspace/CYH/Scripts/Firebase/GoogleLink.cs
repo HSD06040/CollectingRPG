@@ -66,7 +66,6 @@ public class GoogleLink : MonoBehaviour
                 await Manager.DB.SaveNicknameAsync(googleDisplayName);
                 await currentUser.ReloadAsync();
 
-                // TODO: [CYH] 닉네임 text 변경 이벤트 호출
                 //_gameStartPanel.OnSetNicknameField?.Invoke(user.DisplayName);
 
                 Debug.Log("------유저 정보(GoogleLink)------");

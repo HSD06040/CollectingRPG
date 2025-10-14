@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 
 public class TopPanelSystem : MonoBehaviour
 {
@@ -21,9 +23,21 @@ public class TopPanelSystem : MonoBehaviour
     [SerializeField] private PlayerProfilePopup _profilePopup;
     [SerializeField] private Button _playerProfileButton;
 
-    private void Start()
+    [Header("Player Nickname")]
+    [SerializeField] private Button _nicknameChangeButton;
+    [SerializeField] private GameObject _nicknameChangePanel;
+
+    // 비속어 리스트
+    public List<string> BadWordList { get; private set; } = new();
+
+    private string _badWordCSVUrl = "https://docs.google.com/spreadsheets/d/1bdMzkupLBB_opX5k41t09BZ54ziT9E0k/export?format=csv&gid=264842882";
+
+
+
+    private async void Start()
     {
         _playerProfileButton.onClick.AddListener(ShowPlayerProfilePopup);
+        _nicknameChangeButton.onClick.AddListener(ShowNicknameChangePopup);
 
         // PlayerDataController 이벤트 구독
         if (_playerDataController != null)
@@ -31,6 +45,8 @@ public class TopPanelSystem : MonoBehaviour
             _playerDataController.OnUpdateUI += UpdateTopPanelUI;
             _playerDataController.OnStaminaRecoveryTimer += UpdateStaminaTimer;
         }
+
+        await LoadBadWordListAsync();
     }
 
     private void OnDestroy()
@@ -105,5 +121,25 @@ public class TopPanelSystem : MonoBehaviour
         _profilePopup.Init(_playerDataController.Data);
         _profilePopup.EnableDataBind(true);
         _playerProfilePopup.SetActive(true);
+    }
+
+    private void ShowNicknameChangePopup()
+    {
+        PopupManager.Instance.ShowNicknameChangePopup();
+    }
+
+    private async UniTask LoadBadWordListAsync()
+    {
+        BadWordCSV loader = new BadWordCSV(_badWordCSVUrl);
+        List<string> words = await loader.LoadAsync();
+
+        if (words != null)
+        {
+            BadWordList = words;
+        }
+        else
+        {
+            Debug.LogWarning("비속어 리스트 로드 실패");
+        }
     }
 }

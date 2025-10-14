@@ -17,7 +17,7 @@ public class ShopUIController : MonoBehaviour
     Coroutine _dailyCooltimeTimer;
 
     [SerializeField] TMP_Text _dailyResetText;
-    [SerializeField] private Button _testButton;
+    //[SerializeField] private Button _testButton;
 
     [Header("SlotData")]
     [SerializeField] private ShopItemSO _itemDB;
@@ -75,8 +75,8 @@ public class ShopUIController : MonoBehaviour
         await InitShopUI();
 
         _rerollButton.onClick.AddListener(OnClickRefresh);
-        _testButton.onClick.AddListener(RerollShopData);
-        _testButton.onClick.AddListener(OnClickRefresh);
+       // _testButton.onClick.AddListener(RerollShopData);
+       // _testButton.onClick.AddListener(OnClickRefresh);
         _adRerollButton.onClick.AddListener(OnClickAdReroll);
 
         // 새로고침 횟수 UI 초기화
@@ -205,7 +205,7 @@ public class ShopUIController : MonoBehaviour
             return;
         }
 
-        // DB 값이 없을 경우 → 새로 생성
+        // DB 값이 없을 경우 -> 새로 생성
         goldSlots = new List<ShopSlotData>();
         foreach (var meta in _itemDB.Items)
         {
@@ -235,7 +235,7 @@ public class ShopUIController : MonoBehaviour
             return;
         }
 
-        // DB 값이 없을 경우 → 새로 생성
+        // DB 값이 없을 경우 -> 새로 생성
         diamondSlots = new List<ShopSlotData>();
         foreach (var meta in _itemDB.Items)
         {
@@ -290,6 +290,7 @@ public class ShopUIController : MonoBehaviour
         (int cost, string currency) = _dailyManager.GetRefreshCost();
 
         _rerollCountText.text = $"{stageCount}/{stageMax}";
+        Debug.Log($"UpdateRerollButtonUI / stageCount: {stageCount}/ stageMax: {stageMax}");
         _rerollButton.interactable = _dailyManager.CanReroll();
 
         // 가격 텍스트/아이콘 갱신
@@ -356,7 +357,8 @@ public class ShopUIController : MonoBehaviour
     private void UpdateAdRerollButtonUI()
     {
         int current = _dailyManager.GetAdRefreshCount();
-        int max = 2;
+        int max = _dailyManager.AdMaxRerollCount;
+        Debug.Log($"UpdateAdRerollButtonUI / current: {current} max: {max}");
 
         _adRerollCountText.text = $"{current}/{max}";
         _adRerollButton.interactable = _dailyManager.CanAdReroll();

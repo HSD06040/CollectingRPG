@@ -33,7 +33,6 @@ public class PlayerMailBoxController : MonoBehaviour
 
     private async void InitAsync()
     {
-        // TODO: [CYH] 로그인 씬 호출
        await Manager.DB.SyncMailsOnLoginAsync();
 
         List<MailData> userMailDB = await LoadAsync();
@@ -132,7 +131,6 @@ public class PlayerMailBoxController : MonoBehaviour
 
         if (unReceivedMailList.Count == 0) return (0, 0);
 
-        // TODO: [CYH] 일괄 수령 리팩토링
         foreach (MailData mail in unReceivedMailList)
         {
             Debug.Log($"ReceiveRewardAsync 실행");
