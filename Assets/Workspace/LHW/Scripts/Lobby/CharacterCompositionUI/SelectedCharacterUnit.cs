@@ -101,7 +101,6 @@ public class SelectedCharacterUnit : MonoBehaviour
                             break;
                         default:
                             break;
-
                     }
                 }
             }

@@ -13,12 +13,14 @@ public class PartySelectPanelController : MonoBehaviour
 
     [Header("Button")]
     [SerializeField] private Button _gameStartButton;
+    [SerializeField] private Button _backButton;
 
     public Action OnSelectedIndexChanged;
 
     private void OnEnable()
     {
         _gameStartButton.onClick.AddListener(GameStart);
+        _backButton.onClick.AddListener(CloseUI);
         OnSelectedIndexChanged += ActivateGameStartButton;
         ActivateGameStartButton();
     }
@@ -69,5 +71,10 @@ public class PartySelectPanelController : MonoBehaviour
         _bottomPanelCtrl.SelectButton(3);
         _stageSelectPanel.SetActive(false);
         _partySelectPanel.SetActive(false);
+    }
+
+    private void CloseUI()
+    {
+        gameObject.SetActive(false);
     }
 }
