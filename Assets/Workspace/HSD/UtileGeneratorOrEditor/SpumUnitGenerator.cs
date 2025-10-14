@@ -37,7 +37,7 @@ public class SpumUnitGenerator : MonoBehaviour
             bc.offset = new Vector2(0, 0.35f);
 
             fsm.Owner = obj.GetComponent<UnitBase>();
-            obj.GetComponent<UnitBase>().Awake();
+            obj.GetComponent<UnitBase>().Inject();
         }
     }
 

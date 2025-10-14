@@ -26,6 +26,7 @@ public class AddressablesDownloader : MonoBehaviour
     public Action OnDontNeedDownloading;
     public Action OnDownloadEnded;
     public static bool IsDownloaded = false;
+    private long _currentDownloadedBytes;
 
     public void Check()
     {
@@ -112,6 +113,9 @@ public class AddressablesDownloader : MonoBehaviour
             Debug.Log($"[어드레서블] 다운로드 시작 - 총 크기: {FormatBytes(TotalFileSize)}");
 
             List<UniTask> tasks = new List<UniTask>();
+            _currentDownloadedBytes = 0;
+            DownloadedSize.Value = 0;
+            DownloadProgress.Value = 0;
 
             // 각 라벨별로 다운로드
             foreach (var label in LabelsToDownload)
@@ -143,14 +147,19 @@ public class AddressablesDownloader : MonoBehaviour
             Debug.Log($"[어드레서블] {label} 다운로드 시작");
 
             var downloadHandle = Addressables.DownloadDependenciesAsync(label.labelString, false);
+            long bytesDownloadedForThisLabel = 0;
 
-            // 진행률 모니터링
             while (!downloadHandle.IsDone)
             {
                 if (downloadHandle.IsValid())
                 {
                     var status = downloadHandle.GetDownloadStatus();
-                    float targetValue = downloadHandle.PercentComplete;
+                    long newDownloadedBytes = status.DownloadedBytes - bytesDownloadedForThisLabel;
+                    bytesDownloadedForThisLabel = status.DownloadedBytes;
+
+                    _currentDownloadedBytes += newDownloadedBytes;
+
+                    float targetProgress = (float)_currentDownloadedBytes / TotalFileSize;
 
                     if (_progressTween != null && _progressTween.IsActive())
                         _progressTween.Kill();
@@ -158,7 +167,7 @@ public class AddressablesDownloader : MonoBehaviour
                     _progressTween = DOTween.To(
                         () => DownloadProgress.Value,
                         x => DownloadProgress.Value = x,
-                        targetValue,
+                        targetProgress,
                         _speed
                     ).SetEase(Ease.Linear)
                     .SetSpeedBased();
@@ -169,15 +178,19 @@ public class AddressablesDownloader : MonoBehaviour
                     _downloadSizeTween = DOTween.To(
                         () => DownloadedSize.Value,
                         x => DownloadedSize.Value = x,
-                        (long)(TotalFileSize * DownloadProgress.Value),
+                        _currentDownloadedBytes,
                         .1f
-                    ).SetEase(Ease.Linear);                    
+                    ).SetEase(Ease.Linear);
 
                     Debug.Log($"[어드레서블] 다운로드 중 {label}: {DownloadProgress.Value:P2} - {FormatBytes(DownloadedSize.Value)}/{FormatBytes(TotalFileSize)}");
                 }
 
                 await UniTask.Yield();
             }
+
+            _currentDownloadedBytes = (long)Math.Max(_currentDownloadedBytes, _currentDownloadedBytes + labelSize - bytesDownloadedForThisLabel);
+            DownloadedSize.Value = _currentDownloadedBytes;
+            DownloadProgress.Value = (float)_currentDownloadedBytes / TotalFileSize;
 
             if (downloadHandle.Status == AsyncOperationStatus.Succeeded)
             {
@@ -260,8 +273,6 @@ public class AddressablesDownloader : MonoBehaviour
         {
             throw new System.Exception("[어드레서블] 초기화 실패");
         }
-
-        Addressables.Release(initHandle);
     }
 
     private async UniTask CheckCatalogUpdates()
@@ -283,20 +294,7 @@ public class AddressablesDownloader : MonoBehaviour
         {
             Debug.Log("[어드레서블] 업데이트할 카탈로그 없음");
         }
-
-        Addressables.Release(checkHandle);
     }
-
-    public async UniTask<bool> CheckForUpdates()
-    {
-        var checkHandle = Addressables.CheckForCatalogUpdates(false);
-        var catalogsToUpdate = await checkHandle.ToUniTask();
-        bool hasUpdates = catalogsToUpdate.Count > 0;
-
-        Addressables.Release(checkHandle);
-        return hasUpdates;
-    }
-
 
     public string FormatBytes(long bytes)
     {
