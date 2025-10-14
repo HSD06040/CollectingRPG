@@ -13,14 +13,12 @@ public class PartySelectPanelController : MonoBehaviour
 
     [Header("Button")]
     [SerializeField] private Button _gameStartButton;
-    [SerializeField] private Button _arrangeButton;
 
     public Action OnSelectedIndexChanged;
 
     private void OnEnable()
     {
         _gameStartButton.onClick.AddListener(GameStart);
-        _arrangeButton.onClick.AddListener(ArrangePreset);
         OnSelectedIndexChanged += ActivateGameStartButton;
         ActivateGameStartButton();
     }
