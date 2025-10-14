@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -75,6 +74,8 @@ public class IAPManager : Singleton<IAPManager>
         _storeController.OnProductsFetchFailed += HandleProductsFetchFailed;
 
         _storeController.OnPurchaseConfirmed += HandlePurchaseConfirmed;
+        _storeController.OnPurchasePending += HandlePurchasePending;
+
         _storeController.OnPurchaseFailed += HandlePurchaseFailed;
 
 
@@ -180,6 +181,7 @@ public class IAPManager : Singleton<IAPManager>
 
     private async void HandlePurchaseConfirmed(Order order)
     {
+
         Debug.Log($"구매 완료: OrderInfo = {order.Info}");
        
         if (string.IsNullOrEmpty(chachedProductID))
@@ -200,5 +202,11 @@ public class IAPManager : Singleton<IAPManager>
     private void HandlePurchaseFailed(FailedOrder order)
     {
         Debug.LogError($"구매한 상품: {chachedProductID} / 구매 실패: {order.FailureReason}");
+    }
+
+    private void HandlePurchasePending(PendingOrder order)
+    {
+        Debug.Log($"구매 완료(승인 대기): {order.Info}");
+        _storeController.ConfirmPurchase(order);  
     }
 }
