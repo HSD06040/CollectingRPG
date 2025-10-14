@@ -11,6 +11,9 @@ public class UpgradeUnitData : ScriptableObject
     private Grade _grade;
     private LevelUpData _levelUpData;
 
+    // 신화석 전환 필요시 부족한 분의 조각을 캐싱하는 용도
+    private int _lackingStonePiece;
+
     public CurrentUpgradeData CurrentUpgradeData;
 
     public event Action OnLevelUp;
@@ -20,7 +23,9 @@ public class UpgradeUnitData : ScriptableObject
         _grade = grade;
         _levelUpData = data;
     }
-    
+
+    #region GetRequiredCurrents
+
     public int GetRequiredPiece()
     {
         if (CurrentUpgradeData.UpgradeLevel >= 10 || 
@@ -77,10 +82,14 @@ public class UpgradeUnitData : ScriptableObject
         return pieceLevelRatio.RequireGold;
     }
 
+    #endregion
+
     public void AddPiece(int piece)
     {
         CurrentUpgradeData.CurrentPieces += piece;
     }
+
+    #region LevelUp
 
     public async Task<bool> LevelUpWithPiecesOnly()
     {
@@ -123,6 +132,23 @@ public class UpgradeUnitData : ScriptableObject
         return false;
     }
 
+    public async Task LevelUpWithMythStone()
+    {
+        int requiredPiece = GetRequiredPiece();
+        int requiredGold = GetRequiredGold();
+        int ratio = MythStonePieceRatio(_grade);
+
+        int neededFromMythStone = requiredPiece - CurrentUpgradeData.CurrentPieces;
+        if (neededFromMythStone > 0)
+            await DBManager.Instance.SubtractMythStoneAsync(neededFromMythStone * ratio);
+
+        CurrentUpgradeData.CurrentPieces = 0;
+        CurrentUpgradeData.UpgradeLevel += 1;
+        await DBManager.Instance.SubtractGoldAsync(requiredGold);
+
+        OnLevelUp?.Invoke();
+    }
+
     public async Task<bool> CanLevelUpWithMythStone()
     {
         if (CurrentUpgradeData.UpgradeLevel >= 10) return false;
@@ -143,25 +169,10 @@ public class UpgradeUnitData : ScriptableObject
         int ratio = MythStonePieceRatio(_grade);
         int conversedMythstone = currentMythStone / ratio;
 
+        _lackingStonePiece = requiredPiece - CurrentUpgradeData.CurrentPieces;
+
         return (CurrentUpgradeData.CurrentPieces + conversedMythstone >= requiredPiece
             && currentGold >= requiredGold);
-    }
-
-    public async Task LevelUpWithMythStone()
-    {
-        int requiredPiece = GetRequiredPiece();
-        int requiredGold = GetRequiredGold();
-        int ratio = MythStonePieceRatio(_grade);
-
-        int neededFromMythStone = requiredPiece - CurrentUpgradeData.CurrentPieces;
-        if (neededFromMythStone > 0)
-            await DBManager.Instance.SubtractMythStoneAsync(neededFromMythStone * ratio);
-
-        CurrentUpgradeData.CurrentPieces = 0;
-        CurrentUpgradeData.UpgradeLevel += 1;
-        await DBManager.Instance.SubtractGoldAsync(requiredGold);
-
-        OnLevelUp?.Invoke();
     }
 
     private int MythStonePieceRatio(Grade grade)
@@ -178,6 +189,37 @@ public class UpgradeUnitData : ScriptableObject
 
         return pieceRatio;
     }
+
+    #endregion
+
+    #region GetMythStoneNum
+
+    /// <summary>
+    /// 현재 보유 중인 신화석 개수를 반환
+    /// </summary>
+    public async Task<int> GetCurrentMythStoneCount()
+    {
+        string uid = FirebaseManager.Auth.CurrentUser.UserId;
+        var mythStoneRef = FirebaseManager.DataReference.Child("UserData").Child(uid).Child("MythStone");
+
+        DataSnapshot snapshot = await mythStoneRef.GetValueAsync();
+        int currentMythStone = snapshot.Exists ? Convert.ToInt32(snapshot.Value) : 0;
+        return currentMythStone;
+    }
+
+    /// <summary>
+    /// 다음 레벨업을 위해 필요한 조각 중, 신화석으로 대체되는 개수를 반환
+    /// 예: 부족한 조각이 5개이고, 레전드 등급(비율 9)이면 -> 45 반환
+    /// </summary>
+    public int GetRequiredMythStoneForNextLevel(out int requiredPiece)
+    {
+        requiredPiece = _lackingStonePiece;
+        int ratio = MythStonePieceRatio(_grade);
+
+        return requiredPiece * ratio;
+    }
+
+    #endregion
 }
 
 [Serializable]
