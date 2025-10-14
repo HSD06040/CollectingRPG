@@ -22,8 +22,6 @@ public class QuestItem : MonoBehaviour
 
     public void Init(IQuestView questData)
     {
-        // TODO: [CYH] 정렬
-
         _pointText.text = questData.RewardPoint.ToString();
         _questDesc.text = questData.QuestDesc;
 

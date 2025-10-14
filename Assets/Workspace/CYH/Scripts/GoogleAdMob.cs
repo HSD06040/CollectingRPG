@@ -68,7 +68,6 @@ public class GoogleAdMob : MonoBehaviour
             LoadedAd.Show();
             // 광고 시청 보상: Diamond 20 증가
             await Manager.DB.AddDiamondAsync(20);
-            //TODO: [CYH] 광고 퀘스트(광고 시청 끝난 후로 수정 예정)
             QuestManager.Instance.OnAdWatched(QuestManager.Instance.adWatchQuest, true);
         }
         else
