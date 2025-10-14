@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GoogleAdMob : MonoBehaviour
 {
-    public string AdId = "ca-app-pub-3940256099942544/1033173712";
+    public string AdId = "ca-app-pub-7963887056991391/5905095965";
 
     public InterstitialAd LoadedAd;
     private bool _isLoading;
