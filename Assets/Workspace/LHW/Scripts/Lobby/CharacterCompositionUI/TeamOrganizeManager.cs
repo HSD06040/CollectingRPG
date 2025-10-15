@@ -59,7 +59,17 @@ public class TeamOrganizeManager : MonoBehaviour
 
     private void Start()
     {
-        if (Manager.Data != null) _currentPreset = Manager.Data.PresetDB.PresetData[0].Statuses;
+        if (Manager.Data != null)
+        {
+            _currentPreset = Manager.Data.PresetDB.PresetData[0].Statuses;
+            for(int i = 0; i < Manager.Data.PlayerUnitDatas.Length; i++)
+            {
+                //if (Manager.Data.PlayerUnitDatas[i].UpgradeData.CurrentUpgradeData.UpgradeLevel != 0)
+                {
+                    _collectedUnits.Add(new UnitStatus(Manager.Data.PlayerUnitDatas[i]));
+                }
+            }
+        }
     }
 
     #region Event
@@ -245,13 +255,24 @@ public class TeamOrganizeManager : MonoBehaviour
         bestTeam.OrderByDescending(n => n);
 
         // 기존 편성 초기화
-        Array.Clear(_currentPreset, 0, _currentPreset.Length);
+        for (int i = 0; i < _currentPreset.Length; i++)
+        {
+            if (_currentPreset[i] == null)
+                _currentPreset[i] = new UnitStatus(null, 0);
+            else
+            {
+                _currentPreset[i].Data = null;
+                _currentPreset[i].Level = 0;
+            }
+        }
         CurrentCost.Value = 0;
+        CurrentOverallPower.Value = 0;
 
         // 최적 편성 적용
         for (int i = 0; i < bestTeam.Count; i++)
         {
-            _currentPreset[i] = new UnitStatus(bestTeam[i].Data, bestTeam[i].Level);
+            _currentPreset[i].Data = bestTeam[i].Data;
+            _currentPreset[i].Level = bestTeam[i].Level;
             CurrentCost.Value += bestTeam[i].Data.Cost;
         }
         CurrentOverallPower.Value = bestPower;
