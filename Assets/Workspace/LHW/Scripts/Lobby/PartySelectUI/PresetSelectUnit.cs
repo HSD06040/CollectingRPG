@@ -16,6 +16,7 @@ public class PresetSelectUnit : MonoBehaviour
     [SerializeField] private GameObject _disabledPartyButton;
     [SerializeField] private GameObject _lockedPartyButton;
     [SerializeField] private GameObject _highlightPanel;
+    [SerializeField] private Button _backButton;
 
     [Header("UI")]
     [SerializeField] private Image[] _presetImages;
@@ -30,7 +31,7 @@ public class PresetSelectUnit : MonoBehaviour
     {
         _controller = GetComponentInParent<PartySelectPanelController>();
         _activePartyButton.GetComponent<Button>().onClick.AddListener(SelectPreset);
-        _disabledPartyButton.GetComponent<Button>().onClick.AddListener(RearrangePreset);
+        //_disabledPartyButton.GetComponent<Button>().onClick.AddListener(RearrangePreset);
         _lockedPartyButton.GetComponent<Button>().onClick.AddListener(UnlockPreset);
     }
 
