@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Map
 {
-    public class MapView : MonoBehaviour
+    public class MapView : InGameSingleton<MapView>
     {
         public enum MapOrientation
         {
@@ -43,13 +43,11 @@ namespace Map
         public readonly List<MapNode> MapNodes = new List<MapNode>();
         protected readonly List<LineConnection> lineConnections = new List<LineConnection>();
 
-        public static MapView Instance;
-
         public Map Map { get; protected set; }
 
-        private void Awake()
+        protected override void Awake()
         {
-            Instance = this;
+            base.Awake();
             cam = Camera.main;
         }
 
