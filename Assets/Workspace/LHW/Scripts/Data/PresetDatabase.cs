@@ -45,7 +45,10 @@ public class PresetDatabase
     /// <returns></returns>
     public TeamPresetData ReadCurrentSelectedPreset()
     {
-        if (_selectedPresetIndex == -1) return null;
+        if (_selectedPresetIndex == -1 || _presetData == null) return null;
+
+        if (_presetData[_selectedPresetIndex] == null)
+            return null;
 
         return _presetData[_selectedPresetIndex];
     }

@@ -194,13 +194,13 @@ public class DataManager : Singleton<DataManager>
         }
 
         return MagicStoneDic.TryGetValue(magicStoneName, out var magicStoneData) ? magicStoneData : null;
-    }
+    }    
+
     public MagicStoneData GetRandomMagicStoneData()
     {
-        if (MagicStoneDatas.Length == 0)
-            return null;
+        MagicStone magicStone = MagicStones[Random.Range(0, MagicStones.Length)];
 
-        return MagicStoneDatas[Random.Range(0, MagicStoneDatas.Length)];
+        return magicStone.GetMagicStone();
     }
     #endregion
 

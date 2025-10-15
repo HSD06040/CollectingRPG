@@ -60,6 +60,7 @@ public class UnitManager : MonoBehaviour
 
     private async void InitAsync()
     {
+
 #if UNITY_EDITOR
         if (IsTest)
         {
@@ -68,13 +69,11 @@ public class UnitManager : MonoBehaviour
             await Manager.Data.StageGridData.SetGridData();
         }
 #endif
-        if (!InGameManager.Instance.IsOneBattle)
-        {
-            MapPlayerTracker.Instance.unitManager = this;
-            _mapManager.GenerateNewMap();
-        }
+        _unitUIManager.InGameStagePanel.Init();
+        MapPlayerTracker.Instance.unitManager = this;
+        _mapManager.GenerateNewMap();
+        _stageMapLoader.MapSetting();        
 
-        _stageMapLoader.MapSetting();
         _unitSpawnChanceData = Manager.Data.UnitSpawnChanceData;
         Manager.Data.SynergyDB.ResetSynergys();
 

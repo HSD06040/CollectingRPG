@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -155,12 +155,6 @@ namespace Map
         {
             if (Time.time - mouseDownTime < MaxClickDuration)
             {
-        
-                if (MapPlayerTracker.Instance == null)
-                {
-                    return;
-                }
-                
                 MapPlayerTracker.Instance.SelectNode(this);
             }
         }

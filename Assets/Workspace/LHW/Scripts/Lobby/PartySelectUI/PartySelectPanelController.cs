@@ -63,6 +63,7 @@ public class PartySelectPanelController : MonoBehaviour
 
         // 씬 전환
         await SceneChangeManager.Instance.LoadSceneAsync("GameScene", GameSceneInit);
+        await Manager.Data.StageGridData.SetGridData();
 
         Debug.Log("게임 시작");
     }
@@ -71,7 +72,7 @@ public class PartySelectPanelController : MonoBehaviour
     {
         await Manager.Resources.LoadLabel("Stage");
 
-        await Manager.Data.StageGridData.SetGridData();
+        await Manager.Data.StageGridData.SetGridData();        
     }
 
     public void ArrangePreset()

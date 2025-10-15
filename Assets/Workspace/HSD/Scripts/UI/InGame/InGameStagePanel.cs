@@ -8,7 +8,7 @@ public class InGameStagePanel : MonoBehaviour
     [SerializeField] TMP_Text _stageNumberText;
     [SerializeField] TMP_Text _stageNameText;
 
-    private void OnEnable()
+    public void Init()
     {
         Manager.Data.StageGameData.GetStage(out int region, out int stage);
         _stageNumberText.text = $"STAGE {region}-{stage}";

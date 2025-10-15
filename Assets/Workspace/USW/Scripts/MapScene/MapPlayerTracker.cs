@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Map
 {
-    public class MapPlayerTracker : MonoBehaviour
+    public class MapPlayerTracker : InGameSingleton<MapPlayerTracker>
     {
         public bool lockAfterSelecting = false;
         public float enterNodeDelay = 1f;
@@ -14,16 +14,14 @@ namespace Map
         public UnitManager unitManager;       
         public MapView view;
 
-        public static MapPlayerTracker Instance;
-
         // 각 이벤트가 끝날때 호출
         public static Action OnEventEnded;
 
         public bool Locked { get; set; }
 
-        private void Awake()
+        protected override void Awake()
         {
-            Instance = this;            
+            base.Awake();
             OnEventEnded += Unlock;
         }        
 
