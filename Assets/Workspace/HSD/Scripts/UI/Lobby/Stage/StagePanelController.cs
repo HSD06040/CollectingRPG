@@ -27,6 +27,8 @@ public class StagePanelController : MonoBehaviour
     public void Show()
     {
         gameObject.SetActive(true);
+
+        Manager.Data.StageGameData.SetStage(0, 0);
     }
 
     public void Close()

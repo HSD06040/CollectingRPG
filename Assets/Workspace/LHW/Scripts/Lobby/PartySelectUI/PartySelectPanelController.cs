@@ -53,6 +53,14 @@ public class PartySelectPanelController : MonoBehaviour
 
     private async void GameStart()
     {
+        Manager.Data.StageGameData.GetStage(out int region, out int stage);
+
+        if (region == 0 || stage == 0)
+        {
+            UIManager.Instance.MessagePopup.Show("스테이지를 선택해주세요.");
+            return;
+        }
+
         // 씬 전환
         await SceneChangeManager.Instance.LoadSceneAsync("GameScene", GameSceneInit);
 
