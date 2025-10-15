@@ -29,19 +29,27 @@ public class StageDB
             .Child(stageNumber.ToString());
     }
 
-    public async UniTask SaveStageProgress(StageData stageData, int stageNumber, bool cleared = true, bool firstRewardGained = false)
+    public async UniTask SaveStageClear(StageData stageData, int stageNumber, bool cleared = true)
     {
         _stageDataReference = GetStageReference(stageData, stageNumber);
 
-        var progressData = new StageProgressData
-        {
-            isCleared = cleared,
-            isFirstRewardGained = firstRewardGained
-        };
+        var snapshot = await _stageDataReference.GetValueAsync();
+
+        StageProgressData progressData;
+
+        if (snapshot.Exists)
+            progressData = JsonUtility.FromJson<StageProgressData>(snapshot.GetRawJsonValue());
+        else
+            progressData = new StageProgressData();
+
+        _stageDataReference = GetStageReference(stageData, stageNumber);
+
+        progressData.isFirstRewardGained = cleared;
 
         await _stageDataReference.SetRawJsonValueAsync(JsonUtility.ToJson(progressData));
+        stageData.SetClearProof(stageNumber, cleared);        
 
-        Debug.Log($"스테이지 진행 데이터 저장 완료: 지역 {stageData.RegionNumber}, 스테이지 {stageNumber}, 클리어 여부: {cleared}, 최초보상: {firstRewardGained}");
+        Debug.Log($"스테이지 진행 데이터 저장 완료: 지역 {stageData.RegionNumber}, 스테이지 {stageNumber}, 클리어 여부: {cleared}");
     }
 
     public async UniTask SaveStageFirstRewardGainData(StageData stageData, int stageNumber, bool isGained = true)
@@ -59,6 +67,7 @@ public class StageDB
         progressData.isFirstRewardGained = isGained;
 
         await _stageDataReference.SetRawJsonValueAsync(JsonUtility.ToJson(progressData));
+        stageData.SetFirstRewardGainProof(stageNumber, isGained);
 
         Debug.Log($"최초 보상 데이터 업데이트 완료: 지역 {stageData.RegionNumber}, 스테이지 {stageNumber}, 보상 획득: {isGained}");
     }
@@ -113,13 +122,22 @@ public class StageDB
 
     public void EventHandler()
     {
-        FirebaseManager.DataReference.Child("UserData").Child(_uid).Child(StageDataPath)
-            .ChildChanged += UpdateStageClearDatas;
-        Debug.Log("스테이지 데이터 실시간 리스너 연결됨");
+        var baseRef = FirebaseManager.DataReference
+            .Child("UserData")
+            .Child(_uid)
+            .Child(StageDataPath);
+
+        baseRef.ChildChanged += UpdateStageClearDatas;
+        baseRef.ChildAdded += OnNewRegionAdded;
+
+        LoadExistingRegionsAndAttachListeners(baseRef).Forget();
+
+        Debug.Log("StageData 상위 리스너 및 기존 지역 리스너 등록 완료");
     }
 
     public void UpdateStageClearDatas(object sender, ChildChangedEventArgs args)
     {
+        Debug.Log("Update");
         if (!args.Snapshot.Exists) return;
 
         string regionKey = args.Snapshot.Key;
@@ -145,5 +163,38 @@ public class StageDB
                 Debug.Log($"실시간 업데이트: 지역 {regionNumber}, 스테이지 {stageNumber}, 클리어:{loadedData.isCleared}, 보상:{loadedData.isFirstRewardGained}");
             }
         }
+    }
+
+    private async UniTaskVoid LoadExistingRegionsAndAttachListeners(DatabaseReference baseRef)
+    {
+        var snapshot = await baseRef.GetValueAsync();
+        if (!snapshot.Exists)
+        {
+            Debug.Log("DB에 스테이지 데이터 없음. 리스너는 새로 생길 때 자동 추가됨.");
+            return;
+        }
+
+        foreach (var regionChild in snapshot.Children)
+        {
+            var regionKey = regionChild.Key;
+            var regionRef = baseRef.Child(regionKey);
+            regionRef.ChildChanged += UpdateStageClearDatas;
+            Debug.Log($"기존 지역 리스너 등록 완료 → {regionKey}");
+        }
+    }
+
+    private void OnNewRegionAdded(object sender, ChildChangedEventArgs args)
+    {
+        string regionKey = args.Snapshot.Key;
+
+        Debug.Log($"새 지역 감지됨 → {regionKey}, 리스너 등록");
+
+        var baseRef = FirebaseManager.DataReference
+            .Child("UserData")
+            .Child(_uid)
+            .Child(StageDataPath)
+            .Child(regionKey);
+
+        baseRef.ChildChanged += UpdateStageClearDatas;
     }
 }

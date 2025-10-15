@@ -27,6 +27,7 @@ public class SplashBuffProjectile : Projectile
     {
         ComponentProvider.Remove<SplashBuffProjectile>(gameObject);        
     }
+
     private void Update()
     {
         if (_isRotate)

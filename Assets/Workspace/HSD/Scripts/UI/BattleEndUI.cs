@@ -92,16 +92,16 @@ public class BattleEndUI : MonoBehaviour
 
     private async UniTask WaitForClose()
     {
-        await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", TimeScaleClear);
-        await Manager.Game.StageClearAsync(Manager.Data.StageGameData.GetCurrentStage());
+        await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", Clear);
+        
         await Manager.DB.SetTutorialCompleteAsync();
     }
 
-    private async UniTask TimeScaleClear()
+    private async UniTask Clear()
     {
         Time.timeScale = 1f;
         Time.fixedDeltaTime = 0.02f;
-
+        await Manager.Game.StageClearAsync(Manager.Data.StageGameData.GetCurrentStage());
         await UniTask.Delay(100);
     }
 }

@@ -25,12 +25,28 @@ public class BuffRangedSkill : RangedSkill
     {
         GameObject spawnObject = Manager.Resources.Load<GameObject>(EffectAddress);
 
-        SplashBuffProjectile projectile = ComponentProvider.Get<SplashBuffProjectile>(
-            Manager.Resources.Instantiate<GameObject>(
+        if (spawnObject == null)
+        {
+            Debug.Log("SpawnObject is null");
+            return;
+        }
+
+        if (attacker.GetTarget() == null)
+            return;
+        GameObject obj = Manager.Resources.Instantiate<GameObject>(
                 spawnObject,
                 GetSpawnPoint(attacker),
                 true
-                )
+                );
+
+        if(obj == null)
+        {
+            Debug.Log("Object가 없습니다");
+            return;
+        }
+
+        SplashBuffProjectile projectile = ComponentProvider.Get<SplashBuffProjectile>(
+            obj
             );
 
         Transform target = GetTarget(attacker);

@@ -94,12 +94,12 @@ public class StageData : ScriptableObject
         {
             _clearProofDic.Add(stageNumber, isCleared);
         }
-        Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 클리어 증명 로컬 세팅 완료: {isCleared}");   
+        Debug.Log($"지역 {RegionNumber}, 스테이지 {stageNumber} 클리어 증명 로컬 세팅 완료: {isCleared}");
     }
 
     public void SetFirstRewardGainProof(int stageNumber, bool isGain)
     {
-        if(_firstRewardDic.ContainsKey(stageNumber))
+        if(_firstRewardGainDic.ContainsKey(stageNumber))
         {
             _firstRewardGainDic[stageNumber] = isGain;
         }

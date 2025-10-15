@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -90,7 +91,11 @@ public class StageSelectButton : MonoBehaviour
 
     private void GetFirstReward(StageData data, int stageNumber)
     {
+        Manager.DB.stageDB.SaveStageFirstRewardGainData(data, stageNumber, true).Forget();
+
+        _clearImage.sprite = Manager.Resources.SpriteLoad("OpenChest");
+        _firstRewardChest.interactable = false;
+
         Manager.Game.Reward_Controller.GetFirstReward(data, stageNumber);
-        _firstRewardChest.interactable = false;        
-    }
+    }    
 }

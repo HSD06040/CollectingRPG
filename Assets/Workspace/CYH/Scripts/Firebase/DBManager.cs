@@ -151,13 +151,17 @@ public class DBManager : Singleton<DBManager>
         //await charDB.InitializeCharacterData();
         Debug.Log("Initial 완료");
         await charDB.InitializeCharacterUpgradeData();
-        await charDB.LoadAllCharacterDatas();
-        charDB.EventHandler();
-        stageDB.EventHandler();
-        await magicStoneDB.LoadAllMagicStoneDatas();
-        magicStoneDB.EventHandler();
+        await charDB.LoadAllCharacterDatas();        
+        await magicStoneDB.LoadAllMagicStoneDatas();        
 
         return data;
+    }
+
+    public void EventHandler()
+    {
+        charDB.EventHandler();
+        stageDB.EventHandler();
+        magicStoneDB.EventHandler();
     }
 
     /// <summary>

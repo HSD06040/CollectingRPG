@@ -67,7 +67,7 @@ public class GuestSignIn : MonoBehaviour
                 // 튜토리얼 isTutorialComplete = true Data 변경
                 SetTutorialCompleteAsync();
                 _isClicked = false;
-                await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", LoadPrefabs);
+                await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", InitAndLoad);
             }
         });
     }
@@ -77,11 +77,11 @@ public class GuestSignIn : MonoBehaviour
         bool isTutorialCompleted = await Manager.DB.CheckTutorialCompletedAsync();
         if (isTutorialCompleted)
         {
-            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", LoadPrefabs);
+            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", InitAndLoad);
         }
         else
         {
-            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", LoadPrefabs);
+            await SceneChangeManager.Instance.LoadSceneAsync("LobbyScene", InitAndLoad);
         }
     }
 
@@ -95,10 +95,13 @@ public class GuestSignIn : MonoBehaviour
         await Manager.DB.SetTutorialCompleteAsync();
     }
 
-    private async UniTask LoadPrefabs()
+    private async UniTask InitAndLoad()
     {
         Manager.Resources.LoadLabel("UnitPrefab").Forget();
         await Manager.Data.InitAsync();
         await Manager.Resources.LoadLabel("Stage");
+        await Manager.DB.stageDB.LoadAllStageClearDatas();
+
+        Manager.DB.EventHandler();
     }
 }

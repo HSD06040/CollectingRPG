@@ -86,6 +86,7 @@ public class StagePanel : MonoBehaviour
         if(StagePanelController.StageSelectButton != null)
             StagePanelController.StageSelectButton.DeSelect();
 
+        Debug.Log($"Stage Setting {region}-{stage}");
         Manager.Data.StageGameData.SetStage(region, stage);
         
         StageSelectionEvents.SelectStage(region, stage);

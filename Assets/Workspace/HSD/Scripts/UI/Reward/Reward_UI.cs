@@ -93,6 +93,7 @@ public class Reward_UI : MonoBehaviour
 
     public void Close()
     {
+        Debug.Log("Close");
         _closeButton.interactable = false;
         PlayHideAnimation().Forget();
     }

@@ -98,10 +98,16 @@ public class UnitManager : MonoBehaviour
         TeamPresetData preset = Manager.Data.PresetDB.ReadCurrentSelectedPreset();
 
         if (preset == null)
+        {
+            Debug.Log("Preset is null");
             return;
+        }
 
         if (preset.Statuses[0] == null || preset.Statuses[0].Data == null)
+        {
+            Debug.Log("Preset Data is null");
             return;
+        }
 
         for (int i = 0; i < preset.Statuses.Length; i++)
         {

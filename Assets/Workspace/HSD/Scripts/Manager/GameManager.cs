@@ -18,7 +18,7 @@ public class GameManager : Singleton<GameManager>
     {
         Manager.Data.StageGameData.GetStage(out int region, out int stage);
 
-        await Manager.DB.stageDB.SaveStageProgress(stageData, stage);
+        await Manager.DB.stageDB.SaveStageClear(stageData, stage);
     }
 
     public void NextAccelerate()

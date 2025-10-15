@@ -27,7 +27,7 @@ public class StageGameData
 
     public StageData GetCurrentStage()
     {
-        StageData data = Manager.Data.StageDatas.GetStage(_currentStage);
+        StageData data = Manager.Data.StageDatas.GetStage(_currentRegion);
 
         if(data == null)
         {
