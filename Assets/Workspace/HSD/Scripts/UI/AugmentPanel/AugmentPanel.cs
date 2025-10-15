@@ -34,6 +34,8 @@ public class AugmentPanel : MonoBehaviour
         {
             slot.OnSelected += Close;
         }
+
+        CloseAsync().Forget();
     }
 
     public void Show()
@@ -61,7 +63,7 @@ public class AugmentPanel : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Setup()
+    private void Setup()
     {
         List<AUGData> augDatas = new List<AUGData>();
 
@@ -83,5 +85,4 @@ public class AugmentPanel : MonoBehaviour
             _augmentSlots[i].Setup(augDatas[i]);
         }
     }
-
 }
