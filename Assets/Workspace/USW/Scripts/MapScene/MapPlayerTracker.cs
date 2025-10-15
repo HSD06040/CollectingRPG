@@ -115,6 +115,11 @@ namespace Map
         }
 
         private void Lock() { Locked = true; }
-        private void Unlock() { Locked = false; }
+        public void Unlock() 
+        { 
+            Locked = false;
+
+            Debug.Log("Unlock");
+        }
     }
 }

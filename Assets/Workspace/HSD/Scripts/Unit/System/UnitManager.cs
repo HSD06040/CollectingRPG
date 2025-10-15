@@ -120,7 +120,7 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnSpawnUnit += _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit += SpawnUnitAdded;
         BattleManager.OnBattleEnded += GameEndedUnitStandby;
-        BattleManager.OnBattleEnded += MapPlayerTracker.OnEventEnded;
+        BattleManager.OnBattleEnded += MapPlayerTracker.Instance.Unlock;
         BattleManager.OnBattleStarted += ApplyHealAugment;
 
         Manager.Data.StageGameData.CurrentFloor.AddEvent(_unitSpawnChanceData.CalculateChances);
@@ -142,7 +142,7 @@ public class UnitManager : MonoBehaviour
         BattleManager.OnSpawnUnit -= _unitUIManager.UnitHealthBarManager.SetHealthBar;
         BattleManager.OnSpawnUnit -= SpawnUnitAdded;
         BattleManager.OnBattleEnded -= GameEndedUnitStandby;
-        BattleManager.OnBattleEnded -= MapPlayerTracker.OnEventEnded;
+        BattleManager.OnBattleEnded -= MapPlayerTracker.Instance.Unlock;
         BattleManager.OnBattleStarted -= ApplyHealAugment;
 
         Manager.Data.StageGameData.CurrentFloor.RemoveEvent(_unitSpawnChanceData.CalculateChances);
