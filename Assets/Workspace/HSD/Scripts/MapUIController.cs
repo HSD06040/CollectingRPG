@@ -1,9 +1,12 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using Map;
 using UnityEngine;
 
 public class MapUIController : MonoBehaviour
 {
+    [SerializeField] GameObject _map;
+
     [Header("Settings")]
     [SerializeField] float _duration = 0.5f;
     [SerializeField] Ease _downEase = Ease.OutBack;
@@ -63,6 +66,8 @@ public class MapUIController : MonoBehaviour
 
     private async UniTask MapEnterAnimation()
     {
+        _map.SetActive(true);
+
         await _rectTransform.DOAnchorPosY(_downY, _duration)
             .SetEase(_downEase)
             .AsyncWaitForCompletion();
@@ -73,5 +78,7 @@ public class MapUIController : MonoBehaviour
         await _rectTransform.DOAnchorPosY(_upY, _duration)
             .SetEase(_upEase)
             .AsyncWaitForCompletion();
+
+        _map.SetActive(false);
     }
 }

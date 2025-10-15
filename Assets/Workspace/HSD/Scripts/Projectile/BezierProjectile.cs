@@ -14,7 +14,7 @@ public class BezierProjectile : Projectile
 
     private Vector2 _start;
     private Vector2 _end;
-    private Vector2 _control;    
+    private Vector2 _control;
     private float _randomDirection;
     private float _randomOffsetX;
     private float _randomOffsetY;
