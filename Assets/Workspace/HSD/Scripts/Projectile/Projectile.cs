@@ -38,6 +38,8 @@ public class Projectile : MonoBehaviour
             _source.Dispose();
 
         _source = new();
+
+        Manager.Resources.Destroy(gameObject, 2);
     }
 
     private void OnDisable()
